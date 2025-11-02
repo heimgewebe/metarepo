@@ -149,7 +149,7 @@ jobs:
 
           # Fallback: default branch merge-base
           if [[ -z "$base" ]]; then
-            git fetch -q --depth=1 origin "${GH_DEFAULT_BRANCH}" || true
+            git fetch -q origin "${GH_DEFAULT_BRANCH}" || true
             if git rev-parse "origin/${GH_DEFAULT_BRANCH}^{commit}" &>/dev/null; then
               if mb="$(git merge-base "origin/${GH_DEFAULT_BRANCH}" HEAD 2>/dev/null)"; then
                 base="$mb"; base_src="merge-base(origin/${GH_DEFAULT_BRANCH},HEAD)"
