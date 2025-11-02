@@ -1,149 +1,200 @@
-name: contracts-validate
+name: "contracts-validate"
 
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 on:
+  workflow_dispatch: {}
   push:
     paths:
-      - 'contracts/**/*.json'
-      - 'contracts/**/*.schema.json'
-      - '.github/workflows/contracts-validate.yml'
-      - 'fixtures/**/*.jsonl'
+      - "contracts/**"
+      - "schemas/**"
+      - "fixtures/**"
+      - ".github/workflows/**"                # FIX: run on any workflow change
   pull_request:
     paths:
-      - 'contracts/**/*.json'
-      - 'contracts/**/*.schema.json'
-      - '.github/workflows/contracts-validate.yml'
-      - 'fixtures/**/*.jsonl'
-  workflow_dispatch:
-  workflow_call:
-    inputs:
-      # Optional glob override when reusing this workflow
-      schema_glob:
-        required: false
-        type: string
-        default: 'contracts/**/*.schema.json'
-
-concurrency:
-  group: contracts-validate-${{ github.ref }}
-  cancel-in-progress: true
+      - "contracts/**"
+      - "schemas/**"
+      - "fixtures/**"
+      - ".github/workflows/**"                # FIX: run on any workflow change
 
 defaults:
   run:
     shell: bash --noprofile --norc -euo pipefail {0}
 
+env:
+  FAIL_ON_NO_BASE: "1"
+  ALLOW_REMOVALS: "0"
+
 jobs:
-  ajv:
+  version-sync-check:
+    name: "Security: enforce static pin for contracts reusable workflow"
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-    # Use the caller's schema_glob if provided, otherwise fall back to local contracts/
-    if: ${{ (inputs.schema_glob != '' && hashFiles(inputs.schema_glob) != '') || (hashFiles('contracts/**/*.schema.json') != '') }}
-
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4 # v4 (major tag)
-
-      - name: Setup Node
-        uses: actions/setup-node@v4 # v4 (major tag)
+      - uses: actions/checkout@v4
         with:
-          node-version: '20'
+          fetch-depth: 1
+          persist-credentials: false
 
-      - name: Ensure Node toolchain sane
-        run: |
-          npm config set fund false
-          npm config set audit false
-
-      - name: Compile schemas
+      - name: Verify 'uses:' pins for heimgewebe/contracts
         env:
-          SCHEMA_GLOB: ${{ inputs.schema_glob }}
+          REQUIRED_REPO: "heimgewebe/contracts/.github/workflows/contracts-ajv-reusable.yml"
+          REQUIRED_REF: "contracts-v1"
         run: |
           set -euo pipefail
-          # Fallback, wenn der Workflow nicht via workflow_call läuft:
-          SCHEMA_GLOB="${SCHEMA_GLOB:-contracts/**/*.schema.json}"
-          shopt -s nullglob
-          mapfile -t schemas < <(compgen -G "${SCHEMA_GLOB}" || true)
-          if (( ${#schemas[@]} == 0 )); then
-            echo "::notice::No schemas found for pattern '${SCHEMA_GLOB}'"
-            exit 0
-          fi
-          for schema in "${schemas[@]}"; do
-            echo "::group::Schema ${schema}"
-            npx --yes ajv-cli@5 compile -s "${schema}" --strict=true --spec=draft2020
-            echo '::endgroup::'
+          shopt -s extglob  # enable +([[:space:]]) trimming
+
+          files=()
+          while IFS= read -r -d '' f; do files+=("$f"); done < \
+            <(git ls-files -z -- '.github/workflows/*.yml' '.github/workflows/*.yaml' || true)
+
+          [[ ${#files[@]} -gt 0 ]] || { echo "::notice::No workflow files"; exit 0; }
+
+          # Extract the value of 'uses:' (single-quoted, double-quoted, or unquoted)
+          extract_pair() {
+            local line="$1"
+            line="${line%%#*}"
+            line="${line##+([[:space:]])}"
+            line="${line%%+([[:space:]])}"
+
+            # single-quoted
+            if [[ "$line" =~ ^(-[[:space:]]*)?uses:[[:space:]]*'([^']+)' ]]; then
+              echo "${BASH_REMATCH[2]}"; return 0
+            fi
+            # double-quoted
+            if [[ "$line" =~ ^(-[[:space:]]*)?uses:[[:space:]]*"([^"]+)" ]]; then
+              echo "${BASH_REMATCH[2]}"; return 0
+            fi
+            # unquoted (avoid raw single quote in regex)
+            if [[ "$line" =~ ^(-[[:space:]]*)?uses:[[:space:]]*([^[:space:]#]+) ]]; then
+              echo "${BASH_REMATCH[2]}"; return 0
+            fi
+            return 1
+          }
+
+          # Validate repo, forbid dynamic refs, enforce exact pin
+          check_pair() {
+            local wf="$1" repo="$2" ref="$3"
+            [[ "$repo" == "$REQUIRED_REPO" ]] || return 0
+            if [[ "$ref" =~ (\$\{|\$\(|\$[A-Za-z_]) ]]; then
+              echo "::error file=$wf::Dynamic ref not allowed: $ref"; return 1
+            fi
+            if [[ "$ref" != "$REQUIRED_REF" ]]; then
+              echo "::error file=$wf::Pin mismatch: expected '$REQUIRED_REF', got '$ref'"; return 1
+            fi
+            return 0
+          }
+
+          mismatches=0
+          for wf in "${files[@]}"; do
+            while IFS= read -r line || [[ -n "$line" ]]; do
+              pair=""
+              if pair="$(extract_pair "$line")"; then
+                [[ "$pair" == *"@"* ]] || continue
+                repo="${pair%@*}"; ref="${pair#*@}"
+                if ! check_pair "$wf" "$repo" "$ref"; then mismatches=1; fi
+              fi
+            done < "$wf"
           done
 
-      - name: Validate fixtures (if any)
+          [[ $mismatches -eq 0 ]] || exit 1
+          echo "::notice::✅ All version pins validated"
+
+  guard:
+    name: "Security: guard deletion policy (contracts/schemas)"
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      GH_DEFAULT_BRANCH: ${{ github.event.repository.default_branch || 'main' }}
+      GH_PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      GH_PUSH_BEFORE: ${{ github.event.before }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Enforce guard policy
         run: |
           set -euo pipefail
-          if [[ ! -d contracts ]]; then
-            echo 'contracts directory not found – skipping fixture validation'
+
+          is_truthy() { case "${1:-0}" in 1|true|yes|on) return 0 ;; esac; return 1; }
+
+          # Early exit if removals are globally allowed
+          if is_truthy "$ALLOW_REMOVALS"; then
+            echo "::notice::ALLOW_REMOVALS=1 → skipping guard"
             exit 0
-          fi
-          if compgen -G 'fixtures/**/*.jsonl' >/dev/null; then
-            for fixture in fixtures/**/*.jsonl; do
-              base="$(basename "${fixture}" .jsonl)"
-              schema="contracts/${base}.schema.json"
-              echo "::group::Validate ${fixture}"
-              if [[ -f "${schema}" ]]; then
-                npx --yes ajv-cli@5 validate -s "${schema}" -d "${fixture}" --spec=draft2020 --errors=line --all-errors --validate-formats=true
-              else
-                echo "::notice::No matching schema for ${fixture} (expected ${schema})"
-              fi
-              echo '::endgroup::'
-            done
-          else
-            echo 'no fixtures found'
           fi
 
-      - name: Validate curated payloads
-        run: |
-          set -euo pipefail
-          if [[ ! -d contracts ]]; then
-            echo 'contracts directory not found – skipping curated payload validation'
-            exit 0
+          base=""
+          base_src=""
+
+          # PR: safe merge-base
+          if [[ -n "${GH_PR_BASE_SHA:-}" ]] && git rev-parse --verify "${GH_PR_BASE_SHA}^{commit}" &>/dev/null; then
+            if mb="$(git merge-base "$GH_PR_BASE_SHA" HEAD 2>/dev/null)"; then
+              base="$mb"; base_src="merge-base(pr_base,HEAD)"
+            fi
           fi
-          shopt -s nullglob
-          failed=0
-          while IFS= read -r -d '' file; do
-            case "${file}" in
-              *schema.json)
-                continue
-                ;;
-              *insights/*|*insights.json)
-                npx --yes ajv-cli@5 validate -s contracts/insights.schema.json -d "${file}" --spec=draft2020 --all-errors --validate-formats=true || failed=1
-                ;;
-              *metrics*.json)
-                npx --yes ajv-cli@5 validate -s contracts/metrics.snapshot.schema.json -d "${file}" --spec=draft2020 --all-errors --validate-formats=true || failed=1
-                ;;
-              *audio*events*.json|*audio*.jsonl)
-                npx --yes ajv-cli@5 validate -s contracts/audio.events.schema.json -d "${file}" --spec=draft2020 --all-errors --validate-formats=true || failed=1
-                ;;
-              *aussen*|*extern*events*.jsonl)
-                npx --yes ajv-cli@5 validate -s contracts/aussen.event.schema.json -d "${file}" --spec=draft2020 --all-errors --validate-formats=true || failed=1
-                ;;
-              *policy*decision*.json)
-                npx --yes ajv-cli@5 validate -s contracts/policy.decision.schema.json -d "${file}" --spec=draft2020 --all-errors --validate-formats=true || failed=1
-                ;;
-              *intent*event*.json)
-                npx --yes ajv-cli@5 validate -s contracts/intent_event.schema.json -d "${file}" --spec=draft2020 --all-errors --validate-formats=true || failed=1
-                ;;
-              *os.context.state*.json)
-                npx --yes ajv-cli@5 validate -s contracts/os.context.state.schema.json -d "${file}" --spec=draft2020 --all-errors --validate-formats=true || failed=1
-                ;;
-              *os.context.text.redacted*.json)
-                npx --yes ajv-cli@5 validate -s contracts/os.context.text.redacted.schema.json -d "${file}" --spec=draft2020 --all-errors --validate-formats=true || failed=1
-                ;;
-              *os.context.text.embed*.json)
-                npx --yes ajv-cli@5 validate -s contracts/os.context.text.embed.schema.json -d "${file}" --spec=draft2020 --all-errors --validate-formats=true || failed=1
-                ;;
+
+          # Push: 'before' as base
+          if [[ -z "$base" && -n "${GH_PUSH_BEFORE:-}" && ! "${GH_PUSH_BEFORE}" =~ ^0{40}$ ]] \
+             && git rev-parse --verify "${GH_PUSH_BEFORE}^{commit}" &>/dev/null; then
+            base="$GH_PUSH_BEFORE"; base_src="push_before"
+          fi
+
+          # Fallback: default branch merge-base
+          if [[ -z "$base" ]]; then
+            git fetch -q --depth=1 origin "${GH_DEFAULT_BRANCH}" || true
+            if git rev-parse "origin/${GH_DEFAULT_BRANCH}^{commit}" &>/dev/null; then
+              if mb="$(git merge-base "origin/${GH_DEFAULT_BRANCH}" HEAD 2>/dev/null)"; then
+                base="$mb"; base_src="merge-base(origin/${GH_DEFAULT_BRANCH},HEAD)"
+              fi
+            fi
+          fi
+
+          if [[ -z "$base" ]]; then
+            if [[ "${FAIL_ON_NO_BASE:-1}" == "1" ]]; then
+              echo "::error::Cannot determine merge-base"; exit 1
+            else
+              echo "::notice::No merge-base found - skipping guard"; exit 0
+            fi
+          fi
+
+          echo "::notice::Checking diff from ${base:0:8}...HEAD (source=$base_src)"
+
+          blocked_file="$(mktemp)"; trap 'rm -f "$blocked_file"' EXIT
+
+          # Read only deletions and renames; tab-safe parsing
+          while IFS=$'\t' read -r -a fields; do
+            status="${fields[0]}"
+            p1="${fields[1]}"
+            p2="${fields[2]}"
+            [[ "$p1" =~ ^(contracts|schemas)/ ]] || continue
+            case "$status" in
+              D)  echo "DELETE: $p1" ;;
+              R*) echo "RENAME: $p1 → ${p2:-?}" ;;
             esac
-          done < <(find . \
-              -type f \
-              \( -name '*.json' -o -name '*.jsonl' \) \
-              -not -name '*schema.json' \
-              -not -path '*/node_modules/*' \
-              -not -path '*/.git/*' -print0)
-          if (( failed != 0 )); then
-            echo '::error::One or more payloads failed validation'
+          done < <(git diff --name-status --diff-filter=DR "${base}...HEAD") > "$blocked_file"
+
+          if [[ -s "$blocked_file" ]]; then
+            echo "::group::❌ Protected file deletions blocked"
+            sort -u "$blocked_file" | sed 's/^/  • /'
+            echo "::endgroup::"
+            echo "::error::Guard violation"
             exit 1
           fi
+
+          echo "::notice::✅ Guard passed"
+
+  validate:
+    name: "Validate fixtures via reusable workflow"
+    needs: [version-sync-check, guard]
+    uses: heimgewebe/contracts/.github/workflows/contracts-ajv-reusable.yml@contracts-v1
+    secrets: inherit
+    with:
+      fixtures_glob: ${{ vars.FIXTURES_GLOB || 'fixtures/valid/**/*.jsonl' }}
