@@ -1,1 +1,1 @@
-"""Utility scripts package for metarepo."""
+__all__ = []
