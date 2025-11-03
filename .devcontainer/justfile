@@ -2,8 +2,6 @@
 #   just -f .devcontainer/justfile devcontainer:socket
 # )
 
-set shell := ["bash", "--noprofile", "--norc", "-euo", "pipefail", "-c"]
-
 export ROOT_DIR := `git rev-parse --show-toplevel`
 
 _ensure-scripts:
@@ -11,18 +9,18 @@ _ensure-scripts:
       || { echo "::error::Missing .devcontainer/sync-from-toolchain.sh" >&2; exit 1; }
     test -d "$ROOT_DIR/.devcontainer" || { echo "::error::Missing .devcontainer directory" >&2; exit 1; }
 
-devcontainer:sync: _ensure-scripts
+devcontainer-sync: _ensure-scripts
     bash "$ROOT_DIR/.devcontainer/sync-from-toolchain.sh"
 
-devcontainer:socket: devcontainer:sync
+devcontainer-socket: devcontainer-sync
     cp "$ROOT_DIR/.devcontainer/devcontainer-socket.json" "$ROOT_DIR/.devcontainer/devcontainer.json"
     echo "Selected socket variant → .devcontainer/devcontainer.json"
 
-devcontainer:dind: devcontainer:sync
+devcontainer-dind: devcontainer-sync
     cp "$ROOT_DIR/.devcontainer/devcontainer-dind.json" "$ROOT_DIR/.devcontainer/devcontainer.json"
     echo "Selected dind variant → .devcontainer/devcontainer.json"
 
-devcontainer:which
+devcontainer-which:
     test -f "$ROOT_DIR/.devcontainer/devcontainer.json" \
       && { echo "Current:"; grep -m1 '"name":' "$ROOT_DIR/.devcontainer/devcontainer.json" || true; } \
       || echo "No devcontainer.json selected yet."

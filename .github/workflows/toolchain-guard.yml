@@ -1,46 +1,38 @@
-(cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'PATCH'
-*** Begin Patch
-*** Update File: .github/workflows/toolchain-guard.yml
-@@
- name: toolchain-guard
- permissions:
-   contents: read
- on:
-   push:
-@@
- jobs:
-   guard:
-     runs-on: ubuntu-latest
-     timeout-minutes: 10
-     steps:
-       - uses: actions/checkout@v4 # v4 (major tag)
-@@
-           if ! command -v ruby >/dev/null 2>&1; then
-             echo '::notice::ruby not installed (optional)'
-           fi
- 
-       - name: Lint GitHub workflows (actionlint)
--<<<<<<< codex/implement-toolchain-guard-and-contracts-validate-updates
--        uses: rhysd/actionlint@v1.7.1
--=======
--        uses: rhysd/actionlint@v1.2.0
-->>>>>>> main
-+        # Pin auf existierende, erprobte Version (Determinismus)
-+        uses: rhysd/actionlint@v1.6.27
-         with:
-           args: -color
-         # Pin to a concrete release for determinism and use the action wrapper instead of the GHCR image
-         # to avoid registry auth issues.
- 
-       - name: Show tool versions
-         run: |
-           set +e
-           command -v uv >/dev/null 2>&1 && uv --version
-           command -v just >/dev/null 2>&1 && just --version
-           command -v yq >/dev/null 2>&1 && yq --version
-           command -v gh >/dev/null 2>&1 && gh --version
-           command -v ruby >/dev/null 2>&1 && ruby --version
-           set -e
-*** End Patch
-PATCH
-)
+name: toolchain-guard
+permissions:
+  contents: read
+on:
+  push:
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check prerequisites (just, yq)
+        run: |
+          set -euo pipefail
+          if ! command -v just >/dev/null 2>&1; then
+            echo '::error::just is not installed or not in PATH'
+            exit 1
+          fi
+          if ! command -v yq >/dev/null 2>&1; then
+            echo '::error::yq is not installed or not in PATH'
+            exit 1
+          fi
+          if ! command -v ruby >/dev/null 2>&1; then
+            echo '::notice::ruby not installed (optional)'
+          fi
+      - name: Lint GitHub workflows (actionlint)
+        uses: rhysd/actionlint@v1.2.0
+        with:
+          args: -color
+      - name: Show tool versions
+        run: |
+          set +e
+          command -v uv >/dev/null 2>&1 && uv --version
+          command -v just >/dev/null 2>&1 && just --version
+          command -v yq >/dev/null 2>&1 && yq --version
+          command -v gh >/dev/null 2>&1 && gh --version
+          command -v ruby >/dev/null 2>&1 && ruby --version
+          set -e

@@ -6,9 +6,7 @@ set shell := ["bash", "-eu", "-o", "pipefail", "-c"]
 #   just devcontainer:socket
 #   just devcontainer:dind
 #   just devcontainer:which
-if (import_path := ".devcontainer/justfile") != "" && path_exists(import_path)
-    import import_path
-end
+import? ".devcontainer/justfile"
 # --- Meta ---------------------------------------------------------------------
 default: help
 
@@ -90,14 +88,14 @@ log-sync *args:
 #  - contracts/agent.tool.schema.json vorhanden
 
 # Push für einzelnes Repo
-fleet.push repo?="":
+fleet-push repo="":
     @python3 scripts/fleet/push_template.py \
       --repo "{{repo}}" \
       --paths "templates/agent-kit" "contracts" \
       --message "feat: adopt agent-kit + contracts (wave 1)"
 
 # Trockenlauf für einzelnes Repo
-fleet.push-dry repo?="":
+fleet-push-dry repo="":
     @python3 scripts/fleet/push_template.py \
       --repo "{{repo}}" \
       --paths "templates/agent-kit" "contracts" \
@@ -105,7 +103,7 @@ fleet.push-dry repo?="":
       --dry-run
 
 # Push für alle Repos aus fleet/repos.yml
-fleet.push-all:
+fleet-push-all:
     @python3 scripts/fleet/push_template.py \
       --paths "templates/agent-kit" "contracts" \
       --message "feat: adopt agent-kit + contracts (wave 1)"
@@ -121,50 +119,14 @@ validate: yq_ensure
       echo "::warning::docker not available – skipping actionlint"; \
     fi
     @if [ -d contracts ]; then \
-      echo "contracts folder detected – run 'just contracts:validate' for schema checks"; \
+      echo "contracts folder detected – run 'just contracts-validate' for schema checks";
     fi
 
 ci:
     just validate
 
-contracts:validate:
-    @bash -euo pipefail <<'EOS'
-    if [[ ! -d contracts ]]; then
-        echo "contracts directory not found – nothing to validate"
-        exit 0
-    fi
-    if ! command -v npm >/dev/null 2>&1; then
-        echo "::error::npm is required to validate contracts"
-        exit 1
-    fi
-    # Prefer npx to avoid global state on shared runners
-    shopt -s nullglob
-    mapfile -t schemas < <(compgen -G 'contracts/**/*.schema.json' || true)
-    if (( ${#schemas[@]} == 0 )); then
-        echo "::notice::No schemas found under contracts/"
-    else
-        for schema in "${schemas[@]}"; do
-            echo "::group::Schema ${schema}"
-            npx --yes ajv-cli@5 compile -s "${schema}" --strict=true
-            echo "::endgroup::"
-        done
-    fi
-    if compgen -G 'fixtures/**/*.jsonl' >/dev/null; then
-        for fixture in fixtures/**/*.jsonl; do
-            base="$(basename "${fixture}" .jsonl)"
-            schema="contracts/${base}.schema.json"
-            echo "::group::Validate ${fixture}"
-            if [[ -f "${schema}" ]]; then
-                npx --yes ajv-cli@5 validate -s "${schema}" -d "${fixture}" --spec=draft2020 --errors=line --all-errors
-            else
-                echo "::notice::No matching schema for ${fixture} (expected ${schema})"
-            fi
-            echo "::endgroup::"
-        done
-    else
-        echo "No fixtures found under fixtures/"
-    fi
-    EOS
+contracts-validate:
+    @scripts/validate-contracts.sh
 
 e2e-dry:
     set -a; [ -f scripts/e2e/.env ] && . scripts/e2e/.env || true; set +a

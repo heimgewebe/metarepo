@@ -58,12 +58,7 @@ jobs:
         if: ${{ hashFiles('repos.yml') != '' && hashFiles('docs/contracts/index.md') != '' && hashFiles('contracts/**/*.schema.json') != '' }}
         run: |
           mkdir -p reports/graphs
-          python - <<'PY' > reports/graphs/_schemas.txt
-import pathlib
-paths = sorted(path.as_posix() for path in pathlib.Path('contracts').rglob('*.schema.json'))
-for item in paths:
-    print(item)
-PY
+          python scripts/graph/get_schemas.py > reports/graphs/_schemas.txt
           python scripts/graph/impact_analysis.py \
             --graph reports/graphs/deps_graph.gexf \
             --changes-file reports/graphs/_schemas.txt \
@@ -86,16 +81,7 @@ PY
         run: |
           echo '## Dependency graph' >> "$GITHUB_STEP_SUMMARY"
           if [[ -f reports/graphs/deps_graph.json ]]; then
-            python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
-import json
-from pathlib import Path
-
-data = json.loads(Path('reports/graphs/deps_graph.json').read_text())
-nodes = len(data.get('nodes', []))
-edges = len(data.get('links', []))
-print(f"Nodes: {nodes}")
-print(f"Edges: {edges}")
-PY
+            python scripts/graph/generate_summary.py >> "$GITHUB_STEP_SUMMARY"
           else
             echo '_deps_graph.json not found_' >> "$GITHUB_STEP_SUMMARY"
           fi
