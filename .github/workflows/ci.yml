@@ -168,10 +168,11 @@ jobs:
 
       - name: Setup Rust
         if: ${{ hashFiles('**/Cargo.toml') != '' }}
-        uses: dtolnay/rust-toolchain@1a278e64df3de0199f5ea374dc5f4a93938368c0
+        uses: actions-rs/toolchain@v1
         with:
           toolchain: ${{ env.RUST_VERSION }}
           components: clippy, rustfmt
+          profile: minimal
 
       - name: Install sccache
         if: ${{ hashFiles('**/Cargo.toml') != '' }}
