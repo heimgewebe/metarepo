@@ -47,7 +47,7 @@ jobs:
           key: ${{ runner.os }}-py311-uv-${{ hashFiles('uv.lock') }}
           restore-keys: |
             ${{ runner.os }}-py311-uv-
-      - uses: astral-sh/setup-uv@v3
+      - uses: astral-sh/setup-uv@v7
       - run: uv sync --frozen
       - run: uv run scripts/generate_org_assets.py --repos-file repos.yml --index docs/org-index.md --graph docs/org-graph.mmd
       - name: Fail PR if org assets drift
