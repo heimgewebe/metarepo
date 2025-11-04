@@ -550,7 +550,7 @@ jobs:
 
       - name: Upload Playwright report (ignore missing)
         if: ${{ always() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: playwright-report
           path: apps/web/playwright-report
@@ -563,7 +563,7 @@ jobs:
 
       - name: Upload logs on failure
         if: failure()
-        uses: actions/upload-artifact@5a9a88f5c7bf9b001aa0af2f36677d4251894e0c
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
         with:
           name: ci-logs
           path: |

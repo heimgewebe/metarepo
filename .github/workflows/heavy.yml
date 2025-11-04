@@ -34,7 +34,7 @@ jobs:
 
       - name: Upload /ask response artifact
         if: ${{ hashFiles('ask.txt') != '' }}
-        uses: actions/upload-artifact@0b4b9c8226810f08dc095067d8a2493d80274b94 # actions/upload-artifact@v4.3.1 (pinned)
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # actions/upload-artifact@v4.3.1 (pinned)
         with:
           name: ask-response-${{ github.run_id }}
           path: ask.txt
