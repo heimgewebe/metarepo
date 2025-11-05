@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4 # v4 (major tag)
+      - uses: actions/checkout@v5 # v4 (major tag)
 
       - name: Check .wgx/profile.yml presence
         run: |

@@ -21,7 +21,7 @@ jobs:
       ASK_ENDPOINT_URL: ${{ secrets.ASK_ENDPOINT_URL }}
       METRICS_SNAPSHOT_URL: ${{ secrets.METRICS_SNAPSHOT_URL }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Query /ask endpoint (optional)
         if: ${{ env.ASK_ENDPOINT_URL != '' }}
