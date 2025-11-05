@@ -24,7 +24,7 @@ jobs:
             echo '::notice::ruby not installed (optional)'
           fi
       - name: Lint GitHub workflows (actionlint)
-        uses: rhysd/actionlint@v1
+        uses: rhysd/actionlint@v1.6.27
         with:
           args: -color
       - name: Show tool versions
