@@ -9,20 +9,10 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v5
-      - name: Check prerequisites (just, yq)
-        run: |
-          set -euo pipefail
-          if ! command -v just >/dev/null 2>&1; then
-            echo '::error::just is not installed or not in PATH'
-            exit 1
-          fi
-          if ! command -v yq >/dev/null 2>&1; then
-            echo '::error::yq is not installed or not in PATH'
-            exit 1
-          fi
-          if ! command -v ruby >/dev/null 2>&1; then
-            echo '::notice::ruby not installed (optional)'
-          fi
+      - name: Install yq
+        run: scripts/tools/yq-pin.sh
+      - name: Install just
+        run: scripts/tools/just-pin.sh
       - name: Lint GitHub workflows (actionlint)
         uses: rhysd/actionlint@v1.7.8
         with:
