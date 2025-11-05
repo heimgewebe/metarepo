@@ -384,7 +384,7 @@ jobs:
             sudo apt-get install -y just || true
           fi
 
-          # If Rust toolchain present, install via cargo (deterministisch & reproducible)
+          # If Rust toolchain present, install via cargo (deterministic & reproducible)
           if command -v cargo >/dev/null 2>&1; then
             cargo install --locked --version "${JUST_VERSION#v}" just || true
           fi
