@@ -164,7 +164,10 @@ jobs:
           UV=$(yq -r '.uv' toolchain.versions.yml)
           test -n "${UV}" || { echo "uv version missing in toolchain.versions.yml"; exit 1; }
           echo "UV_VERSION=${UV}" >> "$GITHUB_ENV"
-          echo "Detected toolchain versions: Rust=${RUST}, Python=${PY}, uv=${UV}, yq=${YQ_VERSION}"
+          JUST=$(yq -r '.just' toolchain.versions.yml)
+          test -n "${JUST}" || { echo "just version missing in toolchain.versions.yml"; exit 1; }
+          echo "JUST_VERSION=${JUST}" >> "$GITHUB_ENV"
+          echo "Detected toolchain versions: Rust=${RUST}, Python=${PY}, uv=${UV}, yq=${YQ_VERSION}, just=${JUST}"
 
       - name: Setup Rust
         if: ${{ hashFiles('**/Cargo.toml') != '' }}
@@ -356,8 +359,82 @@ jobs:
           uv pip list | sed -n '1,80p'
           uv python --version
 
-      - name: Setup Just
-        uses: extractions/setup-just@2fa60cc7d6fb3586e4cbace17c1169c8d2bd0f5c
+      - name: Install just (fallback)
+        run: |
+          set -euo pipefail
+
+          # Pin in toolchain.versions.yml empfehlen: just: "v0.11.0"
+          JUST_VERSION="${JUST_VERSION:-v0.11.0}"
+          mkdir -p "$HOME/.local/bin"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+          if command -v just >/dev/null 2>&1; then
+          echo "just already installed: $(just --version)"
+          exit 0
+          fi
+
+          # macOS: prefer brew
+          if command -v brew >/dev/null 2>&1; then
+          brew install just || true
+          fi
+
+          # Debian/Ubuntu: try package manager (best-effort)
+          if command -v apt-get >/dev/null 2>&1; then
+          sudo apt-get update
+          sudo apt-get install -y just || true
+          fi
+
+          # If Rust toolchain present, install via cargo (deterministisch & reproducible)
+          if command -v cargo >/dev/null 2>&1; then
+          cargo install --locked --version "${JUST_VERSION#v}" just || true
+          fi
+
+          # If now installed, finish
+          if command -v just >/dev/null 2>&1; then
+          just --version
+          exit 0
+          fi
+
+          # Final attempt: download prebuilt binary from upstream releases (best-effort).
+          OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
+          ARCH_RAW="$(uname -m)"
+          case "$OS" in
+            linux)
+              case "$ARCH_RAW" in
+                x86_64) TARGET="x86_64-unknown-linux-musl" ;;
+                aarch64) TARGET="aarch64-unknown-linux-musl" ;;
+                *) echo "Unsupported Linux architecture: $ARCH_RAW" >&2; exit 1 ;;
+              esac
+              ;;
+            darwin)
+              case "$ARCH_RAW" in
+                x86_64) TARGET="x86_64-apple-darwin" ;;
+                arm64) TARGET="aarch64-apple-darwin" ;;
+                *) echo "Unsupported macOS architecture: $ARCH_RAW" >&2; exit 1 ;;
+              esac
+              ;;
+            *) echo "Unsupported OS: $OS" >&2; exit 1 ;;
+          esac
+
+          TMP_DIR="$(mktemp -d)"
+          RELEASE_TAG="${JUST_VERSION#v}"
+          ASSET="just-${RELEASE_TAG}-${TARGET}.tar.gz"
+          URL="https://github.com/casey/just/releases/download/v${RELEASE_TAG}/${ASSET}"
+
+          if curl -fsSL -o "${TMP_DIR}/${ASSET}" "${URL}"; then
+          tar -xzf "${TMP_DIR}/${ASSET}" -C "${TMP_DIR}"
+          install -m 0755 "${TMP_DIR}/just" "$HOME/.local/bin/just" || true
+          rm -rf "${TMP_DIR}"
+          else
+          echo "Failed to download prebuilt just from ${URL} — please pin a valid asset or install via cargo/brew/apt" >&2
+          fi
+
+          if command -v just >/dev/null 2>&1; then
+          just --version
+          else
+          echo "Installation of just failed; please update CI step to a valid installer or vendor the action." >&2
+          exit 1
+          fi
 
       - name: Show tool versions
         run: |
