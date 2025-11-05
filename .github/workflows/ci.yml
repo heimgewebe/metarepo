@@ -363,7 +363,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Pin in toolchain.versions.yml empfehlen: just: "v0.11.0"
+          # Recommend pinning in toolchain.versions.yml: just: "v0.11.0"
           JUST_VERSION="${JUST_VERSION:-v0.11.0}"
           mkdir -p "$HOME/.local/bin"
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
