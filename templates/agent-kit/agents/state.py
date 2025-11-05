@@ -8,3 +8,4 @@ class AssistantState(TypedDict, total=False):
     code_context: Dict[str, Any]
     knowledge_hits: List[Dict[str, Any]]
     result: Dict[str, Any]
+    next: str
