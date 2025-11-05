@@ -5,31 +5,33 @@ from .state import AssistantState
 from .tools import _require
 
 
-def supervisor(state: AssistantState) -> Literal["code_agent", "knowledge_agent", "done"]:
+def supervisor(state: AssistantState) -> Dict[str, Any]:
     task = (state.get("current_task") or "").lower()
     if any(k in task for k in ["code", "refactor", "rust", "python"]):
-        return "code_agent"
+        return {"next": "code_agent"}
     if any(k in task for k in ["wissen", "notiz", "paper", "sparql", "graph"]):
-        return "knowledge_agent"
-    return "done"
+        return {"next": "knowledge_agent"}
+    return {"next": "done"}
 
 
-def code_agent(state: AssistantState) -> AssistantState:
+def router(state: AssistantState) -> Literal["code_agent", "knowledge_agent", "done"]:
+    return state.get("next", "done")
+
+
+def code_agent(state: AssistantState) -> Dict[str, Any]:
     msg = (state.get("messages") or [])[-1] if state.get("messages") else {}
     query = msg.get("content", "")
     tool = _require("search_codebase")
     hits = tool(query=query, repo_filter=None)
-    state["result"] = {"agent": "code", "hits": hits}
-    return state
+    return {"result": {"agent": "code", "hits": hits}}
 
 
-def knowledge_agent(state: AssistantState) -> AssistantState:
+def knowledge_agent(state: AssistantState) -> Dict[str, Any]:
     msg = (state.get("messages") or [])[-1] if state.get("messages") else {}
     q = f"SELECT * WHERE {{ ?s ?p ?o }} LIMIT 5  # derived from: {msg.get('content','')!r}"
     tool = _require("query_knowledge_graph")
     rows = tool(sparql_query=q)
-    state["result"] = {"agent": "knowledge", "rows": rows}
-    return state
+    return {"result": {"agent": "knowledge", "rows": rows}}
 
 
 def build_graph():
@@ -38,7 +40,7 @@ def build_graph():
     g.add_node("supervisor", supervisor)
     g.add_node("code_agent", code_agent)
     g.add_node("knowledge_agent", knowledge_agent)
-    g.add_conditional_edges("supervisor", supervisor, {
+    g.add_conditional_edges("supervisor", router, {
         "code_agent": "code_agent",
         "knowledge_agent": "knowledge_agent",
         "done": END,
