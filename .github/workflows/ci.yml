@@ -369,24 +369,24 @@ jobs:
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
           if command -v just >/dev/null 2>&1; then
-          echo "just already installed: $(just --version)"
-          exit 0
+            echo "just already installed: $(just --version)"
+            exit 0
           fi
 
           # macOS: prefer brew
           if command -v brew >/dev/null 2>&1; then
-          brew install just || true
+            brew install just || true
           fi
 
           # Debian/Ubuntu: try package manager (best-effort)
           if command -v apt-get >/dev/null 2>&1; then
-          sudo apt-get update
-          sudo apt-get install -y just || true
+            sudo apt-get update
+            sudo apt-get install -y just || true
           fi
 
           # If Rust toolchain present, install via cargo (deterministisch & reproducible)
           if command -v cargo >/dev/null 2>&1; then
-          cargo install --locked --version "${JUST_VERSION#v}" just || true
+            cargo install --locked --version "${JUST_VERSION#v}" just || true
           fi
 
           # If now installed, finish
