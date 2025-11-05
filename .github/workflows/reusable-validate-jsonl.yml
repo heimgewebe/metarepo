@@ -176,7 +176,7 @@ jobs:
 
       - name: Upload failing samples (if any)
         if: failure()
-        uses: actions/upload-artifact@604142bdf202109eb8df72c5824f1feae3d7f8e4 # v4.3.1
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v4.3.1
         with:
           name: jsonl-violations
           path: /tmp/jsonl-violations.*.txt
