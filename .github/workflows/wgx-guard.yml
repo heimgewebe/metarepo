@@ -30,7 +30,7 @@ jobs:
           echo "found .wgx/profile.yml"
 
       - name: Validate minimal schema keys
-        uses: actions/setup-python@v5 # v5 (major tag)
+        uses: actions/setup-python@v6 # v5 (major tag)
         with:
           python-version: '3.12'
 
