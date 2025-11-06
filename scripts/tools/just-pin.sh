@@ -41,8 +41,8 @@ version_ok() {
 
 map_arch() {
 	case "$(uname -m)" in
-	x86_64 | amd64) echo x86_64 ;;
-	arm64 | aarch64) echo aarch64 ;;
+	x86_64|amd64) echo x86_64 ;;
+	arm64|aarch64) echo aarch64 ;;
 	*) uname -m ;;
 	esac
 }
