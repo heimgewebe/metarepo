@@ -4,6 +4,8 @@ set -euo pipefail
 ARCH=$(uname -m)
 if [[ "$ARCH" == "amd64" ]]; then
   ARCH="x86_64"
+elif [[ "$ARCH" == "arm64" ]]; then
+  ARCH="aarch64"
 fi
 
 # 1) Assert correct URL on Linux/glibc
