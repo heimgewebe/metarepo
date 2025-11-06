@@ -31,7 +31,7 @@ have_cmd(){ command -v "$1" >/dev/null 2>&1; }
 version_ok(){
   local v_to_check="$1" # this is from `just --version`, e.g. "1.14.0"
   local req_version_raw
-  req_version_raw="$(get_req_version_raw)" # e.g. "v0.11.0"
+  req_version_raw="$(get_req_version_raw)" # e.g. "v1.25.0"
   # compare them without the 'v'
   [[ "${v_to_check#v}" == "${req_version_raw#v}" ]]
 }
