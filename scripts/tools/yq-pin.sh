@@ -39,9 +39,9 @@ download_yq() {
   # We need yq to read the yq version, so we prefer the local pin if it exists,
   # otherwise we try the system yq.
   if [[ -x "${YQ_LOCAL}" ]]; then
-    yq_version=$("${YQ_LOCAL}" -r '.yq' "${ROOT_DIR}/toolchain.versions.yml")
+    yq_version=$("${YQ_LOCAL}" '.yq' "${ROOT_DIR}/toolchain.versions.yml")
   elif have_cmd yq; then
-    yq_version=$(yq -r '.yq' "${ROOT_DIR}/toolchain.versions.yml")
+    yq_version=$(yq '.yq' "${ROOT_DIR}/toolchain.versions.yml")
   else
     # As a last resort, try to parse with grep. This is not robust, but it's
     # better than nothing.
