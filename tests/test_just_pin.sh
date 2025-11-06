@@ -9,11 +9,13 @@ if [ -f "toolchain.versions.yml" ]; then
 fi
 # Cleanup executes on exit, restoring the original toolchain file
 cleanup() {
+  local exit_code=$?
   if [ -n "${ORIG_TOOLCHAIN}" ]; then
     echo "${ORIG_TOOLCHAIN}" > toolchain.versions.yml
   else
     rm -f toolchain.versions.yml
   fi
+  exit $exit_code
 }
 trap cleanup EXIT
 
