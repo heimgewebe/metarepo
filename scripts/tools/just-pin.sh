@@ -3,22 +3,37 @@ set -euo pipefail
 # Pin & Ensure für casey/just – ohne Netz zur Laufzeit.
 # Erwartet, dass ein kompatibles Binary entweder in ./tools/bin/just liegt oder im PATH verfügbar ist.
 
-REQ_VERSION="1.14.0"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 TOOLS_DIR="${ROOT_DIR}/tools"
 BIN_DIR="${TOOLS_DIR}/bin"
 JUST_LOCAL="${BIN_DIR}/just"
+YQ_BIN="${BIN_DIR}/yq"
 
 log(){ printf '%s\n' "$*" >&2; }
 die(){ log "ERR: $*"; exit 1; }
+
+_REQ_VERSION_RAW=""
+get_req_version_raw() {
+  if [ -z "${_REQ_VERSION_RAW}" ]; then
+    # Sicherstellen, dass yq verfügbar ist
+    if ! "${ROOT_DIR}/scripts/tools/yq-pin.sh" ensure >&2; then
+      die "yq-pin.sh failed"
+    fi
+    _REQ_VERSION_RAW=$("${YQ_BIN}" '.just' "${ROOT_DIR}/toolchain.versions.yml")
+  fi
+  echo "${_REQ_VERSION_RAW}"
+}
 
 ensure_dir(){ mkdir -p -- "${BIN_DIR}"; }
 
 have_cmd(){ command -v "$1" >/dev/null 2>&1; }
 
 version_ok(){
-  local v="$1"
-  [[ "$v" == "${REQ_VERSION}" ]]
+  local v_to_check="$1" # this is from `just --version`, e.g. "1.14.0"
+  local req_version_raw
+  req_version_raw="$(get_req_version_raw)" # e.g. "v1.25.0"
+  # compare them without the 'v'
+  [[ "${v_to_check#v}" == "${req_version_raw#v}" ]]
 }
 
 map_arch() {
@@ -53,10 +68,17 @@ compute_target() {
 }
 
 compute_url() {
-  # Allow pin/version override for tests
-  local ver="${JUST_VERSION:-${REQ_VERSION}}"
+  local ver_tag
+  # For tests, JUST_VERSION overrides. Assume it doesn't have a 'v' like old tests.
+  if [ -n "${JUST_VERSION:-}" ]; then
+    ver_tag="${JUST_VERSION}"
+  else
+    ver_tag="$(get_req_version_raw)" # this will be "v1.25.0"
+  fi
+
+  local ver_numeric="${ver_tag#v}" # strip 'v' for the filename
   local target; target="$(compute_target)"
-  echo "https://github.com/casey/just/releases/download/${ver}/just-${ver}-${target}.tar.gz"
+  echo "https://github.com/casey/just/releases/download/${ver_tag}/just-${ver_numeric}-${target}.tar.gz"
 }
 
 # DRY-RUN mode for tests: only print the URL and exit 0
@@ -66,7 +88,9 @@ if [ "${DRY_RUN:-0}" = "1" ]; then
 fi
 
 download_just() {
-  log "just nicht gefunden/inkompatibel. Lade v${REQ_VERSION} herunter..."
+  local req_version_raw
+  req_version_raw="$(get_req_version_raw)"
+  log "just nicht gefunden/inkompatibel. Lade ${req_version_raw} herunter..."
   local just_url
   just_url="$(compute_url)"
 

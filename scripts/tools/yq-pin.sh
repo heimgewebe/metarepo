@@ -45,7 +45,7 @@ download_yq() {
   else
     # As a last resort, try to parse with grep. This is not robust, but it's
     # better than nothing.
-    yq_version=$(grep -E '^yq:' "${ROOT_DIR}/toolchain.versions.yml" | sed -E 's/^yq:[[:space:]]*"?([^"#[:space:]]+)"?.*/\1/')
+    yq_version=$(grep -E '^\s*yq:' "${ROOT_DIR}/toolchain.versions.yml" | sed -E 's/^\s*yq:\s*["'\'']?([^"'\'']+)["'\'']?/\1/' | xargs)
   fi
   local yq_url="https://github.com/mikefarah/yq/releases/download/${yq_version}/${binary_name}"
 
