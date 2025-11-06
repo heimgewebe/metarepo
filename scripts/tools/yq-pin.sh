@@ -35,7 +35,19 @@ download_yq() {
   esac
 
   local binary_name="yq_${os}_${arch}"
-  local yq_url="https://github.com/mikefarah/yq/releases/download/v4.30.8/${binary_name}"
+  local yq_version
+  # We need yq to read the yq version, so we prefer the local pin if it exists,
+  # otherwise we try the system yq.
+  if [[ -x "${YQ_LOCAL}" ]]; then
+    yq_version=$("${YQ_LOCAL}" '.yq' "${ROOT_DIR}/toolchain.versions.yml")
+  elif have_cmd yq; then
+    yq_version=$(yq '.yq' "${ROOT_DIR}/toolchain.versions.yml")
+  else
+    # As a last resort, try to parse with grep. This is not robust, but it's
+    # better than nothing.
+    yq_version=$(grep -E '^yq:' "${ROOT_DIR}/toolchain.versions.yml" | sed -E 's/^yq:[[:space:]]*"?([^"#[:space:]]+)"?.*/\1/')
+  fi
+  local yq_url="https://github.com/mikefarah/yq/releases/download/${yq_version}/${binary_name}"
 
   ensure_dir
 

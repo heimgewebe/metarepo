@@ -482,7 +482,7 @@ jobs:
 
       - name: Lint GitHub Actions workflows
         if: runner.os == 'Linux'
-        uses: docker://ghcr.io/rhysd/actionlint:1.7.1
+        uses: rhysd/actionlint@v1
         with:
           args: -color
 
