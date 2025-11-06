@@ -64,7 +64,7 @@ while [[ $# -gt 0 ]]; do
 		DRYRUN=1
 		shift
 		;;
-	-h | --help)
+	-h|--help)
 		usage
 		exit 0
 		;;
