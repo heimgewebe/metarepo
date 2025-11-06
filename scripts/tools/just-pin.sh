@@ -21,18 +21,54 @@ version_ok(){
   [[ "$v" == "${REQ_VERSION}" ]]
 }
 
+map_arch() {
+  case "$(uname -m)" in
+    x86_64|amd64) echo x86_64 ;;
+    arm64|aarch64) echo aarch64 ;;
+    *) echo "$(uname -m)";;
+  esac
+}
+
+detect_libc() {
+  # Linux: default to gnu (glibc); allow override
+  if [ -n "${JUST_LIBC:-}" ]; then
+    echo "$JUST_LIBC"
+  elif [ "$(uname -s | tr '[:upper:]' '[:lower:]')" = "linux" ]; then
+    if ldd --version 2>/dev/null | head -n1 | grep -qi musl; then echo musl; else echo gnu; fi
+  else
+    echo ""   # darwin doesn’t use gnu/musl tag
+  fi
+}
+
+compute_target() {
+  local os arch libc
+  os="$(uname -s | tr '[:upper:]' '[:lower:]')"
+  arch="$(map_arch)"
+  libc="$(detect_libc)"
+  if [ "$os" = "darwin" ]; then
+    echo "${arch}-apple-darwin"
+  else
+    echo "${arch}-unknown-${os}${libc:+-$libc}"
+  fi
+}
+
+compute_url() {
+  # Allow pin/version override for tests
+  local ver="${JUST_VERSION:-${REQ_VERSION}}"
+  local target; target="$(compute_target)"
+  echo "https://github.com/casey/just/releases/download/${ver}/just-${ver}-${target}.tar.gz"
+}
+
+# DRY-RUN mode for tests: only print the URL and exit 0
+if [ "${DRY_RUN:-0}" = "1" ]; then
+  compute_url
+  exit 0
+fi
+
 download_just() {
   log "just nicht gefunden/inkompatibel. Lade v${REQ_VERSION} herunter..."
-  local os
-  os=$(uname -s | tr '[:upper:]' '[:lower:]')
-  local arch
-  arch=$(uname -m)
-  local target="${arch}-unknown-${os}-musl"
-  if [[ "${os}" == "darwin" ]]; then
-    target="${arch}-apple-darwin"
-  fi
-
-  local just_url="https://github.com/casey/just/releases/download/${REQ_VERSION}/just-${REQ_VERSION}-${target}.tar.gz"
+  local just_url
+  just_url="$(compute_url)"
 
   ensure_dir
 
