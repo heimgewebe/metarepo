@@ -73,7 +73,7 @@ compute_url() {
   if [ -n "${JUST_VERSION:-}" ]; then
     ver_tag="${JUST_VERSION}"
   else
-    ver_tag="$(get_req_version_raw)" # this will be "v0.11.0"
+    ver_tag="$(get_req_version_raw)" # this will be "v1.25.0"
   fi
 
   local ver_numeric="${ver_tag#v}" # strip 'v' for the filename
