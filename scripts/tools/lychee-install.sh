@@ -8,16 +8,16 @@ set -euo pipefail
 
 # If lychee is already installed, exit early.
 if command -v lychee >/dev/null 2>&1; then
-    echo "lychee is already installed at $(command -v lychee)"
-    exit 0
+	echo "lychee is already installed at $(command -v lychee)"
+	exit 0
 fi
 
 echo "Fetching latest lychee release tag from GitHub API"
 LATEST_TAG=$(curl -sSf "https://api.github.com/repos/lycheeverse/lychee/releases/latest" | jq -r '.tag_name')
 
 if [[ -z "$LATEST_TAG" ]]; then
-    echo "Could not determine latest lychee release tag. Exiting."
-    exit 1
+	echo "Could not determine latest lychee release tag. Exiting."
+	exit 1
 fi
 
 ARCHIVE="lychee-${LATEST_TAG}-x86_64-unknown-linux-gnu.tar.gz"
