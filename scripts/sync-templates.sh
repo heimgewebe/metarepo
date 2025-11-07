@@ -64,7 +64,7 @@ while [[ $# -gt 0 ]]; do
 		DRYRUN=1
 		shift
 		;;
-	-h|--help)
+	-h | --help)
 		usage
 		exit 0
 		;;
@@ -75,7 +75,7 @@ while [[ $# -gt 0 ]]; do
 	esac
 done
 
-if [[ -n "$REPO_FROM" && ( -n "$REPO_TO" || -n "$REPOS_FROM_FILE") ]]; then
+if [[ -n "$REPO_FROM" && (-n "$REPO_TO" || -n "$REPOS_FROM_FILE") ]]; then
 	red "Fehler: --pull-from nicht mit --push-to/--repos-from kombinieren."
 	exit 1
 fi
