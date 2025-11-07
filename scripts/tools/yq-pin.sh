@@ -26,49 +26,99 @@ version_ok() {
 	[[ "${major}" -eq "${REQ_MAJOR}" ]]
 }
 
+require_cmd() {
+        local cmd="$1"
+        local hint="$2"
+        if ! have_cmd "${cmd}"; then
+                if [[ -n "${hint}" ]]; then
+                        die "Benötigtes Kommando '${cmd}' fehlt. ${hint}"
+                else
+                        die "Benötigtes Kommando '${cmd}' fehlt."
+                fi
+        fi
+}
+
+read_pinned_version() {
+        local version
+        if [[ -x "${YQ_LOCAL}" ]]; then
+                version=$("${YQ_LOCAL}" '.yq' "${ROOT_DIR}/toolchain.versions.yml" 2>/dev/null || true)
+        elif have_cmd yq; then
+                version=$(yq '.yq' "${ROOT_DIR}/toolchain.versions.yml" 2>/dev/null || true)
+        fi
+        if [[ -z "${version}" ]]; then
+                version=$(grep -E '^\s*yq:' "${ROOT_DIR}/toolchain.versions.yml" | sed -E 's/^\s*yq:\s*["'\'']?([^"'\'']+)["'\'']?/\1/' | xargs)
+        fi
+        if [[ -z "${version}" ]]; then
+                die "Konnte gewünschte yq-Version aus toolchain.versions.yml nicht ermitteln."
+        fi
+        printf '%s' "${version}"
+}
+
 download_yq() {
-	log "yq nicht gefunden/inkompatibel. Lade v${REQ_MAJOR}.x herunter..."
-	local os
-	os=$(uname -s | tr '[:upper:]' '[:lower:]')
-	local arch
-	arch=$(uname -m)
-	case "${arch}" in
-	x86_64) arch="amd64" ;;
-	aarch64) arch="arm64" ;;
-	esac
+        log "yq nicht gefunden/inkompatibel. Lade v${REQ_MAJOR}.x herunter..."
+        require_cmd curl "Bitte curl installieren oder in PATH bereitstellen."
 
-	local binary_name="yq_${os}_${arch}"
-	local yq_version
-	# We need yq to read the yq version, so we prefer the local pin if it exists,
-	# otherwise we try the system yq.
-	if [[ -x "${YQ_LOCAL}" ]]; then
-		yq_version=$("${YQ_LOCAL}" '.yq' "${ROOT_DIR}/toolchain.versions.yml")
-	elif have_cmd yq; then
-		yq_version=$(yq '.yq' "${ROOT_DIR}/toolchain.versions.yml")
-	else
-		# As a last resort, try to parse with grep. This is not robust, but it's
-		# better than nothing.
-		yq_version=$(grep -E '^\s*yq:' "${ROOT_DIR}/toolchain.versions.yml" | sed -E 's/^\s*yq:\s*["'\'']?([^"'\'']+)["'\'']?/\1/' | xargs)
-	fi
-	local yq_url="https://github.com/mikefarah/yq/releases/download/${yq_version}/${binary_name}"
+        local os
+        os=$(uname -s | tr '[:upper:]' '[:lower:]')
+        case "${os}" in
+        linux | darwin) ;;
+        *)
+                die "Nicht unterstütztes Betriebssystem für automatischen yq-Download: ${os}"
+                ;;
+        esac
 
-	ensure_dir
+        local arch
+        arch=$(uname -m)
+        case "${arch}" in
+        x86_64) arch="amd64" ;;
+        aarch64) arch="arm64" ;;
+        arm64) arch="arm64" ;;
+        *)
+                die "Nicht unterstützte Architektur für automatischen yq-Download: ${arch}"
+                ;;
+        esac
 
-	local tmp
-	tmp="$(mktemp "${YQ_LOCAL}.dl.XXXXXX")"
-	log "Downloading from ${yq_url}"
-	if curl -fSL "${yq_url}" -o "${tmp}"; then
-		chmod +x "${tmp}" || true
-		mv -f -- "${tmp}" "${YQ_LOCAL}"
-		log "yq erfolgreich nach ${YQ_LOCAL} heruntergeladen."
-	else
-		rm -f -- "${tmp}"
-		if [[ -x "${YQ_LOCAL}" ]]; then
-			log "Download fehlgeschlagen – benutze vorhandenen Pin unter ${YQ_LOCAL} (offline fallback)."
-		else
-			die "Download von yq fehlgeschlagen und kein nutzbarer Pin vorhanden."
-		fi
-	fi
+        local binary_name="yq_${os}_${arch}"
+        local yq_version tag_primary tag_alt
+        yq_version="$(read_pinned_version)"
+        if [[ "${yq_version}" == v* ]]; then
+                tag_primary="${yq_version}"
+                tag_alt="${yq_version#v}"
+        else
+                tag_primary="${yq_version}"
+                tag_alt="v${yq_version}"
+        fi
+        local url_primary="https://github.com/mikefarah/yq/releases/download/${tag_primary}/${binary_name}"
+        local url_alt="https://github.com/mikefarah/yq/releases/download/${tag_alt}/${binary_name}"
+
+        ensure_dir
+
+        local tmp
+        tmp="$(mktemp "${YQ_LOCAL}.dl.XXXXXX")"
+        trap 'tmp_file=${tmp-}; if [[ -n "${tmp_file}" ]]; then rm -f -- "${tmp_file}" 2>/dev/null || true; fi' EXIT
+        log "Probiere Download-URL(s) für ${yq_version}..."
+        if curl -fsIL "${url_primary}" >/dev/null 2>&1; then
+                log "Downloading from ${url_primary}"
+                curl -fSL "${url_primary}" -o "${tmp}"
+        elif curl -fsIL "${url_alt}" >/dev/null 2>&1; then
+                log "Downloading from ${url_alt}"
+                curl -fSL "${url_alt}" -o "${tmp}"
+        else
+                rm -f -- "${tmp}"
+                if [[ -x "${YQ_LOCAL}" ]]; then
+                        log "Download nicht gefunden – benutze vorhandenen Pin unter ${YQ_LOCAL} (offline fallback)."
+                        trap - EXIT
+                        return 0
+                fi
+                trap - EXIT
+                die "Download von yq fehlgeschlagen: ${url_primary} / ${url_alt}"
+        fi
+        if [[ -f "${tmp}" ]]; then
+                chmod +x "${tmp}" || true
+                mv -f -- "${tmp}" "${YQ_LOCAL}"
+                log "yq erfolgreich nach ${YQ_LOCAL} heruntergeladen."
+                trap - EXIT
+        fi
 }
 
 resolved_yq() {
@@ -89,15 +139,19 @@ cmd_ensure() {
 	local v
 	local version_is_ok=false
 
-	if yq_bin="$(resolved_yq)"; then
-		if v="$("${yq_bin}" --version 2>/dev/null | sed -E 's/^yq .* version v?//')"; then
-			if version_ok "${v}"; then
-				version_is_ok=true
-			else
-				log "WARN: Found yq is wrong version: ${v}"
-			fi
-		fi
-	fi
+        if yq_bin="$(resolved_yq)"; then
+                log "Benutze yq-Binary unter ${yq_bin}"
+                if v="$("${yq_bin}" --version 2>/dev/null | sed -E 's/^yq .* version v?//')"; then
+                        if version_ok "${v}"; then
+                                version_is_ok=true
+                        else
+                                log "WARN: Found yq is wrong version: ${v}"
+                                log "Erwartet wurde Hauptversion ${REQ_MAJOR}."
+                        fi
+                else
+                        log "WARN: Konnte Version von ${yq_bin} nicht bestimmen."
+                fi
+        fi
 
 	if ! $version_is_ok; then
 		download_yq
@@ -116,7 +170,7 @@ cmd_ensure() {
 	if [[ "${yq_bin}" != "${YQ_LOCAL}" && ! -e "${YQ_LOCAL}" ]]; then
 		ln -s -- "${yq_bin}" "${YQ_LOCAL}" || true
 	fi
-	log "OK: yq ${v} verfügbar"
+        log "OK: yq ${v} verfügbar"
 }
 
 case "${1:-ensure}" in
