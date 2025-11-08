@@ -80,29 +80,21 @@ download_yq() {
 
         local binary_name="yq_${os}_${arch}"
         local yq_version tag_primary tag_alt
+        local yq_version
         yq_version="$(read_pinned_version)"
-        if [[ "${yq_version}" == v* ]]; then
-                tag_primary="${yq_version}"
-                tag_alt="${yq_version#v}"
-        else
-                tag_primary="${yq_version}"
-                tag_alt="v${yq_version}"
+        if [[ "${yq_version}" != v* ]]; then
+                yq_version="v${yq_version}"
         fi
-        local url_primary="https://github.com/mikefarah/yq/releases/download/${tag_primary}/${binary_name}"
-        local url_alt="https://github.com/mikefarah/yq/releases/download/${tag_alt}/${binary_name}"
+        local url="https://github.com/mikefarah/yq/releases/download/${yq_version}/${binary_name}"
 
         ensure_dir
 
         local tmp
         tmp="$(mktemp "${YQ_LOCAL}.dl.XXXXXX")"
         trap 'tmp_file=${tmp-}; if [[ -n "${tmp_file}" ]]; then rm -f -- "${tmp_file}" 2>/dev/null || true; fi' EXIT
-        log "Probiere Download-URL(s) für ${yq_version}..."
-        if curl -fsIL "${url_primary}" >/dev/null 2>&1; then
-                log "Downloading from ${url_primary}"
-                curl -fSL "${url_primary}" -o "${tmp}"
-        elif curl -fsIL "${url_alt}" >/dev/null 2>&1; then
-                log "Downloading from ${url_alt}"
-                curl -fSL "${url_alt}" -o "${tmp}"
+        log "Probiere Download-URL für ${yq_version}..."
+        if curl -fsSL "${url}" -o "${tmp}"; then
+                log "Downloading from ${url}"
         else
                 rm -f -- "${tmp}"
                 if [[ -x "${YQ_LOCAL}" ]]; then
@@ -111,7 +103,7 @@ download_yq() {
                         return 0
                 fi
                 trap - EXIT
-                die "Download von yq fehlgeschlagen: ${url_primary} / ${url_alt}"
+                die "Download von yq fehlgeschlagen: ${url}"
         fi
         if [[ -f "${tmp}" ]]; then
                 chmod +x "${tmp}" || true
