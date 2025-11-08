@@ -1,17 +1,20 @@
 # IDEal – ID²E@l: (intelligently developing) intelligent developer environment @ local
 
-> Blaupause v0.1 – Architektur, Contracts, Flüsse, UI-Skizze
+> **Version:** v0.2 – Stand November 2025
+> (aktualisiert mit `mitschreiber`, neuen Datenflüssen und Schichtdefinitionen)
 
 ## 1. Zielbild
-IDEal ist ein lokaler kognitiver Organismus für Entwicklung: semantische Koordination, autonome Ausführung, reflexive Prüfung, memorative Persistenz, dialogische Interaktion.
+IDEal ist ein lokaler kognitiver Organismus für Entwicklung:
+semantische Koordination • autonome Ausführung • reflexive Prüfung • memorative Persistenz • dialogische Interaktion.
 
 ## 2. Schichtenmodell
-- 0 Physisch: Pop!_OS, systemd, wgx
-- 1 Semantisch: semantAH (Graph, Embeddings, Relationen)
-- 2 Operativ: hausKI (Plan, Simulation, Ausführung)
-- 3 Reflexiv: sichter (Diagnose, Review)
-- 4 Memorativ: leitstand (Episoden, Audit)
-- 5 Dialogisch: mitschreiber, UI/Canvas, cotmux
+- 0 Physisch · Pop!_OS · systemd · wgx
+- 1 Semantisch · semantAH (Embeddings & Graph)
+- 2 Operativ · hausKI (Plan · Simulation · Ausführung)
+- 3 Reflexiv · sichter (Diagnose · Review · Selbstkorrektur)
+- 4 Memorativ · leitstand (Episoden · Metriken · Audit)
+- 5 Politisch-Adaptiv · heimlern (Policies · Lern-Feedback · Scores)
+- 6 Dialogisch-Semantisch · mitschreiber (Intent · Kontext · Text- & State-Embeddings)
 
 ## 3. Heimgewebe-Bus (IPC)
 - Transport: systemd-sockets/FIFO (lokal), Payload JSONL
@@ -58,7 +61,10 @@ IDEal ist ein lokaler kognitiver Organismus für Entwicklung: semantische Koordi
 ```
 
 ## 4. Semantischer Blutkreislauf
-mitschreiber → semantAH → hausKI → sichter → leitstand → semantAH
+**mitschreiber → semantAH → hausKI → heimlern → sichter → leitstand → semantAH**
+
+*Alle Komponenten kommunizieren über den Heimgewebe-Bus
+(lokales JSONL-Eventsystem mit Topics `intent/*`, `graph/*`, `review/*`, `policy/*`, `state/*`, `insight/*`, `error/*`).*
 
 ## 5. IDEal-Shell (UI-Skizze)
 - Cockpit (Status/Build/Events)
@@ -66,12 +72,32 @@ mitschreiber → semantAH → hausKI → sichter → leitstand → semantAH
 - Graph-Inspector (Entitäten/Relationen)
 - Attention-Dial (Fokus, Strenge, Scope)
 
+## 5a. Repos & Zuständigkeiten (Core Fleet)
+
+| Repo | Rolle | Hauptoutput | Contracts |
+|:--|:--|:--|:--|
+| metarepo | Control-Plane · Contracts · CI-Templates | Schemas · Docs | contracts/*.schema.json |
+| wgx | System-Motorik · CLI · Automation | Metrics-Snapshots | metrics.snapshot.schema.json |
+| hausKI | Orchestrator · Planer | Events · Decisions | event.line · policy.decision |
+| heimlern | Policy-Lernen · Scorer | Entscheidungen („why“) | policy.decision.schema.json |
+| semantAH | Wissensgraph · Embeddings | insights/*.json | insights.schema.json |
+| leitstand | Persistenz · Panels | JSONL-Logs · Dashboards | aussen.event.schema.json |
+| hausKI-audio | Audio-Events | – | audio.events.schema.json |
+| aussensensor | Außenfeeds | feed.jsonl | aussen.event.schema.json |
+| mitschreiber | Intent-Sensorik · OS-Kontext | os.context.* | os.context.text.embed.schema.json |
+
 ## 6. „Für Dummies“
 IDEal merkt sich, was du willst und warum. Es probiert sinnvolle Schritte aus, prüft das Ergebnis, schreibt Tagebuch und wird so jedes Mal besser.
 
 ## 7. Ungewissheit
-- Grad: 0.49 (produktive Turbulenz)
-- Quellen: junge Ontologie, IPC-Heterogenität, Mehragenten-Interferenz
+- Grad ≈ 0.49 · produktive Turbulenz
+
+| Ursache | Art | Auswirkung |
+|:--|:--|:--|
+| Ontologie im Aufbau | epistemisch | Intent-Ambiguität |
+| Mehragenten-Interaktion | systemisch | Synchronitäts-Konflikte |
+| Heterogener IPC | technisch | Latenz · Race Conditions |
+| Kontext-Überlappung | organisatorisch | Priorisierung / Backpressure nötig |
 
 ## 8. Essenz
 Von Dateien zu Bedeutungsflüssen: IDEal co-denkt Entwicklung lokal und souverän.
