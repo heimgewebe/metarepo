@@ -95,3 +95,21 @@ Zentrale Schemas und Reusables liegen im metarepo und werden über Tags (z. B.
 3. Push-Kanon: `./scripts/sync-templates.sh --push-to <repo> --pattern "templates/.wgx/profile.yml"`
 
 Tipp: `--dry-run` liefert eine sichere Vorschau; Repos-Liste: `repos.yml` & `--repos-from`.
+
+---
+
+## IDEal – ID²E@l: lokal-autonome Entwicklungsumgebung
+
+**IDEal** („intelligently developing intelligent developer environment @ local“)  
+ist der emergente Kern des Heimgewebe-Systems:  
+eine Entwicklungsumgebung, die sich selbst entwickelt.
+
+**Kernprinzip:**  
+Von Dateien zu Bedeutungsflüssen – das System co-denkt, lernt und prüft lokal.
+
+**Schichten (Überblick)**  
+Semantisch (semantAH) → Operativ (hausKI) → Reflexiv (sichter) → Memorativ (leitstand) → Dialogisch (mitschreiber/UI)  
+verbunden durch den **Heimgewebe-Bus** (intent/*, graph/*, review/* …)
+
+**Weiterführend:**  
+[📘 IDEal_Blueprint → Architektur & Contracts](docs/IDEal_Blueprint.md)
