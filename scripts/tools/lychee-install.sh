@@ -12,16 +12,14 @@ if command -v lychee >/dev/null 2>&1; then
 	exit 0
 fi
 
-echo "Fetching latest lychee release tag from GitHub API"
-LATEST_TAG=$(curl -sSf "https://api.github.com/repos/lycheeverse/lychee/releases/latest" | jq -r '.tag_name')
+echo "Fetching latest lychee release from GitHub API"
+RELEASE_INFO=$(curl -sSf "https://api.github.com/repos/lycheeverse/lychee/releases/latest")
+URL=$(echo "$RELEASE_INFO" | jq -r '.assets[] | select(.name | endswith("x86_64-unknown-linux-gnu.tar.gz")) | .browser_download_url')
 
-if [[ -z "$LATEST_TAG" ]]; then
-	echo "Could not determine latest lychee release tag. Exiting."
+if [[ -z "$URL" ]]; then
+	echo "Could not determine latest lychee release URL. Exiting."
 	exit 1
 fi
-
-ARCHIVE="lychee-${LATEST_TAG}-x86_64-unknown-linux-gnu.tar.gz"
-URL="https://github.com/lycheeverse/lychee/releases/download/${LATEST_TAG}/${ARCHIVE}"
 
 echo "Downloading lychee from ${URL}"
 TMP_DIR=$(mktemp -d)
