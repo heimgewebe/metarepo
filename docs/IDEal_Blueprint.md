@@ -1,4 +1,4 @@
-# IDEal – ID²E@l: (intelligently developing) intelligent developer environment @ local
+# IDEal – ID²E@l: intelligently developing integrated developer environment @ local
 
 > **Version:** v0.2 – Stand November 2025
 > (aktualisiert mit `mitschreiber`, neuen Datenflüssen und Schichtdefinitionen)
