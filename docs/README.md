@@ -32,3 +32,7 @@ Für **WGX (Engine)** siehe: https://github.com/heimgewebe/wgx
 - [Datenfluss (Mermaid)](./heimgewebe-dataflow.mmd)
 - [Architektur (Canvas)](./canvas/heimgewebe-architektur.canvas)
 - [Datenflüsse (Canvas)](./canvas/heimgewebe-dataflow.canvas)
+
+## Diagramm-Rendering
+- Lokal: `scripts/render-diagram.sh docs/IDEal_Blueprint.md --outdir docs/diagrams --format png`
+- CI: Workflow **render-diagrams** (liefert Artefakt `diagrams-<run_id>`)

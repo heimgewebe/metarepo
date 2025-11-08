@@ -1,0 +1,57 @@
+name: render-diagrams
+
+on:
+  workflow_dispatch:
+    inputs:
+      format:
+        description: "Ausgabeformat (png|svg)"
+        required: false
+        default: "png"
+  push:
+    paths:
+      - "docs/**/*.mmd"
+      - "docs/**/IDEal_*.md"
+      - "docs/IDEal_*.md"
+      - "scripts/render-diagram.sh"
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node (für mermaid-cli)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Render Mermaid diagrams
+        run: |
+          set -euo pipefail
+          chmod +x scripts/render-diagram.sh
+          # Sammle Standard-Quellen (ergänze bei Bedarf)
+          files=()
+          # explizite Blueprints
+          [[ -f docs/IDEal_Blueprint.md ]] && files+=("docs/IDEal_Blueprint.md")
+          # alle .mmd in docs/
+          while IFS= read -r -d '' f; do files+=("$f"); done < <(find docs -type f -name '*.mmd' -print0)
+          if (( ${#files[@]} == 0 )); then
+            echo "Keine Diagrammquellen gefunden – Job beendet."
+            exit 0
+          fi
+          echo "Quellen:"
+          printf ' - %s\n' "${files[@]}"
+          scripts/render-diagram.sh "${files[@]}" --outdir docs/diagrams --format "${{ github.event.inputs.format || 'png' }}"
+
+      - name: Upload rendered diagrams
+        uses: actions/upload-artifact@v4
+        with:
+          name: diagrams-${{ github.run_id }}
+          path: docs/diagrams/*
+          if-no-files-found: warn
+          retention-days: 14

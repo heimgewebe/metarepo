@@ -1,94 +1,101 @@
 {
-  "nodes": [
-    {
-      "id": "root",
-      "type": "text",
-      "text": "# IDEal (ID²E@l)\nQuelle: Heimgewebe – lokale kognitive Entwicklungsumgebung",
-      "x": 0, "y": 0, "width": 520, "height": 180, "color": "blue"
-    },
-    {
-      "id": "essenz",
-      "type": "text",
-      "text": "Essenz: Von Dateien zu Bedeutungsflüssen – IDEal co-denkt lokal.",
-      "x": 560, "y": -140, "width": 420, "height": 120, "color": "green"
-    },
-    {
-      "id": "schichten",
-      "type": "text",
-      "text": "Schichten (Ebenen):\n0 Physisch\n1 Semantisch\n2 Operativ\n3 Reflexiv\n4 Memorativ\n5 Dialogisch",
-      "x": -640, "y": -40, "width": 360, "height": 220, "color": "purple"
-    },
-    {
-      "id": "bus",
-      "type": "text",
-      "text": "Heimgewebe-Bus (JSONL, systemd-sockets)\nTopics: intent/*, plan/*, review/*, graph/*, state/*, insight/*, error/*",
-      "x": -80, "y": 220, "width": 560, "height": 160, "color": "yellow"
-    },
-    {
-      "id": "semantAH",
-      "type": "text",
-      "text": "semantAH (Graph)\nEntitäten • Relationen • Embeddings",
-      "x": -420, "y": 260, "width": 320, "height": 120, "color": "gray"
-    },
-    {
-      "id": "hauski",
-      "type": "text",
-      "text": "hausKI (Plan/Execute)\nSimulation • Taktiken • Ressourcen",
-      "x": 240, "y": 420, "width": 320, "height": 120, "color": "gray"
-    },
-    {
-      "id": "sichter",
-      "type": "text",
-      "text": "sichter (Reflexion)\nDiagnose • Reviews • Fix-Vorschläge",
-      "x": 600, "y": 220, "width": 320, "height": 120, "color": "gray"
-    },
-    {
-      "id": "leitstand",
-      "type": "text",
-      "text": "leitstand (Gedächtnis)\nEpisoden • Metriken • Audit",
-      "x": 240, "y": 260, "width": 320, "height": 120, "color": "gray"
-    },
-    {
-      "id": "mitschreiber",
-      "type": "text",
-      "text": "mitschreiber/UI\nIntent-Erfassung • Dialog • Canvas",
-      "x": -420, "y": 420, "width": 320, "height": 120, "color": "gray"
-    },
-    {
-      "id": "fluss",
-      "type": "text",
-      "text": "Semantischer Blutkreislauf:\nmitschreiber → semantAH → hausKI → sichter → leitstand → semantAH",
-      "x": -160, "y": 420, "width": 540, "height": 120, "color": "yellow"
-    },
-    {
-      "id": "hindernisse",
-      "type": "text",
-      "text": "Hindernisse/Ungewissheit:\nIntent-Ontologie jung • IPC-Heterogenität • Mehragenten-Rückkopplung",
-      "x": 960, "y": 80, "width": 420, "height": 140, "color": "red"
-    },
-    {
-      "id": "ziele",
-      "type": "text",
-      "text": "Ziele (MVP):\n1) intent/review-Contracts final\n2) Bus-Demo (wgx→hausKI→sichter→leitstand)\n3) Graph-Upsert\n4) Mini-Cockpit",
-      "x": 960, "y": -140, "width": 420, "height": 160, "color": "green"
-    },
-    {
-      "id": "legende",
-      "type": "text",
-      "text": "Legende:\nFarben: Blau=Zentrum/Meta, Grau=Grundlagen, Gelb=Prozesse, Rot=Hindernisse, Grün=Ziele, Violett=Ebenen\nAchsen: Links=Grundlagen, Mitte=Prozesse, Rechts=Ziele\nHinweis: Essenz frei, Verbindungen sparsam",
-      "x": -920, "y": -340, "width": 520, "height": 180, "color": "blue"
-    }
-  ],
-  "edges": [
-    {"id":"e1","fromNode":"mitschreiber","toNode":"semantAH","label":"intent/declare"},
-    {"id":"e2","fromNode":"semantAH","toNode":"hauski","label":"graph/query"},
-    {"id":"e3","fromNode":"hauski","toNode":"sichter","label":"plan/execute → review/report"},
-    {"id":"e4","fromNode":"sichter","toNode":"leitstand","label":"report → episode"},
-    {"id":"e5","fromNode":"leitstand","toNode":"semantAH","label":"provenance → upsert"},
-    {"id":"e6","fromNode":"root","toNode":"bus","label":"Nervensystem"},
-    {"id":"e7","fromNode":"schichten","toNode":"root","label":"Ebenen/Modell"},
-    {"id":"e8","fromNode":"essenz","toNode":"ziele","label":"MVP-Fokus"},
-    {"id":"e9","fromNode":"hindernisse","toNode":"ziele","label":"Risikominderung"},
-    {"id":"e10","fromNode":"fluss","toNode":"bus","label":"Topics/Contracts"}
-  ]
+  "nodes": [
+    {
+      "id": "root",
+      "type": "text",
+      "text": "# IDEal (ID²E@l)\nQuelle: Heimgewebe – lokale kognitive Entwicklungsumgebung",
+      "x": 0, "y": 0, "width": 520, "height": 180, "color": "blue"
+    },
+    {
+      "id": "essenz",
+      "type": "text",
+      "text": "Essenz: Von Dateien zu Bedeutungsflüssen – IDEal co-denkt lokal.",
+      "x": 560, "y": -140, "width": 420, "height": 120, "color": "green"
+    },
+    {
+      "id": "schichten",
+      "type": "text",
+      "text": "Schichten (Ebenen):\n0 Physisch\n1 Semantisch\n2 Operativ\n3 Reflexiv\n4 Memorativ\n5 Politisch-Adaptiv\n6 Dialogisch-Semantisch",
+      "x": -640, "y": -40, "width": 360, "height": 220, "color": "purple"
+    },
+    {
+      "id": "bus",
+      "type": "text",
+      "text": "Heimgewebe-Bus (JSONL, systemd-sockets)\nTopics: intent/*, plan/*, review/*, graph/*, state/*, insight/*, error/*",
+      "x": -80, "y": 220, "width": 560, "height": 160, "color": "yellow"
+    },
+    {
+      "id": "semantAH",
+      "type": "text",
+      "text": "semantAH (Graph)\nEntitäten • Relationen • Embeddings",
+      "x": -420, "y": 260, "width": 320, "height": 120, "color": "gray"
+    },
+    {
+      "id": "hauski",
+      "type": "text",
+      "text": "hausKI (Plan/Execute)\nSimulation • Taktiken • Ressourcen",
+      "x": 240, "y": 420, "width": 320, "height": 120, "color": "gray"
+    },
+    {
+      "id": "sichter",
+      "type": "text",
+      "text": "sichter (Reflexion)\nDiagnose • Reviews • Fix-Vorschläge",
+      "x": 600, "y": 220, "width": 320, "height": 120, "color": "gray"
+    },
+    {
+      "id": "leitstand",
+      "type": "text",
+      "text": "leitstand (Gedächtnis)\nEpisoden • Metriken • Audit",
+      "x": 240, "y": 260, "width": 320, "height": 120, "color": "gray"
+    },
+    {
+      "id": "mitschreiber",
+      "type": "text",
+      "text": "mitschreiber (Dialogisch-Semantisch)\nIntent · Kontext · Text/State-Embeddings",
+      "x": -640, "y": 260, "width": 340, "height": 120, "color": "purple"
+    },
+    {
+      "id": "fluss",
+      "type": "text",
+      "text": "Semantischer Blutkreislauf v0.2:\nmitschreiber → semantAH → hausKI → heimlern → sichter → leitstand → semantAH",
+      "x": -160, "y": 420, "width": 560, "height": 120, "color": "yellow"
+    },
+    {
+      "id": "hindernisse",
+      "type": "text",
+      "text": "Hindernisse/Ungewissheit:\nIntent-Ontologie jung • IPC-Heterogenität • Mehragenten-Rückkopplung",
+      "x": 960, "y": 80, "width": 420, "height": 140, "color": "red"
+    },
+    {
+      "id": "ziele",
+      "type": "text",
+      "text": "Ziele (MVP):\n1) intent/review-Contracts final\n2) Bus-Demo (wgx→hausKI→sichter→leitstand)\n3) Graph-Upsert\n4) Mini-Cockpit",
+      "x": 960, "y": -140, "width": 420, "height": 160, "color": "green"
+    },
+    {
+      "id": "legende",
+      "type": "text",
+      "text": "Legende:\nFarben: Blau=Zentrum/Meta, Grau=Grundlagen, Gelb=Prozesse, Rot=Hindernisse, Grün=Ziele, Violett=Ebenen/Dialog\nAchsen: Links=Grundlagen, Mitte=Prozesse, Rechts=Ziele\nHinweis: Essenz frei, Verbindungen sparsam",
+      "x": -920, "y": -340, "width": 520, "height": 180, "color": "blue"
+    },
+    {
+      "id": "heimlern",
+      "type": "text",
+      "text": "heimlern (Politisch-Adaptiv)\nPolicies • Lern-Feedback • Scores",
+      "x": 600, "y": 420, "width": 320, "height": 120, "color": "gray"
+    }
+  ],
+  "edges": [
+    {"id":"e1","fromNode":"mitschreiber","toNode":"semantAH","label":"intent/declare · os.context.*"},
+    {"id":"e2","fromNode":"semantAH","toNode":"hauski","label":"graph/query"},
+    {"id":"e3","fromNode":"hauski","toNode":"heimlern","label":"policy/decide"},
+    {"id":"e4","fromNode":"heimlern","toNode":"sichter","label":"feedback/reward"},
+    {"id":"e5","fromNode":"sichter","toNode":"leitstand","label":"review/report → episode"},
+    {"id":"e6","fromNode":"leitstand","toNode":"semantAH","label":"episode → graph/upsert"},
+    {"id":"e7","fromNode":"root","toNode":"bus","label":"Nervensystem"},
+    {"id":"e8","fromNode":"schichten","toNode":"root","label":"Ebenen/Modell"},
+    {"id":"e9","fromNode":"essenz","toNode":"ziele","label":"MVP-Fokus"},
+    {"id":"e10","fromNode":"hindernisse","toNode":"ziele","label":"Risikominderung"},
+    {"id":"e11","fromNode":"fluss","toNode":"bus","label":"Topics/Contracts"}
+  ]
 }
