@@ -26,3 +26,4 @@ tmp/
 # Devcontainer
 .devcontainer/devcontainer.json
 .devcontainer/.devcache/
+.agents/
