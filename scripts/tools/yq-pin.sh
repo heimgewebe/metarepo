@@ -82,6 +82,7 @@ download_yq() {
         local yq_version tag_primary tag_alt
         local yq_version
         yq_version="$(read_pinned_version)"
+        yq_version=$(printf '%s' "${yq_version}" | sed "s/['\"]//g")
         if [[ "${yq_version}" != v* ]]; then
                 yq_version="v${yq_version}"
         fi
