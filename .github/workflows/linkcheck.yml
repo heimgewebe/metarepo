@@ -42,7 +42,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-lychee-
       - name: Run lychee on docs & README (uses .lychee.toml)
-        run: lychee --config .lychee.toml README.md docs/**/*.md
+        run: lychee --config .lychee.toml README.md 'docs/**/*.md' 'contracts/**/*.md'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           LYCHEE_CACHE_DIR: ~/.cache/lychee
