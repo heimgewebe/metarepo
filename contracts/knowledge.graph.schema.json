@@ -5,43 +5,50 @@
  "type": "object",
  "additionalProperties": false,
  "properties": {
-  "nodes": {
-   "type": "array",
-   "items": {
-    "type": "object",
-    "required": ["id", "node_type"],
-    "additionalProperties": true,
-    "properties": {
-     "id": { "type": "string", "minLength": 1 },
-     "node_type": { "type": "string", "enum": ["concept", "code_entity", "document", "decision"] },
-     "label": { "type": "string" },
-     "metadata": { "type": "object", "additionalProperties": true }
-    }
-   }
-  },
-  "edges": {
-   "type": "array",
-   "items": {
-    "type": "object",
-    "required": ["source", "relation", "target"],
-    "additionalProperties": false,
-    "properties": {
-     "source": { "type": "string" },
-     "relation": { "type": "string", "enum": ["implements", "references", "supersedes", "depends_on", "documents", "explains"] },
-     "target": { "type": "string" },
-     "weight": { "type": "number" }
-    }
-   }
-  },
-  "metadata": {
-   "type": "object",
-   "additionalProperties": false,
-   "properties": {
-    "last_updated": { "type": "string", "format": "date-time" },
-    "authors": { "type": "array", "items": { "type": "string" } },
-    "tags": { "type": "array", "items": { "type": "string" } }
-   }
-  }
+ "nodes": {
+ "type": "array",
+ "items": {
+ "type": "object",
+ "additionalProperties": false,
+ "properties": {
+ "id": { "type": "string", "minLength": 1 },
+ "type": { "type": "string", "enum": ["concept", "code_entity", "document", "decision"] },
+ "labels": { "type": "array", "items": { "type": "string" }, "default": [] },
+ "props": { "type": "object", "additionalProperties": true }
+ },
+ "required": ["id", "type"]
+ },
+ "default": []
+ },
+ "edges": {
+ "type": "array",
+ "items": {
+ "type": "object",
+ "additionalProperties": false,
+ "properties": {
+ "source": { "type": "string", "minLength": 1 },
+ "target": { "type": "string", "minLength": 1 },
+ "relation": {
+ "type": "string",
+ "enum": ["implements", "references", "supersedes", "depends_on", "mentions", "fixes", "has_smell"]
+ },
+ "weight": { "type": "number" },
+ "meta": { "type": "object", "additionalProperties": true }
+ },
+ "required": ["source", "target", "relation"]
+ },
+ "default": []
+ },
+ "metadata": {
+ "type": "object",
+ "additionalProperties": false,
+ "properties": {
+ "last_updated": { "type": "string", "format": "date-time" },
+ "authors": { "type": "array", "items": { "type": "string" }, "default": [] },
+ "tags": { "type": "array", "items": { "type": "string" }, "default": [] }
+ },
+ "default": {}
+ }
  },
  "required": ["nodes", "edges"]
 }
