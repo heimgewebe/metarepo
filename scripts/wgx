@@ -403,8 +403,8 @@ case "${1:-}" in
   doctor)    cmd_doctor ;;
   validate)  cmd_validate ;;
   smoke)     cmd_smoke ;;
-  code)      cmd_code "$@";;
-  knowledge) cmd_knowledge "$@";;
-  agent)     cmd_agent "$@";;
+  code)      shift; cmd_code "$@";;
+  knowledge) shift; cmd_knowledge "$@";;
+  agent)     shift; cmd_agent "$@";;
   *)         cmd_help; exit 1;;
 esac
