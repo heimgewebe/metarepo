@@ -24,6 +24,7 @@
 - `wgx → hausKI/leitstand`: `metrics.snapshot.json`
 - `hausKI-audio → hausKI/leitstand`: Session-/Latenz-Events
 - `aussensensor → leitstand`: Außen-Event-Streams (`feed.jsonl`)
+- `mitschreiber → semantAH` *(optional zusätzlich → leitstand)*: **Intents** (`os.context.intent.jsonl`)
 - *(optional)* `weltgewebe → aussensensor/leitstand`: geteilte Außenposts/Projekte (außerhalb der Fleet).
 - `heimlern ↔ hausKI`: `decide(ctx)` → `action, why`; `feedback(reward)`
 - `hausKI → wgx/hausKI-audio`: Playbook-Aufträge & Steuerungsbefehle
@@ -51,5 +52,6 @@ Statt `aussensensor` parallel an `leitstand` **und** `heimlern` senden zu lassen
 | [`insights`](../contracts/insights.schema.json) | semantAH | hausKI, leitstand |
 | [`audio.events`](../contracts/audio.events.schema.json) | hausKI-audio | hausKI, leitstand |
 | [`aussen.event`](../contracts/aussen.event.schema.json) | aussensensor, weltgewebe | leitstand |
-| [`event.line`](../contracts/event.line.schema.json) | hausKI | leitstand |
+| [`event.line`](../contracts/event.line.schema.json) | weltgewebe | hausKI, leitstand |
 | [`policy.decision`](../contracts/policy.decision.schema.json) | heimlern | hausKI |
+| [`os.context.intent`](../contracts/os.context.intent.schema.json) | mitschreiber | semantAH, hausKI, leitstand |
