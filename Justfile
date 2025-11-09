@@ -1,3 +1,5 @@
+export PATH := ".bin:./tools/bin:" + env_var('PATH')
+
 set shell := ["bash", "-eu", "-o", "pipefail", "-c"]
 
 # --- Devcontainer integration (auto-imported) ---

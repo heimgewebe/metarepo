@@ -52,7 +52,11 @@ detect_libc() {
 	if [ -n "${JUST_LIBC:-}" ]; then
 		echo "$JUST_LIBC"
 	elif [ "$(uname -s | tr '[:upper:]' '[:lower:]')" = "linux" ]; then
-		if ldd --version 2>/dev/null | head -n1 | grep -qi musl; then echo musl; else echo gnu; fi
+		if [ -e /lib/ld-musl-x86_64.so.1 ] || [ -e /lib/ld-musl-aarch64.so.1 ]; then
+			echo "musl"
+		else
+			echo "gnu"
+		fi
 	else
 		echo "" # darwin doesn’t use gnu/musl tag
 	fi
