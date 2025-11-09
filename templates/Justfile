@@ -2,7 +2,7 @@ set shell := ["bash", "-eu", "-o", "pipefail", "-c"]
 
 default: help
 help:
-	@echo "Targets: up validate smoke fmt lint test ci"
+	@echo "Targets: up validate smoke agent-run agent-trace fmt lint test ci"
 
 up:
 	@if [ -x scripts/wgx ]; then \
@@ -38,3 +38,24 @@ test:
 	@echo "testing…"; true
 
 ci: fmt lint test
+
+# ---------- IDEal / Agents ----------
+agent-run ARG?="agents/sample.workflow.json":
+	@if [ -x scripts/wgx ]; then \
+	  scripts/wgx agent run "{{ARG}}"; \
+	else \
+	  echo "hint: scripts/wgx fehlt – bitte Templates spiegeln (scripts/wgx up)"; \
+	  exit 1; \
+	fi
+
+agent-trace FILE?="":
+	@if [ -x scripts/wgx ]; then \
+	  if [ -n "{{FILE}}" ]; then \
+	    scripts/wgx agent trace "{{FILE}}"; \
+	  else \
+	    scripts/wgx agent trace; \
+	  fi; \
+	else \
+	  echo "hint: scripts/wgx fehlt – bitte Templates spiegeln (scripts/wgx up)"; \
+	  exit 1; \
+	fi
