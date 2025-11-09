@@ -1,0 +1,33 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://schemas.heimgewebe.org/dev.tooling.schema.json",
+ "title": "Development Tooling Contract",
+ "type": "object",
+ "additionalProperties": false,
+ "properties": {
+  "language": {
+   "type": "string",
+   "enum": ["rust", "python", "typescript", "bash"]
+  },
+  "lsp_config": {
+   "type": "object",
+   "description": "Editor/LSP Einstellungen (schlank, repo-lokal)",
+   "additionalProperties": true
+  },
+  "code_generation": {
+   "type": "object",
+   "properties": {
+    "templates": { "type": "array", "items": { "type": "string" }, "default": [] },
+    "generators": { "type": "array", "items": { "type": "string" }, "default": [] },
+    "validation_rules": { "type": "array", "items": { "type": "string" }, "default": [] }
+   },
+   "additionalProperties": false
+  },
+  "test_framework": {
+   "type": "object",
+   "description": "Minimaler Test-Stack (z. B. cargo test / pytest / bun test)",
+   "additionalProperties": true
+  }
+ },
+ "required": ["language"]
+}

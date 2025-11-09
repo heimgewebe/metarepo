@@ -13,6 +13,36 @@ Die Contracts definieren den gemeinsamen Korridor für alle Fleet-Repos. Jede Pr
 | `contracts/event.line.schema.json` | `hausKI` JSONL Event-Log | Fleet-Debugging, Replays, Append-only Sync |
 | `contracts/policy.decision.schema.json` | `heimlern` Policies | `hausKI` erklärt Entscheidungen („Warum“), `leitstand` zeigt Begründungen |
 
+## Neue Contracts (IDEal v0.2)
+
+| Schema | Producer | Consumer / Zweck |
+| --- | --- | --- |
+| `contracts/dev.tooling.schema.json` | Repos mit IDE/Dev-Setup (Templates) | CI-Gate für konsistente Dev-Konfiguration in Fleet-Repos |
+| `contracts/knowledge.graph.schema.json` | `wgx knowledge extract`, Parser in `scripts/knowledge/*` | `semantAH` Ingest (Graph), `leitstand` Panel „Wissen“ |
+| `contracts/agent.workflow.schema.json` | Agent-/Workflow-Manifeste (YAML → JSON) | `wgx agent validate/run`, `hausKI` Playbooks, Policy-Checks (`heimlern`) |
+
+### Quickstart
+
+**Knowledge-Graph validieren (JSON):**
+```yaml
+jobs:
+  validate-knowledge-graph:
+    uses: heimgewebe/metarepo/.github/workflows/validate-knowledge-graph.yml@contracts-v1
+    with:
+      files_glob: |
+        knowledge.graph.json
+        docs/**/knowledge.graph.json
+```
+
+**Agent-Workflow validieren (YAML→JSON):**
+```yaml
+jobs:
+  validate-agent-workflows:
+    uses: heimgewebe/metarepo/.github/workflows/validate-agent-workflow.yml@contracts-v1
+    with:
+      files_glob: .agent/**/*.yaml
+```
+
 ### `contracts/aussen.event.schema.json`
 
 - **Pflichtfelder:** `type`, `source`; `url` ist Pflicht, wenn `type = "link"`.

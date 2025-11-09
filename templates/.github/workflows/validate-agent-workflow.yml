@@ -1,0 +1,49 @@
+name: validate-agent-workflows
+
+on:
+  push:
+    paths:
+      - ".agent/**/*.yml"
+      - ".agent/**/*.yaml"
+      - ".github/workflows/validate-agent-workflow.yml"
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout
+        uses: actions/checkout@8ade135a242bde00fd19c0e54fb3760beea110ee # v4.1.0
+
+      - name: Setup Node
+        uses: actions/setup-node@5e221d4786ffb21088b21dfc9c80efb16b52cd3b # v4.0.2
+
+      - name: Install tools
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install yq PyYAML
+          npm i -g ajv-cli@5.0.0
+
+      - name: Validate manifests (.agent/*.yml/.yaml)
+        shell: bash
+        env:
+          SCHEMA_URL: https://raw.githubusercontent.com/heimgewebe/metarepo/contracts-v1/contracts/agent.workflow.schema.json
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          mapfile -t FILES < <(printf '%s\n' .agent/**/*.yml .agent/**/*.yaml | tr ' ' '\n' | awk 'NF')
+          if (( ${#FILES[@]} == 0 )); then
+            echo "::notice::Keine Agent-Workflow-Dateien unter .agent/ gefunden – übersprungen."
+            exit 0
+          fi
+          curl -fsSL "$SCHEMA_URL" -o /tmp/schema.json
+          for f in "${FILES[@]}"; do
+            echo "→ $f"
+            tmp="$(mktemp /tmp/agent.XXXX.json)"
+            yq -o=json '.' "$f" > "$tmp"
+            ajv validate --spec=draft2020 --strict=true --validate-formats=true -s /tmp/schema.json -d "$tmp"
+            rm -f "$tmp"
+          done
+          echo "OK."
