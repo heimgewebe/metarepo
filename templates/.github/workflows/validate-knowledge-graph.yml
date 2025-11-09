@@ -1,0 +1,48 @@
+name: validate-knowledge-graph
+
+on:
+  push:
+    paths:
+      - "knowledge.graph.json"
+      - "docs/**/knowledge.graph.json"
+      - ".github/workflows/validate-knowledge-graph.yml"
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@8ade135a242bde00fd19c0e54fb3760beea110ee # v4.1.0
+
+      - name: Setup Node
+        uses: actions/setup-node@5e221d4786ffb21088b21dfc9c80efb16b52cd3b # v4.0.2
+
+      - name: Install ajv-cli
+        run: npm i -g ajv-cli@5.0.0
+
+      - name: Validate knowledge.graph.json
+        shell: bash
+        env:
+          SCHEMA_URL: https://raw.githubusercontent.com/heimgewebe/metarepo/contracts-v1/contracts/knowledge.graph.schema.json
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          declare -a FILES=(
+            knowledge.graph.json
+          )
+          # zusätzliche Standardpfade
+          while IFS= read -r -d '' f; do FILES+=("$f"); done < <(find docs -type f -name 'knowledge.graph.json' -print0 2>/dev/null || true)
+          if (( ${#FILES[@]} == 0 )); then
+            echo "::notice::Keine knowledge.graph.json gefunden – übersprungen."
+            exit 0
+          fi
+          echo "Prüfe ${#FILES[@]} Datei(en)…"
+          curl -fsSL "$SCHEMA_URL" -o /tmp/schema.json
+          for f in "${FILES[@]}"; do
+            echo "→ $f"
+            ajv validate --spec=draft2020 --strict=true --validate-formats=true -s /tmp/schema.json -d "$f"
+          done
+          echo "OK."

@@ -292,6 +292,105 @@ cmd_smoke(){
   echo "Repos in scope: ${count:-0}"
 }
 
+# -------------------------------
+# CODE COMMANDS (scaffold & lint)
+# -------------------------------
+cmd_code(){
+  local sub="${1:-}"; shift || true
+  case "${sub}" in
+    init)
+      local lang="${1:-}"; [[ -n "$lang" ]] || die "wgx code init <rust|python|shell>"
+      local src="${ROOT_DIR}/templates/dev/${lang}"
+      [[ -d "$src" ]] || die "keine Templates für ${lang} gefunden: ${src}"
+      rsync -a "${src}/" "./"
+      log "Templates für ${lang} kopiert."
+      ;;
+    lint)
+      log "Lint (stub) – bitte projektspezifische Linter einhängen."
+      ;;
+    test)
+      log "Test (stub) – delegiere an just test / cargo test / pytest."
+      ;;
+    gen)
+      local name="${1:-}"; [[ -n "$name" ]] || die "wgx code gen <template-name>"
+      local src="${ROOT_DIR}/templates/dev/${name}"
+      [[ -d "$src" || -f "$src" ]] || die "Template nicht gefunden: ${src}"
+      rsync -a "${src}/" "./" 2>/dev/null || cp "${src}" "./"
+      log "Template ${name} generiert."
+      ;;
+    *)
+      die "unknown: wgx code ${sub}"
+      ;;
+  esac
+}
+
+# ------------------------------------
+# KNOWLEDGE COMMANDS (export minimal)
+# ------------------------------------
+cmd_knowledge(){
+  local sub="${1:-}"; shift || true
+  case "${sub}" in
+    extract)
+      local out="knowledge.graph.json"
+      cat >"$out" <<'JSON'
+{"nodes":[{"id":"root","node_type":"concept","label":"root"}],"edges":[],"metadata":{"tags":["demo"]}}
+JSON
+      log "Knowledge Graph geschrieben: $out"
+      ;;
+    export)
+      log "Export (stub) – formatiere für vault-kompatiblen Import."
+      ;;
+    validate)
+      local file="${1:-knowledge.graph.json}"
+      [[ -f "$file" ]] || die "Datei nicht gefunden: $file"
+      if command -v npx >/dev/null 2>&1; then
+        npx --yes ajv-cli@5 validate --spec=draft2020 -s "${ROOT_DIR}/contracts/knowledge.graph.schema.json" -d "$file" || die "Schema-Verstoß"
+      else
+        log "ajv-cli nicht vorhanden – skip."
+      fi
+      ;;
+    *)
+      die "unknown: wgx knowledge ${sub}"
+      ;;
+  esac
+}
+
+# -------------------------
+# AGENT COMMANDS (validate)
+# -------------------------
+cmd_agent(){
+  local sub="${1:-}"; shift || true
+  case "${sub}" in
+    validate)
+      local manifest="${1:-}"; [[ -n "$manifest" ]] || die "wgx agent validate <manifest.yaml>"
+      # naive yaml->json (nur sehr einfacher Fall) – für echte Nutzung: yq
+      if command -v yq >/dev/null 2>&1 && command -v npx >/dev/null 2>&1; then
+        tmp="$(mktemp)"; yq -o=json '.' "$manifest" >"$tmp"
+        npx --yes ajv-cli@5 validate --spec=draft2020 -s "${ROOT_DIR}/contracts/agent.workflow.schema.json" -d "$tmp" || die "Manifest verletzt Contract"
+        rm -f "$tmp"
+        log "OK: Agent-Manifest valid."
+      else
+        log "Hinweis: yq/npx fehlen – nur Format-Anwesenheit geprüft."
+        [[ -s "$manifest" ]] || die "Manifest leer"
+      fi
+      ;;
+    *)
+      die "unknown: wgx agent ${sub}"
+      ;;
+  esac
+}
+
+cmd_help(){
+  cat <<'HLP'
+wgx – weave ground eXtensions
+  usage:
+    wgx plan|up|validate|smoke [...]
+    wgx code <init|lint|test|gen> [...]
+    wgx knowledge <extract|export|validate> [...]
+    wgx agent <validate> <manifest.yaml>
+HLP
+}
+
 case "${1:-}" in
   list)      cmd_list ;;
   plan)      cmd_plan ;;
@@ -304,5 +403,8 @@ case "${1:-}" in
   doctor)    cmd_doctor ;;
   validate)  cmd_validate ;;
   smoke)     cmd_smoke ;;
-  *)         echo "Usage: $0 {list|plan|up [0|1]|run [workflow=ci]|doctor|validate|smoke}" >&2; exit 2 ;;
+  code)      cmd_code "$@";;
+  knowledge) cmd_knowledge "$@";;
+  agent)     cmd_agent "$@";;
+  *)         cmd_help; exit 1;;
 esac

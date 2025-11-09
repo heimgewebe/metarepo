@@ -1,0 +1,47 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://schemas.heimgewebe.org/knowledge.graph.schema.json",
+ "title": "Knowledge Graph Export",
+ "type": "object",
+ "additionalProperties": false,
+ "properties": {
+  "nodes": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "required": ["id", "node_type"],
+    "additionalProperties": true,
+    "properties": {
+     "id": { "type": "string", "minLength": 1 },
+     "node_type": { "type": "string", "enum": ["concept", "code_entity", "document", "decision"] },
+     "label": { "type": "string" },
+     "metadata": { "type": "object", "additionalProperties": true }
+    }
+   }
+  },
+  "edges": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "required": ["source", "relation", "target"],
+    "additionalProperties": false,
+    "properties": {
+     "source": { "type": "string" },
+     "relation": { "type": "string", "enum": ["implements", "references", "supersedes", "depends_on", "documents", "explains"] },
+     "target": { "type": "string" },
+     "weight": { "type": "number" }
+    }
+   }
+  },
+  "metadata": {
+   "type": "object",
+   "additionalProperties": false,
+   "properties": {
+    "last_updated": { "type": "string", "format": "date-time" },
+    "authors": { "type": "array", "items": { "type": "string" } },
+    "tags": { "type": "array", "items": { "type": "string" } }
+   }
+  }
+ },
+ "required": ["nodes", "edges"]
+}

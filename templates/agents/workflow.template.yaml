@@ -1,0 +1,8 @@
+workflow_id: sample-workflow
+orchestration: sequential
+agents:
+ - id: k1
+   agent_type: knowledge
+   capabilities: [extract, link]
+policies:
+ timeout: 120
