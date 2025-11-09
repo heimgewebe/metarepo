@@ -12,6 +12,32 @@ Die Contracts definieren den gemeinsamen Korridor für alle Fleet-Repos. Jede Pr
 | `contracts/aussen.event.schema.json` | `aussensensor`, `weltgewebe` | `leitstand` Panel „Außen“, Downstream Exports |
 | `contracts/event.line.schema.json` | `hausKI` JSONL Event-Log | Fleet-Debugging, Replays, Append-only Sync |
 | `contracts/policy.decision.schema.json` | `heimlern` Policies | `hausKI` erklärt Entscheidungen („Warum“), `leitstand` zeigt Begründungen |
+| `contracts/os.context.intent.schema.json` | `mitschreiber` | `semantAH` (Graph / Kontextaufbau), `hausKI` (Plan/Execute), `leitstand` (Audit) |
+
+### `contracts/os.context.intent.schema.json`
+
+- **Zweck:** Intent-Ereignisse aus dem lokalen Kontext (User/Editor/System) als JSONL (eine Zeile = ein Objekt).
+- **Pflichtfelder:** `actor`, `goal`.
+- **Empfohlen:** `ts` (ISO-8601), `scope.repo` oder `scope.path`, `tags[]`.
+- **Kontext:** `context.*` bündelt OS/App/Editor-Infos, optional `text.lang`/`text.content` (begrenzte Länge) und `embeddings`.
+- **Erweiterbarkeit:** `constraints` und `meta` erlauben lockeres Andocken neuer Hinweise/Transport-Infos.
+
+**CI-Validierung (Beispiel, in Producer-Repos wie `mitschreiber`):**
+```yaml
+name: validate-intent
+on:
+  push:
+    paths: ["export/**", ".github/workflows/**"]
+  pull_request:
+jobs:
+  ajv:
+    uses: heimgewebe/metarepo/.github/workflows/reusable-validate-jsonl.yml@contracts-v1
+    with:
+      jsonl_path: export/os.intent.jsonl
+      schema_url: https://raw.githubusercontent.com/heimgewebe/metarepo/contracts-v1/contracts/os.context.intent.schema.json
+      strict: false
+      validate_formats: true
+```
 
 ### `contracts/aussen.event.schema.json`
 

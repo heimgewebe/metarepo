@@ -31,6 +31,7 @@
 | **aussensensor** | Außen-Signalgeber | Feeds/Sensoren/Webhooks → kuratierter **`feed.jsonl`** | Web/APIs/Sensorik/Weltgewebe | Außen-Events |
 | **weltgewebe** | Karten-Interface (Außensphäre) | Gemeingüter/Neighborhood, Karten/Projekte/Beiträge | Nutzer/Web | Freigegebene Außen-Ergebnisse (→ aussensensor/leitstand) |
 | **tools** | Skript-Bausteine | kleine Utilities (backup, health, diffs, exports) | — | von wgx/hausKI/semantAH genutzt |
+| **mitschreiber** | Intent-/Kontext-Sensor | UI/Editor/OS-Kontext → **Intents** | Nutzer/OS/App | `os.context.intent.jsonl` |
 
 ---
 
