@@ -5,29 +5,32 @@
  "type": "object",
  "additionalProperties": false,
  "properties": {
-  "language": {
-   "type": "string",
-   "enum": ["rust", "python", "typescript", "bash"]
-  },
-  "lsp_config": {
-   "type": "object",
-   "description": "Editor/LSP Einstellungen (schlank, repo-lokal)",
-   "additionalProperties": true
-  },
-  "code_generation": {
-   "type": "object",
-   "properties": {
-    "templates": { "type": "array", "items": { "type": "string" }, "default": [] },
-    "generators": { "type": "array", "items": { "type": "string" }, "default": [] },
-    "validation_rules": { "type": "array", "items": { "type": "string" }, "default": [] }
-   },
-   "additionalProperties": false
-  },
-  "test_framework": {
-   "type": "object",
-   "description": "Minimaler Test-Stack (z. B. cargo test / pytest / bun test)",
-   "additionalProperties": true
-  }
+ "language": {
+ "type": "string",
+ "enum": ["rust", "python", "typescript", "bash"]
+ },
+ "lsp_config": {
+ "type": "object",
+ "description": "IDE/LSP Konfiguration (z. B. rust-analyzer, pylsp, tsserver).",
+ "additionalProperties": true
+ },
+ "code_generation": {
+ "type": "object",
+ "additionalProperties": false,
+ "properties": {
+ "templates": { "type": "array", "items": { "type": "string" }, "default": [] },
+ "generators": { "type": "array", "items": { "type": "string" }, "default": [] },
+ "validation_rules": { "type": "array", "items": { "type": "string" }, "default": [] }
+ }
+ },
+ "test_framework": {
+ "type": "object",
+ "additionalProperties": false,
+ "properties": {
+ "kind": { "type": "string", "enum": ["cargo", "pytest", "node", "bash"] },
+ "watch": { "type": "boolean", "default": false }
+ }
+ }
  },
  "required": ["language"]
 }
