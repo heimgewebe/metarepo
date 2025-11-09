@@ -1,0 +1,24 @@
+name: agent-smoke
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "agents/**/*.workflow.json"
+      - "scripts/agents/**"
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@8ade135a242bde00fd19c0e54fb3760beea110ee # v4.1.0
+      - name: Prepare demo layout
+        run: |
+          mkdir -p agents scripts/agents
+          cp -v templates/agents/sample.workflow.json agents/sample.workflow.json
+          cp -v templates/scripts/agents/*.sh scripts/agents/
+          chmod +x scripts/agents/*.sh
+      - name: Run orchestrator
+        run: scripts/agents/orchestrate.sh agents/sample.workflow.json
+      - name: Show trace
+        run: |
+          latest="$(ls -1t .agents/runs/*.jsonl | head -n1)"
+          bash scripts/agents/trace.sh "$latest" || true

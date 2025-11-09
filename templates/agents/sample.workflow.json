@@ -1,0 +1,10 @@
+{
+  "workflow_id": "sample-sequential",
+  "name": "Sample Sequential Run",
+  "orchestration": "sequential",
+  "agents": [
+    { "id": "lint", "type": "code", "command": ["bash","-lc","echo linting... && sleep 1"] },
+    { "id": "analyze", "type": "knowledge", "command": ["bash","-lc","echo analyze graph... && sleep 1"] }
+  ],
+  "policies": { "retry_strategy": { "max_retries": 1, "backoff": "fixed" }, "timeout_sec": 60 }
+}
