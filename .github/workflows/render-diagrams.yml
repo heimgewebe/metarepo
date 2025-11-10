@@ -49,7 +49,7 @@ jobs:
           scripts/render-diagram.sh "${files[@]}" --outdir docs/diagrams --format "${{ github.event.inputs.format || 'png' }}"
 
       - name: Upload rendered diagrams
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: diagrams-${{ github.run_id }}
           path: docs/diagrams/*
