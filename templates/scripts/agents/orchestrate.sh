@@ -38,7 +38,7 @@ log_event(){ # type payload_json
 
 log_event start '{}'
 log_event meta "$(jq -n --arg wf "$WF" --arg orch "$orchestration" \
-  --argjson timeout $timeout_sec --argjson retries $retries --arg back "$backoff" \
+  --argjson timeout "$timeout_sec" --argjson retries "$retries" --arg back "$backoff" \
   '{workflow_file:$wf, orchestration:$orch, timeout_sec:$timeout, retries:$retries, backoff:$back}')"
 
 # read agents into indexable arrays
@@ -70,23 +70,23 @@ run_one(){
     fi
   else
     # default: no-op
-    CMD=(bash -lc "echo no-op for $id")
+    CMD=(echo "no-op for" "$id")
   fi
 
   local try=0 rc=1 started elapsed_s
   while :; do
     try=$((try+1))
     started=$(date +%s)
-    log_event exec_try "$(jq -n --arg id "$id" --argjson try $try --argjson timeout $timeout_sec '{id:$id,try:$try,timeout_sec:$timeout}')"
+    log_event exec_try "$(jq -n --arg id "$id" --argjson try "$try" --argjson timeout "$timeout_sec" '{id:$id,try:$try,timeout_sec:$timeout}')"
     if (( timeout_sec > 0 )); then
-      (export "${env_kv[@]}" || true; timeout "${timeout_sec}s" "${CMD[@]}") 2> >(sed 's/^/stderr: /' >&2)
+      (export "${env_kv[@]}" || true; timeout -- "${timeout_sec}s" "${CMD[@]}") 2> >(sed 's/^/stderr: /' >&2)
       rc=$?
     else
       (export "${env_kv[@]}" || true; "${CMD[@]}") 2> >(sed 's/^/stderr: /' >&2)
       rc=$?
     fi
     elapsed_s=$(( $(date +%s) - started ))
-    log_event exec_done "$(jq -n --arg id "$id" --argjson rc $rc --argjson secs $elapsed_s '{id:$id,rc:$rc,secs:$secs}')"
+    log_event exec_done "$(jq -n --arg id "$id" --argjson rc "$rc" --argjson secs "$elapsed_s" '{id:$id,rc:$rc,secs:$secs}')"
     if (( rc == 0 )); then break; fi
     if (( try > retries )); then break; fi
     case "$backoff" in
@@ -97,7 +97,7 @@ run_one(){
     esac
   done
   if (( rc != 0 )); then
-    log_event agent_fail "$(jq -n --arg id "$id" --argjson rc $rc '{id:$id,rc:$rc}')"
+    log_event agent_fail "$(jq -n --arg id "$id" --argjson rc "$rc" '{id:$id,rc:$rc}')"
   else
     log_event agent_ok "$(jq -n --arg id "$id" '{id:$id}')"
   fi
@@ -115,7 +115,7 @@ case "$orchestration" in
     # naive parallel: fire-and-wait; stop on first failure
     pids=()
     for i in $(seq 0 $((agents_len-1))); do
-      ( run_one "$i" ) & pids+=($!)
+      ( run_one "$i" ) & pids+=("$!")
     done
     for p in "${pids[@]}"; do
       if ! wait "$p"; then rc=1; fi
@@ -132,5 +132,5 @@ if (( rc == 0 )); then
 else
   log_event error "$(jq -n --arg reason "workflow_failed" '{reason:$reason}')"
 fi
-echo "::notice ::trace written to $trace"
+echo "::notice ::trace written to ${trace}"
 exit "$rc"
