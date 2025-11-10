@@ -93,7 +93,7 @@ download_yq() {
         local tmp
         tmp="$(mktemp "${YQ_LOCAL}.dl.XXXXXX")"
         trap 'tmp_file=${tmp-}; if [[ -n "${tmp_file}" ]]; then rm -f -- "${tmp_file}" 2>/dev/null || true; fi' EXIT
-        log "Probiere Download-URL für ${yq_version}..."
+        log "Probiere Download-URL für ${yq_version}: ${url}"
         if curl -fsSL "${url}" -o "${tmp}"; then
                 log "Downloading from ${url}"
         else
@@ -128,7 +128,7 @@ resolved_yq() {
 
 cmd_ensure() {
 	ensure_dir
-	local yq_bin
+	local yq__bin
 	local v
 	local version_is_ok=false
 
