@@ -141,3 +141,7 @@ _wgx *args:
 
 _yq *args:
     @scripts/tools/yq-pin.sh {{args}}
+default: lint
+lint:
+    bash -n $(git ls-files *.sh *.bash)
+    echo "lint ok"
