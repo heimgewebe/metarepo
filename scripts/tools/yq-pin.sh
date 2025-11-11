@@ -167,7 +167,6 @@ cmd_ensure() {
 
 case "${1:-ensure}" in
 ensure)
-	shift
 	cmd_ensure "$@"
 	;;
 *)
