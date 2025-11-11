@@ -115,7 +115,8 @@ case "$orchestration" in
     # naive parallel: fire-and-wait; stop on first failure
     pids=()
     for i in $(seq 0 $((agents_len-1))); do
-      ( run_one "$i" ) & pids+=("$!")
+      ( run_one "$i" ) &
+      pids+=("$!")
     done
     for p in "${pids[@]}"; do
       if ! wait "$p"; then rc=1; fi
@@ -128,9 +129,9 @@ case "$orchestration" in
 esac
 
 if (( rc == 0 )); then
-  log_event done "{}"
+  log_event "done" "{}"
 else
-  log_event error "$(jq -n --arg reason "workflow_failed" '{reason:$reason}')"
+  log_event "error" "$(jq -n --arg reason "workflow_failed" '{reason:$reason}')"
 fi
 echo "::notice ::trace written to ${trace}"
 exit "$rc"
