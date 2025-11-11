@@ -1,6 +1,6 @@
 <div align=right>Table of Contents↗️</div>
 
-<h1 align=center><code>just</code></h1>
+<h1 align=center id="just"><code>just</code></h1>
 
 <div align=center>
   <a href=https://crates.io/crates/just>
@@ -274,7 +274,7 @@ most Windows users.)
     <tr>
       <td><a href=https://www.gentoo.org>Gentoo</a></td>
       <td><a href=https://wiki.gentoo.org/wiki/Portage>Portage</a></td>
-      <td><a href=https://github.com/gentoo-mirror/guru/tree/master/dev-build/just>guru/dev-build/just</a></td>
+      <td><a href=https://packages.gentoo.org/packages/dev-build/just>dev-build/just</a></td>
       <td>
         <code>eselect repository enable guru</code><br>
         <code>emerge --sync guru</code><br>
@@ -295,7 +295,7 @@ most Windows users.)
     </tr>
     <tr>
       <td><a href=https://getsol.us>Solus</a></td>
-      <td><a href=https://getsol.us/articles/package-management/basics/en>eopkg</a></td>
+      <td><a href=https://help.getsol.us/docs/user/package-management/basics>eopkg</a></td>
       <td><a href=https://dev.getsol.us/source/just/>just</a></td>
       <td><code>eopkg install just</code></td>
     </tr>
@@ -434,21 +434,6 @@ Or with [taiki-e/install-action](https://github.com/taiki-e/install-action):
 
 An [RSS feed](https://en.wikipedia.org/wiki/RSS) of `just` releases is available [here](https://github.com/casey/just/releases.atom).
 
-### Node.js Installation
-
-[just-install](https://npmjs.com/package/just-install) can be used to automate
-installation of `just` in Node.js applications.
-
-`just` is a great, more robust alternative to npm scripts. If you want to
-include `just` in the dependencies of a Node.js application, `just-install`
-will install a local, platform-specific binary as part of the `npm install`
-command. This removes the need for every developer to install `just`
-independently using one of the processes mentioned above. After installation,
-the `just` command will work in npm scripts or with npx. It's great for teams
-who want to make the set up process for their project as easy as possible.
-
-For more information, see the
-[just-install README file](https://github.com/brombal/just-install#readme).
 
 Backwards Compatibility
 -----------------------
@@ -541,7 +526,7 @@ per-file basis:
 
 [just-mode](https://github.com/leon-barrett/just-mode.el) provides syntax
 highlighting and automatic indentation of `justfile`s. It is available on
-[MELPA](https://melpa.org/) as [just-mode](https://melpa.org/#/just-mode).
+[MELPA](https://melpa.org/) as [just-mode](https://melpa.org/#just-mode).
 
 [justl](https://github.com/psibi/justl.el) provides commands for executing and
 listing recipes.
