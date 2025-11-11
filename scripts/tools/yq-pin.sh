@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -euxo pipefail
 # Pin & Ensure für mikefarah/yq v4.x – ohne Netz zur Laufzeit.
 # Erwartet, dass ein kompatibles Binary entweder in ./tools/bin/yq liegt oder im PATH verfügbar ist.
 
@@ -55,6 +55,7 @@ read_pinned_version() {
 }
 
 download_yq() {
+        ensure_dir
         log "yq nicht gefunden/inkompatibel. Lade v${REQ_MAJOR}.x herunter..."
         require_cmd curl "Bitte curl installieren oder in PATH bereitstellen."
 
