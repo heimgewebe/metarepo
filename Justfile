@@ -141,7 +141,7 @@ _wgx *args:
 
 _yq *args:
     @scripts/tools/yq-pin.sh {{args}}
-default: lint
+# default: lint
 
 # Lokaler Helper: Schnelltests & Linter – sicher mit Null-Trennung und Quoting
 lint:

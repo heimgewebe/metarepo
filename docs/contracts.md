@@ -2,6 +2,8 @@
 
 Die Contracts definieren den gemeinsamen Korridor für alle Fleet-Repos. Jede Producer-Anwendung erzeugt Artefakte, die zu einem der Schemas passen, während Consumer und Control-Plane Workflows dieselben Schemas zur Validierung heranziehen.
 
+> **Benennungshinweis:** Historisch taucht für Intent-Events teils der Name `intent_event.schema.json` auf. Gemeint ist dasselbe wie `events/intent.schema.json`. Beide Bezeichnungen verweisen auf denselben Contract-Sachverhalt (Topic `intent/*`). Migrationspfad: Konsolidierung auf `events/intent.schema.json`.
+
 ## Übersicht
 
 | Schema | Producer | Consumer / Zweck |
@@ -13,6 +15,9 @@ Die Contracts definieren den gemeinsamen Korridor für alle Fleet-Repos. Jede Pr
 | `contracts/event.line.schema.json` | `hausKI` JSONL Event-Log | Fleet-Debugging, Replays, Append-only Sync |
 | `contracts/policy.decision.schema.json` | `heimlern` Policies | `hausKI` erklärt Entscheidungen („Warum“), `leitstand` zeigt Begründungen |
 | `contracts/os.context.intent.schema.json` | `mitschreiber` | `semantAH` (Graph / Kontextaufbau), `hausKI` (Plan/Execute), `leitstand` (Audit) |
+| `contracts/events/intent.schema.json` *(Alias: intent_event)* | `mitschreiber` Intent-Sensorik | `hausKI` Planung, `leitstand` Audit |
+| `contracts/insights.schema.json` | `semantAH` | `hausKI`, `leitstand` |
+| `contracts/metrics.snapshot.schema.json` | `wgx` | `hausKI`, `leitstand` |
 
 ### `contracts/os.context.intent.schema.json`
 
