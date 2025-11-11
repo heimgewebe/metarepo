@@ -31,7 +31,7 @@ Ziel: semantische Mitschriften – ohne Rohtext-Speicherung.
 | `focus` | boolean | true = Fenster im Vordergrund |
 | `activity_rpm` | integer ≥ 0 | Tastatur/Maus-Aktivität pro Minute |
 
-📄 Schema: [`contracts/os.context.state.schema.json`](../contracts/os.context.state.schema.json)
+📄 Schema: [`contracts/os.context.state.schema.json`](../../contracts/os.context.state.schema.json)
 
 ---
 
@@ -49,7 +49,7 @@ Ziel: semantische Mitschriften – ohne Rohtext-Speicherung.
 | `confidence` | number | Erkennungs-Konfidenz |
 | `privacy` | object | `{ "raw_retained": false }` usw. |
 
-📄 Schema: [`contracts/os.context.text.redacted.schema.json`](../contracts/os.context.text.redacted.schema.json)
+📄 Schema: [`contracts/os.context.text.redacted.schema.json`](../../contracts/os.context.text.redacted.schema.json)
 
 ---
 
@@ -67,7 +67,7 @@ Ziel: semantische Mitschriften – ohne Rohtext-Speicherung.
 | `hash_id` | string | SHA-256 o. ä. für Dedup/Audit |
 | `privacy` | object | `{ "raw_retained": false, "detector_ver": "v1.x" }` |
 
-📄 Schema: [`contracts/os.context.text.embed.schema.json`](../contracts/os.context.text.embed.schema.json)
+📄 Schema: [`contracts/os.context.text.embed.schema.json`](../../contracts/os.context.text.embed.schema.json)
 
 ---
 
