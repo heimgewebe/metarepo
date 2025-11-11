@@ -16,7 +16,7 @@ weiterführende Dokumente.
 | [`aussensensor`](https://github.com/heimgewebe/aussensensor) | Externe Signale → kuratierte Events | [`docs/`](https://github.com/heimgewebe/aussensensor/tree/main/docs) |
 | [`heimlern`](https://github.com/heimgewebe/heimlern) | Bandit-Policies, Feedback, Snapshots | [`docs/`](https://github.com/heimgewebe/heimlern/tree/main/docs) |
 | [`semantAH`](https://github.com/heimgewebe/semantAH) | Wissensaufbereitung, Graph, Exporte | [`docs/`](https://github.com/heimgewebe/semantAH/tree/main/docs) |
-| [`weltgewebe`](https://github.com/heimgewebe/weltgewebe) | Außensphäre, Community, Karten | [`docs/`](https://github.com/heimgewebe/weltgewebe/tree/main/docs) |
+| [`mitschreiber`](https://github.com/heimgewebe/mitschreiber) | Intent-/Kontext-Sensorik | [`docs/`](https://github.com/heimgewebe/mitschreiber/tree/main/docs) |
 
 > 💡 `vault-gewebe` ist privat; Dokumentation erfolgt bewusst nicht öffentlich.
 
