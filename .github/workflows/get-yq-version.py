@@ -13,7 +13,8 @@ if not toolchain_file.is_file():
     sys.exit(1)
 
 text = toolchain_file.read_text()
-match = re.search(r"^yq:\s*\"?([^\"#\n]+)\"?", text, re.MULTILINE)
+# Updated regex to optionally match 'v' prefix and single/double quotes
+match = re.search(r"^yq:\s*['\"]?v?([^'\"#\n]+)['\"]?", text, re.MULTILINE)
 if not match:
     print("yq version missing in toolchain.versions.yml", file=sys.stderr)
     sys.exit(1)

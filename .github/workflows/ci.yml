@@ -80,7 +80,7 @@ jobs:
           else
             YQ_VER="$("${PYTHON_BIN}" -c $'import pathlib,re,sys\np=pathlib.Path("toolchain.versions.yml")\n'
               $'c=p.read_text(encoding="utf-8")\n'
-              $'m=re.search(r"^yq:\\s*\\"?([^\\"#\\n]+)\\"?",c,re.M)\n'
+              $'m=re.search(r"^yq:\\s*[\'\\"]?v?([^\'\\"#\\n]+)[\'\\"]?",c,re.M)\n'
               $'sys.exit("yq version missing in toolchain.versions.yml") if not m else print(m.group(1).strip())')"
           fi
           test -n "${YQ_VER}" || { echo "Failed to resolve yq version" >&2; exit 1; }
