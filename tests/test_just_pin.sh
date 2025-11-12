@@ -80,7 +80,7 @@ assert_url \
 	"New: Reads from toolchain.yml (v-prefix)" \
 	"" \
 	"gnu" \
-	"https://github.com/casey/just/releases/download/v1.25.0/just-1.25.0-${ARCH}-unknown-linux-gnu.tar.gz"
+	"https://github.com/casey/just/releases/download/1.25.0/just-1.25.0-${ARCH}-unknown-linux-gnu.tar.gz"
 
 # 4) New test: Read a version without 'v' prefix from toolchain
 echo "just: '1.26.0'" >toolchain.versions.yml
