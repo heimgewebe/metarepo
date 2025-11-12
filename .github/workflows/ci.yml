@@ -100,18 +100,30 @@ jobs:
 
       - name: Ensure yq is available
         run: |
+          set -euo pipefail
           mkdir -p "$HOME/.local/bin"
-          export YQ_VERSION="${YQ_VERSION:?YQ_VERSION not set}"
+          # Add to PATH for current and subsequent steps
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          export PATH="$HOME/.local/bin:$PATH"
+
           YQ_VER_TRIM="${YQ_VERSION#v}"
 
-          # Ensure PATH to local bin for the rest of the job
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          # If yq is already installed, check version and skip install if it matches.
+          if command -v yq >/dev/null; then
+            if yq --version | grep -q "version v${YQ_VER_TRIM}"; then
+              echo "✅ yq ${YQ_VER_TRIM} already installed and verified."
+              exit 0
+            else
+              echo "Found existing yq, but version does not match. Re-installing."
+            fi
+          fi
 
           if [[ -x scripts/tools/yq-pin.sh ]]; then
             scripts/tools/yq-pin.sh ensure
-          elif ! command -v yq >/dev/null; then
-            OS="$(uname -s | tr '[:upper:]' '[:lower:]')"   # linux | darwin
-            ARCH_RAW="$(uname -m)"                          # x86_64 | aarch64 | arm64 | ...
+          else
+            echo "yq not found, attempting download..."
+            OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
+            ARCH_RAW="$(uname -m)"
             case "$ARCH_RAW" in
               x86_64) ARCH="amd64" ;;
               arm64|aarch64) ARCH="arm64" ;;
@@ -122,9 +134,11 @@ jobs:
             YQ_SHA_URL="${YQ_URL}.sha256"
             TMP_YQ="$(mktemp)"
             TMP_SHA="$(mktemp)"
+            trap 'rm -f "${TMP_YQ}" "${TMP_SHA}"' EXIT
+
             echo "Downloading yq ${YQ_VERSION} from ${YQ_URL}"
             curl -fsSL -o "${TMP_YQ}" "${YQ_URL}"
-            # SHA-Datei ist optional unterschiedlich formatiert; prüfen, wenn vorhanden
+
             if curl -fsSL -o "${TMP_SHA}" "${YQ_SHA_URL}"; then
               EXPECTED="$(cut -d ' ' -f1 < "${TMP_SHA}")"
               if command -v sha256sum >/dev/null; then
@@ -138,21 +152,21 @@ jobs:
               fi
             fi
             install -m 0755 "${TMP_YQ}" "$HOME/.local/bin/yq"
-            rm -f "${TMP_YQ}" "${TMP_SHA}"
-            yq --version
           fi
 
+          # Final verification
           if ! command -v yq >/dev/null; then
-            echo "yq installation failed" >&2
+            echo "yq installation failed: command not found after install attempt." >&2
             exit 1
           fi
 
           YQ_VERSION_OUTPUT="$(yq --version)"
           echo "${YQ_VERSION_OUTPUT}"
-          echo "${YQ_VERSION_OUTPUT}" | grep -qF "${YQ_VER_TRIM}" || {
-            echo "::error::yq version check failed. Expected '${YQ_VER_TRIM}', got: ${YQ_VERSION_OUTPUT}"
+          if ! echo "${YQ_VERSION_OUTPUT}" | grep -q "version v${YQ_VER_TRIM}"; then
+            echo "yq version check failed. Expected v${YQ_VER_TRIM}, got: ${YQ_VERSION_OUTPUT}" >&2
             exit 1
-          }
+          fi
+
           echo "✅ yq ${YQ_VER_TRIM} verified OK"
 
       - name: Read toolchain versions
@@ -636,6 +650,11 @@ jobs:
           path: apps/web/playwright-report
           if-no-files-found: ignore
           retention-days: 7
+
+  check-action-refs:
+    needs: ci
+    if: ${{ (github.event_name != 'push' || (!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '[ci skip]'))) && (github.event_name != 'pull_request' || github.event.pull_request.draft != true) }}
+    uses: ./.github/workflows/reusable-check-action-refs.yml
 
       - name: Show sccache stats
         if: ${{ hashFiles('**/Cargo.toml') != '' }}
