@@ -503,10 +503,6 @@ jobs:
         with:
           args: -color
 
-      - name: Check for @main references in Actions
-        if: runner.os == 'Linux'
-        uses: ./.github/workflows/reusable-check-action-refs.yml
-
       - name: Check Rust formatting
         if: ${{ hashFiles('**/Cargo.toml') != '' }}
         run: cargo fmt --all --check
@@ -654,6 +650,11 @@ jobs:
           path: apps/web/playwright-report
           if-no-files-found: ignore
           retention-days: 7
+
+  check-action-refs:
+    needs: ci
+    if: ${{ (github.event_name != 'push' || (!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '[ci skip]'))) && (github.event_name != 'pull_request' || github.event.pull_request.draft != true) }}
+    uses: ./.github/workflows/reusable-check-action-refs.yml
 
       - name: Show sccache stats
         if: ${{ hashFiles('**/Cargo.toml') != '' }}
