@@ -1,0 +1,20 @@
+name: reusable-check-action-refs
+on:
+  workflow_call: {}
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Scan workflow refs
+        run: |
+          shopt -s nullglob
+          failed=0
+          while IFS= read -r -d '' f; do
+            # erlaubt: @v*, @contracts-*, @metarepo-*, @
+            if grep -E 'uses:\s*[^@]+@main' -n "$f"; then
+              echo "::error file=$f::Found @main reference – pin Actions by tag or SHA."
+              failed=1
+            fi
+          done < <(find .github/workflows -type f -name '*.yml' -print0)
+          exit $failed

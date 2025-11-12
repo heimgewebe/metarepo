@@ -486,6 +486,10 @@ jobs:
         with:
           args: -color
 
+      - name: Check for @main references in Actions
+        if: runner.os == 'Linux'
+        uses: ./.github/workflows/reusable-check-action-refs.yml
+
       - name: Check Rust formatting
         if: ${{ hashFiles('**/Cargo.toml') != '' }}
         run: cargo fmt --all --check
