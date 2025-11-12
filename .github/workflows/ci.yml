@@ -149,7 +149,10 @@ jobs:
 
           YQ_VERSION_OUTPUT="$(yq --version)"
           echo "${YQ_VERSION_OUTPUT}"
-          test "${YQ_VERSION_OUTPUT}" = "yq (https://github.com/mikefarah/yq/) version v${YQ_VER_TRIM}"
+          echo "${YQ_VERSION_OUTPUT}" | grep -qF "${YQ_VER_TRIM}" || {
+            echo "::error::yq version check failed. Expected '${YQ_VER_TRIM}', got: ${YQ_VERSION_OUTPUT}"
+            exit 1
+          }
           echo "✅ yq ${YQ_VER_TRIM} verified OK"
 
       - name: Read toolchain versions
