@@ -651,11 +651,6 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
-  check-action-refs:
-    needs: ci
-    if: ${{ (github.event_name != 'push' || (!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '[ci skip]'))) && (github.event_name != 'pull_request' || github.event.pull_request.draft != true) }}
-    uses: ./.github/workflows/reusable-check-action-refs.yml
-
       - name: Show sccache stats
         if: ${{ hashFiles('**/Cargo.toml') != '' }}
         run: sccache --show-stats
@@ -672,3 +667,8 @@ jobs:
             .runtime/**/*
             !**/node_modules/**
           retention-days: 7
+
+  check-action-refs:
+    needs: ci
+    if: ${{ (github.event_name != 'push' || (!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '[ci skip]'))) && (github.event_name != 'pull_request' || github.event.pull_request.draft != true) }}
+    uses: ./.github/workflows/reusable-check-action-refs.yml
