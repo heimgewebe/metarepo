@@ -1,5 +1,15 @@
 # Contracts v1 – Kurzreferenz
 
+## Benennung & Mapping (Stand v0.2)
+
+| Thema | Dateiname | Topic/Verwendung | Status | Bemerkung |
+|----------------------|------------------------------|------------------|---------|-----------|
+| Intent deklarieren | `intent_event.schema.json` | `intent/*` | aktiv | **Mapping:** entspricht zukünftig `intent.event.schema.json` |
+| Policy-Entscheidung | `policy.decision.schema.json`| `policy/*` | aktiv | Punkt-Notation preferiert |
+| Außen-Event | `aussen.event.schema.json` | `aussen/*` | aktiv | JSONL/NDJSON Zeilenformat |
+
+> **Hinweis:** Neue Schemas nutzen **Punkt-Notation** (z. B. `policy.decision.schema.json`). Historische Unterstrich-Varianten bleiben bis `contracts-v2` gültig.
+
 Die Contracts definieren den gemeinsamen Korridor für alle Fleet-Repos. Jede Producer-Anwendung erzeugt Artefakte, die zu einem der Schemas passen, während Consumer und Control-Plane Workflows dieselben Schemas zur Validierung heranziehen.
 
 > **Benennungshinweis:** Historisch taucht für Intent-Events teils der Name `intent_event.schema.json` auf. Gemeint ist dasselbe wie `events/intent.schema.json`. Beide Bezeichnungen verweisen auf denselben Contract-Sachverhalt (Topic `intent/*`). Migrationspfad: Konsolidierung auf `events/intent.schema.json`.
