@@ -1,5 +1,17 @@
 # Architektur
 
+## Kernkomponenten (7 Schichten) — Stand v0.2
+
+1. **Physisch (WGX/OS/systemd)** – Orchestrierung & Ausführung (wgx, just, Runner)
+2. **Semantisch (semantAH)** – Embeddings, Graph, Relationen
+3. **Operativ (hausKI)** – Planung, Simulation, Ausführung
+4. **Reflexiv (sichter)** – Diagnose, Review, Selbstkorrektur
+5. **Memorativ (leitstand)** – Episoden, Metriken, Audit-Persistenz
+6. **Politisch-Adaptiv (heimlern)** – Policies, Bandits, Feedback/Score
+7. **Dialogisch-Semantisch (mitschreiber, hausKI-audio)** – Intent, Kontext, Audio-Events
+
+> **Nicht-Fleet:** `vault-gewebe` (privat) und `weltgewebe` (öffentlich, unabhängig) gehören nicht zur Fleet; sie werden nur referenziert.
+
 Diese Seite fasst die wichtigsten Architektur-Perspektiven zusammen und verlinkt auf die
 bestehenden Diagramme sowie Detaildokumente.
 
