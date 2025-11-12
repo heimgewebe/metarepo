@@ -1,14 +1,15 @@
 version: 2
 updates:
+  # Halte CI-Actions aktuell (Sicherheitsfixes)
   - package-ecosystem: "github-actions"
     directory: "/"
-    schedule:
-      interval: "daily"
-    open-pull-requests-limit: 10
-    commit-message:
-      prefix: "deps(actions)"
-      include: "scope"
-    # Hinweis/Note: Dependabot unterstützt bei github-actions KEINE 'groups'-Funktion.
-    # Wenn 'groups' gesetzt ist, stoppt die Verarbeitung der Actions-Updates komplett
-    # (siehe https://github.com/dependabot/dependabot-core/issues/8324).
-    # Daher bewusst ohne Gruppierung / groups intentionally omitted.
+    schedule: { interval: "weekly" }
+  - package-ecosystem: "cargo"
+    directory: "/"
+    schedule: { interval: "weekly" }
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule: { interval: "weekly" }
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule: { interval: "weekly" }
