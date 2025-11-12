@@ -1,0 +1,28 @@
+name: reusable-wgx-metrics
+on:
+  workflow_call:
+    inputs:
+      out:
+        description: Output-Datei
+        required: false
+        type: string
+        default: .wgx/metrics.snapshot.json
+jobs:
+  metrics:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Try just wgx metrics snapshot
+        run: |
+          set -euo pipefail
+          mkdir -p .wgx
+          if command -v just >/dev/null 2>&1; then
+            if just -l | grep -q 'wgx metrics snapshot'; then
+              if just wgx metrics snapshot --output "${{ inputs.out }}"; then
+                exit 0
+              fi
+            fi
+          fi
+          echo "::notice::Fallback to script: scripts/wgx-metrics-snapshot.sh"
+          bash scripts/wgx-metrics-snapshot.sh --output "${{ inputs.out }}" || {
+            echo "::error::WGX metrics snapshot not available"; exit 1; }
