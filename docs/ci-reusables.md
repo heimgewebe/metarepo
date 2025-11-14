@@ -11,7 +11,7 @@ verweisen bei Bedarf auf die WGX-Engine im [WGX-Repository](https://github.com/h
 * `reusable-ci.yml` – generischer CI-Baustein mit optionalen Lint- und Test-Schritten (`just`).
 * **Zentraler Reusable:** `.github/workflows/reusable-validate-jsonl.yml` (liegt im metarepo) validiert JSONL-Zeilen gegen Contracts (AJV Draft 2020-12). Consumer-Repos referenzieren ihn via `uses: heimgewebe/metarepo/...`.
 
-  * **Aktuelle Nutzung (Stand jetzt):** `aussensensor`, `leitstand`, `heimlern`.
+  * **Aktuelle Nutzung (Stand jetzt):** `aussensensor`, `chronik`, `heimlern`.
     `hausKI` bindet ihn nur, wenn dort JSONL-Feeds/Fixtures geprüft werden sollen.
 
 ## Konsum in Sub-Repos

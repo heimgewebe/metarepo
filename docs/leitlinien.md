@@ -19,7 +19,7 @@
 - Keine Secrets ins Repo; Tokens nur lokal/als CI-Secret.
 
 ## Ports & Endpunkte
-- leitstand: `POST /ingest/{domain}` → `data/{domain}.jsonl`
+- chronik: `POST /ingest/{domain}` → `data/{domain}.jsonl`
 - Domains: `aussen`, `pc`, `musik`, `heute`, …
 
 ## CI

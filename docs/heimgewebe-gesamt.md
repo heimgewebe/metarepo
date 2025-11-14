@@ -2,7 +2,7 @@
 
 > Kurzfassung siehe [`docs/overview.md`](./overview.md); dort sind Rollen, Datenflüsse und Auth-Anker zusammengefasst.
 
-> **Fleet-Abgrenzung:** Core-Repos der Fleet sind `wgx, hausKI, hausKI-audio, metarepo, heimlern, aussensensor, leitstand, semantAH`.  
+> **Fleet-Abgrenzung:** Core-Repos der Fleet sind `wgx, hausKI, hausKI-audio, metarepo, heimlern, aussensensor, chronik, semantAH`.
 > `vault-gewebe` (inkl. privat) ist persönlicher Wissensspeicher und **nicht** Teil der Fleet.  
 > `weltgewebe` ist **unabhängig** vom Heimgewebe gedacht und wird parallel entwickelt.
 
@@ -23,13 +23,14 @@
 | --- | --- | --- | --- | --- |
 | **metarepo** | Control-Plane & Verträge | `repos.yml`, Templates, Reusable-CIs, **Contracts** (`*.schema.json`, OpenAPI) | — | Contracts, CI-Checks |
 | **wgx** | Motorik & PC-Pflege | `doctor/clean/backup/metrics/drift`, System-Tasks | Jobs (hausKI), Policies (heimlern) | **Metrics-Snapshots**, Outcomes, Logs |
-| **hausKI** | Orchestrator & Persistenzkern | Playbooks (YAML), Job-Runner, Policy-Hook, lokaler State (SQLite + JSONL Events), lokale API | Insights (semantAH), Metrics (wgx), Audio-Events, Außen-Events (optional) | Jobs→wgx, Decisions (heimlern), **Events**, Exporte für leitstand |
+| **hausKI** | Orchestrator & Persistenzkern | Playbooks (YAML), Job-Runner, Policy-Hook, lokaler State (SQLite + JSONL Events), lokale API | Insights (semantAH), Metrics (wgx), Audio-Events, Außen-Events (optional) | Jobs→wgx, Decisions (heimlern), **Events**, Exporte für chronik |
 | **semantAH** | Wissen & Selbsterkenntnis | Vault/Docs-Ingest, Embeddings/Graph, Writer für **`insights/*`** | Vault, Code/Docs | `insights/today.json`, `weekly.md`, `.gewebe/index/*` |
 | **heimlern** *(neu)* | Lernen/Policies (Lib) | Bandits/Heuristiken/Scorer, Eval-Harness, Snapshots laden/speichern | Kontext (hausKI), Feedback/Rewards | Decisions (`action, score, why`) |
 | **hausKI-audio** | Musik/Audio-Schicht | Geräte-Profile, Routing, Übe-Sessions, Telemetrie | User-Aktion, Systemstatus | `audio.session_*`, `audio.latency_ms` |
-| **leitstand** | Ingest + Panels (UI) | `POST /ingest/{domain}`, Panels „Heute/Wissen/PC/Musik/Außen“, Tages-Digest | Snapshots/Insights/Events | Visualisierung, Benachrichtigung |
+| **chronik** | Event-Ingest + Persistenz/Audit | `POST /ingest/{domain}` | Snapshots/Insights/Events | Speicherung, Audit-Log |
+| **leitstand** | UI/Dashboard (Kontrollraum) | Panels „Heute/Wissen/PC/Musik/Außen“, Tages-Digest | Daten aus chronik, semantAH, hausKI | Visualisierung, Benachrichtigung |
 | **aussensensor** | Außen-Signalgeber | Feeds/Sensoren/Webhooks → kuratierter **`feed.jsonl`** | Web/APIs/Sensorik/Weltgewebe | Außen-Events |
-| **weltgewebe** | Karten-Interface (Außensphäre) | Gemeingüter/Neighborhood, Karten/Projekte/Beiträge | Nutzer/Web | Freigegebene Außen-Ergebnisse (→ aussensensor/leitstand) |
+| **weltgewebe** | Karten-Interface (Außensphäre) | Gemeingüter/Neighborhood, Karten/Projekte/Beiträge | Nutzer/Web | Freigegebene Außen-Ergebnisse (→ aussensensor/chronik) |
 | **tools** | Skript-Bausteine | kleine Utilities (backup, health, diffs, exports) | — | von wgx/hausKI/semantAH genutzt |
 | **mitschreiber** | Intent-/Kontext-Sensor | UI/Editor/OS-Kontext → **Intents** | Nutzer/OS/App | `os.context.intent.jsonl` |
 
@@ -42,8 +43,8 @@
 - `semantAH → hausKI/leitstand`: `insights/today.json`, `weekly.md`
 - `wgx → hausKI/leitstand`: `metrics.snapshot.json` (Host/Temps/Updates/Backup/Drift)
 - `hausKI-audio → hausKI/leitstand`: `audio.session_*`, `audio.latency_ms`
-- `aussensensor → leitstand`: `export/feed.jsonl` (kuratiert)
-- `weltgewebe → aussensensor/leitstand`: freigegebene Außen-Ergebnisse (gleiches Event-Schema)
+- `aussensensor → chronik`: `export/feed.jsonl` (kuratiert)
+- `weltgewebe → aussensensor/chronik`: freigegebene Außen-Ergebnisse (gleiches Event-Schema)
 - `heimlern ↔ hausKI`: `decide(ctx) → action,why` · `feedback(reward)`
 
 **hausKI intern:**
@@ -74,7 +75,7 @@
 2. **Plan:** hausKI Playbooks + **heimlern** Policies → Entscheidung (`action, why`)
 3. **Act:** wgx / audio führen aus
 4. **Reflect:** Outcomes in Events/SQLite → **feedback()** an heimlern → Policy-Parameter aktualisieren
-5. **Explain:** leitstand zeigt „Was/Warum/Resultat“
+5. **Explain:** leitstand (UI) zeigt „Was/Warum/Resultat“
 
 Beispiele Policies (heimlern):
 
@@ -90,8 +91,10 @@ Beispiele Policies (heimlern):
 - **hausKI:**
   - `POST /v1/policy/decide` · `POST /v1/policy/feedback` · `GET /v1/health/latest`
   - `POST /v1/ingest/metrics` · `GET /v1/events/tail` · `POST /v1/jobs`
-- **leitstand:**
-  - `POST /ingest/{domain}` · `GET /panels/{name}` · `GET /digest/today`
+- **chronik:**
+  - `POST /ingest/{domain}`
+- **leitstand (UI):**
+  - `GET /panels/{name}` · `GET /digest/today`
 - **aussensensor:**
   - optional `POST /ingest/event` → `export/feed.jsonl` append-safe
 
@@ -103,7 +106,8 @@ Beispiele Policies (heimlern):
 
 - **hausKI:** `~/.hauski/state/hauski.db` (jobs, job_runs, policy_param, health_snapshot), `~/.hauski/events/*.jsonl`
 - **semantAH:** `vault/.gewebe/index/*` (rebuildbar), `vault/.gewebe/insights/*`
-- **leitstand:** `data/*.jsonl`, `digest/*.md`
+- **chronik:** `data/*.jsonl`
+- **leitstand (UI):** `digest/*.md`
 - **Schemas:** `metarepo/contracts/*.schema.json` (AJV-validiert via Reusable CI)
 
 ---
@@ -118,7 +122,7 @@ Beispiele Policies (heimlern):
 | wgx Metrics Snapshot | stündlich + on-demand |
 | Events-Merge (optional Server) | 30–60 min |
 | DB-Backup (SQLite gz) | täglich 02:30 |
-| Digest (leitstand) | täglich 08:00 |
+| Digest (leitstand UI) | täglich 08:00 |
 
 ---
 
@@ -134,8 +138,9 @@ Beispiele Policies (heimlern):
 
 1. **Contracts & CI (metarepo)** → **wgx metrics** → **semantAH insights**
 2. **hausKI Persistenz + Playbooks + heimlern-Hook**
-3. **leitstand Panels** + **aussensensor feed**
-4. Policies schärfen, Audio-Telemetrie, Außenquellen erweitern
+3. **chronik Ingest** + **aussensensor feed**
+4. **leitstand Panels**
+5. Policies schärfen, Audio-Telemetrie, Außenquellen erweitern
 
 ---
 

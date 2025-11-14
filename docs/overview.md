@@ -8,7 +8,8 @@
 +- 1 **Semantisch:** semantAH
 +- 2 **Operativ:** hausKI
 +- 3 **Reflexiv:** sichter
-+- 4 **Memorativ:** leitstand
++- 4 **Memorativ:** chronik
++- 5 **Interaktiv:** leitstand (UI)
 +- 5 **Politisch-Adaptiv:** heimlern
 +- 6 **Dialogisch-Semantisch:** mitschreiber, hausKI-audio
 +

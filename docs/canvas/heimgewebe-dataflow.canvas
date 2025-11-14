@@ -1,32 +1,20 @@
 {
   "nodes": [
-    { "id": "meta",     "type": "text", "text": "metarepo\n(Schemas · Contracts)",           "x": -520, "y": -110, "width": 260, "height": 120, "color": "1" },
+    { "id": "wgx", "type": "text", "text": "wgx\n(metrics.snapshot.json)", "x": -200, "y": -160, "width": 260, "height": 120, "color": "5" },
+    { "id": "hauski", "type": "text", "text": "hausKI\n(events.jsonl)", "x": -200, "y": 0, "width": 260, "height": 120, "color": "3" },
+    { "id": "semantah", "type": "text", "text": "semantAH\n(insights/today.json)", "x": -200, "y": 160, "width": 260, "height": 120, "color": "5" },
+    { "id": "audio", "type": "text", "text": "hausKI-audio\n(audio.events)", "x": -200, "y": 320, "width": 260, "height": 120, "color": "5" },
+    { "id": "aussen", "type": "text", "text": "aussensensor\n(feed.jsonl)", "x": -200, "y": 480, "width": 260, "height": 120, "color": "3" },
 
-    { "id": "semantah", "type": "text", "text": "semantAH\ninsights/today.json",              "x": -220, "y": -260, "width": 240, "height": 110, "color": "5" },
-    { "id": "wgx",      "type": "text", "text": "wgx\nmetrics.snapshot.json",                 "x": -220, "y": -110, "width": 240, "height": 110, "color": "5" },
-    { "id": "audio",    "type": "text", "text": "hausKI-audio\naudio.events",                 "x": -220, "y":   40, "width": 240, "height": 110, "color": "5" },
-    { "id": "aussen",   "type": "text", "text": "aussensensor\nfeed.jsonl",                   "x": -220, "y":  190, "width": 240, "height": 110, "color": "5" },
-
-    { "id": "hauski",   "type": "text", "text": "hausKI\n(local state, events.jsonl)",        "x":  160, "y":  -60, "width": 280, "height": 120, "color": "3" },
-    { "id": "heimlern", "type": "text", "text": "heimlern\n{action, score, why}",             "x":  420, "y":  -60, "width": 240, "height": 110, "color": "2" },
-    { "id": "leitstand","type": "text", "text": "leitstand\n/data/{domain}.jsonl",            "x":  220, "y":  160, "width": 260, "height": 120, "color": "3" }
+    { "id": "chronik", "type": "text", "text": "chronik\n/data/{domain}.jsonl", "x": 220, "y": 160, "width": 260, "height": 120, "color": "3" },
+    { "id": "leitstand", "type": "text", "text": "leitstand\nUI/Dashboard", "x": 520, "y": 160, "width": 260, "height": 120, "color": "4" }
   ],
   "edges": [
-    { "id": "d1",  "fromNode": "meta",     "fromSide": "right", "toNode": "semantah", "toSide": "left",  "label": "insights.schema.json" },
-    { "id": "d2",  "fromNode": "meta",     "fromSide": "right", "toNode": "wgx",      "toSide": "left",  "label": "metrics.snapshot.schema.json" },
-    { "id": "d3",  "fromNode": "meta",     "fromSide": "right", "toNode": "audio",    "toSide": "left",  "label": "audio.events.schema.json" },
-    { "id": "d4",  "fromNode": "meta",     "fromSide": "right", "toNode": "aussen",   "toSide": "left",  "label": "aussen.event.schema.json" },
-    { "id": "d5",  "fromNode": "meta",     "fromSide": "right", "toNode": "hauski",   "toSide": "left",  "label": "event.line.schema.json" },
-    { "id": "d6",  "fromNode": "meta",     "fromSide": "right", "toNode": "heimlern", "toSide": "left",  "label": "policy.decision.schema.json" },
-
-    { "id": "d7",  "fromNode": "semantah", "fromSide": "right", "toNode": "hauski",   "toSide": "left",  "label": "insights/today.json" },
-    { "id": "d8",  "fromNode": "semantah", "fromSide": "right", "toNode": "leitstand","toSide": "left",  "label": "insights/today.json" },
-    { "id": "d9",  "fromNode": "wgx",      "fromSide": "right", "toNode": "hauski",   "toSide": "left",  "label": "metrics.json" },
-    { "id": "d10", "fromNode": "audio",    "fromSide": "right", "toNode": "hauski",   "toSide": "left",  "label": "audio.events" },
-    { "id": "d11", "fromNode": "audio",    "fromSide": "right", "toNode": "leitstand","toSide": "left",  "label": "audio.events" },
-    { "id": "d12", "fromNode": "aussen",   "fromSide": "right", "toNode": "leitstand","toSide": "left",  "label": "feed.jsonl /ingest/aussen" },
-    { "id": "d13", "fromNode": "hauski",   "fromSide": "right", "toNode": "heimlern", "toSide": "left",  "label": "policy.decide" },
-    { "id": "d14", "fromNode": "heimlern", "fromSide": "left",  "toNode": "hauski",   "toSide": "right", "label": "policy.feedback" },
-    { "id": "d15", "fromNode": "hauski",   "fromSide": "bottom","toNode": "leitstand","toSide": "top",   "label": "events.jsonl" }
+    { "id": "d1", "fromNode": "wgx", "fromSide": "right", "toNode": "chronik", "toSide": "left", "label": "metrics.snapshot.json" },
+    { "id": "d2", "fromNode": "hauski", "fromSide": "right", "toNode": "chronik", "toSide": "left", "label": "events.jsonl" },
+    { "id": "d3", "fromNode": "semantah", "fromSide": "right", "toNode": "chronik", "toSide": "left", "label": "insights/today.json" },
+    { "id": "d4", "fromNode": "audio", "fromSide": "right", "toNode": "chronik", "toSide": "left", "label": "audio.events" },
+    { "id": "d5", "fromNode": "aussen", "fromSide": "right", "toNode": "chronik", "toSide": "left", "label": "feed.jsonl /ingest/aussen" },
+    { "id": "d6", "fromNode": "chronik", "fromSide": "right", "toNode": "leitstand", "toSide": "left", "label": "Events" }
   ]
 }

@@ -1,22 +1,28 @@
-# End-to-End: aussensensor → leitstand → heimlern
+# End-to-End: aussensensor → chronik → heimlern
 
-## Vorbereitung
-1. `scripts/e2e/.env.example` nach `scripts/e2e/.env` kopieren und anpassen.
-2. Repos lokal vorhanden:
-   - `AUSSENSENSOR_DIR` zeigt auf dein `aussensensor`-Klon.
-   - `LEITSTAND_INGEST_URL` & `LEITSTAND_TOKEN` gültig.
-   - `HEIMLERN_INGEST_URL` gültig.
+> **Ziel:** Nachweis, dass ein Außen-Event korrekt eine Policy-Anpassung triggert.
 
-## Ausführung
-```sh
-just e2e-dry   # nur Trockenläufe
-just e2e       # Echtlauf + Report
-```
+## Setup
+- **aussensensor**: lauscht auf `aussen.event` (z.B. via `POST /ingest/aussen`)
+- **chronik**: persistiert Events, `heimlern` ist Consumer
+- **heimlern**: Policy `demo-policy-aussen` (reagiert auf `aussen.event.score > 0.8`)
+- **hausKI**: orchestriert, nutzt `heimlern`
 
-Artefakte:
-- Logs: `./.e2e-logs/`
-- Report: `./.hauski-reports/<timestamp>-e2e-aussen-leitstand-heimlern.md`
+## Ablauf
+1. `just e2e.reset`
+2. Event simulieren:
+   ```bash
+   just e2e.aussen-event score=0.9 content="Test-Event"
+   ```
+3. Logs prüfen:
+   - `aussensensor` loggt Event-Empfang & -Export.
+   - `chronik` loggt Ingest.
+   - `hausKI` loggt Policy-Aufruf & Entscheidung.
+   - `heimlern` loggt `reward()`-Aufruf.
+4. Report prüfen:
+   - Report: `./.hauski-reports/<timestamp>-e2e-aussen-chronik-heimlern.md`
+   - Inhalt: Event, Policy-Entscheidung, Reward-Kalkulation.
 
-## Qualitätssicherung
-- Optional: `shellcheck scripts/e2e/run_aussen_to_heimlern.sh scripts/e2e/report.sh`
-  prüfen, um Shell-Nits früh zu finden.
+## Erwartetes Ergebnis
+- Policy-Parameter in `heimlern` wurden angepasst.
+- Report enthält alle Schritte mit korrekten Werten.

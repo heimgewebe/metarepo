@@ -10,7 +10,8 @@ Quelle: [`repos.yml`](../repos.yml).
 | [hausKI](https://github.com/heimgewebe/hausKI) | main | assistant | policy | ✅ | – |
 | [hauski-audio](https://github.com/heimgewebe/hauski-audio) | main | audio | events | – | hausKI |
 | [heimlern](https://github.com/heimgewebe/heimlern) | main | policy | library | – | – |
-| [leitstand](https://github.com/heimgewebe/leitstand) | main | leitstand | ingest | – | – |
+| [chronik](https://github.com/heimgewebe/chronik) | main | chronik | ingest | – | – |
+| [leitstand](https://github.com/heimgewebe/leitstand) | main | leitstand | ui | – | – |
 | [semantAH](https://github.com/heimgewebe/semantAH) | main | insights | export | – | – |
 | [tools](https://github.com/heimgewebe/tools) | main | tooling | shared | – | – |
 | [weltgewebe](https://github.com/heimgewebe/weltgewebe) | main | aussen | events | – | – |

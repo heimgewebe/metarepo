@@ -5,7 +5,9 @@ graph TD
     hausKI["hausKI\n(assistant › policy)"]
     hauski_audio["hauski-audio\n(audio › events)"]
     heimlern["heimlern\n(policy › library)"]
-    leitstand["leitstand\n(leitstand › ingest)"]
+    chronik["chronik\n(chronik › ingest)"]
+    leitstand["leitstand (UI)\n(leitstand › dashboard)"]
+    chronik --> leitstand
     semantAH["semantAH\n(insights › export)"]
     tools["tools\n(tooling › shared)"]
     weltgewebe["weltgewebe\n(aussen › events)"]

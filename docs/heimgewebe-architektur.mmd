@@ -14,7 +14,9 @@ graph TD
     end
 
     subgraph VIS["Darstellung & Integration"]
-        LST[leitstand<br/>Ingest · Panels · Explain]
+        CHRONIK[chronik<br/>Ingest · Event-Store]
+        LST[leitstand<br/>UI · Panels · Explain]
+        CHRONIK --> LST
         AUS[aussensensor<br/>Außenfeed · Sensorik]
     end
 

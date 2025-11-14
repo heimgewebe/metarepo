@@ -9,8 +9,9 @@
 | **hausKI** | KI-Orchestrator (Rust, GPU, Offline) | assistant | policy | aktiv |
 | **hausKI-audio** | Audio-Pipeline | audio | events | MVP |
 | **semantAH** | Semantik & Graph | insights | export | Aufbau |
-| **leitstand** | HTTP-Ingest (JSONL) & Dashboard | leitstand | ingest | stabil |
-| **aussensensor** | Feeds → Leitstand | aussen | events | aktiv (Daemon geplant) |
+| **chronik** | Event-Ingest + Persistenz/Audit (vormals leitstand) | chronik | ingest | stabil |
+| **leitstand** | UI/Dashboard (geplant) | ui | dashboard | geplant |
+| **aussensensor** | Feeds → Chronik | aussen | events | aktiv (Daemon geplant) |
 | **heimlern** | Policies/Bandit | policy | library | Experiment |
 | **weltgewebe** | Web (docs-first, Gates) | aussen | events | Docs-only |
 | **tools** | Hilfsskripte & Shared Utilities | tooling | shared | aktiv |
