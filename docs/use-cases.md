@@ -1,46 +1,43 @@
-# Use-Cases & Ablaufbeispiele
+# Anwendungsfälle (User-Stories)
 
-Diese Seite sammelt typische Arbeitsabläufe und verweist auf die passenden Skripte sowie
-Detaildokumentation.
+## 1. Tägliches Wissens-Digest
 
-### Wie finde ich den richtigen Ablauf?
+-   **User:** Ich möchte jeden Morgen eine Zusammenfassung dessen, was gestern in meinem digitalen Garten (Vault) passiert ist.
+-   **Flow:**
+    1.  **semantAH** analysiert `vault-gewebe` (Git-Historie, Dateiänderungen).
+    2.  `semantAH` erzeugt `insights/today.json` mit den wichtigsten Änderungen.
+    3.  **leitstand** (UI) zeigt dieses Digest im Panel „Heute“ an.
+-   **Komponenten:** `semantAH`, `leitstand`.
 
-| Ziel | Einstieg |
-| --- | --- |
-| **Events testen** (Aussensensor → Leitstand → Heimlern) | Abschnitt [Außen-Event ingestieren & Policy-Feedback erhalten](#ingest-e2e) |
-| **Flottenzustand prüfen** (Health, Drift, Index) | Abschnitt [Fleet-Gesundheitscheck & Drift-Erkennung](#2-fleet-gesundheitscheck--drift-erkennung) |
-| **Templates ausrollen oder zurückholen** | Abschnitt [Templates in Sub-Repos aktualisieren](#3-templates-in-sub-repos-aktualisieren) |
-| **Weitere Spezialfälle / Runbooks** | [Weitere Beispiele](#weitere-beispiele) |
+## 2. Proaktiver Backup-Hinweis
 
-<a id="ingest-e2e"></a>
-## 1. Außen-Event ingestieren & Policy-Feedback erhalten
+-   **User:** Das System soll mich warnen, wenn ein Backup sinnvoll wäre, aber nicht automatisch laufen.
+-   **Flow:**
+    1.  **wgx** erzeugt stündlich `metrics.snapshot.json` (CPU-Last, Netz-Traffic, offene Dateien).
+    2.  **hausKI** liest den Snapshot.
+    3.  **heimlern**-Policy `suggest_backup` prüft: „last_backup > 24h && cpu_load < 0.2 && network_traffic < 1Mbit“.
+    4.  Wenn ja, sendet `hausKI` ein `user.notification`-Event.
+    5.  **leitstand** (UI) zeigt an: „Guter Zeitpunkt für ein Backup. Jetzt starten?“
+-   **Komponenten:** `wgx`, `hausKI`, `heimlern`, `leitstand`.
 
-1. **Event vorbereiten** – neue Zeile in `aussensensor/export/feed.jsonl` schreiben und mit den
-   Repo-Tools validieren (siehe [`aussensensor/docs/`](https://github.com/heimgewebe/aussensensor/tree/main/docs)).
-2. **Ingest auslösen** – `scripts/e2e/run_aussen_to_heimlern.sh` im Metarepo ausführen oder den
-   dort beschriebenen curl-Aufruf nutzen. Voraussetzungen siehe [docs/e2e.md](./e2e.md).
-3. **Leitstand prüfen** – Panels / JSONL-Ablage im `leitstand`-Repo kontrollieren.
-4. **Policy-Feedback einsammeln** – `heimlern` erzeugt `policy_feedback.jsonl`; Details siehe
-   [`heimlern/docs/`](https://github.com/heimgewebe/heimlern/tree/main/docs).
+## 3. Automatisierte Test-Ausführung
 
-## 2. Fleet-Gesundheitscheck & Drift-Erkennung
+-   **User:** Wenn ich an einem `Justfile` arbeite, soll automatisch der `lint`-Befehl ausgeführt werden.
+-   **Flow:**
+    1.  **mitschreiber** erkennt, dass `Justfile` im Fokus ist (`os.context.intent`).
+    2.  Event geht an **chronik**.
+    3.  **hausKI** hat ein Playbook: `trigger: on_context(file == "Justfile") → run: wgx just lint`.
+    4.  `hausKI` führt den Job aus.
+    5.  **chronik** speichert das Job-Ergebnis (Erfolg/Fehler).
+    6.  **leitstand** zeigt im Panel „PC“ den letzten `lint`-Lauf an.
+-   **Komponenten:** `mitschreiber`, `chronik`, `hausKI`, `leitstand`.
 
-1. `just smoke` im Metarepo ausführen, um read-only Checks über alle Repos laufen zu lassen.
-2. `wgx doctor --all` ruft detaillierte Drifts & Health-Indikatoren ab.
-3. Optional `make all`, um [Org-Index](./org-index.md) und [Org-Graph](./org-graph.mmd) neu zu
-   generieren.
-4. Ergebnisse als Report in [`reports/sync-logs/`](../reports/sync-logs) dokumentieren
-   (`just log-sync`).
+## 4. Debugging & Audit
 
-## 3. Templates in Sub-Repos aktualisieren
-
-1. Änderungen in `templates/**` im Metarepo vornehmen.
-2. `./scripts/sync-templates.sh --push-to <repo> --pattern "templates/**"` für Ziel-Repo ausführen.
-3. In Pull-Requests der Ziel-Repos Drift-Berichte (`reports/*.md`) beilegen.
-4. Bei Rückportierungen `--pull-from` nutzen, um Verbesserungen aus Sub-Repos wieder aufzunehmen.
-
-## Weitere Beispiele
-
-- [Runbooks](./runbooks.md) – Detaillierte Schritt-für-Schritt-Anleitungen für Spezialfälle.
-- [Fleet-Operations](./fleet.md) – Abläufe für Betriebsrunden (Smoke, Doctor, Rollouts).
-- [WGX-Konzepte](./wgx-konzept.md) – Hintergrund zu `wgx`-Kommandos & Policies.
+-   **User:** Ich will nachvollziehen, warum gestern Abend der Server neu gestartet wurde.
+-   **Flow:**
+    1.  User öffnet **leitstand** (UI).
+    2.  Filtert im „Audit“-Panel nach `event_type: system.reboot`.
+    3.  Findet das Event, inklusive `policy.decision`, das den Reboot ausgelöst hat.
+    4.  Kann von dort zur `heimlern`-Policy und dem `metrics.snapshot` springen, der zur Entscheidung führte.
+-   **Komponenten:** `chronik`, `leitstand`.

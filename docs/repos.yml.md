@@ -36,8 +36,8 @@ repos:
   - name: aussensensor
     url: https://github.com/heimgewebe/aussensensor
     default_branch: main
-  - name: leitstand
-    url: https://github.com/heimgewebe/leitstand
+  - name: chronik
+    url: https://github.com/heimgewebe/chronik
     default_branch: main
   - name: wgx
     url: https://github.com/heimgewebe/wgx

@@ -49,10 +49,10 @@ repos:
     scope: shared
     metrics:
       enable: false
-  - name: leitstand
-    url: https://github.com/heimgewebe/leitstand
+  - name: chronik
+    url: https://github.com/heimgewebe/chronik
     default_branch: main
-    domain: leitstand
+    domain: chronik
     scope: ingest
     metrics:
       enable: false
