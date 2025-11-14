@@ -23,8 +23,8 @@ repos:
     default_branch: main
   - name: heimgewebe/mitschreiber
     default_branch: main
-  - name: heimgewebe/chronik
-    default_branch: main
+  # - name: heimgewebe/chronik
+  #   default_branch: main
   - name: heimgewebe/heimlern
     default_branch: main
   - name: heimgewebe/aussensensor

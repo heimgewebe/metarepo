@@ -23,6 +23,8 @@ Hier ist die Übersicht der zentralen Datenverträge (Schemas), die die Kommunik
 
 ## Versionierung & Rollout (Policy)
 
+## Rollout-Checkliste
+
 1.  **Strict SemVer** für alle Änderungen an Schemas.
 2.  **Contracts-First:** Code-Änderungen, die neue Felder oder Strukturen nutzen, erfordern **zuerst** die Schema-Anpassung im `metarepo`.
 3.  **Tags & Branches:** Reusable Workflows in der Fleet nutzen einen `contracts-vX` Tag, um gegen stabile Schema-Versionen zu validieren.

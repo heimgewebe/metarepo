@@ -45,6 +45,7 @@ render_mmd() {
   local out="${OUTDIR}/${out_base}.${FORMAT}"
   echo "→ render ${in}  ->  ${out}"
   npx --yes @mermaid-js/mermaid-cli@10.9.1 \
+      --puppeteerConfigFile "puppeteer-config.json" \
       -i "$in" -o "$out" -t "$THEME" -s 1 >/dev/null
 }
 
