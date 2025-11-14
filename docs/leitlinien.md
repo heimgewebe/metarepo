@@ -26,6 +26,8 @@
 - Schema-Checks via reusable Workflow `contracts-validate` (AJV).
 - Kleine Beispielartefakte in PRs validieren lassen.
 
+## Contracts-First
+
 ## Mantras
 - Dateien & Code syncen, **State nie**.
 - **Events immer** (append-only, deterministisch mergen).
