@@ -67,6 +67,7 @@ jobs:
       - name: Load yq version pin
         run: |
           test -f toolchain.versions.yml || { echo "toolchain.versions.yml not found" >&2; exit 1; }
+          PYTHON_BIN=""
           if command -v python3 >/dev/null; then
             PYTHON_BIN=python3
           elif command -v python >/dev/null; then
@@ -75,14 +76,31 @@ jobs:
             echo "Python interpreter required to parse toolchain.versions.yml" >&2
             exit 1
           fi
+
+          YQ_VER=""
           if [[ -f .github/workflows/get-yq-version.py ]]; then
-            YQ_VER="$("${PYTHON_BIN}" .github/workflows/get-yq-version.py)"
+            YQ_VER="$($PYTHON_BIN .github/workflows/get-yq-version.py)"
           else
-            YQ_VER="$("${PYTHON_BIN}" -c $'import pathlib,re,sys\np=pathlib.Path("toolchain.versions.yml")\n'
-              $'c=p.read_text(encoding="utf-8")\n'
-              $'m=re.search(r"^yq:\\s*[\'\\"]?v?([^\'\\"#\\n]+)[\'\\"]?",c,re.M)\n'
-              $'sys.exit("yq version missing in toolchain.versions.yml") if not m else print(m.group(1).strip())')"
+            # Fallback to embedded Python script if the dedicated file is missing
+            YQ_VER=$($PYTHON_BIN - <<'EOF'
+          import pathlib
+          import re
+          import sys
+          try:
+              p = pathlib.Path("toolchain.versions.yml")
+              c = p.read_text(encoding="utf-8")
+              m = re.search(r"^yq:\s*['\"]?v?([^'\"#\n]+)['\"]?", c, re.M)
+              if m:
+                  print(m.group(1).strip())
+              else:
+                  sys.exit("yq version missing in toolchain.versions.yml")
+          except Exception as e:
+              print(f"Error parsing toolchain.versions.yml: {e}", file=sys.stderr)
+              sys.exit(1)
+          EOF
+          )
           fi
+
           test -n "${YQ_VER}" || { echo "Failed to resolve yq version" >&2; exit 1; }
           echo "YQ_VERSION=${YQ_VER}" >> "$GITHUB_ENV"
           echo "Resolved yq version ${YQ_VER}"
