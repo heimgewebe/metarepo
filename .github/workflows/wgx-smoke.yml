@@ -1,4 +1,4 @@
-name: wgx-guard
+name: wgx-smoke
 
 permissions:
   contents: read
@@ -7,15 +7,15 @@ on:
   push:
     paths:
       - ".wgx/**"
-      - ".github/workflows/wgx-guard.yml"
+      - ".github/workflows/wgx-smoke.yml"
   pull_request:
     paths:
       - ".wgx/**"
-      - ".github/workflows/wgx-guard.yml"
+      - ".github/workflows/wgx-smoke.yml"
   workflow_dispatch:
 
 jobs:
-  guard:
+  smoke:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -31,7 +31,7 @@ jobs:
           fi
           echo "Found ./wgx/wgx"
 
-      - name: Run wgx guard
+      - name: Run wgx smoke
         run: |
           set -euo pipefail
-          ./wgx/wgx guard
+          ./wgx/wgx smoke
