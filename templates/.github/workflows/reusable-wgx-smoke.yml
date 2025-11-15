@@ -1,0 +1,14 @@
+name: reusable-wgx-smoke
+on:
+  workflow_call:
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-yaml yq
+      - name: run wgx smoke
+        run: ./wgx/wgx smoke

@@ -1,0 +1,14 @@
+name: reusable-wgx-guard
+on:
+  workflow_call:
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck yamllint yq
+      - name: run wgx guard
+        run: ./wgx/wgx guard
