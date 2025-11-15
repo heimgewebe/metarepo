@@ -1,25 +1,29 @@
-version: 1
-# Hinweis: Repo-spezifische Overlays optional unter .wgx/profile.overlay.yml
-project: metarepo
-roles:
-  - name: meta
-    provides:
-      - templates
-      - wgx-commands
-env_priority:
-  - devcontainer
-  - devbox
-  - mise/direnv
-  - termux
-sync:
-  include:
-    - ".github/workflows/*.yml"
-    - "Justfile"
-    - "docs/**"
-    - ".wgx/profile.yml"
-rules:
-  reconcile:
-    prefer: canonical
-    exceptions:
-      - pattern: "docs/adrs/**"
-        prefer: improved_field_version
+class: meta
+
+tasks:
+  smoke: |
+    python3 - <<'EOF'
+import glob, yaml
+for f in glob.glob('.github/workflows/*.yml'):
+    try:
+        yaml.safe_load(open(f))
+        print(f"OK   {f}")
+    except Exception as e:
+        print(f"FAIL {f}: {e}")
+        exit(1)
+EOF
+
+  guard: |
+    if command -v shellcheck >/dev/null; then
+      shellcheck -s bash wgx/**/*.bash
+    fi
+    yamllint .
+
+  metrics: |
+    if [ -x scripts/wgx-metrics-snapshot.sh ]; then
+       scripts/wgx-metrics-snapshot.sh --json
+    else
+       echo "no metrics script; skipping"
+    fi
+
+  snapshot: ""
