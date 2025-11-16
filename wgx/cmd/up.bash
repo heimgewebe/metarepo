@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
 cmd_up(){
   cmd_plan
@@ -13,7 +14,7 @@ cmd_up(){
     fi
   fi
 
-  local repos_to_sync; repos_to_sync=($(ordered_repos))
+  local repos_to_sync; mapfile -t repos_to_sync < <(ordered_repos)
   local total=${#repos_to_sync[@]} i=0 success_count=0 fail_count=0
   for r in "${repos_to_sync[@]}"; do
     (( i++ ))

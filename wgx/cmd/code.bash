@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
 cmd_code(){
   local sub="${1:-}"; shift || true

@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+set -euo pipefail
+
+source "$ROOT_DIR/wgx/lib/templates.bash"
 
 cmd_plan(){
   echo "▶ Plan (ohne Klonen/Push):"

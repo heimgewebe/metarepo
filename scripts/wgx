@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Kompatibilitäts-Shim zum neuen Bash-Dispatcher unter wgx/wgx.
+# Viele Call-Sites (Justfile, ältere Repos, CI) sprechen noch scripts/wgx an.
+
+ROOT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+DISPATCHER="$ROOT_DIR/wgx/wgx"
+
+if [[ ! -x "$DISPATCHER" ]]; then
+  echo "ERR: expected wgx dispatcher at $DISPATCHER" >&2
+  exit 127
+fi
+exec "$DISPATCHER" "$@"

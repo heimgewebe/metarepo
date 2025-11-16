@@ -1,0 +1,16 @@
+name: wgx-smoke
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    # Flottenweiter Smoke ruft den im Metarepo definierten
+    # reusable Workflow auf, der wiederum ./wgx/wgx smoke nutzt.
+    uses: heimgewebe/metarepo/.github/workflows/reusable-wgx-smoke.yml@main

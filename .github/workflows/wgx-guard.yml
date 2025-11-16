@@ -1,5 +1,4 @@
 name: wgx-guard
-
 permissions:
   contents: read
 
@@ -8,10 +7,14 @@ on:
     paths:
       - ".wgx/**"
       - ".github/workflows/wgx-guard.yml"
+      - "pyproject.toml"
+      - "Cargo.toml"
   pull_request:
     paths:
       - ".wgx/**"
       - ".github/workflows/wgx-guard.yml"
+      - "pyproject.toml"
+      - "Cargo.toml"
   workflow_dispatch:
 
 jobs:
@@ -19,19 +22,81 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v5 # v4 (major tag)
 
-      - name: Ensure wgx entrypoint exists
+      - name: Check .wgx/profile.yml presence
         run: |
-          set -euo pipefail
-          if [[ ! -x ./wgx/wgx ]]; then
-            echo "::error::./wgx/wgx not found or not executable"
+          test -f .wgx/profile.yml || { echo "::error::.wgx/profile.yml missing"; exit 1; }
+          echo "found .wgx/profile.yml"
+
+      - name: Validate minimal schema keys
+        uses: actions/setup-python@v6 # v5 (major tag)
+        with:
+          python-version: '3.12'
+
+      - name: Cache pip downloads
+        uses: actions/cache@v4 # v4 (major tag)
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ runner.os }}-${{ hashFiles('.wgx/profile.yml', 'pyproject.toml', 'uv.lock') }}
+          restore-keys: |
+            pip-${{ runner.os }}-
+
+      - name: Install PyYAML for schema check
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "pyyaml~=6.0"
+
+      - name: Run schema-lite check
+        run: |
+          python - <<'PY'
+          import sys
+          import yaml
+          import pathlib
+
+          p = pathlib.Path(".wgx/profile.yml")
+          data = yaml.safe_load(p.read_text(encoding="utf-8"))
+
+          required_top = ["version", "env_priority", "tooling", "tasks"]
+          missing = [k for k in required_top if k not in data]
+          if missing:
+              print(f"::error::missing keys: {missing}")
+              sys.exit(1)
+
+          envp = data["env_priority"]
+          if not isinstance(envp, list) or not envp:
+              print("::error::env_priority must be a non-empty list")
+              sys.exit(1)
+
+          for t in ["up", "lint", "test", "build", "smoke"]:
+              if t not in data["tasks"]:
+                  print(f"::error::task '{t}' missing")
+                  sys.exit(1)
+
+          print("schema-lite ok")
+          PY
+
+      - name: (Optional) UV bootstrap (pyproject present)
+        if: ${{ hashFiles('pyproject.toml') != '' }}
+        # Pin to a maintained major version to reduce supply-chain drift.
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: "0.7.*"
+
+      - name: Sync Python project with uv
+        if: ${{ hashFiles('pyproject.toml') != '' && !cancelled() }}
+        run: |
+          # Beispielausgabe: "uv 0.7.3 (rev abcdef)" – Regex toleriert Zusatzinfos am Ende
+          ver="$(uv --version)"
+          echo "$ver"
+          if ! [[ "$ver" =~ ^uv\ 0\.7\. ]]; then
+            echo "::error::uv 0.7.x erwartet, gefunden: $ver"
             exit 1
           fi
-          echo "Found ./wgx/wgx"
+          uv sync --frozen
+          if ! uv pip check; then
+            echo "::warning::dependency conflicts detected"
+          fi
 
-      - name: Run wgx guard
-        run: |
-          set -euo pipefail
-          ./wgx/wgx guard
+      - name: Done
+        run: echo "wgx-guard passed ✅"

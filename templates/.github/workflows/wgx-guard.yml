@@ -1,0 +1,16 @@
+name: wgx-guard
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  guard:
+    # Flottenweiter Guard ruft den im Metarepo definierten
+    # reusable Workflow auf, der wiederum ./wgx/wgx guard nutzt.
+    uses: heimgewebe/metarepo/.github/workflows/reusable-wgx-guard.yml@main

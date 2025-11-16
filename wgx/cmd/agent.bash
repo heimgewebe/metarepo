@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
 cmd_agent(){
   local sub="${1:-}"; shift || true
@@ -36,7 +37,7 @@ cmd_agent(){
         exit 2
       fi
       if [[ -z "$runfile" ]]; then
-        runfile="$(ls -1t .agents/runs/*.jsonl 2>/dev/null | head -n1 || true)"
+        runfile=$(find .agents/runs -name '*.jsonl' -print0 | xargs -0 ls -1t | head -n1 || true)
         [[ -n "$runfile" ]] || { echo "Kein Run gefunden unter .agents/runs/*.jsonl"; exit 2; }
       fi
       bash "$trc" "$runfile"

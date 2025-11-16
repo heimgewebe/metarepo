@@ -17,6 +17,7 @@ trap cleanup EXIT INT TERM
 
 source "$ROOT_DIR/wgx/lib/logging.bash"
 source "$ROOT_DIR/wgx/lib/runner.bash"
+source "$ROOT_DIR/wgx/lib/templates.bash"
 need(){ command -v "$1" >/dev/null 2>&1 || die "Fehlt: $1"; }
 
 [[ -f "$REPOS_YML" ]] || die "repos.yml fehlt (erwartet: $REPOS_YML)"
@@ -68,149 +69,16 @@ for cmd_file in "$ROOT_DIR"/wgx/cmd/*.bash; do
   source "$cmd_file"
 done
 
-list_template_files(){
-  [[ -d "$ROOT_DIR/templates" ]] || return 1
-  ( cd "$ROOT_DIR/templates" && find . -type f -print | sed 's|^\./||' | LC_ALL=C sort )
-}
-
-
-# Git commit/PR messages
-COMMIT_MSG="chore(wgx): sync templates from metarepo"
-PR_TITLE="chore(wgx): sync templates from metarepo"
-PR_BODY="Automatischer WGX-Sync aus dem metarepo."
-
-# Clone a repository using the best available method
-clone_repo(){
-  local repo_name="$1" workdir="$2"
-  local ow gh_path
-  ow="$(owner)"
-  gh_path="$(command -v gh || true)"
-
-  if [[ -n "$gh_path" && -n "${GH_TOKEN:-}" ]]; then
-    log "Klonen via gh auf ${ow}/${repo_name}"
-    "$gh_path" repo clone "${ow}/${repo_name}" "$workdir" -- --depth 1
-    return
-  fi
-
-  local url_https="https://github.com/${ow}/${repo_name}.git"
-  if [[ -n "${GH_TOKEN:-}" ]]; then
-    log "Klonen via HTTPS (mit GH_TOKEN über temporären Credential-Helper) auf ${ow}/${repo_name}"
-    local _wgx_cred_helper
-    _wgx_cred_helper="$(mktemp "${TMPDIR:-/tmp}/wgx-gh-cred.XXXXXX")"
-    _tmp_dirs+=("$_wgx_cred_helper")
-    cat >"$_wgx_cred_helper" <<'EOS'
-#!/usr/bin/env sh
-set -eu
-# Git credential helper: liest Anfrage (stdin) bis zur Leerzeile und antwortet
-# mit Benutzer/Passwort aus der Umgebung. GH_TOKEN verbleibt in der ENV.
-while IFS= read -r line; do
-  [ -z "$line" ] && break
-done
-printf 'username=%s\n' "x"
-[ -n "${GH_TOKEN:-}" ] || exit 1
-printf 'password=%s\n' "$GH_TOKEN"
-EOS
-    chmod 700 "$_wgx_cred_helper"
-    GIT_TERMINAL_PROMPT=0 GH_TOKEN="${GH_TOKEN}" \
-      git -c "credential.helper=!\"$_wgx_cred_helper\"" \
-          clone --depth 1 "$url_https" "$workdir"
-    rm -f "$_wgx_cred_helper"
-    return
-  fi
-
-  local url_ssh="git@github.com:${ow}/${repo_name}.git"
-  if ssh -o BatchMode=yes -T git@github.com 2>&1 | grep -q "successfully authenticated"; then
-    log "Klonen via SSH auf ${ow}/${repo_name}"
-    git clone --depth 1 "$url_ssh" "$workdir"
-  else
-    log "Klonen via HTTPS auf ${ow}/${repo_name}"
-    git clone --depth 1 "$url_https" "$workdir"
-  fi
-}
-
-copy_templates_into_repo(){
-  local r="$1"
-  local tmp workdir; tmp="$(mktemp -d)"; _tmp_dirs+=("$tmp"); workdir="$(mktemp -d)"; _tmp_dirs+=("$workdir")
-
-  if [[ ! -d "$ROOT_DIR/templates" ]]; then
-    echo "Keine templates/ gefunden – skip $r"; return 0
-  fi
-
-  rsync -a --delete "$ROOT_DIR/templates/" "$tmp/"
-
-  # {{REPO_NAME}} → repo (nur Textdateien; binär wird übersprungen via UnicodeDecodeError)
-  python3 - "$tmp" "$r" <<'PY'
-import sys
-from pathlib import Path
-root = Path(sys.argv[1]); repo = sys.argv[2]
-for p in root.rglob('*'):
-    if not p.is_file(): continue
-    try:
-        t = p.read_text(encoding='utf-8')
-    except UnicodeDecodeError:
-        continue
-    if '{{REPO_NAME}}' in t:
-        p.write_text(t.replace('{{REPO_NAME}}', repo), encoding='utf-8')
-PY
-
-  if ! clone_repo "$r" "$workdir"; then
-    log "Klonen von $r fehlgeschlagen, übersprungen."
-    return 1
-  fi
-  rsync -a "$tmp/." "$workdir/"
-
-  pushd "$workdir" >/dev/null
-    local branch="chore/wgx-sync-$(date +%Y%m%d-%H%M%S)"
-    git checkout -b "$branch" || true
-    git add -A
-    if ! git diff --cached --quiet; then
-      if (( DRYRUN == 1 )); then
-        echo "DRY-RUN: Änderungen erkannt in $r (kein Commit/Push)."
-        git status --short
-      else
-        git -c user.email="codex-bot@local" -c user.name="Codex Bot" commit -m "$COMMIT_MSG"
-        git push -u origin "$branch"
-        local gh_path; gh_path="$(command -v gh || true)"
-        if [[ -n "$gh_path" ]]; then
-          local base_branch; base_branch="$(default_branch_of "$r")"
-          local gh_args=(pr create --fill --title "$PR_TITLE" --body "$PR_BODY" --base "${base_branch:-main}")
-          [[ "${WGX_PR_DRAFT:-0}" == "1" ]] && gh_args+=(--draft)
-          "$gh_path" "${gh_args[@]}" || true
-        else
-          echo "Hinweis: gh fehlt – PR bitte manuell öffnen."
-        fi
-      fi
-    else
-      echo "No changes for $r"
-    fi
-  popd >/dev/null
-}
-
-
-
-
-
-
-# -------------------------------
-# CODE COMMANDS (scaffold & lint)
-# -------------------------------
-
-# ------------------------------------
-# KNOWLEDGE COMMANDS (export minimal)
-# ------------------------------------
-
-# ------------------------------------------------------------
-# Agent-Orchestrierung (IDEal)
-# ------------------------------------------------------------
-
 cmd_help(){
   cat <<'HLP'
 wgx – weave ground eXtensions
   usage:
-    wgx plan|up|validate|smoke [...]
-    wgx code <init|lint|test|gen> [...]
-    wgx knowledge <extract|export|validate> [...]
-    wgx agent <validate> <manifest.yaml>
+    wgx <command> [args]
+  commands:
+    plan|up|list|run|doctor|validate|smoke|guard
+    code <init|lint|test|gen>
+    knowledge <extract|export|validate>
+    agent <run|trace|validate>
 HLP
 }
 
