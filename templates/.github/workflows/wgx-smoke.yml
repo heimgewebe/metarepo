@@ -1,4 +1,5 @@
 name: wgx-smoke
+
 on:
   workflow_dispatch:
   push:
@@ -8,7 +9,6 @@ on:
 
 jobs:
   smoke:
-    uses: heimgewebe/metarepo/.github/workflows/reusable-ci.yml@main
-    with:
-      run_lint: true
-      run_tests: false
+    # auch hier: statt eigener CI-Logik nur noch Forwarder auf das
+    # kanonische wgx-Workflow-Repo.
+    uses: heimgewebe/wgx/.github/workflows/wgx-smoke.yml@main
