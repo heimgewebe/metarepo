@@ -13,4 +13,4 @@ jobs:
   smoke:
     # auch Smoke für das metarepo selbst wird über heimgewebe/wgx
     # zentral definiert.
-    uses: heimgewebe/wgx/.github/workflows/wgx-smoke.yml@main
+    uses: heimgewebe/wgx/.github/workflows/reusable-wgx-smoke.yml@main

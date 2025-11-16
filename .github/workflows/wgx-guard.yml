@@ -13,4 +13,4 @@ jobs:
   guard:
     # metarepo wird selbst wie ein Fleet-Repo behandelt und nutzt
     # die kanonische Guard-Definition aus heimgewebe/wgx.
-    uses: heimgewebe/wgx/.github/workflows/wgx-guard.yml@main
+    uses: heimgewebe/wgx/.github/workflows/reusable-wgx-guard.yml@main
