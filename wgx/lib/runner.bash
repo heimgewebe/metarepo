@@ -20,6 +20,7 @@ wgx_run_task() {
   fi
 
   local task_script
+  # Use eval to handle multi-line scripts correctly from yq output
   task_script=$("$yq_bin" -r ".tasks.$task_name" "$profile_file")
 
   if [[ -z "$task_script" || "$task_script" == "null" ]]; then

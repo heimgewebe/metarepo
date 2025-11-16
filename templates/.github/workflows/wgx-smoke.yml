@@ -1,16 +1,14 @@
 name: wgx-smoke
 
 on:
-  pull_request:
-  push:
-    branches: [ main ]
   workflow_dispatch:
-
-permissions:
-  contents: read
+  push:
+    paths:
+      - ".wgx/**"
+      - "docs/wgx-konzept.md"
 
 jobs:
   smoke:
-    # Flottenweiter Smoke ruft den im Metarepo definierten
-    # reusable Workflow auf, der wiederum ./wgx/wgx smoke nutzt.
-    uses: heimgewebe/metarepo/.github/workflows/reusable-wgx-smoke.yml@main
+    # auch hier: statt eigener CI-Logik nur noch Forwarder auf das
+    # kanonische wgx-Workflow-Repo.
+    uses: heimgewebe/wgx/.github/workflows/wgx-smoke.yml@main

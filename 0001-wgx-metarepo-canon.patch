@@ -1,0 +1,201 @@
+From 9999999999999999999999999999999999999999 Mon Sep 17 00:00:00 2001
+From: Alexander Mohr <alexdermohr@gmail.com>
+Date: Sun, 16 Nov 2025 08:10:00 +0100
+Subject: [PATCH] chore(wgx): restore scripts shim and point guard/smoke to
+ heimgewebe/wgx
+
+- Stellt einen schlanken scripts/wgx-Wrapper auf wgx/wgx her.
+- Richtet die metarepo-eigenen wgx-Guard/Smoke-Workflows so aus,
+  dass sie die kanonischen Workflows aus heimgewebe/wgx verwenden.
+- Bringt die Guard/Smoke-Templates im templates/-Baum zurück und
+  verweist dort ebenfalls auf heimgewebe/wgx, statt eigene Logik
+  zu duplizieren.
+
+---
+ scripts/wgx                                  |  9 +++++++++
+ .github/workflows/wgx-guard.yml              | 30 +++++++---------------------
+ .github/workflows/wgx-smoke.yml              | 30 +++++++---------------------
+ templates/.github/workflows/wgx-guard.yml    | 19 +++++++++++++++++
+ templates/.github/workflows/wgx-smoke.yml    | 14 +++++++++++++
+ 5 files changed, 58 insertions(+), 44 deletions(-)
+ create mode 100755 scripts/wgx
+ create mode 100644 templates/.github/workflows/wgx-guard.yml
+ create mode 100644 templates/.github/workflows/wgx-smoke.yml
+
+diff --git a/scripts/wgx b/scripts/wgx
+new file mode 100755
+index 0000000..1111111
+--- /dev/null
++++ b/scripts/wgx
+@@ -0,0 +1,9 @@
++#!/usr/bin/env bash
++set -euo pipefail
++
++ROOT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
++
++# zentraler Shim: alle bestehenden Aufrufer benutzen weiterhin scripts/wgx,
++# intern lebt die eigentliche CLI unter wgx/wgx.
++exec "${ROOT_DIR}/wgx/wgx" "$@"
++
+diff --git a/.github/workflows/wgx-guard.yml b/.github/workflows/wgx-guard.yml
+index c39e399..2222222 100644
+--- a/.github/workflows/wgx-guard.yml
++++ b/.github/workflows/wgx-guard.yml
+@@ -1,37 +1,19 @@
+-name: wgx-guard
+-
+-permissions:
+-  contents: read
+-
+-on:
+-  push:
+-    paths:
+-      - ".wgx/**"
+-      - ".github/workflows/wgx-guard.yml"
+-      - "pyproject.toml"
+-      - "Cargo.toml"
+-  pull_request:
+-    paths:
+-      - ".wgx/**"
+-      - ".github/workflows/wgx-guard.yml"
+-      - "pyproject.toml"
+-      - "Cargo.toml"
+-  workflow_dispatch:
+-
+-jobs:
+-  guard:
+-    runs-on: ubuntu-latest
+-    timeout-minutes: 5
+-    steps:
+-      - uses: actions/checkout@v4
+-
+-      - name: Check .wgx/profile.yml presence
+-        run: |
+-          test -f .wgx/profile.yml || { echo "::error::.wgx/profile.yml missing"; exit 1; }
+-          echo "found .wgx/profile.yml"
+-
+-      - name: Run wgx guard
+-        run: scripts/wgx guard
++name: wgx-guard
++
++permissions:
++  contents: read
++
++on:
++  pull_request:
++  push:
++    branches: [ main ]
++  workflow_dispatch:
++
++jobs:
++  guard:
++    # metarepo wird selbst wie ein Fleet-Repo behandelt und nutzt
++    # die kanonische Guard-Definition aus heimgewebe/wgx.
++    uses: heimgewebe/wgx/.github/workflows/wgx-guard.yml@main
++
+diff --git a/.github/workflows/wgx-smoke.yml b/.github/workflows/wgx-smoke.yml
+index 79c3c7f..3333333 100644
+--- a/.github/workflows/wgx-smoke.yml
++++ b/.github/workflows/wgx-smoke.yml
+@@ -1,37 +1,19 @@
+-name: wgx-smoke
+-
+-permissions:
+-  contents: read
+-
+-on:
+-  push:
+-    paths:
+-      - ".wgx/**"
+-      - ".github/workflows/wgx-smoke.yml"
+-  pull_request:
+-    paths:
+-      - ".wgx/**"
+-      - ".github/workflows/wgx-smoke.yml"
+-  workflow_dispatch:
+-
+-jobs:
+-  smoke:
+-    runs-on: ubuntu-latest
+-    timeout-minutes: 5
+-    steps:
+-      - name: Checkout repository
+-        uses: actions/checkout@v4
+-
+-      - name: Ensure wgx entrypoint exists
+-        run: |
+-          set -euo pipefail
+-          if [[ ! -x ./wgx/wgx ]]; then
+-            echo "::error::./wgx/wgx not found or not executable"
+-            exit 1
+-          fi
+-          echo "Found ./wgx/wgx"
+-
+-      - name: Run wgx smoke
+-        run: |
+-          set -euo pipefail
+-          ./wgx/wgx smoke
++name: wgx-smoke
++
++permissions:
++  contents: read
++
++on:
++  pull_request:
++  push:
++    branches: [ main ]
++  workflow_dispatch:
++
++jobs:
++  smoke:
++    # auch Smoke für das metarepo selbst wird über heimgewebe/wgx
++    # zentral definiert.
++    uses: heimgewebe/wgx/.github/workflows/wgx-smoke.yml@main
++
+diff --git a/templates/.github/workflows/wgx-guard.yml b/templates/.github/workflows/wgx-guard.yml
+new file mode 100644
+index 0000000..4444444
+--- /dev/null
++++ b/templates/.github/workflows/wgx-guard.yml
+@@ -0,0 +1,19 @@
++name: wgx-guard
++
++on:
++  push:
++    paths: [".wgx/**", ".github/workflows/wgx-guard.yml", "pyproject.toml", "Cargo.toml"]
++  pull_request:
++    paths: [".wgx/**", ".github/workflows/wgx-guard.yml", "pyproject.toml", "Cargo.toml"]
++  workflow_dispatch:
++
++permissions:
++  contents: read
++
++jobs:
++  guard:
++    # Fleet-Repos, die von metarepo aus via wgx up Templates beziehen,
++    # werden auf den kanonischen Guard-Workflow aus heimgewebe/wgx gesetzt.
++    uses: heimgewebe/wgx/.github/workflows/wgx-guard.yml@main
++
+diff --git a/templates/.github/workflows/wgx-smoke.yml b/templates/.github/workflows/wgx-smoke.yml
+new file mode 100644
+index 0000000..5555555
+--- /dev/null
++++ b/templates/.github/workflows/wgx-smoke.yml
+@@ -0,0 +1,14 @@
++name: wgx-smoke
++
++on:
++  workflow_dispatch:
++  push:
++    paths:
++      - ".wgx/**"
++      - "docs/wgx-konzept.md"
++
++jobs:
++  smoke:
++    # auch hier: statt eigener CI-Logik nur noch Forwarder auf das
++    # kanonische wgx-Workflow-Repo.
++    uses: heimgewebe/wgx/.github/workflows/wgx-smoke.yml@main
++
+--
+2.46.0

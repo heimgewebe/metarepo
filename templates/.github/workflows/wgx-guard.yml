@@ -1,9 +1,10 @@
 name: wgx-guard
 
 on:
-  pull_request:
   push:
-    branches: [ main ]
+    paths: [".wgx/**", ".github/workflows/wgx-guard.yml", "pyproject.toml", "Cargo.toml"]
+  pull_request:
+    paths: [".wgx/**", ".github/workflows/wgx-guard.yml", "pyproject.toml", "Cargo.toml"]
   workflow_dispatch:
 
 permissions:
@@ -11,6 +12,6 @@ permissions:
 
 jobs:
   guard:
-    # Flottenweiter Guard ruft den im Metarepo definierten
-    # reusable Workflow auf, der wiederum ./wgx/wgx guard nutzt.
-    uses: heimgewebe/metarepo/.github/workflows/reusable-wgx-guard.yml@main
+    # Fleet-Repos, die von metarepo aus via wgx up Templates beziehen,
+    # werden auf den kanonischen Guard-Workflow aus heimgewebe/wgx gesetzt.
+    uses: heimgewebe/wgx/.github/workflows/wgx-guard.yml@main

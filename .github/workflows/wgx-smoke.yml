@@ -1,0 +1,16 @@
+name: wgx-smoke
+
+permissions:
+  contents: read
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    # auch Smoke für das metarepo selbst wird über heimgewebe/wgx
+    # zentral definiert.
+    uses: heimgewebe/wgx/.github/workflows/wgx-smoke.yml@main
