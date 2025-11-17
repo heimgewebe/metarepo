@@ -6,9 +6,9 @@
 2. **Semantisch (semantAH)** – Embeddings, Graph, Relationen
 3. **Operativ (hausKI)** – Planung, Simulation, Ausführung
 4. **Reflexiv (sichter)** – Diagnose, Review, Selbstkorrektur
-5. **Memorativ (leitstand)** – Episoden, Metriken, Audit-Persistenz
+- **Memorativ (chronik)** – Event-Ingest, Persistenz, Audit-Trails
 6. **Politisch-Adaptiv (heimlern)** – Policies, Bandits, Feedback/Score
-7. **Dialogisch-Semantisch (mitschreiber, hausKI-audio)** – Intent, Kontext, Audio-Events
+- **Interaktiv/Dialogisch (leitstand, mitschreiber, hausKI-audio)** – UI, Intent, Kontext, Audio-Events
 
 > **Nicht-Fleet:** `vault-gewebe` (privat) und `weltgewebe` (öffentlich, unabhängig) gehören nicht zur Fleet; sie werden nur referenziert.
 
@@ -19,9 +19,12 @@ bestehenden Diagramme sowie Detaildokumente.
 
 - **aussensensor** – sammelt externe Signale, normalisiert sie in JSONL-Events und validiert gegen
   `contracts/aussen.event.schema.json`.
-- **leitstand** – bietet das Ingest-API, persistiert Events und stellt Panels für Operator:innen.
+- **chronik** – bietet das Ingest-API (`POST /ingest/{domain}`), persistiert Events in JSONL,
+  führt Audit-Trails und stellt Snapshots/Exports bereit.
 - **heimlern** – verwaltet Policies, Entscheidungen (`policy.decision`), Snapshots und Feedback.
 - **hausKI** – zentraler Orchestrator, koordiniert Entscheidungs- und Review-Schritte.
+- **leitstand** – UI/Dashboard; zeigt Panels (PC, Musik, Heute, Außen), Digests und verbindet
+  Daten aus chronik, semantAH und hausKI.
 - **wgx** – Flottenmotor für Sync, Doctor, Smoke & Automatisierung.
 - **semantAH** – erzeugt Insights & Graph-Artefakte für Berichte.
 - **hauski-audio** – liefert Audio-/Telemetrie-Events.
@@ -34,7 +37,7 @@ Ausführliche Rollenbeschreibungen findest du in der [Systemübersicht](./system
 Der Kernpfad für Entscheidungsdaten lautet:
 
 ```
-aussensensor → leitstand → heimlern → hausKI → leitstand
+aussensensor → chronik → heimlern → hausKI → leitstand
 ```
 
 Weitere Flüsse (Metrics, Insights, Audio) sind im [Heimgewebe-Datenfluss](./heimgewebe-dataflow.mmd)
