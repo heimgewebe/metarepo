@@ -43,10 +43,16 @@ npx --yes @mermaid-js/mermaid-cli@10.9.1 --version >/dev/null
 render_mmd() {
   local in="$1" out_base="$2"
   local out="${OUTDIR}/${out_base}.${FORMAT}"
+  # Preprocess to remove markdown fences, write to temp file
+  local tmp_mmd
+  tmp_mmd="$(mktemp)"
+  trap 'rm -f "$tmp_mmd"' RETURN
+  sed '/^```/d' "$in" > "$tmp_mmd"
+
   echo "→ render ${in}  ->  ${out}"
   npx --yes @mermaid-js/mermaid-cli@10.9.1 \
       --puppeteerConfigFile "puppeteer-config.json" \
-      -i "$in" -o "$out" -t "$THEME" -s 1 >/dev/null
+      -i "$tmp_mmd" -o "$out" -t "$THEME" -s 1 >/dev/null
 }
 
 extract_md_mermaid_blocks() {
