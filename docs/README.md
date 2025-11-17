@@ -10,7 +10,7 @@ Für **WGX (Engine)** siehe: https://github.com/heimgewebe/wgx
 - [Umgebung & Secrets](./environment.md) – lokale Konfiguration & Token-Hinweise
 - [Troubleshooting & FAQ](./troubleshooting.md) – häufige Fehler & Lösungen
 - [Events & Contracts](./contracts/index.md) – Schemas & Versionierung
-- [End-to-End-Läufe](./e2e.md) – Kette `aussensensor → leitstand → heimlern`
+- [End-to-End-Läufe](./e2e.md) – Kette `aussensensor → chronik → heimlern`
 
 ## Vertiefung & Referenzen
 - [Kernkonzepte (Architektur, Sync, Drift)](./konzept-kern.md)

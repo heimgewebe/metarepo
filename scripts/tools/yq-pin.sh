@@ -20,10 +20,15 @@ ensure_dir() { mkdir -p -- "${BIN_DIR}"; }
 have_cmd() { command -v "$1" >/dev/null 2>&1; }
 
 version_ok() {
-	local v="$1"
-	[[ "$v" =~ ^([0-9]+)\. ]] || return 1
-	local major="${BASH_REMATCH[1]}"
-	[[ "${major}" -eq "${REQ_MAJOR}" ]]
+	local v_have="$1"
+	local v_want="$2"
+	# Strip leading 'v' and quotes from wanted version
+	local v_want_clean
+	v_want_clean=$(echo "${v_want}" | tr -d "'\"v")
+	# Strip leading 'v' from have version
+	local v_have_clean
+	v_have_clean=$(echo "${v_have}" | tr -d "v")
+	[[ "${v_have_clean}" == "${v_want_clean}" ]]
 }
 
 require_cmd() {
@@ -130,20 +135,22 @@ cmd_ensure() {
 	ensure_dir
 	local v
 	local version_is_ok=false
+	local pinned_version
+	pinned_version=$(read_pinned_version)
 
-        if yq_bin="$(resolved_yq)"; then
-                log "Benutze yq-Binary unter ${yq_bin}"
-                if v="$("${yq_bin}" --version 2>/dev/null | sed -E 's/^yq .* version v?//')"; then
-                        if version_ok "${v}"; then
-                                version_is_ok=true
-                        else
-                                log "WARN: Found yq is wrong version: ${v}"
-                                log "Erwartet wurde Hauptversion ${REQ_MAJOR}."
-                        fi
-                else
-                        log "WARN: Konnte Version von ${yq_bin} nicht bestimmen."
-                fi
-        fi
+	if yq_bin="$(resolved_yq)"; then
+		log "Benutze yq-Binary unter ${yq_bin}"
+		if v="$("${yq_bin}" --version 2>/dev/null | sed -E 's/^yq .* version v?//')"; then
+			if version_ok "${v}" "${pinned_version}"; then
+				version_is_ok=true
+			else
+				log "WARN: Found yq is wrong version: ${v}"
+				log "Erwartet wurde Version ${pinned_version}."
+			fi
+		else
+			log "WARN: Konnte Version von ${yq_bin} nicht bestimmen."
+		fi
+	fi
 
 	if ! $version_is_ok; then
 		download_yq
@@ -154,7 +161,7 @@ cmd_ensure() {
 		if ! v="$("${yq_bin}" --version 2>/dev/null | sed -E 's/^yq .* version v?//')"; then
 			die "konnte yq-Version nach Download nicht ermitteln"
 		fi
-		if ! version_ok "${v}"; then
+		if ! version_ok "${v}" "${pinned_version}"; then
 			die "Heruntergeladenes yq hat falsche Version: ${v}"
 		fi
 	fi
@@ -162,7 +169,7 @@ cmd_ensure() {
 	if [[ "${yq_bin}" != "${YQ_LOCAL}" && ! -e "${YQ_LOCAL}" ]]; then
 		ln -s -- "${yq_bin}" "${YQ_LOCAL}" || true
 	fi
-        log "OK: yq ${v} verfügbar"
+	log "OK: yq ${v} verfügbar"
 }
 
 case "${1:-ensure}" in

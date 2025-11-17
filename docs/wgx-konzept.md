@@ -1,72 +1,34 @@
-# WGX – Master-Konzept
+# wgx – Konzept & Blueprint v1
 
-WGX (`weltgewebe-exchange`) ist ein schlanker Meta-Layer, der als zentrales Werkzeug zur Orchestrierung und Synchronisation von Konfigurationen über alle Repositories der `heimgewebe`-Flotte dient. Es stellt sicher, dass kanonische Vorlagen (Templates) konsistent auf alle Sub-Repos angewendet werden.
+> **Leitfrage:** Wie bedient man ein komplexes System, ohne sich in Details zu verlieren?
 
-Die Priorisierung der Entwicklungsumgebungen für WGX-Operationen ist wie folgt: Devcontainer → Devbox → mise/direnv → Termux.
+**Antwort:** Ein einziges, stabiles CLI-Tool – `wgx`.
 
-## WGX-Befehle
+**Essenz:** `wgx` ist der **Steuer-Nerv** des Heimgewebes. Es ist das, was du im Terminal aufrufst, um den Zustand zu prüfen, Backups zu machen oder Templates auszurollen.
 
-Die folgenden Befehle werden über das `scripts/wgx`-Skript ausgeführt und ermöglichen die Verwaltung der gesamten Flotte.
+Kurz: wgx ist der **Bordcomputer**, der die Flotte bedient – nicht das Gehirn (hausKI) und nicht das Gedächtnis (chronik).
 
-### `list`
-Zeigt eine detaillierte Liste aller im `repos.yml` definierten Repositories an. Die Ausgabe enthält den Namen des Repos, den Branch, die URL und alle Abhängigkeiten.
+## Abgrenzung
 
-**Anwendung:**
-```bash
-./scripts/wgx list
-```
+-   **hausKI**: der denkende Agent, der *entscheidet*, was zu tun ist (oft asynchron).
+-   **chronik**: speichert und zeigt Ereignisse (Events, Panels, Metriken).
+-   **wgx**: der ausführende Befehl, der *macht*, was du (oder `hausKI`) ihm sagst.
 
-### `plan`
-Erstellt eine Vorschau der Aktionen, die der `up`-Befehl ausführen würde, ohne jedoch Änderungen vorzunehmen. Er listet die Template-Dateien auf, die in jedes Ziel-Repository kopiert werden. Dies ist nützlich für einen Dry-Run.
+> Wenn hausKI der Denker ist und chronik das Tagebuch,  
+> dann ist `wgx` der verlässliche **Assistent**, der die Ordner anlegt, die Skripte startet und prüft, ob alles läuft.
 
-**Anwendung:**
-```bash
-./scripts/wgx plan
-```
+## Kernkommandos (v1)
 
-### `up`
-Der Hauptbefehl zur Synchronisation der Templates. Er klont jedes Repository, kopiert die Vorlagen aus dem `templates`-Verzeichnis, ersetzt Variablen wie `{{REPO_NAME}}`, committet die Änderungen in einen neuen Branch und öffnet automatisch einen Pull Request.
+-   `wgx doctor`: Gesundheitscheck (Configs, Ports, Git-Status).
+-   `wgx metrics snapshot`: Systemmetriken erfassen → `metrics.snapshot.json`.
+-   `wgx fleet up`: Templates aus `metarepo` auf die Fleet-Repos anwenden.
+-   `wgx knowledge extract`: Wissen aus Code/Docs in `knowledge.graph.jsonl` extrahieren.
+-   `wgx agent run <workflow>`: Einen Agenten-Workflow ausführen.
 
-**Anwendung:**
-```bash
-./scripts/wgx up
-```
+## Prinzipien
 
-### `run [workflow]`
-Startet einen angegebenen GitHub-Actions-Workflow in allen Repositories der Flotte. Standardmäßig wird der `ci`-Workflow ausgelöst.
-
-**Anwendung:**
-```bash
-./scripts/wgx run          # Startet den 'ci'-Workflow
-./scripts/wgx run build    # Startet den 'build'-Workflow
-```
-
-### `doctor`
-Führt eine Diagnose durch, um sicherzustellen, dass alle Abhängigkeiten (wie `git`, `gh`, `jq`) installiert sind und die Konfiguration (Owner, Modus) korrekt geladen wird.
-
-**Anwendung:**
-```bash
-./scripts/wgx doctor
-```
-
-### `validate`
-Überprüft die `repos.yml`-Datei auf syntaktische Korrektheit.
-
-**Anwendung:**
-```bash
-./scripts/wgx validate
-```
-
-### `smoke`
-Ein einfacher Health-Check, der die Anzahl der in der Flotte konfigurierten Repositories ausgibt.
-
-**Anwendung:**
-```bash
-./scripts/wgx smoke
-```
-
----
-**Verteilung**: Diese Datei wird als Referenz in Subrepos gespiegelt (`templates/docs/wgx-konzept.md`).
-Änderungen hier -> `just up` -> Subrepos erhalten Updates.
-
-Siehe auch `.wgx/profile.yml` für repo-lokale Profile.
+1.  **Ein Entrypoint:** `wgx` ist der einzige Weg, mit dem System zu interagieren.
+2.  **Idempotent:** Jeder `wgx`-Befehl kann mehrfach ausgeführt werden und führt zum selben Ergebnis.
+3.  **Lokal-First:** `wgx` funktioniert ohne Internetverbindung.
+4.  **Erklärbar:** `--dry-run` und `--verbose` zeigen, was passieren würde und was passiert ist.
+5.  **Mensch & Maschine:** `wgx` ist für Menschen im Terminal und für `hausKI` in Playbooks gleichermaßen bedienbar.

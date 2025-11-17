@@ -8,7 +8,10 @@ flowchart LR
     SEMA[semantAH\nInsights/Graph]
     HKA[hausKI-audio\nAudio Events/Sessions]
     AUSS[aussensensor\nAußen-Events\nfeed.jsonl]
-    LEIT[leitstand\nHTTP Ingest\nPanels/Digest]
+    CHRONIK[chronik\nHTTP Ingest\nEvent-Store]
+    LEIT[leitstand\nUI/Dashboard]
+
+    CHRONIK --> LEIT
   end
 
   subgraph Related

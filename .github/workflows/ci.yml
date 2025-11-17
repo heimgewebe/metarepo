@@ -67,6 +67,7 @@ jobs:
       - name: Load yq version pin
         run: |
           test -f toolchain.versions.yml || { echo "toolchain.versions.yml not found" >&2; exit 1; }
+          PYTHON_BIN=""
           if command -v python3 >/dev/null; then
             PYTHON_BIN=python3
           elif command -v python >/dev/null; then
@@ -75,14 +76,31 @@ jobs:
             echo "Python interpreter required to parse toolchain.versions.yml" >&2
             exit 1
           fi
+
+          YQ_VER=""
           if [[ -f .github/workflows/get-yq-version.py ]]; then
-            YQ_VER="$("${PYTHON_BIN}" .github/workflows/get-yq-version.py)"
+            YQ_VER="$($PYTHON_BIN .github/workflows/get-yq-version.py)"
           else
-            YQ_VER="$("${PYTHON_BIN}" -c $'import pathlib,re,sys\np=pathlib.Path("toolchain.versions.yml")\n'
-              $'c=p.read_text(encoding="utf-8")\n'
-              $'m=re.search(r"^yq:\\s*[\'\\"]?v?([^\'\\"#\\n]+)[\'\\"]?",c,re.M)\n'
-              $'sys.exit("yq version missing in toolchain.versions.yml") if not m else print(m.group(1).strip())')"
+            # Fallback to embedded Python script if the dedicated file is missing
+            YQ_VER=$($PYTHON_BIN - <<'EOF'
+          import pathlib
+          import re
+          import sys
+          try:
+              p = pathlib.Path("toolchain.versions.yml")
+              c = p.read_text(encoding="utf-8")
+              m = re.search(r"^yq:\s*['\"]?v?([^'\"#\n]+)['\"]?", c, re.M)
+              if m:
+                  print(m.group(1).strip())
+              else:
+                  sys.exit("yq version missing in toolchain.versions.yml")
+          except Exception as e:
+              print(f"Error parsing toolchain.versions.yml: {e}", file=sys.stderr)
+              sys.exit(1)
+          EOF
+          )
           fi
+
           test -n "${YQ_VER}" || { echo "Failed to resolve yq version" >&2; exit 1; }
           echo "YQ_VERSION=${YQ_VER}" >> "$GITHUB_ENV"
           echo "Resolved yq version ${YQ_VER}"
@@ -118,41 +136,7 @@ jobs:
             fi
           fi
 
-          if [[ -x scripts/tools/yq-pin.sh ]]; then
-            scripts/tools/yq-pin.sh ensure
-          else
-            echo "yq not found, attempting download..."
-            OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
-            ARCH_RAW="$(uname -m)"
-            case "$ARCH_RAW" in
-              x86_64) ARCH="amd64" ;;
-              arm64|aarch64) ARCH="arm64" ;;
-              *) echo "Unsupported architecture: $ARCH_RAW" >&2; exit 1 ;;
-            esac
-
-            YQ_URL="https://github.com/mikefarah/yq/releases/download/v${YQ_VER_TRIM}/yq_${OS}_${ARCH}"
-            YQ_SHA_URL="${YQ_URL}.sha256"
-            TMP_YQ="$(mktemp)"
-            TMP_SHA="$(mktemp)"
-            trap 'rm -f "${TMP_YQ}" "${TMP_SHA}"' EXIT
-
-            echo "Downloading yq ${YQ_VERSION} from ${YQ_URL}"
-            curl -fsSL -o "${TMP_YQ}" "${YQ_URL}"
-
-            if curl -fsSL -o "${TMP_SHA}" "${YQ_SHA_URL}"; then
-              EXPECTED="$(cut -d ' ' -f1 < "${TMP_SHA}")"
-              if command -v sha256sum >/dev/null; then
-                ACTUAL="$(sha256sum "${TMP_YQ}" | cut -d ' ' -f1)"
-              else
-                ACTUAL="$(shasum -a 256 "${TMP_YQ}" | awk '{print $1}')"
-              fi
-              if [[ -n "${EXPECTED}" && "${EXPECTED}" != "${ACTUAL}" ]]; then
-                echo "Checksum mismatch for yq (expected ${EXPECTED}, got ${ACTUAL})" >&2
-                exit 1
-              fi
-            fi
-            install -m 0755 "${TMP_YQ}" "$HOME/.local/bin/yq"
-          fi
+          scripts/tools/yq-pin.sh ensure
 
           # Final verification
           if ! command -v yq >/dev/null; then
@@ -651,11 +635,6 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
-  check-action-refs:
-    needs: ci
-    if: ${{ (github.event_name != 'push' || (!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '[ci skip]'))) && (github.event_name != 'pull_request' || github.event.pull_request.draft != true) }}
-    uses: ./.github/workflows/reusable-check-action-refs.yml
-
       - name: Show sccache stats
         if: ${{ hashFiles('**/Cargo.toml') != '' }}
         run: sccache --show-stats
@@ -672,3 +651,8 @@ jobs:
             .runtime/**/*
             !**/node_modules/**
           retention-days: 7
+
+  check-action-refs:
+    needs: ci
+    if: ${{ (github.event_name != 'push' || (!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '[ci skip]'))) && (github.event_name != 'pull_request' || github.event.pull_request.draft != true) }}
+    uses: ./.github/workflows/reusable-check-action-refs.yml

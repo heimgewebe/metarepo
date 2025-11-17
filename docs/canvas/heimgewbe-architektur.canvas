@@ -1,0 +1,35 @@
+{
+  "nodes": [
+    { "id": "meta",     "type": "text", "text": "metarepo\n(Control · Contracts · CI)",             "x": -400, "y": -120, "width": 260, "height": 120, "color": "1" },
+    { "id": "tools",    "type": "text", "text": "tools\n(Skripte · Utils)",                          "x": -400, "y":   40, "width": 220, "height": 100, "color": "1" },
+
+    { "id": "wgx",      "type": "text", "text": "wgx\n(System · Backups · Metrics)",                 "x": -100, "y": -160, "width": 260, "height": 120, "color": "5" },
+    { "id": "hauski",   "type": "text", "text": "hausKI\n(Orchestrator · State · Events)",           "x":  200, "y": -110, "width": 280, "height": 120, "color": "3" },
+    { "id": "heimlern", "type": "text", "text": "heimlern\n(Lernen · Policies · Why)",               "x":  470, "y": -110, "width": 260, "height": 120, "color": "2" },
+    { "id": "semantah", "type": "text", "text": "semantAH\n(Vault · Embeddings · Insights)",         "x":  200, "y":   80, "width": 280, "height": 120, "color": "5" },
+    { "id": "audio",    "type": "text", "text": "hausKI-audio\n(Audio · Routing · Latenzen)",        "x":  200, "y":  240, "width": 280, "height": 120, "color": "5" },
+
+    { "id": "chronik", "type": "text", "text": "chronik\n(Ingest · Event-Store)", "x": 520, "y": 120, "width": 260, "height": 120, "color": "3" },
+    { "id": "leitstand", "type": "text", "text": "leitstand\n(UI · Panels · Explain)", "x": 820, "y": 120, "width": 260, "height": 120, "color": "4" },
+    { "id": "aussen",   "type": "text", "text": "aussensensor\n(Feed · Sensorik)",                   "x":  740, "y":  180, "width": 240, "height": 110, "color": "3" },
+
+    { "id": "welt",     "type": "text", "text": "weltgewebe\n(Gemeinschaft · Karten · Güter)\n[externe Sphäre]", "x": 980, "y": 200, "width": 300, "height": 140, "color": "4" }
+  ],
+  "edges": [
+    { "id": "e1",  "fromNode": "meta",     "fromSide": "right", "toNode": "wgx",      "toSide": "left" },
+    { "id": "e2",  "fromNode": "meta",     "fromSide": "right", "toNode": "hauski",   "toSide": "left" },
+    { "id": "e3",  "fromNode": "meta",     "fromSide": "right", "toNode": "chronik","toSide": "left" },
+    { "id": "e4",  "fromNode": "wgx",      "fromSide": "right", "toNode": "hauski",   "toSide": "left" },
+    { "id": "e5",  "fromNode": "hauski",   "fromSide": "right", "toNode": "heimlern", "toSide": "left" },
+    { "id": "e6",  "fromNode": "hauski",   "fromSide": "right", "toNode": "chronik","toSide": "left" },
+    { "id": "e7",  "fromNode": "hauski",   "fromSide": "bottom","toNode": "semantah", "toSide": "top" },
+    { "id": "e8",  "fromNode": "hauski",   "fromSide": "bottom","toNode": "audio",    "toSide": "top" },
+    { "id": "e9",  "fromNode": "heimlern", "fromSide": "left",  "toNode": "hauski",   "toSide": "right" },
+    { "id": "e10", "fromNode": "semantah", "fromSide": "left",  "toNode": "hauski",   "toSide": "bottom" },
+    { "id": "e11", "fromNode": "audio",    "fromSide": "left",  "toNode": "hauski",   "toSide": "bottom" },
+    { "id": "e12", "fromNode": "aussen",   "fromSide": "left",  "toNode": "chronik","toSide": "right" },
+    { "id": "e13", "fromNode": "welt",     "fromSide": "left",  "toNode": "aussen",   "toSide": "right", "label": "know-how" },
+    { "id": "e14", "fromNode": "aussen",   "fromSide": "right", "toNode": "welt",     "toSide": "left",  "label": "insights" },
+    { "id": "e15", "fromNode": "chronik",   "fromSide": "right",  "toNode": "leitstand","toSide": "left" }
+  ]
+}

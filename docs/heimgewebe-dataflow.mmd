@@ -14,7 +14,9 @@ flowchart LR
     end
 
     subgraph UI
-      LST[leitstand\n/data/{domain}.jsonl]
+      CHRONIK[chronik\n/data/{domain}.jsonl]
+      LST[leitstand\nUI/Dashboard]
+      CHRONIK -- "Events" --> LST
     end
 
     subgraph Meta

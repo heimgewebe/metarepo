@@ -53,7 +53,9 @@ detect_libc() {
 		echo "$JUST_LIBC"
 	elif [ "$(uname -s | tr '[:upper:]' '[:lower:]')" = "linux" ]; then
 		# just v1.43.0 only has musl builds for linux
-		if [ "$(get_req_version_raw)" = "v1.43.0" ]; then
+		local req_version_raw
+		req_version_raw="$(get_req_version_raw)"
+		if [ "${req_version_raw#v}" = "1.43.0" ]; then
 			echo "musl"
 			return
 		fi

@@ -23,8 +23,8 @@ repos:
     default_branch: main
   - name: heimgewebe/mitschreiber
     default_branch: main
-  - name: heimgewebe/leitstand
-    default_branch: main
+  # - name: heimgewebe/chronik
+  #   default_branch: main
   - name: heimgewebe/heimlern
     default_branch: main
   - name: heimgewebe/aussensensor
@@ -48,7 +48,7 @@ just fleet.push-all
 3. Kopieren:
    - `templates/agent-kit/**` → `<repo>/templates/agent-kit/**`
    - `contracts/agent.tool.schema.json` → `<repo>/contracts/agent.tool.schema.json`
-   - **wenn Repo = `leitstand`**: zusätzlich `contracts/intent_event.schema.json`
+   - **wenn Repo = `chronik`**: zusätzlich `contracts/intent_event.schema.json`
 4. Commit & Push
 5. PR eröffnen (Label: `fleet/wave-1`)
 
