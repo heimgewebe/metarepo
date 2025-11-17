@@ -93,7 +93,21 @@ jobs:
 
           VALIDATE_FORMATS="${VALIDATE_FORMATS_RAW,,}"
           FAIL_ON_EMPTY="${FAIL_ON_EMPTY_RAW,,}"
-          FORMAT_FLAG=$([[ "$VALIDATE_FORMATS" == "false" ]] && echo "--validate-formats=false" || echo "--validate-formats=true")
+
+          # ---- AJV Argumente sicher bauen (ShellCheck SC2086 fix) -----------
+          declare -a AJV_ARGS=()
+          AJV_ARGS+=(--spec=draft2020)
+          if [[ "$STRICT" == "true" ]]; then
+            AJV_ARGS+=(--strict=true)
+          else
+            AJV_ARGS+=(--strict=false)
+          fi
+          if [[ "$VALIDATE_FORMATS" == "false" ]]; then
+            AJV_ARGS+=(--validate-formats=false)
+          else
+            # Default is true, explizit setzen für Klarheit
+            AJV_ARGS+=(--validate-formats=true)
+          fi
 
           # ---- Dateien ermitteln (Single oder Liste) -------------------------
           declare -a FILES=()
@@ -153,10 +167,7 @@ jobs:
               [[ -z "${line// }" ]] && continue
               # CRLF defensiv entfernen
               printf '%s\n' "$line" | tr -d '\r' > /tmp/event.json
-              if ! ajv validate --spec=draft2020 \
-                   $([[ "$STRICT" == "true" ]] && echo "--strict=true" || echo "--strict=false") \
-                   $FORMAT_FLAG \
-                   -s "$SCHEMA" -d /tmp/event.json; then
+              if ! ajv validate "${AJV_ARGS[@]}" -s "$SCHEMA" -d /tmp/event.json; then
                 echo "::error file=$FILE,line=$line_no::Schema-Verstoß in Zeile $line_no"
                 cat /tmp/event.json >> "$fail_file"; echo "" >> "$fail_file"
                 had_fail=1

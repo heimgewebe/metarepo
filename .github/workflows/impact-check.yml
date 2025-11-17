@@ -56,18 +56,32 @@ jobs:
 
       - name: Run impact guard analysis (always)
         run: |
+          # ShellCheck SC2046 Fix: Read files into an array to prevent word splitting.
+          cmd_base=()
           if [ -f pyproject.toml ] || [ -f setup.py ]; then
-            set -- python -m metarepo_tools.impact_guard
+            cmd_base=("python" "-m" "metarepo_tools.impact_guard")
           else
-            set -- python metarepo_tools/impact_guard.py
+            cmd_base=("python" "metarepo_tools/impact_guard.py")
           fi
-          "$@" \
+
+          readarray -t changed_files < <(printf '%s\n' "${{ steps.changed.outputs.all_changed_files }}")
+
+          # Filter out empty strings from the array.
+          args=()
+          for f in "${changed_files[@]}"; do
+            if [[ -n "$f" ]]; then
+              args+=("$f")
+            fi
+          done
+
+          # Always run the script, passing file arguments only if they exist.
+          "${cmd_base[@]}" \
             --contracts-dir contracts \
             --manifest repos.yml \
             --graph-out reports/impact/impact-graph.mmd \
             --report-out reports/impact/impact-report.md \
             --json-out reports/impact/impact-report.json \
-            $(printf '%s\n' "${{ steps.changed.outputs.all_changed_files }}" | tr '\n' ' ')
+            "${args[@]}"
 
       - name: Publish summary
         run: cat reports/impact/impact-report.md >> "$GITHUB_STEP_SUMMARY"

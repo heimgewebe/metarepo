@@ -12,7 +12,7 @@ jobs:
       - name: Install yq
         run: |
           scripts/tools/yq-pin.sh
-          echo "${PWD}/tools/bin" >> $GITHUB_PATH
+          echo "${PWD}/tools/bin" >> "$GITHUB_PATH"
       - name: Install just
         run: scripts/tools/just-pin.sh
       - name: Lint GitHub workflows (actionlint)
