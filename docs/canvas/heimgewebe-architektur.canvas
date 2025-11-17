@@ -9,7 +9,7 @@
     { "id": "semantah", "type": "text", "text": "semantAH\n(Vault · Embeddings · Insights)",         "x":  200, "y":   80, "width": 280, "height": 120, "color": "5" },
     { "id": "audio",    "type": "text", "text": "hausKI-audio\n(Audio · Routing · Latenzen)",        "x":  200, "y":  240, "width": 280, "height": 120, "color": "5" },
 
-    { "id": "leitstand","type": "text", "text": "leitstand\n(Ingest · Panels · Explain)",            "x":  520, "y":  120, "width": 260, "height": 120, "color": "3" },
+    { "id": "leitstand","type": "text", "text": "chronik\n(Ingest · Persistenz · Audit)",            "x":  520, "y":  120, "width": 260, "height": 120, "color": "3" },
     { "id": "aussen",   "type": "text", "text": "aussensensor\n(Feed · Sensorik)",                   "x":  740, "y":  180, "width": 240, "height": 110, "color": "3" },
 
     { "id": "welt",     "type": "text", "text": "weltgewebe\n(Gemeinschaft · Karten · Güter)\n[externe Sphäre]", "x": 980, "y": 200, "width": 300, "height": 140, "color": "4" }

@@ -23,14 +23,15 @@ Nicht Teil des metarepo: produktiver Service-Code oder umfangreiche Projekt-Doku
 ## Heimgewebe – Komponenten & Zuständigkeiten (ohne weltgewebe)
 
 - **WGX** – Flotten-Motor/CLI (Schicht 0): Orchestrierung, Doctor/Smoke/Metrics, Start/Watch. Keine KI-Logik.
-- **aussensensor** – Außen-Signalaufnahme (Schicht 6): produziert `aussen.event` (JSONL), validiert lokal.
-- **leitstand** – Memorativ (Schicht 4): Ingest-API, Persistenz/Audit, Operator-Panels, Exporte.
-- **heimlern** – Politisch-Adaptiv (Schicht 5): Policies, Entscheidungen, Lern-Scores → `policy.decision`.
-- **hausKI** – Operativ (Schicht 2): Orchestrierung/Planung/Ausführung; koordiniert Reviews & Aktionen.
 - **semantAH** – Semantisch (Schicht 1): Knowledge-Graph, Embeddings, `insight/*`, `graph/*`.
+- **hausKI** – Operativ (Schicht 2): Orchestrierung/Planung/Ausführung; koordiniert Reviews & Aktionen.
 - **sichter** – Reflexiv (Schicht 3): Reviews/Diagnosen → `review/*` (ggf. als State-Updates gemappt).
+- **chronik** – Memorativ (Schicht 4): Ingest-API, Persistenz/Audit, Event-Exports.
+- **heimlern** – Politisch-Adaptiv (Schicht 5): Policies, Entscheidungen, Lern-Scores → `policy.decision`.
+- **leitstand** – Interaktiv (Schicht 5/6): UI/Dashboard, Panels („Heute“, „Wissen“, „PC“, „Musik“, „Außen“), Tages-Digest.
 - **mitschreiber** – Dialogisch-Semantisch (Schicht 6): OS-Kontext/Intents → `os.context.*` (JSONL).
-- **hausKI-audio** – Audio-Pipeline: VAD/ASR → `audio.events` (Kontextquelle für hausKI, Panel in leitstand).
+- **hausKI-audio** – Audio-Pipeline: VAD/ASR → `audio.events` (Kontextquelle für hausKI, Panels in leitstand).
+- **aussensensor** – Außen-Signalaufnahme (Schicht 6): produziert `aussen.event` (JSONL), validiert lokal.
 - **tools** – Hilfs-Skripte (Pins, JSONL-Utilities, Merge-Helfer); perspektivisch Konsolidierung mit WGX/Metarepo.
 - **vault-gewebe** – Privater Wissensspeicher (außerhalb der Fleet); ggf. Exporte für semantAH.
 

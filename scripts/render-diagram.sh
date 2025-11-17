@@ -43,17 +43,24 @@ npx --yes @mermaid-js/mermaid-cli@10.9.1 --version >/dev/null
 render_mmd() {
   local in="$1" out_base="$2"
   local out="${OUTDIR}/${out_base}.${FORMAT}"
+  # Preprocess to remove markdown fences, write to temp file
+  local tmp_mmd
+  tmp_mmd="$(mktemp)"
+  trap 'rm -f "$tmp_mmd"' RETURN
+  sed '/^```/d' "$in" > "$tmp_mmd"
+
   echo "→ render ${in}  ->  ${out}"
   npx --yes @mermaid-js/mermaid-cli@10.9.1 \
       --puppeteerConfigFile "puppeteer-config.json" \
-      -i "$in" -o "$out" -t "$THEME" -s 1 >/dev/null
+      -i "$tmp_mmd" -o "$out" -t "$THEME" -s 1 >/dev/null
 }
 
 extract_md_mermaid_blocks() {
   # Druckt blockweise Mermaid-Inhalte mit Nullbyte-Trennzeichen
   # und Zeilen "===BLOCK:<n>:<safe_base>===" als Header je Block auf stderr
   local file="$1"
-  local base="$(basename "${file%.*}")"
+  local base
+  base="$(basename "${file%.*}")"
   awk -v base="$base" '
     BEGIN {in=0; n=0}
     /^```[ \t]*mermaid[ \t]*$/ {in=1; n++; next}
@@ -71,7 +78,8 @@ for f in "${ARGS[@]}"; do
     render_mmd "$f" "$stem"
   elif [[ "$ext" == "md" ]]; then
     # Extrahiere mermaid-Blöcke in temp Dateien und rendere nummeriert
-    tmpdir="$(mktemp -d)"; trap 'rm -rf "$tmpdir"' EXIT
+    tmpdir="$(mktemp -d)"
+    trap 'rm -rf "$tmpdir"' EXIT
     mapfile -t blocks < <(grep -n '```[[:space:]]*mermaid' -n "$f" | cut -d: -f1)
     if (( ${#blocks[@]} == 0 )); then
       echo "Hinweis: keine \`\`\`mermaid Codeblöcke in $f gefunden – übersprungen."
@@ -101,8 +109,8 @@ for f in "${ARGS[@]}"; do
       continue
     fi
     for b in "$tmpdir"/*.mmd; do
-      blk="$(basename "$b" .mmd)"
-      render_mmd "$b" "$blk"
+      blk_base="$(basename "$b" .mmd)"
+      render_mmd "$b" "$blk_base"
     done
   else
     echo "Unbekannter Typ ($ext) – nur .mmd oder .md werden unterstützt: $f" >&2
