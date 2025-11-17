@@ -172,11 +172,13 @@ jobs:
 
       - name: Setup Rust
         if: ${{ hashFiles('**/Cargo.toml') != '' }}
-        uses: actions-rs/toolchain@v1
+        # actions-rs/toolchain ist deprecated und wird von GitHub blockiert.
+        # Ersatz: dtolnay/rust-toolchain – stabil, maintained, zukunftssicher.
+        uses: dtolnay/rust-toolchain@stable
         with:
+          # entspricht dem bisherigen Verhalten
           toolchain: ${{ env.RUST_VERSION }}
-          components: clippy, rustfmt
-          profile: minimal
+          components: rustfmt, clippy
 
       - name: Install sccache
         if: ${{ hashFiles('**/Cargo.toml') != '' }}
