@@ -119,23 +119,13 @@ jobs:
       - name: Ensure yq is available
         run: |
           set -euo pipefail
-          mkdir -p "$HOME/.local/bin"
-          # Add to PATH for current and subsequent steps
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-          export PATH="$HOME/.local/bin:$PATH"
+          # Add tools/bin to PATH for current and subsequent steps to ensure pinned version usage
+          echo "$PWD/tools/bin" >> "$GITHUB_PATH"
+          export PATH="$PWD/tools/bin:$PATH"
 
           YQ_VER_TRIM="${YQ_VERSION#v}"
 
-          # If yq is already installed, check version and skip install if it matches.
-          if command -v yq >/dev/null; then
-            if yq --version | grep -q "version v${YQ_VER_TRIM}"; then
-              echo "✅ yq ${YQ_VER_TRIM} already installed and verified."
-              exit 0
-            else
-              echo "Found existing yq, but version does not match. Re-installing."
-            fi
-          fi
-
+          # Ensure the pinned version is installed (force check/download)
           scripts/tools/yq-pin.sh ensure
 
           # Final verification

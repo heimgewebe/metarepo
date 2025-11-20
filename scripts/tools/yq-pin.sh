@@ -95,6 +95,9 @@ download_yq() {
 
         ensure_dir
 
+        # Force cleanup of existing binaries in target location
+        rm -f "${YQ_LOCAL}"
+
         local tmp tmp_file
         tmp="$(mktemp "${YQ_LOCAL}.dl.XXXXXX")"
         trap 'tmp_file=${tmp-}; if [[ -n "${tmp_file}" ]]; then rm -f -- "${tmp_file}" 2>/dev/null || true; fi' EXIT
@@ -138,6 +141,9 @@ cmd_ensure() {
 	local pinned_version
 	pinned_version=$(read_pinned_version)
 
+    # Prioritize local BIN_DIR in PATH for this script execution
+    export PATH="${BIN_DIR}:${PATH}"
+
 	if yq_bin="$(resolved_yq)"; then
 		log "Benutze yq-Binary unter ${yq_bin}"
 		if v="$("${yq_bin}" --version 2>/dev/null | sed -E 's/^yq .* version v?//')"; then
@@ -154,10 +160,9 @@ cmd_ensure() {
 
 	if ! $version_is_ok; then
 		download_yq
-		# After download, resolved_yq should find the local binary first.
-		if ! yq_bin="$(resolved_yq)"; then
-			die "yq nach Download immer noch nicht gefunden."
-		fi
+        # Explicitly use the local binary for verification
+        yq_bin="${YQ_LOCAL}"
+
 		if ! v="$("${yq_bin}" --version 2>/dev/null | sed -E 's/^yq .* version v?//')"; then
 			die "konnte yq-Version nach Download nicht ermitteln"
 		fi
@@ -166,6 +171,7 @@ cmd_ensure() {
 		fi
 	fi
 
+    # Ensure symlink exists if we are using a different binary (unlikely now due to forced download)
 	if [[ "${yq_bin}" != "${YQ_LOCAL}" && ! -e "${YQ_LOCAL}" ]]; then
 		ln -s -- "${yq_bin}" "${YQ_LOCAL}" || true
 	fi
