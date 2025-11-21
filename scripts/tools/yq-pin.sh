@@ -117,6 +117,7 @@ download_yq() {
         if [[ -f "${tmp}" ]]; then
                 chmod +x "${tmp}" || true
                 mv -f -- "${tmp}" "${YQ_LOCAL}"
+                chmod +x "${YQ_LOCAL}"
                 log "yq erfolgreich nach ${YQ_LOCAL} heruntergeladen."
                 trap - EXIT
         fi
