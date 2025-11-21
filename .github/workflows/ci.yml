@@ -185,9 +185,9 @@ jobs:
                 aarch64) TARGET="aarch64-unknown-linux-musl" ;;
                 *) echo "Unsupported Linux architecture for sccache: $ARCH" >&2; exit 1 ;;
               esac
-              URL="https://github.com/mozilla/sccache/releases/download/${SCCACHE_VERSION}/sccache-${SCCACHE_VERSION_NUM}-${TARGET}.tar.gz"
+              URL="https://github.com/mozilla/sccache/releases/download/${SCCACHE_VERSION}/sccache-${SCCACHE_VERSION}-${TARGET}.tar.gz"
               if curl --head --silent --fail "$URL" > /dev/null; then
-                curl -L "$URL" | tar -xz --strip-components=1 -C "$BIN_DIR" "sccache-${SCCACHE_VERSION_NUM}-${TARGET}/sccache"
+                curl -L "$URL" | tar -xz --strip-components=1 -C "$BIN_DIR" "sccache-${SCCACHE_VERSION}-${TARGET}/sccache"
               else
                 echo "sccache binary not available for $TARGET and version $SCCACHE_VERSION" >&2
                 exit 1
@@ -200,9 +200,9 @@ jobs:
                 arm64|aarch64) TARGET="aarch64-apple-darwin" ;;
                 *) echo "Unsupported macOS architecture for sccache: $ARCH" >&2; exit 1 ;;
               esac
-              URL="https://github.com/mozilla/sccache/releases/download/${SCCACHE_VERSION}/sccache-${SCCACHE_VERSION_NUM}-${TARGET}.tar.gz"
+              URL="https://github.com/mozilla/sccache/releases/download/${SCCACHE_VERSION}/sccache-${SCCACHE_VERSION}-${TARGET}.tar.gz"
               if curl --head --silent --fail "$URL" > /dev/null; then
-                curl -L "$URL" | tar -xz --strip-components=1 -C "$BIN_DIR" "sccache-${SCCACHE_VERSION_NUM}-${TARGET}/sccache"
+                curl -L "$URL" | tar -xz --strip-components=1 -C "$BIN_DIR" "sccache-${SCCACHE_VERSION}-${TARGET}/sccache"
               else
                 echo "sccache binary not available for $TARGET and version $SCCACHE_VERSION" >&2
                 exit 1
