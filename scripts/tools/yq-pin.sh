@@ -99,10 +99,11 @@ download_yq() {
         # Force cleanup of existing binaries in target location
         rm -f "${YQ_LOCAL}"
 
-        local tmp tmp_file tmp_checksum
+        local tmp tmp_checksum
         tmp="$(mktemp "${YQ_LOCAL}.dl.XXXXXX")"
         tmp_checksum="$(mktemp "${YQ_LOCAL}.sha256.XXXXXX")"
-        trap 'rm -f -- "${tmp}" "${tmp_checksum}" 2>/dev/null || true' EXIT
+        # Use ${var-} expansion to avoid "unbound variable" errors if trap triggers before assignment
+        trap 'rm -f -- "${tmp-}" "${tmp_checksum-}" 2>/dev/null || true' EXIT
 
         log "Probiere Download-URL für ${yq_version}: ${url}"
 
