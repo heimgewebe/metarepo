@@ -119,23 +119,13 @@ jobs:
       - name: Ensure yq is available
         run: |
           set -euo pipefail
-          mkdir -p "$HOME/.local/bin"
-          # Add to PATH for current and subsequent steps
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-          export PATH="$HOME/.local/bin:$PATH"
+          # Add tools/bin to PATH (aktuellem Step + nachfolgenden Steps)
+          echo "$PWD/tools/bin" >> "$GITHUB_PATH"
+          export PATH="$PWD/tools/bin:$PATH"
 
           YQ_VER_TRIM="${YQ_VERSION#v}"
 
-          # If yq is already installed, check version and skip install if it matches.
-          if command -v yq >/dev/null; then
-            if yq --version | grep -q "version v${YQ_VER_TRIM}"; then
-              echo "✅ yq ${YQ_VER_TRIM} already installed and verified."
-              exit 0
-            else
-              echo "Found existing yq, but version does not match. Re-installing."
-            fi
-          fi
-
+          # Pinned Version erzwingen (Download + Verifikation)
           scripts/tools/yq-pin.sh ensure
 
           # Final verification
@@ -183,7 +173,7 @@ jobs:
       - name: Install sccache
         if: ${{ hashFiles('**/Cargo.toml') != '' }}
         run: |
-          SCCACHE_VERSION="v0.7.4"
+          SCCACHE_VERSION="v0.12.0"
           SCCACHE_VERSION_NUM="${SCCACHE_VERSION#v}"
           BIN_DIR="$HOME/.local/bin"
           mkdir -p "$BIN_DIR"
@@ -195,9 +185,9 @@ jobs:
                 aarch64) TARGET="aarch64-unknown-linux-musl" ;;
                 *) echo "Unsupported Linux architecture for sccache: $ARCH" >&2; exit 1 ;;
               esac
-              URL="https://github.com/mozilla/sccache/releases/download/${SCCACHE_VERSION}/sccache-${SCCACHE_VERSION_NUM}-${TARGET}.tar.xz"
+              URL="https://github.com/mozilla/sccache/releases/download/${SCCACHE_VERSION}/sccache-${SCCACHE_VERSION}-${TARGET}.tar.gz"
               curl -LsSf "$URL" |
-                tar -xJ --strip-components=1 -C "$BIN_DIR" "sccache-${SCCACHE_VERSION_NUM}-${TARGET}/sccache"
+                tar -xz --strip-components=1 -C "$BIN_DIR" "sccache-${SCCACHE_VERSION}-${TARGET}/sccache"
               ;;
             macOS)
               if ! command -v xz >/dev/null; then
@@ -210,9 +200,9 @@ jobs:
                 arm64|aarch64) TARGET="aarch64-apple-darwin" ;;
                 *) echo "Unsupported macOS architecture for sccache: $ARCH" >&2; exit 1 ;;
               esac
-              URL="https://github.com/mozilla/sccache/releases/download/${SCCACHE_VERSION}/sccache-${SCCACHE_VERSION_NUM}-${TARGET}.tar.xz"
+              URL="https://github.com/mozilla/sccache/releases/download/${SCCACHE_VERSION}/sccache-${SCCACHE_VERSION}-${TARGET}.tar.gz"
               curl -LsSf "$URL" |
-                tar -xJ --strip-components=1 -C "$BIN_DIR" "sccache-${SCCACHE_VERSION_NUM}-${TARGET}/sccache"
+                tar -xz --strip-components=1 -C "$BIN_DIR" "sccache-${SCCACHE_VERSION}-${TARGET}/sccache"
               ;;
             *)
               echo "Unsupported runner OS for sccache: ${RUNNER_OS}" >&2
@@ -227,7 +217,9 @@ jobs:
         if: ${{ hashFiles('**/Cargo.toml') != '' }}
         run: |
           echo "RUSTC_WRAPPER=sccache" >> "$GITHUB_ENV"
-          echo "SCCACHE_GHA_ENABLED=1" >> "$GITHUB_ENV"
+          # GHA-Backend deaktivieren, wir nutzen lokalen Cache
+          # echo "SCCACHE_GHA_ENABLED=1" >> "$GITHUB_ENV"
+          echo "SCCACHE_CACHE_TYPE=local" >> "$GITHUB_ENV"
 
       - name: Capture rustc version
         if: ${{ hashFiles('**/Cargo.toml') != '' }}
@@ -479,7 +471,7 @@ jobs:
           LYCHEE_CACHE_DIR: ~/.cache/lychee
         with:
           # nutzt deine .lychee.toml (inkl. inputs), kein doppelter Pfad nötig
-          args: --config .lychee.toml --statistics
+          args: --config .lychee.toml -- --statistics
           # schlägt den Job hart fehl, wenn Links kaputt sind
           fail: true
 
