@@ -16,7 +16,7 @@ jobs:
       - name: Install just
         run: scripts/tools/just-pin.sh
       - name: Lint GitHub workflows (actionlint)
-        uses: rhysd/actionlint@v1.7.8
+        uses: rhysd/actionlint@v1.7.9
         with:
           args: -color
       - name: Show tool versions

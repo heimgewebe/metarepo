@@ -485,7 +485,7 @@ jobs:
 
       - name: Lint GitHub Actions workflows
         if: runner.os == 'Linux'
-        uses: rhysd/actionlint@v1.7.8
+        uses: rhysd/actionlint@v1.7.9
         with:
           args: -color
 
