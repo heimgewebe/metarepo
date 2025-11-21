@@ -92,7 +92,8 @@ download_yq() {
                 yq_version="v${yq_version}"
         fi
         local url="https://github.com/mikefarah/yq/releases/download/${yq_version}/${binary_name}"
-        local checksum_url="${url}.sha256"
+        # Use the 'checksums' file which contains hashes for all assets
+        local checksum_url="https://github.com/mikefarah/yq/releases/download/${yq_version}/checksums"
 
         ensure_dir
 
@@ -119,20 +120,24 @@ download_yq() {
         # Download checksum
         if curl -fsSL "${checksum_url}" -o "${tmp_checksum}"; then
              log "Verifying checksum..."
-             # yq checksum files often contain "filename hash", we need to check against our tmp file
-             # But since the filename in the sum file won't match our tmp file, we can just compare the hash manually.
+             # Find the line for our binary and extract the 64-char SHA256 hash
              local expected_sum
-             expected_sum=$(awk '{print $19}' "${tmp_checksum}" 2>/dev/null || awk '{print $1}' "${tmp_checksum}")
-             local actual_sum
-             actual_sum=$(sha256sum "${tmp}" | awk '{print $1}')
+             expected_sum=$(grep -E "${binary_name}(\s|$)" "${tmp_checksum}" | grep -oE '\b[a-fA-F0-9]{64}\b' | head -n 1 || true)
 
-             if [[ "${expected_sum}" != "${actual_sum}" ]]; then
-                 die "Checksum verification failed! Expected: ${expected_sum}, Actual: ${actual_sum}"
+             if [[ -z "${expected_sum}" ]]; then
+                 log "WARN: Could not find SHA256 hash for ${binary_name} in checksums file. Skipping verification."
              else
-                 log "Checksum verified: ${actual_sum}"
+                 local actual_sum
+                 actual_sum=$(sha256sum "${tmp}" | awk '{print $1}')
+
+                 if [[ "${expected_sum}" != "${actual_sum}" ]]; then
+                     die "Checksum verification failed! Expected: ${expected_sum}, Actual: ${actual_sum}"
+                 else
+                     log "Checksum verified: ${actual_sum}"
+                 fi
              fi
         else
-             log "WARN: No checksum file found at ${checksum_url}, skipping verification."
+             log "WARN: No checksums file found at ${checksum_url}, skipping verification."
         fi
 
         if [[ -f "${tmp}" ]]; then

@@ -221,7 +221,9 @@ jobs:
         if: ${{ hashFiles('**/Cargo.toml') != '' }}
         run: |
           echo "RUSTC_WRAPPER=sccache" >> "$GITHUB_ENV"
-          echo "SCCACHE_GHA_ENABLED=1" >> "$GITHUB_ENV"
+          # Disable GHA cache backend as it requires additional setup/env vars which are missing
+          # echo "SCCACHE_GHA_ENABLED=1" >> "$GITHUB_ENV"
+          echo "SCCACHE_CACHE_TYPE=local" >> "$GITHUB_ENV"
 
       - name: Capture rustc version
         if: ${{ hashFiles('**/Cargo.toml') != '' }}
@@ -473,7 +475,7 @@ jobs:
           LYCHEE_CACHE_DIR: ~/.cache/lychee
         with:
           # nutzt deine .lychee.toml (inkl. inputs), kein doppelter Pfad nötig
-          args: --config .lychee.toml --statistics
+          args: --config .lychee.toml -- --statistics
           # schlägt den Job hart fehl, wenn Links kaputt sind
           fail: true
 
