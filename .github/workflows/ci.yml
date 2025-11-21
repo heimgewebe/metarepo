@@ -380,14 +380,14 @@ jobs:
           fi
 
           # If Rust toolchain present, install via cargo (deterministic & reproducible)
+          # Fallback mechanism: Try cargo first if available (but continue if it fails to try download)
           if command -v cargo >/dev/null 2>&1; then
-            cargo install --locked --version "${JUST_VERSION#v}" just || true
-          fi
-
-          # If now installed, finish
-          if command -v just >/dev/null 2>&1; then
-          just --version
-          exit 0
+            if cargo install --locked --version "${JUST_VERSION#v}" just; then
+              echo "Installed just via cargo"
+              exit 0
+            else
+              echo "cargo install failed, falling back to prebuilt binary download..."
+            fi
           fi
 
           # Final attempt: download prebuilt binary from upstream releases (best-effort).
@@ -414,14 +414,15 @@ jobs:
           TMP_DIR="$(mktemp -d)"
           RELEASE_TAG="${JUST_VERSION#v}"
           ASSET="just-${RELEASE_TAG}-${TARGET}.tar.gz"
-          URL="https://github.com/casey/just/releases/download/v${RELEASE_TAG}/${ASSET}"
+          # NOTE: casey/just releases use raw tags (e.g. 1.43.0) in download URLs, not v-prefixed.
+          URL="https://github.com/casey/just/releases/download/${RELEASE_TAG}/${ASSET}"
 
           if curl -fsSL -o "${TMP_DIR}/${ASSET}" "${URL}"; then
-          tar -xzf "${TMP_DIR}/${ASSET}" -C "${TMP_DIR}"
-          install -m 0755 "${TMP_DIR}/just" "$HOME/.local/bin/just" || true
-          rm -rf "${TMP_DIR}"
+            tar -xzf "${TMP_DIR}/${ASSET}" -C "${TMP_DIR}"
+            install -m 0755 "${TMP_DIR}/just" "$HOME/.local/bin/just" || true
+            rm -rf "${TMP_DIR}"
           else
-          echo "Failed to download prebuilt just from ${URL} — please pin a valid asset or install via cargo/brew/apt" >&2
+            echo "Failed to download prebuilt just from ${URL} — please pin a valid asset or install via cargo/brew/apt" >&2
           fi
 
           if command -v just >/dev/null 2>&1; then
@@ -471,7 +472,7 @@ jobs:
           LYCHEE_CACHE_DIR: ~/.cache/lychee
         with:
           # nutzt deine .lychee.toml (inkl. inputs), kein doppelter Pfad nötig
-          args: --config .lychee.toml
+          args: --config .lychee.toml README.md docs/
           # schlägt den Job hart fehl, wenn Links kaputt sind
           fail: true
 
