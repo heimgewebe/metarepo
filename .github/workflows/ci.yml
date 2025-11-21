@@ -471,7 +471,7 @@ jobs:
           LYCHEE_CACHE_DIR: ~/.cache/lychee
         with:
           # nutzt deine .lychee.toml (inkl. inputs), kein doppelter Pfad nötig
-          args: --config .lychee.toml --statistics
+          args: --config .lychee.toml -- --statistics
           # schlägt den Job hart fehl, wenn Links kaputt sind
           fail: true
 
