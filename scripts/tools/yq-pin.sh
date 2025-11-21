@@ -108,7 +108,7 @@ download_yq() {
 
         log "Probiere Download-URL für ${yq_version}: ${url}"
         # Binary herunterladen
-        if ! curl -fsSL "${url}" -o "${tmp}"; then
+        if ! curl --connect-timeout 10 --retry 3 -fsSL "${url}" -o "${tmp}"; then
                 if [[ -x "${YQ_LOCAL}" ]]; then
                         log "Download fehlgeschlagen – benutze vorhandenen Pin unter ${YQ_LOCAL} (offline fallback)."
                         return 0
@@ -117,7 +117,7 @@ download_yq() {
         fi
 
         # Checksum herunterladen und prüfen (falls verfügbar)
-        if curl -fsSL "${checksum_url}" -o "${tmp_checksum}"; then
+        if curl --connect-timeout 10 --retry 3 -fsSL "${checksum_url}" -o "${tmp_checksum}"; then
              log "Verifiziere Checksumme..."
              # Zeile für unser Binary finden (start of line OR preceded by whitespace)
              local checksum_line
