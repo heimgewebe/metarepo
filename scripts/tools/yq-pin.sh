@@ -119,9 +119,9 @@ download_yq() {
         # Checksum herunterladen und prüfen (falls verfügbar)
         if curl -fsSL "${checksum_url}" -o "${tmp_checksum}"; then
              log "Verifiziere Checksumme..."
-             # Zeile für unser Binary finden
+             # Zeile für unser Binary finden (start of line OR preceded by whitespace)
              local checksum_line
-             checksum_line=$(grep -E "^${binary_name}\s+" "${tmp_checksum}" || true)
+             checksum_line=$(grep -E "(^|[[:space:]])${binary_name}([[:space:]]|$)" "${tmp_checksum}" || true)
 
              if [[ -z "${checksum_line}" ]]; then
                  log "WARN: Keine Zeile für ${binary_name} in checksums gefunden, überspringe Verifikation."
