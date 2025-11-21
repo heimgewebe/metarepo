@@ -92,34 +92,59 @@ download_yq() {
                 yq_version="v${yq_version}"
         fi
         local url="https://github.com/mikefarah/yq/releases/download/${yq_version}/${binary_name}"
+        local checksum_url="${url}.sha256"
 
         ensure_dir
 
         # Force cleanup of existing binaries in target location
         rm -f "${YQ_LOCAL}"
 
-        local tmp tmp_file
+        local tmp tmp_file tmp_checksum
         tmp="$(mktemp "${YQ_LOCAL}.dl.XXXXXX")"
-        trap 'tmp_file=${tmp-}; if [[ -n "${tmp_file}" ]]; then rm -f -- "${tmp_file}" 2>/dev/null || true; fi' EXIT
+        tmp_checksum="$(mktemp "${YQ_LOCAL}.sha256.XXXXXX")"
+        trap 'rm -f -- "${tmp}" "${tmp_checksum}" 2>/dev/null || true' EXIT
+
         log "Probiere Download-URL für ${yq_version}: ${url}"
-        if curl -fsSL "${url}" -o "${tmp}"; then
-                log "Downloading from ${url}"
-        else
-                rm -f -- "${tmp}"
+
+        # Download binary
+        if ! curl -fsSL "${url}" -o "${tmp}"; then
                 if [[ -x "${YQ_LOCAL}" ]]; then
                         log "Download nicht gefunden – benutze vorhandenen Pin unter ${YQ_LOCAL} (offline fallback)."
-                        trap - EXIT
                         return 0
                 fi
-                trap - EXIT
                 die "Download von yq fehlgeschlagen: ${url}"
         fi
+
+        # Download checksum
+        if curl -fsSL "${checksum_url}" -o "${tmp_checksum}"; then
+             log "Verifying checksum..."
+             # yq checksum files often contain "filename hash", we need to check against our tmp file
+             # But since the filename in the sum file won't match our tmp file, we can just compare the hash manually.
+             local expected_sum
+             expected_sum=$(awk '{print $19}' "${tmp_checksum}" 2>/dev/null || awk '{print $1}' "${tmp_checksum}")
+             local actual_sum
+             actual_sum=$(sha256sum "${tmp}" | awk '{print $1}')
+
+             if [[ "${expected_sum}" != "${actual_sum}" ]]; then
+                 die "Checksum verification failed! Expected: ${expected_sum}, Actual: ${actual_sum}"
+             else
+                 log "Checksum verified: ${actual_sum}"
+             fi
+        else
+             log "WARN: No checksum file found at ${checksum_url}, skipping verification."
+        fi
+
         if [[ -f "${tmp}" ]]; then
                 chmod +x "${tmp}" || true
                 mv -f -- "${tmp}" "${YQ_LOCAL}"
                 chmod +x "${YQ_LOCAL}"
-                log "yq erfolgreich nach ${YQ_LOCAL} heruntergeladen."
-                trap - EXIT
+
+                # Verify execution
+                if ! "${YQ_LOCAL}" --version >/dev/null; then
+                    die "Heruntergeladenes yq Binary ist nicht ausführbar oder defekt."
+                fi
+
+                log "yq erfolgreich nach ${YQ_LOCAL} heruntergeladen und verifiziert."
         fi
 }
 
