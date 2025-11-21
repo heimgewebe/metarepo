@@ -27,7 +27,7 @@ jobs:
     timeout-minutes: 40
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup Just
         uses: extractions/setup-just@2fa60cc7d6fb3586e4cbace17c1169c8d2bd0f5c # extractions/setup-just@v2 (pinned)

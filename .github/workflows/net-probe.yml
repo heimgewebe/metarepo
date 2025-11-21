@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 7
     steps:
-      - uses: actions/checkout@v5 # v4 (major tag)
+      - uses: actions/checkout@v6 # v4 (major tag)
 
       - name: Check outbound HTTPS access (GitHub, PyPI, crates.io)
         run: |

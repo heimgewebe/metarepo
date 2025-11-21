@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v5 # v4 (major tag)
+      - uses: actions/checkout@v6 # v4 (major tag)
       - name: Cache lychee URL state
         uses: actions/cache@v4 # v4 (major tag)
         with:
