@@ -49,7 +49,7 @@ jobs:
     timeout-minutes: 40
     steps:
       - name: Checkout caller repo
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup Node
         uses: actions/setup-node@dda4788290998366da86b6a4f497909644397bb2 # v4.0.2

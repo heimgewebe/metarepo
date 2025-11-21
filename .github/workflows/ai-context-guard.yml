@@ -15,7 +15,7 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Ensure AI context exists and is non-empty
         run: |
           if [ ! -s .ai-context.yml ]; then

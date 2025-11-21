@@ -11,7 +11,7 @@ jobs:
   metrics:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Try just wgx metrics snapshot
         run: |
           set -euo pipefail
