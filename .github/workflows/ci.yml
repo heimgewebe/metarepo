@@ -185,24 +185,28 @@ jobs:
                 aarch64) TARGET="aarch64-unknown-linux-musl" ;;
                 *) echo "Unsupported Linux architecture for sccache: $ARCH" >&2; exit 1 ;;
               esac
-              URL="https://github.com/mozilla/sccache/releases/download/${SCCACHE_VERSION}/sccache-${SCCACHE_VERSION_NUM}-${TARGET}.tar.xz"
-              curl -LsSf "$URL" |
-                tar -xJ --strip-components=1 -C "$BIN_DIR" "sccache-${SCCACHE_VERSION_NUM}-${TARGET}/sccache"
+              URL="https://github.com/mozilla/sccache/releases/download/${SCCACHE_VERSION}/sccache-${SCCACHE_VERSION_NUM}-${TARGET}.tar.gz"
+              if curl --head --silent --fail "$URL" > /dev/null; then
+                curl -L "$URL" | tar -xz --strip-components=1 -C "$BIN_DIR" "sccache-${SCCACHE_VERSION_NUM}-${TARGET}/sccache"
+              else
+                echo "sccache binary not available for $TARGET and version $SCCACHE_VERSION" >&2
+                exit 1
+              fi
               ;;
             macOS)
-              if ! command -v xz >/dev/null; then
-                echo "Installing xz to support sccache archive extraction"
-                brew install xz
-              fi
               ARCH=$(uname -m)
               case "$ARCH" in
                 x86_64) TARGET="x86_64-apple-darwin" ;;
                 arm64|aarch64) TARGET="aarch64-apple-darwin" ;;
                 *) echo "Unsupported macOS architecture for sccache: $ARCH" >&2; exit 1 ;;
               esac
-              URL="https://github.com/mozilla/sccache/releases/download/${SCCACHE_VERSION}/sccache-${SCCACHE_VERSION_NUM}-${TARGET}.tar.xz"
-              curl -LsSf "$URL" |
-                tar -xJ --strip-components=1 -C "$BIN_DIR" "sccache-${SCCACHE_VERSION_NUM}-${TARGET}/sccache"
+              URL="https://github.com/mozilla/sccache/releases/download/${SCCACHE_VERSION}/sccache-${SCCACHE_VERSION_NUM}-${TARGET}.tar.gz"
+              if curl --head --silent --fail "$URL" > /dev/null; then
+                curl -L "$URL" | tar -xz --strip-components=1 -C "$BIN_DIR" "sccache-${SCCACHE_VERSION_NUM}-${TARGET}/sccache"
+              else
+                echo "sccache binary not available for $TARGET and version $SCCACHE_VERSION" >&2
+                exit 1
+              fi
               ;;
             *)
               echo "Unsupported runner OS for sccache: ${RUNNER_OS}" >&2
