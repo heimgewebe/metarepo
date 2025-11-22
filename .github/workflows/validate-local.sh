@@ -57,7 +57,8 @@ else
 	for file in "${YAML_FILES[@]}"; do
 		echo "Checking ${file}"
 		# reine Syntaxprüfung: eval '.' ohne -e; optional -e via STRICT_YQ_E
-		if ! "${YQ_BIN}" eval "${YQ_ARGS[@]}" '.' "${ROOT_DIR}/${file}" >/dev/null; then
+		# Safe array expansion for bash 3.2 (macOS) with set -u
+		if ! "${YQ_BIN}" eval ${YQ_ARGS[@]+"${YQ_ARGS[@]}"} '.' "${ROOT_DIR}/${file}" >/dev/null; then
 			echo "❌ YAML validation failed for ${file}"
 			exit 1
 		fi
