@@ -37,11 +37,15 @@ jobs:
           # Official yq checksums file often has: "hash  filename".
           # We grep the line for our binary name, then extract the hash.
 
-          # Find line containing the binary name
-          CHECKSUM_LINE="$(grep 'yq_linux_amd64' "$TMP_SHA")" || { echo "Checksum entry not found!"; exit 1; }
+          # Find strict line for binary: "HASH  filename" (anchored start/end)
+          CHECKSUM_LINE="$(grep -E '^[a-fA-F0-9]{64}\s+yq_linux_amd64$' "$TMP_SHA" || true)"
+          if [[ -z "$CHECKSUM_LINE" ]]; then
+            echo "Kein gültiger Checksummeneintrag für yq_linux_amd64 gefunden."
+            exit 1
+          fi
 
-          # Extract the hash (assuming it's the 64-char hex string in that line)
-          EXPECTED_SHA="$(echo "$CHECKSUM_LINE" | grep -oE '[a-fA-F0-9]{64}' | head -n 1)"
+          # Extract the hash (first field)
+          EXPECTED_SHA="$(echo "$CHECKSUM_LINE" | awk '{print $1}')"
           ACTUAL_SHA="$(sha256sum "$TMP_BIN" | awk '{print $1}')"
 
           if [[ "$EXPECTED_SHA" != "$ACTUAL_SHA" ]]; then

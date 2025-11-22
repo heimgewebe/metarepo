@@ -119,21 +119,22 @@ download_yq() {
         # Checksum herunterladen und prüfen (falls verfügbar)
         if curl --fail --max-time 60 --connect-timeout 10 --retry 3 -fsSL "${checksum_url}" -o "${tmp_checksum}"; then
              log "Verifiziere Checksumme..."
-             # Zeile für unser Binary finden (start of line OR preceded by whitespace)
+             # Strict regex match: "HASH  binary_name" (anchored start/end)
              local checksum_line
-             checksum_line=$(grep -E "(^|[[:space:]])${binary_name}([[:space:]]|$)" "${tmp_checksum}" || true)
+             checksum_line=$(grep -E "^[a-fA-F0-9]{64}[[:space:]]+${binary_name}$" "${tmp_checksum}" || true)
 
              if [[ -z "${checksum_line}" ]]; then
-                 log "WARN: Keine Zeile für ${binary_name} in checksums gefunden, überspringe Verifikation."
+                 log "WARN: Keine strikte Zeile für ${binary_name} in checksums gefunden, überspringe Verifikation."
              else
+                 local expected_sum
+                 expected_sum=$(echo "${checksum_line}" | awk '{print $1}')
                  local actual_sum
                  actual_sum=$(sha256sum "${tmp}" | awk '{print $1}')
 
-                 # Prüfen ob der berechnete Hash in der Zeile vorkommt
-                 if echo "${checksum_line}" | grep -qF "${actual_sum}"; then
-                     log "Checksumme ok: ${actual_sum}"
+                 if [[ "${expected_sum}" != "${actual_sum}" ]]; then
+                     die "Checksum-Verifikation fehlgeschlagen! Erwartet: ${expected_sum}, Ist: ${actual_sum}"
                  else
-                     die "Checksum-Verifikation fehlgeschlagen! Berechnet: ${actual_sum} - nicht in Checksums-Datei gefunden."
+                     log "Checksumme ok: ${actual_sum}"
                  fi
              fi
         else
