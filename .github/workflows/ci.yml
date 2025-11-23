@@ -64,6 +64,9 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      - name: Check toolchain.versions.yml exists
+        run: test -f toolchain.versions.yml || { echo "toolchain.versions.yml fehlt"; exit 1; }
+
       - name: Load yq version pin
         run: |
           test -f toolchain.versions.yml || { echo "toolchain.versions.yml not found" >&2; exit 1; }
