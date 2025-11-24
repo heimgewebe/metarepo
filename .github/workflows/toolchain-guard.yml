@@ -28,13 +28,16 @@ jobs:
 
           # Download checksums (try common possible names)
           echo "Download checksums (versuche mehrere mögliche Namen)..."
-          if ! curl --fail --max-time 60 --connect-timeout 10 --retry 3 -fsSL \
-              "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/checksums" -o "$TMP_SHA"; then
-            if ! curl --fail --max-time 60 --connect-timeout 10 --retry 3 -fsSL \
-                "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/checksums.txt" -o "$TMP_SHA"; then
-              echo "Fehler: Konnte keine Checksums-Datei herunterladen" >&2
-              exit 1
-            fi
+          CHECKSUM_URL_BASE="https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}"
+          if curl --fail --max-time 60 --connect-timeout 10 --retry 3 -fsSL \
+              "${CHECKSUM_URL_BASE}/checksums" -o "$TMP_SHA"; then
+            echo "Checksums geladen: checksums"
+          elif curl --fail --max-time 60 --connect-timeout 10 --retry 3 -fsSL \
+              "${CHECKSUM_URL_BASE}/checksums.txt" -o "$TMP_SHA"; then
+            echo "Checksums geladen: checksums.txt"
+          else
+            echo "Fehler: Konnte keine Checksums-Datei herunterladen" >&2
+            exit 1
           fi
 
           # Verify checksums file is not empty
