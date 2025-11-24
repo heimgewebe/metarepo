@@ -10,7 +10,6 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Install yq (robust)
-        shell: bash
         run: |
           set -euo pipefail
           YQ_VERSION="v4.44.3"
@@ -27,35 +26,39 @@ jobs:
           curl --fail --max-time 60 --connect-timeout 10 --retry 3 -fsSL \
             "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64" -o "$TMP_BIN"
 
-          # Download checksums
-          curl --fail --max-time 60 --connect-timeout 10 --retry 3 -fsSL \
-            "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/checksums" -o "$TMP_SHA"
+          # Download checksums (try common possible names)
+          echo "Download checksums (versuche mehrere mögliche Namen)..."
+          if ! curl --fail --max-time 60 --connect-timeout 10 --retry 3 -fsSL \
+              "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/checksums" -o "$TMP_SHA"; then
+            if ! curl --fail --max-time 60 --connect-timeout 10 --retry 3 -fsSL \
+                "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/checksums.txt" -o "$TMP_SHA"; then
+              echo "Fehler: Konnte keine Checksums-Datei herunterladen" >&2
+              exit 1
+            fi
+          fi
 
-          # Verify Checksum
-          # The checksum file format is: "HASH  filename" (hash first, or filename first depending on tool).
-          # The provided example used awk $1 for expected hash, implying hash is first column or unique line.
-          # Official yq checksums file often has: "hash  filename".
-          # We grep the line for our binary name, then extract the hash.
-
-          # Find strict line for binary: "HASH  filename" (anchored start/end)
-          CHECKSUM_LINE="$(grep -E '^[a-fA-F0-9]{64}\s+yq_linux_amd64$' "$TMP_SHA" || true)"
-          if [[ -z "$CHECKSUM_LINE" ]]; then
-            echo "Kein gültiger Checksummeneintrag für yq_linux_amd64 gefunden."
+          # Verify checksums file is not empty
+          if [[ ! -s "$TMP_SHA" ]]; then
+            echo "Fehler: Checksums-Datei ist leer" >&2
             exit 1
           fi
 
-          # Extract the hash (first field)
-          EXPECTED_SHA="$(echo "$CHECKSUM_LINE" | awk '{print $1}')"
+          # Calculate the actual SHA256 hash of the downloaded file first
           ACTUAL_SHA="$(sha256sum "$TMP_BIN" | awk '{print $1}')"
 
-          if [[ "$EXPECTED_SHA" != "$ACTUAL_SHA" ]]; then
-            echo "SHA256-Prüfsumme stimmt nicht überein!"
-            echo "Erwartet: $EXPECTED_SHA"
-            echo "Gefunden:  $ACTUAL_SHA"
+          # Search for a line that contains both the hash and the filename
+          # This avoids the ambiguity of extracting 64-hex strings which could match wrong algorithms
+          # The line might have either "hash ... filename" or "filename ... hash" format
+          if grep "yq_linux_amd64" "$TMP_SHA" | grep -q "$ACTUAL_SHA"; then
+            echo "SHA256-Prüfsumme erfolgreich verifiziert: $ACTUAL_SHA"
+          else
+            echo "SHA256-Prüfsumme stimmt nicht überein!" >&2
+            echo "Gesuchter Hash: $ACTUAL_SHA" >&2
+            echo "Inhalt der Checksums-Datei (erste 200 Zeilen):" >&2
+            sed -n '1,200p' "$TMP_SHA" >&2 || true
             exit 1
           fi
 
-          # Install
           chmod +x "$TMP_BIN"
           mv "$TMP_BIN" "$BIN_DIR/yq"
           echo "yq erfolgreich installiert und verifiziert."
