@@ -63,23 +63,15 @@ jobs:
             exit 0
           fi
 
-          # Versuche, die passende Zeile und SHA256 zu finden
-          CHECKSUM_LINE="$(grep -E 'yq_linux_amd64' "${TMP_SHA}" | tail -n 1 || true)"
-          if [[ -z "${CHECKSUM_LINE}" ]]; then
-            echo "::warning::Kein gültiger Checksummen-Eintrag für yq_linux_amd64 gefunden – überspringe Verifikation."
+          # Berechne den SHA256-Hash der heruntergeladenen Datei
+          ACTUAL_SUM="$(sha256sum "${TMP_BIN}" | awk '{print $1}')"
+
+          # Suche nach einer Zeile, die sowohl den Hash als auch den Dateinamen enthält
+          if grep -q "${ACTUAL_SUM}.*yq_linux_amd64" "${TMP_SHA}"; then
+            echo "Checksumme verifiziert: ${ACTUAL_SUM}"
           else
-            EXPECTED_SUM="$(echo "${CHECKSUM_LINE}" | grep -oE '[a-fA-F0-9]{64}' | head -n 1 || true)"
-            if [[ -z "${EXPECTED_SUM}" ]]; then
-              echo "::warning::Konnte keinen SHA256-Hash aus Checksummen-Zeile extrahieren – überspringe Verifikation."
-            else
-              ACTUAL_SUM="$(sha256sum "${TMP_BIN}" | awk '{print $1}')"
-              if [[ "${EXPECTED_SUM}" != "${ACTUAL_SUM}" ]]; then
-                echo "::error::Checksum-Verifikation fehlgeschlagen! Expected: ${EXPECTED_SUM}, Actual: ${ACTUAL_SUM}"
-                exit 1
-              else
-                echo "Checksumme verifiziert: ${ACTUAL_SUM}"
-              fi
-            fi
+            echo "::error::Checksum-Verifikation fehlgeschlagen! Kein passender Eintrag für Hash ${ACTUAL_SUM} und Datei yq_linux_amd64 gefunden."
+            exit 1
           fi
 
           mv "${TMP_BIN}" "${BIN_DIR}/yq"
