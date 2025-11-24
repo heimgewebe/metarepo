@@ -1,7 +1,7 @@
 import textwrap
 import unittest
 
-from scripts import repo_config
+from wgx import repo_config
 
 
 class ParseSimpleYamlTests(unittest.TestCase):
