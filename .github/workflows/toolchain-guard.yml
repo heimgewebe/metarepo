@@ -9,10 +9,65 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
-      - name: Install yq
+      - name: Install yq (robust)
         run: |
-          scripts/tools/yq-pin.sh
-          echo "${PWD}/tools/bin" >> "$GITHUB_PATH"
+          set -euo pipefail
+          YQ_VERSION="v4.44.3"
+          BIN_DIR="${GITHUB_WORKSPACE}/tools/bin"
+          mkdir -p "$BIN_DIR"
+          # Add to PATH for subsequent steps in this job
+          echo "$BIN_DIR" >> "$GITHUB_PATH"
+
+          TMP_BIN="$(mktemp "$BIN_DIR/yq.dl.XXXXXX")"
+          TMP_SHA="$(mktemp "$BIN_DIR/yq.sha256.XXXXXX")"
+
+          echo "Lade yq $YQ_VERSION herunter..."
+          # Download binary
+          curl --fail --max-time 60 --connect-timeout 10 --retry 3 -fsSL \
+            "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64" -o "$TMP_BIN"
+
+          # Download checksums (try common possible names)
+          echo "Download checksums (versuche mehrere mögliche Namen)..."
+          if ! curl --fail --max-time 60 --connect-timeout 10 --retry 3 -fsSL \
+              "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/checksums" -o "$TMP_SHA"; then
+            curl --fail --max-time 60 --connect-timeout 10 --retry 3 -fsSL \
+              "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/checksums.txt" -o "$TMP_SHA" || true
+          fi
+
+          # Tolerant parsing: find line containing the binary name
+          CHECKSUM_LINE="$(grep -E 'yq_linux_amd64' "$TMP_SHA" | tail -n 1 || true)"
+          if [[ -z "$CHECKSUM_LINE" ]]; then
+            echo "Kein gültiger Checksummeneintrag für yq_linux_amd64 gefunden."
+            echo "Inhalt der Checksums-Datei (erste 200 Zeilen):" >&2
+            sed -n '1,200p' "$TMP_SHA" >&2 || true
+            exit 1
+          fi
+
+          # Calculate actual SHA256 of downloaded binary
+          ACTUAL_SHA="$(sha256sum "$TMP_BIN" | awk '{print $1}')"
+          
+          # Extract all 64-hex strings from the checksum line and try to find a match
+          # This handles formats where multiple hashes may be present
+          FOUND_MATCH=false
+          while IFS= read -r candidate_sha; do
+            if [[ "$candidate_sha" == "$ACTUAL_SHA" ]]; then
+              FOUND_MATCH=true
+              echo "SHA256-Prüfsumme erfolgreich verifiziert: $ACTUAL_SHA"
+              break
+            fi
+          done < <(echo "$CHECKSUM_LINE" | grep -oE '[a-fA-F0-9]{64}')
+
+          if ! $FOUND_MATCH; then
+            echo "SHA256-Prüfsumme stimmt nicht überein!"
+            echo "Gefundene Checksummen in Datei:"
+            echo "$CHECKSUM_LINE" | grep -oE '[a-fA-F0-9]{64}' | head -n 5
+            echo "Tatsächliche SHA256 des Downloads: $ACTUAL_SHA"
+            exit 1
+          fi
+
+          chmod +x "$TMP_BIN"
+          mv "$TMP_BIN" "$BIN_DIR/yq"
+          echo "yq erfolgreich installiert und verifiziert."
       - name: Install just
         run: scripts/tools/just-pin.sh
       - name: Lint GitHub workflows (actionlint)
