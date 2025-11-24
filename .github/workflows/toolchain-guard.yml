@@ -9,10 +9,56 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
-      - name: Install yq
+      - name: Install yq (robust)
+        shell: bash
         run: |
-          scripts/tools/yq-pin.sh
-          echo "${PWD}/tools/bin" >> "$GITHUB_PATH"
+          set -euo pipefail
+          YQ_VERSION="v4.44.3"
+          BIN_DIR="${GITHUB_WORKSPACE}/tools/bin"
+          mkdir -p "$BIN_DIR"
+          # Add to PATH for subsequent steps in this job
+          echo "$BIN_DIR" >> "$GITHUB_PATH"
+
+          TMP_BIN="$(mktemp "$BIN_DIR/yq.dl.XXXXXX")"
+          TMP_SHA="$(mktemp "$BIN_DIR/yq.sha256.XXXXXX")"
+
+          echo "Lade yq $YQ_VERSION herunter..."
+          # Download binary
+          curl --fail --max-time 60 --connect-timeout 10 --retry 3 -fsSL \
+            "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64" -o "$TMP_BIN"
+
+          # Download checksums
+          curl --fail --max-time 60 --connect-timeout 10 --retry 3 -fsSL \
+            "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/checksums" -o "$TMP_SHA"
+
+          # Verify Checksum
+          # The checksum file format is: "HASH  filename" (hash first, or filename first depending on tool).
+          # The provided example used awk $1 for expected hash, implying hash is first column or unique line.
+          # Official yq checksums file often has: "hash  filename".
+          # We grep the line for our binary name, then extract the hash.
+
+          # Find strict line for binary: "HASH  filename" (anchored start/end)
+          CHECKSUM_LINE="$(grep -E '^[a-fA-F0-9]{64}\s+yq_linux_amd64$' "$TMP_SHA" || true)"
+          if [[ -z "$CHECKSUM_LINE" ]]; then
+            echo "Kein gültiger Checksummeneintrag für yq_linux_amd64 gefunden."
+            exit 1
+          fi
+
+          # Extract the hash (first field)
+          EXPECTED_SHA="$(echo "$CHECKSUM_LINE" | awk '{print $1}')"
+          ACTUAL_SHA="$(sha256sum "$TMP_BIN" | awk '{print $1}')"
+
+          if [[ "$EXPECTED_SHA" != "$ACTUAL_SHA" ]]; then
+            echo "SHA256-Prüfsumme stimmt nicht überein!"
+            echo "Erwartet: $EXPECTED_SHA"
+            echo "Gefunden:  $ACTUAL_SHA"
+            exit 1
+          fi
+
+          # Install
+          chmod +x "$TMP_BIN"
+          mv "$TMP_BIN" "$BIN_DIR/yq"
+          echo "yq erfolgreich installiert und verifiziert."
       - name: Install just
         run: scripts/tools/just-pin.sh
       - name: Lint GitHub workflows (actionlint)
