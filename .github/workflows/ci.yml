@@ -64,6 +64,9 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      - name: Check toolchain.versions.yml exists
+        run: test -f toolchain.versions.yml || { echo "toolchain.versions.yml fehlt"; exit 1; }
+
       - name: Load yq version pin
         run: |
           test -f toolchain.versions.yml || { echo "toolchain.versions.yml not found" >&2; exit 1; }
@@ -119,23 +122,13 @@ jobs:
       - name: Ensure yq is available
         run: |
           set -euo pipefail
-          mkdir -p "$HOME/.local/bin"
-          # Add to PATH for current and subsequent steps
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-          export PATH="$HOME/.local/bin:$PATH"
+          # Add tools/bin to PATH (aktuellem Step + nachfolgenden Steps)
+          echo "$PWD/tools/bin" >> "$GITHUB_PATH"
+          export PATH="$PWD/tools/bin:$PATH"
 
           YQ_VER_TRIM="${YQ_VERSION#v}"
 
-          # If yq is already installed, check version and skip install if it matches.
-          if command -v yq >/dev/null; then
-            if yq --version | grep -q "version v${YQ_VER_TRIM}"; then
-              echo "✅ yq ${YQ_VER_TRIM} already installed and verified."
-              exit 0
-            else
-              echo "Found existing yq, but version does not match. Re-installing."
-            fi
-          fi
-
+          # Pinned Version erzwingen (Download + Verifikation)
           scripts/tools/yq-pin.sh ensure
 
           # Final verification
@@ -183,7 +176,7 @@ jobs:
       - name: Install sccache
         if: ${{ hashFiles('**/Cargo.toml') != '' }}
         run: |
-          SCCACHE_VERSION="v0.7.4"
+          SCCACHE_VERSION="v0.12.0"
           SCCACHE_VERSION_NUM="${SCCACHE_VERSION#v}"
           BIN_DIR="$HOME/.local/bin"
           mkdir -p "$BIN_DIR"
@@ -191,13 +184,13 @@ jobs:
             Linux)
               ARCH=$(uname -m)
               case "$ARCH" in
-                x86_64) TARGET="x86_64-unknown-linux-musl" ;;
-                aarch64) TARGET="aarch64-unknown-linux-musl" ;;
+                x86_64) TARGET="x86_64-unknown-linux-gnu" ;;
+                aarch64) TARGET="aarch64-unknown-linux-gnu" ;;
                 *) echo "Unsupported Linux architecture for sccache: $ARCH" >&2; exit 1 ;;
               esac
-              URL="https://github.com/mozilla/sccache/releases/download/${SCCACHE_VERSION}/sccache-${SCCACHE_VERSION_NUM}-${TARGET}.tar.xz"
+              URL="https://github.com/mozilla/sccache/releases/download/${SCCACHE_VERSION}/sccache-${SCCACHE_VERSION}-${TARGET}.tar.gz"
               curl -LsSf "$URL" |
-                tar -xJ --strip-components=1 -C "$BIN_DIR" "sccache-${SCCACHE_VERSION_NUM}-${TARGET}/sccache"
+                tar -xz --strip-components=1 -C "$BIN_DIR" "sccache-${SCCACHE_VERSION}-${TARGET}/sccache"
               ;;
             macOS)
               if ! command -v xz >/dev/null; then
@@ -210,9 +203,9 @@ jobs:
                 arm64|aarch64) TARGET="aarch64-apple-darwin" ;;
                 *) echo "Unsupported macOS architecture for sccache: $ARCH" >&2; exit 1 ;;
               esac
-              URL="https://github.com/mozilla/sccache/releases/download/${SCCACHE_VERSION}/sccache-${SCCACHE_VERSION_NUM}-${TARGET}.tar.xz"
+              URL="https://github.com/mozilla/sccache/releases/download/${SCCACHE_VERSION}/sccache-${SCCACHE_VERSION}-${TARGET}.tar.gz"
               curl -LsSf "$URL" |
-                tar -xJ --strip-components=1 -C "$BIN_DIR" "sccache-${SCCACHE_VERSION_NUM}-${TARGET}/sccache"
+                tar -xz --strip-components=1 -C "$BIN_DIR" "sccache-${SCCACHE_VERSION}-${TARGET}/sccache"
               ;;
             *)
               echo "Unsupported runner OS for sccache: ${RUNNER_OS}" >&2
@@ -227,7 +220,9 @@ jobs:
         if: ${{ hashFiles('**/Cargo.toml') != '' }}
         run: |
           echo "RUSTC_WRAPPER=sccache" >> "$GITHUB_ENV"
-          echo "SCCACHE_GHA_ENABLED=1" >> "$GITHUB_ENV"
+          # GHA-Backend deaktivieren, wir nutzen lokalen Cache
+          # echo "SCCACHE_GHA_ENABLED=1" >> "$GITHUB_ENV"
+          echo "SCCACHE_CACHE_TYPE=local" >> "$GITHUB_ENV"
 
       - name: Capture rustc version
         if: ${{ hashFiles('**/Cargo.toml') != '' }}
@@ -388,14 +383,14 @@ jobs:
           fi
 
           # If Rust toolchain present, install via cargo (deterministic & reproducible)
+          # Fallback mechanism: Try cargo first if available (but continue if it fails to try download)
           if command -v cargo >/dev/null 2>&1; then
-            cargo install --locked --version "${JUST_VERSION#v}" just || true
-          fi
-
-          # If now installed, finish
-          if command -v just >/dev/null 2>&1; then
-          just --version
-          exit 0
+            if cargo install --locked --version "${JUST_VERSION#v}" just; then
+              echo "Installed just via cargo"
+              exit 0
+            else
+              echo "cargo install failed, falling back to prebuilt binary download..."
+            fi
           fi
 
           # Final attempt: download prebuilt binary from upstream releases (best-effort).
@@ -422,14 +417,15 @@ jobs:
           TMP_DIR="$(mktemp -d)"
           RELEASE_TAG="${JUST_VERSION#v}"
           ASSET="just-${RELEASE_TAG}-${TARGET}.tar.gz"
-          URL="https://github.com/casey/just/releases/download/v${RELEASE_TAG}/${ASSET}"
+          # NOTE: casey/just releases use raw tags (e.g. 1.43.0) in download URLs, not v-prefixed.
+          URL="https://github.com/casey/just/releases/download/${RELEASE_TAG}/${ASSET}"
 
           if curl -fsSL -o "${TMP_DIR}/${ASSET}" "${URL}"; then
-          tar -xzf "${TMP_DIR}/${ASSET}" -C "${TMP_DIR}"
-          install -m 0755 "${TMP_DIR}/just" "$HOME/.local/bin/just" || true
-          rm -rf "${TMP_DIR}"
+            tar -xzf "${TMP_DIR}/${ASSET}" -C "${TMP_DIR}"
+            install -m 0755 "${TMP_DIR}/just" "$HOME/.local/bin/just" || true
+            rm -rf "${TMP_DIR}"
           else
-          echo "Failed to download prebuilt just from ${URL} — please pin a valid asset or install via cargo/brew/apt" >&2
+            echo "Failed to download prebuilt just from ${URL} — please pin a valid asset or install via cargo/brew/apt" >&2
           fi
 
           if command -v just >/dev/null 2>&1; then
@@ -479,7 +475,7 @@ jobs:
           LYCHEE_CACHE_DIR: ~/.cache/lychee
         with:
           # nutzt deine .lychee.toml (inkl. inputs), kein doppelter Pfad nötig
-          args: --config .lychee.toml --statistics
+          args: --config .lychee.toml README.md docs/
           # schlägt den Job hart fehl, wenn Links kaputt sind
           fail: true
 

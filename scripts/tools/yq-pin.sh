@@ -92,30 +92,66 @@ download_yq() {
                 yq_version="v${yq_version}"
         fi
         local url="https://github.com/mikefarah/yq/releases/download/${yq_version}/${binary_name}"
+        # checksums-Datei enthält Hashes für alle Assets
+        local checksum_url="https://github.com/mikefarah/yq/releases/download/${yq_version}/checksums"
 
         ensure_dir
 
-        local tmp tmp_file
+        # Force cleanup of existing binaries in target location
+        rm -f "${YQ_LOCAL}"
+
+        local tmp tmp_checksum
         tmp="$(mktemp "${YQ_LOCAL}.dl.XXXXXX")"
-        trap 'tmp_file=${tmp-}; if [[ -n "${tmp_file}" ]]; then rm -f -- "${tmp_file}" 2>/dev/null || true; fi' EXIT
+        tmp_checksum="$(mktemp "${YQ_LOCAL}.sha256.XXXXXX")"
+        # ${var-} um set -u sauber zu halten
+        trap 'rm -f -- "${tmp-}" "${tmp_checksum-}" 2>/dev/null || true' EXIT
+
         log "Probiere Download-URL für ${yq_version}: ${url}"
-        if curl -fsSL "${url}" -o "${tmp}"; then
-                log "Downloading from ${url}"
-        else
-                rm -f -- "${tmp}"
+        # Binary herunterladen
+        if ! curl --fail --max-time 60 --connect-timeout 10 --retry 3 -fsSL "${url}" -o "${tmp}"; then
                 if [[ -x "${YQ_LOCAL}" ]]; then
-                        log "Download nicht gefunden – benutze vorhandenen Pin unter ${YQ_LOCAL} (offline fallback)."
-                        trap - EXIT
+                        log "Download fehlgeschlagen – benutze vorhandenen Pin unter ${YQ_LOCAL} (offline fallback)."
                         return 0
                 fi
-                trap - EXIT
                 die "Download von yq fehlgeschlagen: ${url}"
         fi
+
+        # Checksum herunterladen und prüfen (falls verfügbar)
+        if curl --fail --max-time 60 --connect-timeout 10 --retry 3 -fsSL "${checksum_url}" -o "${tmp_checksum}"; then
+             log "Verifiziere Checksumme..."
+             # Strict regex match: "HASH  binary_name" (anchored start/end)
+             local checksum_line
+             checksum_line=$(grep -E "^[a-fA-F0-9]{64}[[:space:]]+${binary_name}$" "${tmp_checksum}" || true)
+
+             if [[ -z "${checksum_line}" ]]; then
+                 log "WARN: Keine strikte Zeile für ${binary_name} in checksums gefunden, überspringe Verifikation."
+             else
+                 local expected_sum
+                 expected_sum=$(echo "${checksum_line}" | awk '{print $1}')
+                 local actual_sum
+                 actual_sum=$(sha256sum "${tmp}" | awk '{print $1}')
+
+                 if [[ "${expected_sum}" != "${actual_sum}" ]]; then
+                     die "Checksum-Verifikation fehlgeschlagen! Erwartet: ${expected_sum}, Ist: ${actual_sum}"
+                 else
+                     log "Checksumme ok: ${actual_sum}"
+                 fi
+             fi
+        else
+             log "WARN: checksums-Datei unter ${checksum_url} nicht gefunden, überspringe Verifikation."
+        fi
+
         if [[ -f "${tmp}" ]]; then
                 chmod +x "${tmp}" || true
                 mv -f -- "${tmp}" "${YQ_LOCAL}"
-                log "yq erfolgreich nach ${YQ_LOCAL} heruntergeladen."
-                trap - EXIT
+                chmod +x "${YQ_LOCAL}"
+
+                # Ausführung testen
+                if ! "${YQ_LOCAL}" --version >/dev/null 2>&1; then
+                    die "Heruntergeladenes yq-Binary ist nicht ausführbar oder defekt."
+                fi
+
+                log "yq erfolgreich nach ${YQ_LOCAL} heruntergeladen und verifiziert."
         fi
 }
 
@@ -137,6 +173,9 @@ cmd_ensure() {
 	local version_is_ok=false
 	local pinned_version
 	pinned_version=$(read_pinned_version)
+
+    # Lokales BIN_DIR für diesen Aufruf priorisieren
+    export PATH="${BIN_DIR}:${PATH}"
 
 	if yq_bin="$(resolved_yq)"; then
 		log "Benutze yq-Binary unter ${yq_bin}"
