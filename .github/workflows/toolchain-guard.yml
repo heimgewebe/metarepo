@@ -87,7 +87,7 @@ jobs:
 
           # If file looks like "hash  filename", try to extract expected hash for our file robustly
           EXPECTED_SHA="$(grep -E "yq(_|-)linux|yq_linux_amd64|yq-linux-amd64" "$TMP_SHA" \
-            | sed -E 's/^[[:space:]]*([0-9a-fA-F]{64}).*/\1/; t; s/.*([0-9a-fA-F]{64}).*/\1/') || true"
+            | sed -E 's/^([[:xdigit:]]{64})[[:space:]]+.*$/\1/') || true"
 
           if [[ -n "$EXPECTED_SHA" && "$EXPECTED_SHA" == "$ACTUAL_SHA" ]]; then
             echo "SHA256-Prüfsumme erfolgreich verifiziert: $ACTUAL_SHA"
