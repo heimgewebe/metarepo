@@ -1,38 +1,12 @@
-# metarepo · Docs-Index (Tower)
-Diese Dokumente beschreiben **Fleet/Themen** des metarepo (Inventar, Verteilung, CI-Reusables, Drift).
-Für **WGX (Engine)** siehe: https://github.com/heimgewebe/wgx
+Documents
+=========
 
-## Schnelleinstieg
-- [Systemübersicht](./system-overview.md) – Repos, Rollen & Einstiegspunkte
-- [Architektur](./architecture.md) – Komponenten, Datenflüsse & Diagramme
-- [Use-Cases](./use-cases.md) – typische Abläufe Schritt für Schritt
-- [Automatisierung & CI](./automation.md) – Just-Targets, Workflows, WGX
-- [Umgebung & Secrets](./environment.md) – lokale Konfiguration & Token-Hinweise
-- [Troubleshooting & FAQ](./troubleshooting.md) – häufige Fehler & Lösungen
-- [Events & Contracts](./contracts/index.md) – Schemas & Versionierung
-- [End-to-End-Läufe](./e2e.md) – Kette `aussensensor → chronik → heimlern`
-
-## Vertiefung & Referenzen
-- [Kernkonzepte (Architektur, Sync, Drift)](./konzept-kern.md)
-- [Fleet-Kurzüberblick (Rollen, Flüsse, Auth)](./overview.md)
-- [Fleet-Operations](./fleet.md)
-- [repos.yml – Inventar & Filter](./repos.yml.md)
-- [Templates verteilen & driftfrei halten](./templates.md)
-- [CI-Reusables](./ci-reusables.md)
-- [Runbooks verteilen](./runbooks.md)
-- [WGX-Doku-Stubs](./wgx-stub.md)
-- [Leitlinien](./leitlinien.md)
-- [Heimgewebe — Überblick (Ideales Gesamtsystem)](./heimgewebe-gesamt.md)
-- [Vision & Architekturüberblick](./vision.md)
-- [Contract-Versionierung](./contract-versioning.md)
-- [Architecture Decision Records (ADRs)](./adr/README.md)
-
-## Visuals & Diagramme
-- [Architektur (Mermaid)](./heimgewebe-architektur.mmd)
-- [Datenfluss (Mermaid)](./heimgewebe-dataflow.mmd)
-- [Architektur (Canvas)](./canvas/heimgewebe-architektur.canvas)
-- [Datenflüsse (Canvas)](./canvas/heimgewebe-dataflow.canvas)
-
-## Diagramm-Rendering
-- Lokal: `scripts/render-diagram.sh docs/IDEal_Blueprint.md --outdir docs/diagrams --format png`
-- CI: Workflow **render-diagrams** (liefert Artefakt `diagrams-<run_id>`)
+- [Checks](checks.md): Full list of all checks done by actionlint with example inputs, outputs, and playground links.
+- [Installation](install.md): Installation instructions. Prebuilt binaries, Homebrew package, a Docker image, building from
+  source, a download script (for CI) are available.
+- [Usage](usage.md): How to use `actionlint` command locally or on GitHub Actions, the online playground, an official Docker
+  image, and integrations with reviewdog, Problem Matchers, super-linter, pre-commit.
+- [Configuration](config.md): How to configure actionlint behavior. Currently, only labels of self-hosted runners can be
+  configured.
+- [Go API](api.md): How to use actionlint as Go library.
+- [References](reference.md): Links to resources.

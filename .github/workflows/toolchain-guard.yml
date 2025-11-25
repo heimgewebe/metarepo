@@ -26,15 +26,54 @@ jobs:
           curl --fail --max-time 60 --connect-timeout 10 --retry 3 -fsSL \
             "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64" -o "$TMP_BIN"
 
-          # Download checksums (try common possible names)
+          # robustere Checksums-Download & Verifikation
           echo "Download checksums (versuche mehrere mögliche Namen)..."
-          if ! curl --fail --max-time 60 --connect-timeout 10 --retry 3 -fsSL \
-              "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/checksums" -o "$TMP_SHA"; then
-            if ! curl --fail --max-time 60 --connect-timeout 10 --retry 3 -fsSL \
-                "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/checksums.txt" -o "$TMP_SHA"; then
-              echo "Fehler: Konnte keine Checksums-Datei herunterladen" >&2
-              exit 1
+          SHA_NAMES=(
+            "checksums"
+            "checksums.txt"
+            "SHA256SUMS"
+            "yq_linux_amd64.sha256"
+            "yq_linux_amd64.sha256.txt"
+            "sha256"
+          )
+
+          FOUND_SHA=0
+          for name in "${SHA_NAMES[@]}"; do
+            if curl --fail --max-time 60 --connect-timeout 10 --retry 3 -fsSL \
+                "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${name}" -o "$TMP_SHA"; then
+              if [[ -s "$TMP_SHA" ]]; then
+                FOUND_SHA=1
+                echo "Gefundene Checksums-Datei: $name"
+                break
+              fi
             fi
+          done
+
+          # Fallback: Release-Metadaten durchsuchen und asset-url verwenden
+          if [[ $FOUND_SHA -eq 0 ]]; then
+            echo "Versuche Release-Metadaten zu parsen und passende Checksums-Asset-URL zu finden..."
+            RELEASE_JSON="$(mktemp "$BIN_DIR/release.json.XXXXXX")"
+            if curl --fail --max-time 60 --connect-timeout 10 --retry 3 -fsSL \
+                "https://api.github.com/repos/mikefarah/yq/releases/tags/${YQ_VERSION}" -o "$RELEASE_JSON"; then
+              # Suche nach assets mit "sha" oder "check" im Namen
+              ASSET_URL="$(grep -oE '"browser_download_url":\s*"[^\"]+"' "$RELEASE_JSON" \
+                | sed -E 's/.*"([^"]+)".*/\1/' \
+                | grep -Ei '(sha|check)' || true)"
+              if [[ -n "$ASSET_URL" ]]; then
+                # nimm erstes Ergebnis
+                ASSET_URL="$(printf '%s\n' $ASSET_URL | head -n1)"
+                echo "Download Checksums von: $ASSET_URL"
+                if curl --fail --max-time 60 --connect-timeout 10 --retry 3 -fsSL "$ASSET_URL" -o "$TMP_SHA"; then
+                  FOUND_SHA=1
+                fi
+              fi
+            fi
+            rm -f "$RELEASE_JSON" || true
+          fi
+
+          if [[ $FOUND_SHA -eq 0 ]]; then
+            echo "Fehler: Konnte keine Checksums-Datei herunterladen" >&2
+            exit 1
           fi
 
           # Verify checksums file is not empty
@@ -43,17 +82,19 @@ jobs:
             exit 1
           fi
 
-          # Calculate the actual SHA256 hash of the downloaded file first
+          # Calculate actual sha
           ACTUAL_SHA="$(sha256sum "$TMP_BIN" | awk '{print $1}')"
 
-          # Search for a line that contains both the hash and the filename
-          # This avoids the ambiguity of extracting 64-hex strings which could match wrong algorithms
-          # The line might have either "hash ... filename" or "filename ... hash" format
-          if grep "yq_linux_amd64" "$TMP_SHA" | grep -q "$ACTUAL_SHA"; then
+          # If file looks like "hash  filename", try to extract expected hash for our file robustly
+          EXPECTED_SHA="$(grep -E "yq(_|-)linux|yq_linux_amd64|yq-linux-amd64" "$TMP_SHA" \
+            | sed -E 's/^[[:space:]]*([0-9a-fA-F]{64}).*/\1/; t; s/.*([0-9a-fA-F]{64}).*/\1/') || true"
+
+          if [[ -n "$EXPECTED_SHA" && "$EXPECTED_SHA" == "$ACTUAL_SHA" ]]; then
             echo "SHA256-Prüfsumme erfolgreich verifiziert: $ACTUAL_SHA"
           else
             echo "SHA256-Prüfsumme stimmt nicht überein!" >&2
             echo "Gesuchter Hash: $ACTUAL_SHA" >&2
+            echo "Gefundener Hash in Checksums-Datei (falls vorhanden): ${EXPECTED_SHA:-'(kein Hash gefunden)'}" >&2
             echo "Inhalt der Checksums-Datei (erste 200 Zeilen):" >&2
             sed -n '1,200p' "$TMP_SHA" >&2 || true
             exit 1
