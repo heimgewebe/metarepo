@@ -61,7 +61,7 @@ jobs:
                 | grep -Ei '(sha|check)' || true)"
               if [[ -n "$ASSET_URL" ]]; then
                 # nimm erstes Ergebnis
-                ASSET_URL="$(printf '%s\n' $ASSET_URL | head -n1)"
+                ASSET_URL="$(printf '%s\n' "$ASSET_URL" | head -n1)"
                 echo "Download Checksums von: $ASSET_URL"
                 if curl --fail --max-time 60 --connect-timeout 10 --retry 3 -fsSL "$ASSET_URL" -o "$TMP_SHA"; then
                   FOUND_SHA=1
