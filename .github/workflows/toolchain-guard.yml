@@ -26,7 +26,7 @@ jobs:
           curl --fail --max-time 60 --connect-timeout 10 --retry 3 -fsSL \
             "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64" -o "$TMP_BIN"
 
-          # robustere Checksums-Download & Verifikation
+          # more robust checksum download & verification
           echo "Download checksums (versuche mehrere mögliche Namen)..."
           SHA_NAMES=(
             "checksums"
