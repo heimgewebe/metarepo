@@ -13,7 +13,7 @@ flowchart LR
       HLM[heimlern\nDecisions {action,score,why}]
     end
 
-    subgraph UI
+    subgraph Persistence_UI["Persistenz & UI"]
       CHRONIK[chronik\n/data/{domain}.jsonl]
       LST[leitstand\nUI/Dashboard]
       CHRONIK -- "Events" --> LST
@@ -33,19 +33,19 @@ flowchart LR
 
     %% Flows
     SEM -->|insights/today.json| HKI
-    SEM -->|insights/today.json| LST
+    SEM -->|insights/today.json| CHRONIK
 
     WGX -->|metrics.json| HKI
     HKI -->|/v1/ingest/metrics\n(append Event)| HKI
 
     AUD -->|audio.events| HKI
-    AUD -->|audio.events| LST
+    AUD -->|audio.events| CHRONIK
 
-    AUS -->|feed.jsonl → HTTP /ingest/aussen| LST
+    AUS -->|feed.jsonl → HTTP /ingest/aussen| CHRONIK
 
     HKI -->|/v1/policy/decide| HLM
     HLM -->|{action,score,why}| HKI
     HKI -->|/v1/policy/feedback {reward}| HLM
 
-    HKI -->|events JSONL| LST
+    HKI -->|events JSONL| CHRONIK
 ```

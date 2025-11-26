@@ -7,7 +7,7 @@
     1.  **semantAH** analysiert `vault-gewebe` (Git-Historie, Dateiänderungen).
     2.  `semantAH` erzeugt `insights/today.json` mit den wichtigsten Änderungen.
     3.  **leitstand** (UI) zeigt dieses Digest im Panel „Heute“ an.
--   **Komponenten:** `semantAH`, `leitstand`.
+-   **Komponenten:** `semantAH`, `leitstand` (UI).
 
 ## 2. Proaktiver Backup-Hinweis
 
@@ -18,7 +18,7 @@
     3.  **heimlern**-Policy `suggest_backup` prüft: „last_backup > 24h && cpu_load < 0.2 && network_traffic < 1Mbit“.
     4.  Wenn ja, sendet `hausKI` ein `user.notification`-Event.
     5.  **leitstand** (UI) zeigt an: „Guter Zeitpunkt für ein Backup. Jetzt starten?“
--   **Komponenten:** `wgx`, `hausKI`, `heimlern`, `leitstand`.
+-   **Komponenten:** `wgx`, `hausKI`, `heimlern`, `leitstand` (UI).
 
 ## 3. Automatisierte Test-Ausführung
 
@@ -29,8 +29,8 @@
     3.  **hausKI** hat ein Playbook: `trigger: on_context(file == "Justfile") → run: wgx just lint`.
     4.  `hausKI` führt den Job aus.
     5.  **chronik** speichert das Job-Ergebnis (Erfolg/Fehler).
-    6.  **leitstand** zeigt im Panel „PC“ den letzten `lint`-Lauf an.
--   **Komponenten:** `mitschreiber`, `chronik`, `hausKI`, `leitstand`.
+    6.  **leitstand** (UI) zeigt im Panel „PC“ den letzten `lint`-Lauf an.
+-   **Komponenten:** `mitschreiber`, `chronik`, `hausKI`, `leitstand` (UI).
 
 ## 4. Debugging & Audit
 
@@ -40,4 +40,4 @@
     2.  Filtert im „Audit“-Panel nach `event_type: system.reboot`.
     3.  Findet das Event, inklusive `policy.decision`, das den Reboot ausgelöst hat.
     4.  Kann von dort zur `heimlern`-Policy und dem `metrics.snapshot` springen, der zur Entscheidung führte.
--   **Komponenten:** `chronik`, `leitstand`.
+-   **Komponenten:** `chronik`, `leitstand` (UI).

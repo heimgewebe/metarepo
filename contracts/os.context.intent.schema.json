@@ -2,7 +2,7 @@
  "$schema": "https://json-schema.org/draft/2020-12/schema",
  "$id": "https://schemas.heimgewebe.org/os.context.intent.schema.json",
  "title": "OS Context Intent",
- "description": "Intent-Ereignis aus dem lokalen Kontext (mitschreiber) zur semantischen Weiterverarbeitung (semantAH/hausKI/leitstand). JSONL: 1 Objekt/Zeile.",
+ "description": "Intent-Ereignis aus dem lokalen Kontext (mitschreiber) zur semantischen Weiterverarbeitung (semantAH/hausKI/chronik). JSONL: 1 Objekt/Zeile.",
  "type": "object",
  "additionalProperties": false,
  "properties": {

@@ -3,7 +3,7 @@
   "$id": "https://schemas.heimgewebe.org/contracts/policy.decision.schema.json",
   "title": "heimlern decision",
   "x-producers": ["heimlern"],
-  "x-consumers": ["hausKI", "leitstand"],
+  "x-consumers": ["hausKI", "chronik"],
   "type": "object",
   "required": ["action", "score", "why"],
   "properties": {

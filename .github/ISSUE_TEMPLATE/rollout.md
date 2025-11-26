@@ -21,8 +21,8 @@ labels: ["contracts-v1", "fleet"]
 ## Consumer-Aufgaben
 - [ ] **hausKI** – Endpunkte `/v1/ingest/metrics`, `/v1/policy/decide`, `/v1/policy/feedback` aktiv
 - [ ] **hausKI** – JSONL Event-Log `~/.hauski/events/YYYY-MM.jsonl` validiert gegen `event.line.schema.json`
-- [ ] **leitstand** – `POST /ingest/{domain}` appends nach `data/{domain}.jsonl`
-- [ ] **leitstand** – Panels „Heute/Wissen/PC/Musik/Außen“ zeigen valide Daten, inkl. `why`
+- [ ] **chronik** – `POST /ingest/{domain}` appends nach `data/{domain}.jsonl`
+- [ ] **leitstand** (UI) – Panels „Heute/Wissen/PC/Musik/Außen“ zeigen valide Daten, inkl. `why`
 - [ ] **heimlern** – `policy.decision.schema.json` implementiert (`Decide` + `Feedback`), Beispiel integriert
 
 ## Dokumentation & Enablement
@@ -33,4 +33,4 @@ labels: ["contracts-v1", "fleet"]
 ## Abschluss
 - [ ] Reviewer bestätigt lokale Tests (Panels/Metrics)
 - [ ] CI `contracts-validate` & `wgx-metrics` (falls zutreffend) grün
-- [ ] „Warum wurde X empfohlen?“ sichtbar im leitstand
+- [ ] „Warum wurde X empfohlen?“ sichtbar im leitstand (UI)

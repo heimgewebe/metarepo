@@ -19,7 +19,7 @@ PR_BODY = textwrap.dedent("""\
 
   - add `templates/agent-kit/**`
   - add `contracts/agent.tool.schema.json`
-  - add `contracts/intent_event.schema.json` (leitstand only)
+  - add `contracts/intent_event.schema.json` (chronik only)
   - docs: linked from metarepo
 
   Fleet wave-1 rollout. Label: `fleet/wave-1`.

@@ -1,6 +1,6 @@
 # Knowledge-Graph Contracts – Kurzleitfaden
 
-**Zweck:** Strukturierter Export von Wissen aus Code/Docs/ADRs als Graph für `semantAH` & `leitstand`.
+**Zweck:** Strukturierter Export von Wissen aus Code/Docs/ADRs als Graph für `semantAH` & `leitstand` (UI).
 
 **Schema:** `contracts/knowledge.graph.schema.json`
 

@@ -5,11 +5,15 @@ set -euo pipefail
 #
 # Erwartet:
 #  - AUSSENSENSOR_DIR: Pfad zum Repo "aussensensor"
-#  - CHRONIK_INGEST_URL, CHRONIK_TOKEN (Legacy: LEITSTAND_*)
+#  - CHRONIK_INGEST_URL, CHRONIK_TOKEN
 #  - HEIMLERN_INGEST_URL
 # Optional:
 #  - DRY_RUN=1   (führt nur Trockenläufe aus)
 #  - LOG_DIR     (Standard: ./.e2e-logs)
+#
+# Hinweis: Dieses Skript erwartet, dass aussensensor/scripts/push_chronik.sh
+#          existiert. Falls aussensensor noch nicht aktualisiert wurde,
+#          muss push_leitstand.sh zu push_chronik.sh umbenannt werden.
 #
 # Exit-Codes sind streng; bei Fehlern bricht das Script ab.
 
@@ -22,19 +26,16 @@ log() { printf "• %s %s\n" "$(ts)" "$*" | tee -a "${LOG_DIR}/e2e.log"; }
 ok() { printf "✓ %s %s\n" "$(ts)" "$*" | tee -a "${LOG_DIR}/e2e.log"; }
 err() { printf "✗ %s %s\n" "$(ts)" "$*" | tee -a "${LOG_DIR}/e2e.log" >&2; }
 
-CHRONIK_INGEST_URL="${CHRONIK_INGEST_URL:-${LEITSTAND_INGEST_URL:-}}"
-CHRONIK_TOKEN="${CHRONIK_TOKEN:-${LEITSTAND_TOKEN:-}}"
-
 [[ -d "${AUSSENSENSOR_DIR:-}" ]] || {
-        err "AUSSENSENSOR_DIR fehlt/ungültig"
-        exit 2
+	err "AUSSENSENSOR_DIR fehlt/ungültig"
+	exit 2
 }
 [[ -n "${CHRONIK_INGEST_URL:-}" ]] || {
-        err "CHRONIK_INGEST_URL fehlt (Legacy: LEITSTAND_INGEST_URL)"
-        exit 2
+	err "CHRONIK_INGEST_URL fehlt"
+	exit 2
 }
 [[ -n "${CHRONIK_TOKEN:-}" ]] || {
-	err "CHRONIK_TOKEN fehlt (Legacy: LEITSTAND_TOKEN)"
+	err "CHRONIK_TOKEN fehlt"
 	exit 2
 }
 [[ -n "${HEIMLERN_INGEST_URL:-}" ]] || {
@@ -44,8 +45,6 @@ CHRONIK_TOKEN="${CHRONIK_TOKEN:-${LEITSTAND_TOKEN:-}}"
 
 export CHRONIK_INGEST_URL="${CHRONIK_INGEST_URL}"
 export CHRONIK_TOKEN="${CHRONIK_TOKEN}"
-export LEITSTAND_INGEST_URL="${CHRONIK_INGEST_URL}"
-export LEITSTAND_TOKEN="${CHRONIK_TOKEN}"
 export HEIMLERN_INGEST_URL="${HEIMLERN_INGEST_URL}"
 
 AS="${AUSSENSENSOR_DIR}"
@@ -63,11 +62,11 @@ else
 fi
 ok "Validierung abgeschlossen"
 
-log "Trockenlauf: push_leitstand.sh --dry-run (chronik ingest)"
-if [[ -x scripts/push_leitstand.sh ]]; then
-	scripts/push_leitstand.sh --dry-run | tee "${LOG_DIR}/02_push_chronik_dry.out"
+log "Trockenlauf: push_chronik.sh --dry-run (chronik ingest)"
+if [[ -x scripts/push_chronik.sh ]]; then
+	scripts/push_chronik.sh --dry-run | tee "${LOG_DIR}/02_push_chronik_dry.out"
 else
-	err "scripts/push_leitstand.sh fehlt"
+	err "scripts/push_chronik.sh fehlt"
 	exit 3
 fi
 ok "Trockenlauf zu Chronik ok"
@@ -86,8 +85,8 @@ if [[ "${DRY_RUN:-0}" == "1" ]]; then
 	exit 0
 fi
 
-log "REAL: push_leitstand.sh (chronik ingest)"
-scripts/push_leitstand.sh | tee "${LOG_DIR}/04_push_chronik_real.out"
+log "REAL: push_chronik.sh (chronik ingest)"
+scripts/push_chronik.sh | tee "${LOG_DIR}/04_push_chronik_real.out"
 ok "Echtlauf zu Chronik ok"
 
 log "REAL: push_heimlern.sh"

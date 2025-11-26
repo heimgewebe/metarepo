@@ -3,7 +3,7 @@
   "$id": "https://schemas.heimgewebe.org/contracts/insights.schema.json",
   "title": "Heimgewebe Review Insight",
   "x-producers": ["semantAH"],
-  "x-consumers": ["hausKI", "leitstand"],
+  "x-consumers": ["hausKI", "chronik"],
   "type": "object",
   "additionalProperties": false,
   "required": ["type","repo","source","file","score","verdict","ingested_at"],

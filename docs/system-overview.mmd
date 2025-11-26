@@ -20,15 +20,15 @@ flowchart LR
   end
 
   %% Datenflüsse
-  AUSS -- aussen.event --> LEIT
+  AUSS -- aussen.event --> CHRONIK
   AUSS -- aussen.event --> HLN
   WELT -- optional events --> AUSS
   WGX -- metrics.snapshot --> HKI
-  WGX -- metrics.snapshot --> LEIT
+  WGX -- metrics.snapshot --> CHRONIK
   SEMA -- insights --> HKI
-  SEMA -- insights --> LEIT
+  SEMA -- insights --> CHRONIK
   HKA -- audio.events --> HKI
-  HKA -- audio.events --> LEIT
+  HKA -- audio.events --> CHRONIK
   HKI -- decide(ctx) --> HLN
   HLN -- action/why --> HKI
   HKI -- playbooks --> WGX

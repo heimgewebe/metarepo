@@ -3,7 +3,7 @@
   "$id": "https://schemas.heimgewebe.org/contracts/audio.events.schema.json",
   "title": "hausKI-audio events",
   "x-producers": ["hauski-audio"],
-  "x-consumers": ["hausKI", "leitstand"],
+  "x-consumers": ["hausKI", "chronik"],
   "oneOf": [
     {
       "type": "object",

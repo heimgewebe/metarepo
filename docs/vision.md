@@ -28,7 +28,8 @@ Es besteht aus vernetzten Repositories, die gemeinsam ein lernfähiges Ökosyste
 | **Lernen & Policies** | **heimlern** | Rust-Lib für adaptive Entscheidungslogik; liefert `action`, `score`, `why`. |
 | **Wissen & Bedeutung** | **semantAH** | Ingest von Vault-Daten, Embeddings, tägliche **Insights** (`insights/today.json`). |
 | **Audio & Musik** | **hausKI-audio** | Erfasst Sessions, Latenzen, Routing; Events für „Musik“-Panel und Lernkontext. |
-| **Visualisierung / UI** | **leitstand** | HTTP-Ingest + Panels. Zeigt Systemzustände, Lernfortschritt, Audioaktivität, Außenfeeds. |
+| **Persistenz / Audit** | **chronik** | Event-Ingest, Persistenz und Audit-Trails. Das „Gedächtnis" des Systems. |
+| **Visualisierung / UI** | **leitstand** | Panels für Systemzustände, Lernfortschritt, Audioaktivität, Außenfeeds. Der „Kontrollraum". |
 | **Außenwahrnehmung** | **aussensensor** | Aggregiert externe Quellen (News, Projekte, Sensorik) zu kuratiertem Feed (`export/feed.jsonl`). |
 | **Werkzeuge** | **tools** | Gemeinsame Skripte und Utilities für die gesamte Flotte. |
 
@@ -58,13 +59,14 @@ Es besteht aus vernetzten Repositories, die gemeinsam ein lernfähiges Ökosyste
 2. **Plan** – hausKI fragt heimlern: „Was soll ich tun?“  
 3. **Act** – hausKI oder wgx führen aus.  
 4. **Reflect** – Outcomes werden zu Events; heimlern lernt.  
-5. **Explain** – leitstand zeigt, *was*, *warum* und *mit welchem Ergebnis* passiert ist.
+5. **Explain** – leitstand (UI) zeigt, *was*, *warum* und *mit welchem Ergebnis* passiert ist.
 
 ---
 
 ## Entwicklungsstrategie
 1. **Verträge etablieren** (Contracts v1 im metarepo).  
-2. **leitstand + aussensensor** → End-to-End-Flow: Außen → Innen.  
+2. **chronik + aussensensor** → End-to-End-Flow: Außen → Innen (Ingest).  
+3. **leitstand** → UI für Visualisierung und Erklärung.  
 3. **hausKI + heimlern** → Entscheidungs- und Feedback-Mechanik.  
 4. **semantAH + hausKI-audio** → Wissens- und Kreativintegration.  
 5. **ADR-Dokumentation** fortlaufend für alle Architekturentscheidungen.  
@@ -76,7 +78,7 @@ Das Heimgewebe entwickelt sich zu einem **autonom lernenden System**,
 das lokale Daten in Bedeutung übersetzt, Entscheidungen begründet und Aktionen ausführt –  
 transparent, nachvollziehbar und stets erklärbar.
 
-> **Essenz:** semantAH liefert Sinn, hausKI entscheidet, heimlern verbessert, wgx handelt, leitstand erklärt, aussensensor beobachtet.  
+> **Essenz:** semantAH liefert Sinn, hausKI entscheidet, heimlern verbessert, wgx handelt, chronik persistiert, leitstand erklärt, aussensensor beobachtet.  
 > weltgewebe bleibt als Nachbar – verbunden im Geist, nicht im Code.
 
 ---
@@ -93,22 +95,25 @@ graph TD
     HLA[heimlern]
     SEM[semantAH]
     AUD[hausKI-audio]
+    CHR[chronik]
     LST[leitstand]
     AUS[aussensensor]
     WELT[weltgewebe]
 
     M --> WGX
     M --> HKI
+    M --> CHR
     M --> LST
     WGX --> HKI
     HKI --> HLA
-    HKI --> LST
+    HKI --> CHR
     HKI --> SEM
     HKI --> AUD
     HLA --> HKI
     SEM --> HKI
     AUD --> HKI
-    AUS --> LST
+    AUS --> CHR
+    CHR --> LST
     WELT -. know-how .-> AUS
     AUS -. insights .-> WELT
 
@@ -118,13 +123,13 @@ graph TD
 
 Siehe [heimgewebe-dataflow.mmd](./heimgewebe-dataflow.mmd).
 Die wichtigsten Artefakte & Verträge:
-- **semantAH → hausKI/leitstand**: `insights/today.json`  
+- **semantAH → hausKI/chronik**: `insights/today.json`  
   Schema: `contracts/insights.schema.json`
 - **wgx → hausKI**: `metrics.json` (Snapshot)  
   Schema: `contracts/metrics.snapshot.schema.json` (Validierung in hausKI vor Persistenz)
-- **hausKI-audio → hausKI/leitstand**: `audio.session_*`, `audio.latency_ms`  
+- **hausKI-audio → hausKI/chronik**: `audio.session_*`, `audio.latency_ms`  
   Schema: `contracts/audio.events.schema.json`
-- **aussensensor → leitstand**: `export/feed.jsonl` → POST `/ingest/aussen`  
+- **aussensensor → chronik**: `export/feed.jsonl` → POST `/ingest/aussen`  
   Schema: `contracts/aussen.event.schema.json`
 - **hausKI (intern/Export)**: `~/.hauski/events/YYYY-MM.jsonl` (append-only)  
   Schema: `contracts/event.line.schema.json`

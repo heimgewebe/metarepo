@@ -3,7 +3,7 @@
   "$id": "https://schemas.heimgewebe.org/contracts/event.line.schema.json",
   "title": "hausKI event line (JSONL)",
   "x-producers": ["hausKI"],
-  "x-consumers": ["leitstand"],
+  "x-consumers": ["chronik"],
   "type": "object",
   "required": ["id", "node_id", "ts", "kind", "payload"],
   "properties": {
