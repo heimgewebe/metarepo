@@ -110,7 +110,7 @@ jobs:
                     if (all_tokens[i] ~ /^[0-9a-fA-F]{64}$/) { print all_tokens[i]; exit }
                   }
                 }'
-          ) || true
+          )" || true
 
           # Endgültige Prüfung
           if [[ -n "$EXPECTED_SHA" && "$EXPECTED_SHA" == "$ACTUAL_SHA" ]]; then
