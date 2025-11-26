@@ -87,7 +87,7 @@ if [[ "${DRY_RUN:-0}" == "1" ]]; then
 fi
 
 log "REAL: push_leitstand.sh (chronik ingest)"
-	scripts/push_leitstand.sh | tee "${LOG_DIR}/04_push_chronik_real.out"
+scripts/push_leitstand.sh | tee "${LOG_DIR}/04_push_chronik_real.out"
 ok "Echtlauf zu Chronik ok"
 
 log "REAL: push_heimlern.sh"
