@@ -135,9 +135,9 @@ actionlint is distributed under [the MIT license](./LICENSE.txt).
 [playground]: https://rhysd.github.io/actionlint/
 [shellcheck]: https://github.com/koalaman/shellcheck
 [pyflakes]: https://github.com/PyCQA/pyflakes
-[syntax-doc]: https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions
+[syntax-doc]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
 [filter-pattern-doc]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#filter-pattern-cheat-sheet
-[script-injection-doc]: https://docs.github.com/en/actions/reference/security/secure-use#good-practices-for-mitigating-script-injection-attacks
+[script-injection-doc]: https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
 [releases]: https://github.com/rhysd/actionlint/releases
 [checks]: https://github.com/rhysd/actionlint/blob/v1.7.9/docs/checks.md
 [install]: https://github.com/rhysd/actionlint/blob/v1.7.9/docs/install.md

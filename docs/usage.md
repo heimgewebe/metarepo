@@ -453,17 +453,17 @@ You can also see actionlint issues inline in VS Code via the [Trunk VS Code exte
 
 [reviewdog-actionlint]: https://github.com/reviewdog/action-actionlint
 [reviewdog]: https://github.com/reviewdog/reviewdog
-[cmd-manual]: https://rhysd.github.io/actionlint/usage.html
+[cmd-manual]: https://github.com/rhysd/actionlint/blob/main/docs/usage.md
 [re2]: https://golang.org/s/re2syntax
 [go-template]: https://pkg.go.dev/text/template
 [jsonl]: https://jsonlines.org/
-[ga-annotate-error]: https://docs.github.com/en/actions/learn-github-actions/workflow-commands-for-github-actions#setting-an-error-message
+[ga-annotate-error]: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-error-message
 [sarif]: https://docs.oasis-open.org/sarif/sarif/v2.1.0/sarif-v2.1.0.html
-[problem-matchers]: https://github.com/actions/toolkit/blob/master/docs/problem-matchers.md
+[problem-matchers]: https://github.com/actions/toolkit/blob/main/docs/problem-matchers.md
 [super-linter]: https://github.com/github/super-linter
 [super-linter-env-var]: https://github.com/super-linter/super-linter#environment-variables
 [actionlint-matcher]: https://raw.githubusercontent.com/rhysd/actionlint/main/.github/actionlint-matcher.json
-[preinstall-ubuntu]: https://github.com/actions/virtual-environments/blob/main/images/linux/Ubuntu2004-README.md
+[preinstall-ubuntu]: https://github.com/actions/runner-images/tree/main/images/ubuntu
 [pre-commit]: https://pre-commit.com
 [go-install]: https://go.dev/doc/install
 [docker]: https://www.docker.com/
