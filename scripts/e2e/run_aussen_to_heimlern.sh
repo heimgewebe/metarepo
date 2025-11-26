@@ -34,13 +34,19 @@ CHRONIK_TOKEN="${CHRONIK_TOKEN:-${LEITSTAND_TOKEN:-}}"
         exit 2
 }
 [[ -n "${CHRONIK_TOKEN:-}" ]] || {
-        err "CHRONIK_TOKEN fehlt (Legacy: LEITSTAND_TOKEN)"
-        exit 2
+	err "CHRONIK_TOKEN fehlt (Legacy: LEITSTAND_TOKEN)"
+	exit 2
 }
 [[ -n "${HEIMLERN_INGEST_URL:-}" ]] || {
-        err "HEIMLERN_INGEST_URL fehlt"
-        exit 2
+	err "HEIMLERN_INGEST_URL fehlt"
+	exit 2
 }
+
+export CHRONIK_INGEST_URL="${CHRONIK_INGEST_URL}"
+export CHRONIK_TOKEN="${CHRONIK_TOKEN}"
+export LEITSTAND_INGEST_URL="${CHRONIK_INGEST_URL}"
+export LEITSTAND_TOKEN="${CHRONIK_TOKEN}"
+export HEIMLERN_INGEST_URL="${HEIMLERN_INGEST_URL}"
 
 AS="${AUSSENSENSOR_DIR}"
 
@@ -59,21 +65,16 @@ ok "Validierung abgeschlossen"
 
 log "Trockenlauf: push_leitstand.sh --dry-run (chronik ingest)"
 if [[ -x scripts/push_leitstand.sh ]]; then
-        CHRONIK_INGEST_URL="${CHRONIK_INGEST_URL}" \
-                CHRONIK_TOKEN="${CHRONIK_TOKEN}" \
-                LEITSTAND_INGEST_URL="${CHRONIK_INGEST_URL}" \
-                LEITSTAND_TOKEN="${CHRONIK_TOKEN}" \
-                scripts/push_leitstand.sh --dry-run | tee "${LOG_DIR}/02_push_chronik_dry.out"
+	scripts/push_leitstand.sh --dry-run | tee "${LOG_DIR}/02_push_chronik_dry.out"
 else
-        err "scripts/push_leitstand.sh fehlt"
-        exit 3
+	err "scripts/push_leitstand.sh fehlt"
+	exit 3
 fi
 ok "Trockenlauf zu Chronik ok"
 
 log "Trockenlauf: push_heimlern.sh --dry-run"
 if [[ -x scripts/push_heimlern.sh ]]; then
-	HEIMLERN_INGEST_URL="${HEIMLERN_INGEST_URL}" \
-		scripts/push_heimlern.sh --dry-run | tee "${LOG_DIR}/03_push_heimlern_dry.out"
+	scripts/push_heimlern.sh --dry-run | tee "${LOG_DIR}/03_push_heimlern_dry.out"
 else
 	err "scripts/push_heimlern.sh fehlt"
 	exit 3
@@ -86,15 +87,10 @@ if [[ "${DRY_RUN:-0}" == "1" ]]; then
 fi
 
 log "REAL: push_leitstand.sh (chronik ingest)"
-CHRONIK_INGEST_URL="${CHRONIK_INGEST_URL}" \
-        CHRONIK_TOKEN="${CHRONIK_TOKEN}" \
-        LEITSTAND_INGEST_URL="${CHRONIK_INGEST_URL}" \
-        LEITSTAND_TOKEN="${CHRONIK_TOKEN}" \
-        scripts/push_leitstand.sh | tee "${LOG_DIR}/04_push_chronik_real.out"
+	scripts/push_leitstand.sh | tee "${LOG_DIR}/04_push_chronik_real.out"
 ok "Echtlauf zu Chronik ok"
 
 log "REAL: push_heimlern.sh"
-HEIMLERN_INGEST_URL="${HEIMLERN_INGEST_URL}" \
 	scripts/push_heimlern.sh | tee "${LOG_DIR}/05_push_heimlern_real.out"
 ok "Echtlauf zu Heimlern ok"
 
