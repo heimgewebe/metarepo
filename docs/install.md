@@ -199,5 +199,5 @@ go install github.com/rhysd/actionlint/cmd/actionlint@main
 [archlinux]: https://archlinux.org/packages/extra/x86_64/actionlint/
 [aur]: https://aur.archlinux.org/
 [paru]: https://github.com/Morganamilo/paru
-[nixpkgs]: https://github.com/NixOS/nixpkgs/blob/master/pkgs/development/tools/analysis/actionlint/default.nix
+[nixpkgs]: https://search.nixos.org/packages?show=actionlint
 [mise]: https://github.com/jdx/mise

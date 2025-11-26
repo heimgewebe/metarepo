@@ -74,5 +74,5 @@ vim .github/actionlint.yaml
 
 [Super-Linter]: https://github.com/super-linter/super-linter
 [pat]: https://pkg.go.dev/path#Match
-[vars]: https://docs.github.com/en/actions/learn-github-actions/variables
+[vars]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#variables
 [doublestar]: https://github.com/bmatcuk/doublestar
