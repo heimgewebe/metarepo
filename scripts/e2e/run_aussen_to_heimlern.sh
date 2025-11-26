@@ -11,6 +11,10 @@ set -euo pipefail
 #  - DRY_RUN=1   (führt nur Trockenläufe aus)
 #  - LOG_DIR     (Standard: ./.e2e-logs)
 #
+# Hinweis: Dieses Skript erwartet, dass aussensensor/scripts/push_chronik.sh
+#          existiert. Falls aussensensor noch nicht aktualisiert wurde,
+#          muss push_leitstand.sh zu push_chronik.sh umbenannt werden.
+#
 # Exit-Codes sind streng; bei Fehlern bricht das Script ab.
 
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
