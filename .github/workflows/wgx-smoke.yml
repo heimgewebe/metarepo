@@ -13,4 +13,6 @@ jobs:
   smoke:
     # auch Smoke für das metarepo selbst wird über heimgewebe/wgx
     # zentral definiert.
+    # HINWEIS: @main wird akzeptiert, da wgx noch keine stabilen Tags hat.
+    # Sobald Tags verfügbar sind, sollte dies auf einen stabilen Tag gepinnt werden.
     uses: heimgewebe/wgx/.github/workflows/reusable-wgx-smoke.yml@main

@@ -52,7 +52,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup Node
-        uses: actions/setup-node@dda4788290998366da86b6a4f497909644397bb2 # v4.0.2
+        uses: actions/setup-node@v6
 
       - name: Install ajv-cli
         run: npm i -g ajv-cli@5.0.0
@@ -187,7 +187,7 @@ jobs:
 
       - name: Upload failing samples (if any)
         if: failure()
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v4.3.1
+        uses: actions/upload-artifact@v5
         with:
           name: jsonl-violations
           path: /tmp/jsonl-violations.*.txt
