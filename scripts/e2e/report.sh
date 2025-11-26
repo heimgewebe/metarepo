@@ -54,7 +54,7 @@ emit() {
 }
 
 emit "01 validate.sh" "${LOG_DIR}/01_validate.out"
-emit "02 push_leitstand (dry)" "${LOG_DIR}/02_push_chronik_dry.out"
+emit "02 push_chronik (dry)" "${LOG_DIR}/02_push_chronik_dry.out"
 emit "03 push_heimlern (dry)" "${LOG_DIR}/03_push_heimlern_dry.out"
 emit "04 push_leitstand (real)" "${LOG_DIR}/04_push_chronik_real.out"
 emit "05 push_heimlern (real)" "${LOG_DIR}/05_push_heimlern_real.out"
