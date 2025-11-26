@@ -91,7 +91,7 @@ scripts/push_leitstand.sh | tee "${LOG_DIR}/04_push_chronik_real.out"
 ok "Echtlauf zu Chronik ok"
 
 log "REAL: push_heimlern.sh"
-	scripts/push_heimlern.sh | tee "${LOG_DIR}/05_push_heimlern_real.out"
+scripts/push_heimlern.sh | tee "${LOG_DIR}/05_push_heimlern_real.out"
 ok "Echtlauf zu Heimlern ok"
 
 ok "E2E abgeschlossen"
