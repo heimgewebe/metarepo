@@ -85,10 +85,37 @@ jobs:
           # Calculate actual sha
           ACTUAL_SHA="$(sha256sum "$TMP_BIN" | awk '{print $1}')"
 
-          # If file looks like "hash  filename", try to extract expected hash for our file robustly
-          EXPECTED_SHA="$(grep -E "yq(_|-)linux|yq_linux_amd64|yq-linux-amd64" "$TMP_SHA" \
-            | sed -E 's/^([[:xdigit:]]{64})[[:space:]]+.*$/\1/') || true"
+          # Robustere Extraktion der erwarteten SHA256 aus der Checksums-Datei.
+          # Wir suchen zuerst in Zeilen, die auf unseren Dateinamen verweisen und extrahieren das erste 64-hex-Token.
+          EXPECTED_SHA="$(
+            # Normalisiere Trennzeichen: ersetze alle Whitespaces durch neue Zeilen,
+            # damit auch space-separated Einträge korrekt tokenisiert werden.
+            tr -s '[:space:]' '\n' < "$TMP_SHA" \
+              | awk '
+                BEGIN { target_re = "yq(_|-)?linux|yq_linux_amd64|yq-linux-amd64" }
+                {
+                  # speichere token und prüfe, ob es ein 64-hex-token ist
+                  if ($0 ~ /^[0-9a-fA-F]{64}$/) {
+                    hashes[++hcount] = $0
+                  } else {
+                    tokens[++tcount] = $0
+                  }
+                }
+                END {
+                  # Versuch 1: wenn ein token exakt den Dateinamen enthält, suche in der Nachbarschaft
+                  # (direkt davor oder danach) nach einem 64-hex-Hash.
+                  for (i=1;i<=tcount;i++) {
+                    if (tolower(tokens[i]) ~ target_re) {
+                      if (i>1 && tokens[i-1] ~ /^[0-9a-fA-F]{64}$/) { print tokens[i-1]; exit }
+                      if (i<tcount && tokens[i+1] ~ /^[0-9a-fA-F]{64}$/) { print tokens[i+1]; exit }
+                    }
+                  }
+                  # Versuch 2: falls oben nichts gefunden, gib erstes 64-hex-Hash-Token zurück
+                  if (hcount>=1) { print hashes[1]; exit }
+                }'
+          ) || true
 
+          # Endgültige Prüfung
           if [[ -n "$EXPECTED_SHA" && "$EXPECTED_SHA" == "$ACTUAL_SHA" ]]; then
             echo "SHA256-Prüfsumme erfolgreich verifiziert: $ACTUAL_SHA"
           else
