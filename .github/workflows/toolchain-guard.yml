@@ -92,7 +92,7 @@ jobs:
             # damit auch space-separated Einträge korrekt tokenisiert werden.
             tr -s '[:space:]' '\n' < "$TMP_SHA" \
               | awk '
-                BEGIN { target_re = "yq(_|-)?linux|yq_linux_amd64|yq-linux-amd64" }
+                BEGIN { target_re = "yq[_-]?linux|yq_linux_amd64|yq-linux-amd64" }
                 {
                   # speichere token und prüfe, ob es ein 64-hex-token ist
                   if ($0 ~ /^[0-9a-fA-F]{64}$/) {
