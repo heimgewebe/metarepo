@@ -94,24 +94,21 @@ jobs:
               | awk '
                 BEGIN { target_re = "yq[_-]?linux|yq_linux_amd64|yq-linux-amd64" }
                 {
-                  # speichere token und prüfe, ob es ein 64-hex-token ist
-                  if ($0 ~ /^[0-9a-fA-F]{64}$/) {
-                    hashes[++hcount] = $0
-                  } else {
-                    tokens[++tcount] = $0
-                  }
+                  # Speichere alle Tokens in Reihenfolge
+                  all_tokens[++count] = $0
                 }
                 END {
-                  # Versuch 1: wenn ein token exakt den Dateinamen enthält, suche in der Nachbarschaft
-                  # (direkt davor oder danach) nach einem 64-hex-Hash.
-                  for (i=1;i<=tcount;i++) {
-                    if (tolower(tokens[i]) ~ target_re) {
-                      if (i>1 && tokens[i-1] ~ /^[0-9a-fA-F]{64}$/) { print tokens[i-1]; exit }
-                      if (i<tcount && tokens[i+1] ~ /^[0-9a-fA-F]{64}$/) { print tokens[i+1]; exit }
+                  # Versuch 1: wenn ein Token exakt den Dateinamen enthält, suche in der Nachbarschaft nach einem 64-hex-Hash.
+                  for (i=1;i<=count;i++) {
+                    if (tolower(all_tokens[i]) ~ target_re) {
+                      if (i>1 && all_tokens[i-1] ~ /^[0-9a-fA-F]{64}$/) { print all_tokens[i-1]; exit }
+                      if (i<count && all_tokens[i+1] ~ /^[0-9a-fA-F]{64}$/) { print all_tokens[i+1]; exit }
                     }
                   }
                   # Versuch 2: falls oben nichts gefunden, gib erstes 64-hex-Hash-Token zurück
-                  if (hcount>=1) { print hashes[1]; exit }
+                  for (i=1;i<=count;i++) {
+                    if (all_tokens[i] ~ /^[0-9a-fA-F]{64}$/) { print all_tokens[i]; exit }
+                  }
                 }'
           ) || true
 
