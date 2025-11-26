@@ -12,13 +12,13 @@ Hier ist die Übersicht der zentralen Datenverträge (Schemas), die die Kommunik
 | `contracts/agent.workflow.schema.json` | Agenten-Ablaufdefinition | `wgx agent` | `wgx agent run/trace` |
 | `contracts/knowledge.graph.schema.json` | Wissensgraph-Elemente | `wgx knowledge extract` | `semantAH` |
 | `contracts/insights.schema.json` | `semantAH` exportiert `vault/.gewebe/insights/today.json` | `chronik` zeigt Tageswissen, `hausKI` nutzt Fragen für Lern-Jobs |
-| `contracts/audio.events.schema.json` | `hausKI-audio` Event-Stream | `leitstand` Panels „Musik/PC“, `hausKI` zum Kontextlernen |
+| `contracts/audio.events.schema.json` | `hausKI-audio` Event-Stream | `chronik` Panels „Musik/PC“, `hausKI` zum Kontextlernen |
 | `contracts/aussen.event.schema.json` | `aussensensor`, `weltgewebe` | `chronik` Panel „Außen“, Downstream Exports |
-| `contracts/policy.decision.schema.json` | `heimlern` Policies | `hausKI` erklärt Entscheidungen („Warum“), `leitstand` zeigt Begründungen |
+| `contracts/policy.decision.schema.json` | `heimlern` Policies | `hausKI` erklärt Entscheidungen („Warum“), `leitstand` (UI) zeigt Begründungen |
 | `contracts/os.context.intent.schema.json` | `mitschreiber` | `semantAH` (Graph / Kontextaufbau), `hausKI` (Plan/Execute), `chronik` (Audit) |
 | `contracts/events/intent.schema.json` *(Alias: intent_event)* | `mitschreiber` Intent-Sensorik | `hausKI` Planung, `chronik` Audit |
-| `contracts/insights.schema.json` | `semantAH` | `hausKI`, `leitstand` |
-| `contracts/metrics.snapshot.schema.json` | `wgx` | `hausKI`, `leitstand` |
+| `contracts/insights.schema.json` | `semantAH` | `hausKI`, `chronik` |
+| `contracts/metrics.snapshot.schema.json` | `wgx` | `hausKI`, `chronik` |
 | `contracts/knowledge.graph.schema.json` | `wgx knowledge extract`, Parser in `scripts/knowledge/*` | `semantAH` Ingest (Graph), `leitstand` Panel „Wissen“ |
 
 ## Versionierung & Rollout (Policy)
@@ -28,7 +28,7 @@ Hier ist die Übersicht der zentralen Datenverträge (Schemas), die die Kommunik
 1.  **Strict SemVer** für alle Änderungen an Schemas.
 2.  **Contracts-First:** Code-Änderungen, die neue Felder oder Strukturen nutzen, erfordern **zuerst** die Schema-Anpassung im `metarepo`.
 3.  **Tags & Branches:** Reusable Workflows in der Fleet nutzen einen `contracts-vX` Tag, um gegen stabile Schema-Versionen zu validieren.
-4.  **Rollout-Reihenfolge:** Producer (`wgx`, `semantAH`) zuerst mergen, danach Consumer (`hausKI`, `leitstand`) und Policies (`heimlern`).
+4.  **Rollout-Reihenfolge:** Producer (`wgx`, `semantAH`) zuerst mergen, danach Consumer (`hausKI`, `chronik`) und Policies (`heimlern`).
 
 ## CI/CD-Integration
 

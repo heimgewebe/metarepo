@@ -13,8 +13,8 @@ graph TD
         AUD[hausKI-audio<br/>Audio · Routing · Latenzen]
     end
 
-    subgraph VIS["Darstellung & Integration"]
-        CHRONIK[chronik<br/>Ingest · Event-Store]
+    subgraph VIS["Persistenz & Darstellung"]
+        CHRONIK[chronik<br/>Ingest · Persistenz · Audit]
         LST[leitstand<br/>UI · Panels · Explain]
         CHRONIK --> LST
         AUS[aussensensor<br/>Außenfeed · Sensorik]
@@ -26,19 +26,20 @@ graph TD
 
     M --> WGX
     M --> HKI
+    M --> CHRONIK
     M --> LST
     M --> AUS
 
     WGX --> HKI
     HKI --> HLA
-    HKI --> LST
+    HKI --> CHRONIK
     HKI --> SEM
     HKI --> AUD
     HLA --> HKI
     SEM --> HKI
     AUD --> HKI
 
-    AUS --> LST
+    AUS --> CHRONIK
     WELT -. know-how .-> AUS
     AUS -. insights .-> WELT
 

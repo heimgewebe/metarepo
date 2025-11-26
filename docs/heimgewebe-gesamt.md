@@ -40,9 +40,9 @@
 
 **Produzenten → Konsumenten (Datei/API + Schemas aus `metarepo/contracts/`):**
 
-- `semantAH → hausKI/leitstand`: `insights/today.json`, `weekly.md`
-- `wgx → hausKI/leitstand`: `metrics.snapshot.json` (Host/Temps/Updates/Backup/Drift)
-- `hausKI-audio → hausKI/leitstand`: `audio.session_*`, `audio.latency_ms`
+- `semantAH → hausKI/chronik`: `insights/today.json`, `weekly.md`
+- `wgx → hausKI/chronik`: `metrics.snapshot.json` (Host/Temps/Updates/Backup/Drift)
+- `hausKI-audio → hausKI/chronik`: `audio.session_*`, `audio.latency_ms`
 - `aussensensor → chronik`: `export/feed.jsonl` (kuratiert)
 - `weltgewebe → aussensensor/chronik`: freigegebene Außen-Ergebnisse (gleiches Event-Schema)
 - `heimlern ↔ hausKI`: `decide(ctx) → action,why` · `feedback(reward)`
@@ -148,5 +148,5 @@ Beispiele Policies (heimlern):
 
 Ein klar getrenntes, lokal-erstes System:
 
-- **semantAH** liefert Sinn, **hausKI** entscheidet & behält Gedächtnis, **heimlern** verbessert Entscheidungen, **wgx** handelt, **leitstand** erklärt, **aussensensor/weltgewebe** verknüpfen die Außenwelt.
+- **semantAH** liefert Sinn, **hausKI** entscheidet & behält Gedächtnis, **heimlern** verbessert Entscheidungen, **wgx** handelt, **chronik** persistiert, **leitstand** erklärt, **aussensensor/weltgewebe** verknüpfen die Außenwelt.
 - **Sync:** Dateien & Code live, **State nie**, **Events immer** – so bleibt alles robust, erklärbar und erweiterbar.

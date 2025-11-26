@@ -43,9 +43,9 @@
       "x": 600, "y": 220, "width": 320, "height": 120, "color": "gray"
     },
     {
-      "id": "leitstand",
+      "id": "chronik",
       "type": "text",
-      "text": "leitstand (Gedächtnis)\nEpisoden • Metriken • Audit",
+      "text": "chronik (Gedächtnis)\nEpisoden • Metriken • Audit",
       "x": 240, "y": 260, "width": 320, "height": 120, "color": "gray"
     },
     {
@@ -57,7 +57,7 @@
     {
       "id": "fluss",
       "type": "text",
-      "text": "Semantischer Blutkreislauf v0.2:\nmitschreiber → semantAH → hausKI → heimlern → sichter → leitstand → semantAH",
+      "text": "Semantischer Blutkreislauf v0.2:\nmitschreiber → semantAH → hausKI → heimlern → sichter → chronik → semantAH",
       "x": -160, "y": 420, "width": 560, "height": 120, "color": "yellow"
     },
     {
@@ -69,7 +69,7 @@
     {
       "id": "ziele",
       "type": "text",
-      "text": "Ziele (MVP):\n1) intent/review-Contracts final\n2) Bus-Demo (wgx→hausKI→sichter→leitstand)\n3) Graph-Upsert\n4) Mini-Cockpit",
+      "text": "Ziele (MVP):\n1) intent/review-Contracts final\n2) Bus-Demo (wgx→hausKI→sichter→chronik)\n3) Graph-Upsert\n4) Mini-Cockpit",
       "x": 960, "y": -140, "width": 420, "height": 160, "color": "green"
     },
     {
@@ -90,8 +90,8 @@
     {"id":"e2","fromNode":"semantAH","toNode":"hauski","label":"graph/query"},
     {"id":"e3","fromNode":"hauski","toNode":"heimlern","label":"policy/decide"},
     {"id":"e4","fromNode":"heimlern","toNode":"sichter","label":"feedback/reward"},
-    {"id":"e5","fromNode":"sichter","toNode":"leitstand","label":"review/report → episode"},
-    {"id":"e6","fromNode":"leitstand","toNode":"semantAH","label":"episode → graph/upsert"},
+    {"id":"e5","fromNode":"sichter","toNode":"chronik","label":"review/report → episode"},
+    {"id":"e6","fromNode":"chronik","toNode":"semantAH","label":"episode → graph/upsert"},
     {"id":"e7","fromNode":"root","toNode":"bus","label":"Nervensystem"},
     {"id":"e8","fromNode":"schichten","toNode":"root","label":"Ebenen/Modell"},
     {"id":"e9","fromNode":"essenz","toNode":"ziele","label":"MVP-Fokus"},

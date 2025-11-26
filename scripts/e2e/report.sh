@@ -35,8 +35,7 @@ emit() {
                                 -e 's/(Authorization: *Bearer +)[A-Za-z0-9._-]+/\1****/g' \
                                 -e 's/(X-Api-Key: +)[A-Za-z0-9._-]+/\1****/g' \
                                 -e 's/(token=)[A-Za-z0-9._-]+/\1****/g' \
-                                -e 's/(CHRONIK_TOKEN=)[^[:space:]]+/\1****/g' \
-                                -e 's/(LEITSTAND_TOKEN=)[^[:space:]]+/\1****/g'
+                                -e 's/(CHRONIK_TOKEN=)[^[:space:]]+/\1****/g'
 		}
 		{
 			echo "### ${title}"

@@ -3,7 +3,7 @@
   "$id": "https://schemas.heimgewebe.org/contracts/insights.daily.schema.json",
   "title": "semantAH insights (daily)",
   "x-producers": ["semantAH"],
-  "x-consumers": ["hausKI", "leitstand"],
+  "x-consumers": ["hausKI", "chronik"],
   "type": "object",
   "required": ["ts", "topics"],
   "properties": {
