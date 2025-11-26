@@ -1527,15 +1527,15 @@ jobs:
 Output:
 
 ```
-test.yaml:6:10: character '^' is invalid for branch and tag names. ref name cannot contain spaces, ~, ^, :, [, ?, *. see `man git-check-ref-format` for more details. note that regular expression is unavailable. note: filter pattern syntax is explained at https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#filter-pattern-cheat-sheet [glob]
+test.yaml:6:10: character '^' is invalid for branch and tag names. ref name cannot contain spaces, ~, ^, :, [, ?, *. see `man git-check-ref-format` for more details. note that regular expression is unavailable. note: filter pattern syntax is explained at https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#filter-pattern-cheat-sheet [glob]
   |
 6 |       - '^foo-'
   |          ^~~~~~
-test.yaml:9:12: invalid glob pattern. unexpected character '+' while checking special character + (one or more). the preceding character must not be special character. note: filter pattern syntax is explained at https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#filter-pattern-cheat-sheet [glob]
+test.yaml:9:12: invalid glob pattern. unexpected character '+' while checking special character + (one or more). the preceding character must not be special character. note: filter pattern syntax is explained at https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#filter-pattern-cheat-sheet [glob]
   |
 9 |       - 'v*+'
   |            ^~
-test.yaml:11:14: invalid glob pattern. unexpected character '1' while checking character range in []. start of range '9' (57) is larger than end of range '1' (49). note: filter pattern syntax is explained at https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#filter-pattern-cheat-sheet [glob]
+test.yaml:11:14: invalid glob pattern. unexpected character '1' while checking character range in []. start of range '9' (57) is larger than end of range '1' (49). note: filter pattern syntax is explained at https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#filter-pattern-cheat-sheet [glob]
    |
 11 |       - 'v[9-1]'
    |              ^~~
@@ -2247,7 +2247,7 @@ test.yaml:6:5: when a reusable workflow is called with "uses", "runs-on" is not 
   |
 6 |     runs-on: ubuntu-latest
   |     ^~~~~~~~
-test.yaml:9:11: reusable workflow call "./.github/workflows/ci.yml@main" at "uses" is not following the format "owner/repo/path/to/workflow.yml@ref" nor "./path/to/workflow.yml". see https://docs.github.com/en/actions/using-workflows/reusing-workflows for more details [workflow-call]
+test.yaml:9:11: reusable workflow call "./.github/workflows/ci.yml@main" at "uses" is not following the format "owner/repo/path/to/workflow.yml@ref" nor "./path/to/workflow.yml". see https://docs.github.com/en/actions/writing-workflows/reusing-workflows for more details [workflow-call]
   |
 9 |     uses: ./.github/workflows/ci.yml@main
   |           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -2671,23 +2671,23 @@ jobs:
 Output:
 
 ```
-test.yaml:6:16: context "env" is not allowed here. no context is available here. see https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#context-availability for more details [expression]
+test.yaml:6:16: context "env" is not allowed here. no context is available here. see https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#context-availability for more details [expression]
   |
 6 |     shell: ${{ env.SHELL }}
   |                ^~~~~~~~~
-test.yaml:16:17: context "runner" is not allowed here. available contexts are "github", "inputs", "needs", "vars". see https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#context-availability for more details [expression]
+test.yaml:16:17: context "runner" is not allowed here. available contexts are "github", "inputs", "needs", "vars". see https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#context-availability for more details [expression]
    |
 16 |           - ${{ runner.temp }}
    |                 ^~~~~~~~~~~
-test.yaml:24:16: context "env" is not allowed here. available contexts are "github", "inputs", "matrix", "needs", "secrets", "strategy", "vars". see https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#context-availability for more details [expression]
+test.yaml:24:16: context "env" is not allowed here. available contexts are "github", "inputs", "matrix", "needs", "secrets", "strategy", "vars". see https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#context-availability for more details [expression]
    |
 24 |       FOO: ${{ env.BAR }}
    |                ^~~~~~~
-test.yaml:30:20: context "env" is not allowed here. no context is available here. see https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#context-availability for more details [expression]
+test.yaml:30:20: context "env" is not allowed here. no context is available here. see https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#context-availability for more details [expression]
    |
 30 |         shell: ${{ env.SHELL}}
    |                    ^~~~~~~~~~~
-test.yaml:32:33: calling function "success" is not allowed here. "success" is only available in "jobs.<job_id>.if", "jobs.<job_id>.steps.if". see https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#context-availability for more details [expression]
+test.yaml:32:33: calling function "success" is not allowed here. "success" is only available in "jobs.<job_id>.if", "jobs.<job_id>.steps.if". see https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#context-availability for more details [expression]
    |
 32 |         run: echo 'Success? ${{ success() }}'
    |                                 ^~~~~~~~~
@@ -3035,8 +3035,8 @@ them.
 
 [yamllint]: https://github.com/adrienverge/yamllint
 [issue-form]: https://github.com/rhysd/actionlint/issues/new
-[syntax-doc]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
-[filter-pattern-doc]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#filter-pattern-cheat-sheet
+[syntax-doc]: https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions
+[filter-pattern-doc]: https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#filter-pattern-cheat-sheet
 [shellcheck]: https://github.com/koalaman/shellcheck
 [shellcheck-install]: https://github.com/koalaman/shellcheck#installing
 [SC1091]: https://github.com/koalaman/shellcheck/wiki/SC1091
@@ -3047,44 +3047,44 @@ them.
 [SC2043]: https://github.com/koalaman/shellcheck/wiki/SC2043
 [shellcheck-env-var]: https://github.com/koalaman/shellcheck/wiki/Integration#environment-variables
 [pyflakes]: https://github.com/PyCQA/pyflakes
-[expr-doc]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#expressions
-[contexts-doc]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#contexts
-[funcs-doc]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#functions
-[needs-doc]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idneeds
-[needs-context-doc]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#needs-context
-[shell-doc]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#using-a-specific-shell
-[matrix-doc]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstrategymatrix
-[webhook-doc]: https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#webhook-events
-[schedule-event-doc]: https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#scheduled-events
+[expr-doc]: https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#using-expressions
+[contexts-doc]: https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#contexts
+[funcs-doc]: https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#functions
+[needs-doc]: https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#jobsjob_idneeds
+[needs-context-doc]: https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#needs-context
+[shell-doc]: https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#using-a-specific-shell
+[matrix-doc]: https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#jobsjob_idstrategymatrix
+[webhook-doc]: https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows
+[schedule-event-doc]: https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
 [cron-syntax]: https://pubs.opengroup.org/onlinepubs/9699919799/utilities/crontab.html#tag_20_25_07
 [gh-hosted-runner]: https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners
 [self-hosted-runner]: https://docs.github.com/en/actions/hosting-your-own-runners/about-self-hosted-runners
-[action-uses-doc]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsuses
+[action-uses-doc]: https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsuses
 [dependabot-doc]: https://docs.github.com/en/code-security/dependabot/working-with-dependabot/keeping-your-actions-up-to-date-with-dependabot
-[credentials-doc]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idcontainercredentials
+[credentials-doc]: https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#jobsjob_idcontainercredentials
 [actions-cache]: https://github.com/actions/cache
-[permissions-doc]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#permissions
-[perm-config-doc]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#permissions
+[permissions-doc]: https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#permissions
+[perm-config-doc]: https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#permissions
 [generate-webhook-events]: https://github.com/rhysd/actionlint/tree/main/scripts/generate-webhook-events
 [generate-popular-actions]: https://github.com/rhysd/actionlint/tree/main/scripts/generate-popular-actions
 [issue-25]: https://github.com/rhysd/actionlint/issues/25
 [issue-40]: https://github.com/rhysd/actionlint/issues/40
 [security-doc]: https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-[reusable-workflow-doc]: https://docs.github.com/en/actions/using-workflows/reusing-workflows
-[create-reusable-workflow-doc]: https://docs.github.com/en/actions/using-workflows/reusing-workflows#creating-a-reusable-workflow
-[reusable-workflow-call-keys]: https://docs.github.com/en/actions/using-workflows/reusing-workflows#supported-keywords-for-jobs-that-call-a-reusable-workflow
-[object-filter-syntax]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#object-filters
+[reusable-workflow-doc]: https://docs.github.com/en/actions/writing-workflows/reusing-workflows
+[create-reusable-workflow-doc]: https://docs.github.com/en/actions/writing-workflows/reusing-workflows#creating-a-reusable-workflow
+[reusable-workflow-call-keys]: https://docs.github.com/en/actions/writing-workflows/reusing-workflows#supported-keywords-for-jobs-that-call-a-reusable-workflow
+[object-filter-syntax]: https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#object-filters
 [github-script]: https://github.com/actions/github-script
 [workflow-dispatch-event]: https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#workflow_dispatch
 [workflow-dispatch-input-type-announce]: https://github.blog/changelog/2021-11-10-github-actions-input-types-for-manual-workflows/
-[reusable-workflow-outputs]: https://docs.github.com/en/actions/using-workflows/reusing-workflows#using-outputs-from-a-reusable-workflow
+[reusable-workflow-outputs]: https://docs.github.com/en/actions/writing-workflows/reusing-workflows#using-outputs-from-a-reusable-workflow
 [inherit-secrets-announce]: https://github.blog/changelog/2022-05-03-github-actions-simplify-using-secrets-with-reusable-workflows/
 [specific-paths-doc]: https://docs.github.com/en/actions/using-workflows/triggering-a-workflow#using-filters-to-target-specific-paths-for-pull-request-or-push-events
-[availability-doc]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#context-availability
+[availability-doc]: https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#context-availability
 [deprecate-set-output-save-state]: https://github.blog/changelog/2022-10-11-github-actions-deprecating-save-state-and-set-output-commands/
 [deprecate-set-env-add-path]: https://github.blog/changelog/2020-10-01-github-actions-deprecating-set-env-and-add-path-commands/
 [workflow-commands-doc]: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions
 [action-metadata-doc]: https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions
 [branding-icons-doc]: https://github.com/github/docs/blob/main/content/actions/creating-actions/metadata-syntax-for-github-actions.md#exhaustive-list-of-all-currently-supported-icons
-[operators-doc]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#operators
+[operators-doc]: https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#operators
 [dep-msg]: https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions#inputsinput_iddeprecationmessage
