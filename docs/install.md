@@ -103,7 +103,7 @@ Note: The following targets are not tested since GitHub Actions doesn't support 
 <a id="download-script"></a>
 ## Download script
 
-To install `actionlint` executable with one command, [the download script](../scripts/download-actionlint.bash) is available.
+To install `actionlint` executable with one command, [the download script](https://github.com/rhysd/actionlint/blob/main/scripts/download-actionlint.bash) is available.
 It downloads the latest version of actionlint (`actionlint.exe` on Windows and `actionlint` on other OSes) to the current
 directory automatically. This is a recommended way if you install actionlint in some shell script.
 
