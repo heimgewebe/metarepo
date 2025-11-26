@@ -17,8 +17,8 @@ Weitere Tools (z. B. `wgx`, `uv`) werden in den jeweiligen Repos erklärt.
 | Variable | Zweck | Wo genutzt |
 | --- | --- | --- |
 | `AUSSENSENSOR_DIR` | Pfad zum `aussensensor`-Repo für End-to-End-Läufe | [`scripts/e2e/run_aussen_to_heimlern.sh`](../scripts/e2e/run_aussen_to_heimlern.sh) |
-| `LEITSTAND_INGEST_URL` | HTTP-Endpunkt des Leitstand-Ingests | [`scripts/e2e/run_aussen_to_heimlern.sh`](../scripts/e2e/run_aussen_to_heimlern.sh) |
-| `LEITSTAND_TOKEN` | Authentisierungstoken für Leitstand-Ingest | [`scripts/e2e/run_aussen_to_heimlern.sh`](../scripts/e2e/run_aussen_to_heimlern.sh) |
+| `CHRONIK_INGEST_URL` | HTTP-Endpunkt des Chronik-Ingests (Legacy: `LEITSTAND_INGEST_URL`) | [`scripts/e2e/run_aussen_to_heimlern.sh`](../scripts/e2e/run_aussen_to_heimlern.sh) |
+| `CHRONIK_TOKEN` | Authentisierungstoken für Chronik-Ingest (Legacy: `LEITSTAND_TOKEN`) | [`scripts/e2e/run_aussen_to_heimlern.sh`](../scripts/e2e/run_aussen_to_heimlern.sh) |
 | `HEIMLERN_INGEST_URL` | HTTP-Endpunkt für Policy-Feedback | [`scripts/e2e/run_aussen_to_heimlern.sh`](../scripts/e2e/run_aussen_to_heimlern.sh) |
 | `GH_TOKEN` | GitHub-PAT für `wgx`/CI sowie HTTPS-Clones | [`scripts/wgx`](../scripts/wgx) |
 | `GITHUB_OWNER` / `WGX_OWNER` | Überschreibt den Owner für `wgx`-Kommandos | [`scripts/wgx`](../scripts/wgx) |

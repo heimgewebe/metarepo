@@ -131,7 +131,7 @@ def determine_copies(paths: list[str], repo_name: str) -> list[tuple[Path, Path]
             for f in src.glob("*.schema.json"):
                 if f.name == "agent.tool.schema.json":
                     copies.append((f, Path("contracts") / f.name))
-                if f.name == "intent_event.schema.json" and repo_name.endswith("/leitstand"):
+                if f.name == "intent_event.schema.json" and repo_name.endswith("/chronik"):
                     copies.append((f, Path("contracts") / f.name))
         else:
             # default: mirror relative path
