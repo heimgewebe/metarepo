@@ -3052,7 +3052,7 @@ them.
 [funcs-doc]: https://docs.github.com/en/actions/learn-github-actions/expressions#functions
 [needs-doc]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idneeds
 [needs-context-doc]: https://docs.github.com/en/actions/learn-github-actions/contexts#needs-context
-[shell-doc]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#using-a-specific-shell
+[shell-doc]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#choosing-the-shell-to-run-commands-in
 [matrix-doc]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstrategymatrix
 [webhook-doc]: https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows
 [schedule-event-doc]: https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
@@ -3072,8 +3072,8 @@ them.
 [security-doc]: https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
 [reusable-workflow-doc]: https://docs.github.com/en/actions/using-workflows/reusing-workflows
 [create-reusable-workflow-doc]: https://docs.github.com/en/actions/using-workflows/reusing-workflows#creating-a-reusable-workflow
-[reusable-workflow-call-keys]: https://docs.github.com/en/actions/using-workflows/reusing-workflows#supported-keywords-for-jobs-that-call-a-reusable-workflow
-[object-filter-syntax]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#object-filters
+[reusable-workflow-call-keys]: https://docs.github.com/en/actions/using-workflows/reusing-workflows#supported-keywords-for-calling-a-reusable-workflow
+[object-filter-syntax]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#filter-pattern-cheat-sheet
 [github-script]: https://github.com/actions/github-script
 [workflow-dispatch-event]: https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#workflow_dispatch
 [workflow-dispatch-input-type-announce]: https://github.blog/changelog/2021-11-10-github-actions-input-types-for-manual-workflows/
@@ -3085,6 +3085,6 @@ them.
 [deprecate-set-env-add-path]: https://github.blog/changelog/2020-10-01-github-actions-deprecating-set-env-and-add-path-commands/
 [workflow-commands-doc]: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions
 [action-metadata-doc]: https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions
-[branding-icons-doc]: https://github.com/github/docs/blob/main/content/actions/creating-actions/metadata-syntax-for-github-actions.md#exhaustive-list-of-all-currently-supported-icons
+[branding-icons-doc]: https://primer.style/octicons/
 [operators-doc]: https://docs.github.com/en/actions/learn-github-actions/expressions#operators
 [dep-msg]: https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions#inputsinput_iddeprecationmessage

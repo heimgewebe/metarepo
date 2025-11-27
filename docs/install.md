@@ -194,7 +194,7 @@ go install github.com/rhysd/actionlint/cmd/actionlint@main
 [asdf]: https://asdf-vm.com/
 [asdf-plugin]: https://github.com/crazy-matt/asdf-actionlint
 [chocolatey]: https://community.chocolatey.org/packages/actionlint
-[scoop]: https://scoop.sh/#/apps?q=actionlint&s=0&d=1&o=true
+[scoop]: https://github.com/ScoopInstaller/Main/blob/master/bucket/actionlint.json
 [winget]: https://github.com/microsoft/winget-pkgs/tree/master/manifests/r/rhysd/actionlint
 [archlinux]: https://archlinux.org/packages/extra/x86_64/actionlint/
 [aur]: https://aur.archlinux.org/
