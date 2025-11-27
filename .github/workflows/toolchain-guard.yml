@@ -36,16 +36,16 @@ jobs:
               | sed -E 's/.*"([^"]+)".*/\1/'
           } || true)"
 
-          # Try deterministic candidate asset names first (prefer .tar.gz for better reliability)
+          # Try deterministic candidate asset names first (prefer plain binary for simplicity)
           BIN_CANDIDATES=(
-            "yq_linux_amd64.tar.gz"
             "yq_linux_amd64"
-            "yq_linux_x86_64.tar.gz"
+            "yq_linux_amd64.tar.gz"
             "yq_linux_x86_64"
-            "yq_linux_arm64.tar.gz"
+            "yq_linux_x86_64.tar.gz"
             "yq_linux_arm64"
-            "yq_linux_ppc64le.tar.gz"
+            "yq_linux_arm64.tar.gz"
             "yq_linux_ppc64le"
+            "yq_linux_ppc64le.tar.gz"
           )
 
           BIN_URL=""
@@ -131,13 +131,34 @@ jobs:
           # Calculate and verify
           ACTUAL_SHA="$(sha256sum "$TMP_BIN" | awk '{print $1}')"
           ASSET_NAME="$(basename "$BIN_URL")"
-          EXPECTED_SHA="$(
-            grep -iF "$ASSET_NAME" "$TMP_SHA" \
-              | grep -oE '[0-9a-fA-F]{64}' \
-              | head -n1 || true
-          )"
+
+          # yq checksums file has multiple hash types per line, space-separated
+          # SHA-256 is at field 19 (after filename): format is "filename  hash1  hash2  ... hash18(sha256)  ..."
+          # Try to extract the SHA-256 by matching against the actual SHA or by position
+          EXPECTED_SHA=""
+
+          # First try: look for exact match of actual SHA in the checksums file (most reliable)
+          if grep -qF "$ACTUAL_SHA" "$TMP_SHA" 2>/dev/null; then
+            # Verify the line also contains our asset name
+            if grep -iF "$ASSET_NAME" "$TMP_SHA" | grep -qF "$ACTUAL_SHA" 2>/dev/null; then
+              EXPECTED_SHA="$ACTUAL_SHA"
+            fi
+          fi
+
+          # Second try: extract SHA-256 from the line for our asset (field 19 in yq's format)
           if [[ -z "$EXPECTED_SHA" ]]; then
-            EXPECTED_SHA="$(grep -oE '[0-9a-fA-F]{64}' "$TMP_SHA" | head -n1 || true)"
+            LINE="$(grep -E "^${ASSET_NAME}[[:space:]]" "$TMP_SHA" || true)"
+            if [[ -n "$LINE" ]]; then
+              # Split by double-space and get field 19 (SHA-256)
+              EXPECTED_SHA="$(echo "$LINE" | awk -F'  ' '{print $19}' | grep -oE '^[0-9a-fA-F]{64}$' || true)"
+            fi
+          fi
+
+          # Third try: fallback to matching any 64-char hex that equals our actual SHA
+          if [[ -z "$EXPECTED_SHA" ]]; then
+            if grep -iF "$ASSET_NAME" "$TMP_SHA" | grep -oE '[0-9a-fA-F]{64}' | grep -qF "$ACTUAL_SHA" 2>/dev/null; then
+              EXPECTED_SHA="$ACTUAL_SHA"
+            fi
           fi
 
           if [[ -n "$EXPECTED_SHA" && "$EXPECTED_SHA" == "$ACTUAL_SHA" ]]; then
