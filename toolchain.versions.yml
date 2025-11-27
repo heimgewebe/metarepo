@@ -3,5 +3,5 @@
 rust: "stable"       # oder z. B. "1.81.0"
 python: "3.12"
 uv: "0.4.20"
-yq: "v4.44.3"
+yq: "v4.44.2"
 just: "v1.43.0"
