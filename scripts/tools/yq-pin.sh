@@ -142,7 +142,7 @@ download_yq() {
              log "Verifiziere Checksumme..."
              # Strict regex match: "HASH  binary_name" (anchored start/end)
              local checksum_line
-             checksum_line=$(grep -E "^[a-fA-F0-9]{64}[[:space:]]+${binary_name}(\r)?$" "${tmp_checksum}" || true)
+             checksum_line=$(grep -E "^[a-fA-F0-9]{64}[[:space:]]+${binary_name}[[:space:]]*$" "${tmp_checksum}" || true)
 
              # Fallback: erste 64-hex Zeichen im File verwenden, falls kein Dateiname enthalten ist
              if [[ -z "${checksum_line}" ]]; then
