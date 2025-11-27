@@ -85,31 +85,22 @@ jobs:
           # Calculate actual sha
           ACTUAL_SHA="$(sha256sum "$TMP_BIN" | awk '{print $1}')"
 
-          # Robustere Extraktion der erwarteten SHA256 aus der Checksums-Datei.
-          # Wir suchen zuerst in Zeilen, die auf unseren Dateinamen verweisen und extrahieren das erste 64-hex-Token.
+          # Robuste Extraktion der erwarteten SHA256 aus der Checksums-Datei.
+          # Suche nach Varianten des Dateinamens und extrahiere den ersten 64-hex-Hash.
+          # Define patterns outside the command substitution to avoid bash array scoping issues
+          FNAME_PATTERNS="yq_linux_amd64|yq_linux_amd64\.tar\.gz|yq_linux_amd64\.exe|yq_linux_amd64\.zip"
+
           EXPECTED_SHA="$(
-            # Normalisiere Trennzeichen: ersetze alle Whitespaces durch neue Zeilen,
-            # damit auch space-separated Einträge korrekt tokenisiert werden.
-            tr -s '[:space:]' '\n' < "$TMP_SHA" \
-              | awk '
-                BEGIN { target_re = "yq_linux_amd64" }
-                {
-                  # Speichere alle Tokens in Reihenfolge
-                  all_tokens[++count] = $0
-                }
-                END {
-                  # Versuch 1: wenn ein Token exakt den Dateinamen enthält, suche in der Nachbarschaft nach einem 64-hex-Hash.
-                  for (i=1;i<=count;i++) {
-                    if (tolower(all_tokens[i]) ~ target_re) {
-                      if (i>1 && all_tokens[i-1] ~ /^[0-9a-fA-F]{64}$/) { print all_tokens[i-1]; exit }
-                      if (i<count && all_tokens[i+1] ~ /^[0-9a-fA-F]{64}$/) { print all_tokens[i+1]; exit }
-                    }
-                  }
-                  # Versuch 2: falls oben nichts gefunden, gib erstes 64-hex-Hash-Token zurück
-                  for (i=1;i<=count;i++) {
-                    if (all_tokens[i] ~ /^[0-9a-fA-F]{64}$/) { print all_tokens[i]; exit }
-                  }
-                }'
+            # Try to find a line matching any pattern
+            sha="$(grep -iE "$FNAME_PATTERNS" "$TMP_SHA" \
+              | grep -oE '[0-9a-fA-F]{64}' \
+              | head -n1 || true)"
+            if [[ -n "$sha" ]]; then
+              printf '%s' "$sha"
+            else
+              # Fallback: first 64-hex token anywhere
+              grep -oE '[0-9a-fA-F]{64}' "$TMP_SHA" | head -n1 || true
+            fi
           )" || true
 
           # Endgültige Prüfung
