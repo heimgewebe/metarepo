@@ -3085,6 +3085,6 @@ them.
 [deprecate-set-env-add-path]: https://github.blog/changelog/2020-10-01-github-actions-deprecating-set-env-and-add-path-commands/
 [workflow-commands-doc]: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions
 [action-metadata-doc]: https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions
-[branding-icons-doc]: https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions#branding
+[branding-icons-doc]: https://primer.style/octicons/
 [operators-doc]: https://docs.github.com/en/actions/learn-github-actions/expressions#operators
 [dep-msg]: https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions#inputsinput_iddeprecationmessage
