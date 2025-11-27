@@ -92,8 +92,7 @@ download_yq() {
                 yq_version="v${yq_version}"
         fi
         local url="https://github.com/mikefarah/yq/releases/download/${yq_version}/${binary_name}"
-        # checksums-Datei enthält Hashes für alle Assets
-        local checksum_url="https://github.com/mikefarah/yq/releases/download/${yq_version}/checksums"
+        local checksum_base="https://github.com/mikefarah/yq/releases/download/${yq_version}"
 
         ensure_dir
 
@@ -116,15 +115,43 @@ download_yq() {
                 die "Download von yq fehlgeschlagen: ${url}"
         fi
 
-        # Checksum herunterladen und prüfen (falls verfügbar)
-        if curl --fail --max-time 60 --connect-timeout 10 --retry 3 -fsSL "${checksum_url}" -o "${tmp_checksum}"; then
+        # Checksummen herunterladen und prüfen (falls verfügbar)
+        local checksum_asset
+        checksum_asset=""
+        local -a checksum_candidates=(
+                "checksums"
+                "checksums.txt"
+                "checksums_sha256"
+                "checksums_sha256.txt"
+                "${binary_name}.sha256"
+                "${binary_name}.sha256.txt"
+        )
+
+        for candidate in "${checksum_candidates[@]}"; do
+                rm -f -- "${tmp_checksum}" || true
+                local candidate_url="${checksum_base}/${candidate}"
+                if curl --fail --max-time 60 --connect-timeout 10 --retry 3 -fsSL "${candidate_url}" -o "${tmp_checksum}"; then
+                        checksum_asset="${candidate}"
+                        log "Gefundene Checksummen-Datei: ${candidate}"
+                        break
+                else
+                        log "INFO: Checksummen-Datei nicht verfügbar: ${candidate_url}"
+                fi
+        done
+
+        if [[ -n "${checksum_asset}" ]]; then
              log "Verifiziere Checksumme..."
              # Strict regex match: "HASH  binary_name" (anchored start/end)
              local checksum_line
-             checksum_line=$(grep -E "^[a-fA-F0-9]{64}[[:space:]]+${binary_name}$" "${tmp_checksum}" || true)
+             checksum_line=$(grep -E "^[a-fA-F0-9]{64}[[:space:]]+${binary_name}(\r)?$" "${tmp_checksum}" || true)
+
+             # Fallback: erste 64-hex Zeichen im File verwenden, falls kein Dateiname enthalten ist
+             if [[ -z "${checksum_line}" ]]; then
+                 checksum_line=$(grep -Eo "^[a-fA-F0-9]{64}" "${tmp_checksum}" | head -n1 || true)
+             fi
 
              if [[ -z "${checksum_line}" ]]; then
-                 log "WARN: Keine strikte Zeile für ${binary_name} in checksums gefunden, überspringe Verifikation."
+                 log "WARN: Keine passende Checksumme für ${binary_name} in ${checksum_asset} gefunden, überspringe Verifikation."
              else
                  local expected_sum
                  expected_sum=$(echo "${checksum_line}" | awk '{print $1}')
@@ -132,13 +159,13 @@ download_yq() {
                  actual_sum=$(sha256sum "${tmp}" | awk '{print $1}')
 
                  if [[ "${expected_sum}" != "${actual_sum}" ]]; then
-                     die "Checksum-Verifikation fehlgeschlagen! Erwartet: ${expected_sum}, Ist: ${actual_sum}"
+                     die "Checksum-Verifikation fehlgeschlagen! Erwartet: ${expected_sum}, Ist: ${actual_sum} (Quelle: ${checksum_asset})"
                  else
-                     log "Checksumme ok: ${actual_sum}"
+                     log "Checksumme ok (Quelle ${checksum_asset}): ${actual_sum}"
                  fi
              fi
         else
-             log "WARN: checksums-Datei unter ${checksum_url} nicht gefunden, überspringe Verifikation."
+             log "WARN: Keine Checksummen-Datei im Release gefunden, überspringe Verifikation."
         fi
 
         if [[ -f "${tmp}" ]]; then
