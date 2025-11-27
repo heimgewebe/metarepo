@@ -3087,4 +3087,4 @@ them.
 [action-metadata-doc]: https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions
 [branding-icons-doc]: https://github.com/github/docs/blob/main/content/actions/creating-actions/metadata-syntax-for-github-actions.md#exhaustive-list-of-all-currently-supported-icons
 [operators-doc]: https://docs.github.com/en/actions/learn-github-actions/expressions#operators
-[dep-msg]: https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions
+[dep-msg]: https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions#inputsinput_iddeprecationmessage
