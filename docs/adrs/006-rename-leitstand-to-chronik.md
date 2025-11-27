@@ -1,4 +1,4 @@
-# ADR-0002: Umbenennung von `leitstand` zu `chronik` und Einführung eines UI-Repos
+# ADR-006: Umbenennung von `leitstand` zu `chronik` und Einführung eines UI-Repos
 
 - **Status**: Akzeptiert
 - **Datum**: 2025-11-14
