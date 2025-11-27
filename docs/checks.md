@@ -3073,7 +3073,7 @@ them.
 [reusable-workflow-doc]: https://docs.github.com/en/actions/using-workflows/reusing-workflows
 [create-reusable-workflow-doc]: https://docs.github.com/en/actions/using-workflows/reusing-workflows
 [reusable-workflow-call-keys]: https://docs.github.com/en/actions/using-workflows/reusing-workflows#supported-keywords-for-jobs-that-call-a-reusable-workflow
-[object-filter-syntax]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
+[object-filter-syntax]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#object-filters
 [github-script]: https://github.com/actions/github-script
 [workflow-dispatch-event]: https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#workflow_dispatch
 [workflow-dispatch-input-type-announce]: https://github.blog/changelog/2021-11-10-github-actions-input-types-for-manual-workflows/
