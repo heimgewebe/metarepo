@@ -104,7 +104,6 @@ jobs:
                   | head -n1 || true)"
                 if [[ -n "$sha" ]]; then
                   printf '%s' "$sha"
-                  exit 0
                 fi
               fi
             done
