@@ -57,7 +57,7 @@ jobs:
                 "https://api.github.com/repos/mikefarah/yq/releases/tags/${YQ_VERSION}" -o "$RELEASE_JSON"; then
               ASSET_URL="$(grep -oE '"browser_download_url":\s*"[^\"]+"' "$RELEASE_JSON" \
                 | sed -E 's/.*"([^"]+)".*/\1/' \
-                | grep -Ei "(sha|check).*$YQ_ARCH" \
+                | grep -Ei "(sha|check).*${YQ_ARCH}" \
                 | head -n1 || true)"
               if [[ -z "$ASSET_URL" ]]; then
                 ASSET_URL="$(grep -oE '"browser_download_url":\s*"[^\"]+"' "$RELEASE_JSON" \
