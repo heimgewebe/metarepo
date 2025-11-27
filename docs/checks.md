@@ -3061,7 +3061,7 @@ them.
 [self-hosted-runner]: https://docs.github.com/en/actions/hosting-your-own-runners/about-self-hosted-runners
 [action-uses-doc]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsuses
 [dependabot-doc]: https://docs.github.com/en/code-security/dependabot/working-with-dependabot/keeping-your-actions-up-to-date-with-dependabot
-[credentials-doc]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
+[credentials-doc]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idcontainercredentials
 [actions-cache]: https://github.com/actions/cache
 [permissions-doc]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#permissions
 [perm-config-doc]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#permissions
