@@ -3077,7 +3077,7 @@ them.
 [github-script]: https://github.com/actions/github-script
 [workflow-dispatch-event]: https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#workflow_dispatch
 [workflow-dispatch-input-type-announce]: https://github.blog/changelog/2021-11-10-github-actions-input-types-for-manual-workflows/
-[reusable-workflow-outputs]: https://docs.github.com/en/actions/using-workflows/reusing-workflows
+[reusable-workflow-outputs]: https://docs.github.com/en/actions/using-workflows/reusing-workflows#using-outputs-from-a-reusable-workflow
 [inherit-secrets-announce]: https://github.blog/changelog/2022-05-03-github-actions-simplify-using-secrets-with-reusable-workflows/
 [specific-paths-doc]: https://docs.github.com/en/actions/using-workflows/triggering-a-workflow
 [availability-doc]: https://docs.github.com/en/actions/learn-github-actions/contexts
