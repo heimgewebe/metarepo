@@ -31,27 +31,44 @@ jobs:
             exit 1
           fi
 
-          # Find the binary asset URL that best matches the desired arch
-          BIN_URL="$(
+          ASSET_URLS="$({
             grep -oE '"browser_download_url":\s*"[^\"]+"' "$RELEASE_JSON" \
-              | sed -E 's/.*"([^"]+)".*/\1/' \
-              | grep -Ei "yq.*(${YQ_ARCH}|linux.*amd64|amd64|x86_64)" \
-              | head -n1 || true
-          )"
+              | sed -E 's/.*"([^"]+)".*/\1/'
+          } || true)"
 
-          # Fallback: any yq_linux* binary
+          # Try deterministic candidate asset names first
+          BIN_CANDIDATES=(
+            "yq_linux_amd64"
+            "yq_linux_x86_64"
+            "yq_linux_amd64.tar.gz"
+            "yq_linux_x86_64.tar.gz"
+            "yq_linux_arm64"
+            "yq_linux_arm64.tar.gz"
+            "yq_linux_ppc64le"
+          )
+
+          BIN_URL=""
+          for name in "${BIN_CANDIDATES[@]}"; do
+            candidate="https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${name}"
+            if curl --head --silent --fail --max-time 10 "$candidate" >/dev/null 2>&1; then
+              BIN_URL="$candidate"
+              break
+            fi
+          done
+
+          # Fallback to scanning release JSON assets (existing behavior)
           if [[ -z "$BIN_URL" ]]; then
-            BIN_URL="$(
-              grep -oE '"browser_download_url":\s*"[^\"]+"' "$RELEASE_JSON" \
-                | sed -E 's/.*"([^"]+)".*/\1/' \
-                | grep -Ei "yq(_|-)linux|yq.*linux" \
-                | head -n1 || true
-            )"
+            BIN_URL="$({
+              printf '%s\n' "$ASSET_URLS" \
+                | grep -Ei "yq.*(${YQ_ARCH}|linux.*amd64|amd64|x86_64|linux|yq_linux)" \
+                | head -n1
+            } || true)"
           fi
 
           if [[ -z "$BIN_URL" ]]; then
             echo "Fehler: konnte keine passende yq-Binary-URL in Release-Assets finden" >&2
-            sed -n '1,200p' "$RELEASE_JSON" >&2 || true
+            echo "Release asset list (debug):" >&2
+            printf '%s\n' "$ASSET_URLS" >&2
             rm -f "$RELEASE_JSON"
             exit 1
           fi
@@ -59,52 +76,59 @@ jobs:
           echo "Download binary from: $BIN_URL"
           curl --fail --max-time 120 --connect-timeout 10 --retry 3 -fsSL "$BIN_URL" -o "$TMP_BIN"
 
-          # Find checksum asset: prefer dedicated checksums files first
-          SHA_URL="$(
-            grep -oE '"browser_download_url":\s*"[^\"]+"' "$RELEASE_JSON" \
-              | sed -E 's/.*"([^"]+)".*/\1/' \
-              | grep -Ei 'checksums.*\.txt$|checksums$' \
-              | head -n1 || true
-          )"
+          # Try a list of likely checksum filenames hosted under the release /download/{tag}/
+          SHA_CANDIDATES=(
+            "checksums.txt"
+            "checksums"
+            "SHA256SUMS.txt"
+            "sha256sum.txt"
+            "sha256sums.txt"
+            "sha256sums"
+            "yq_${YQ_VERSION}_SHA256SUMS.txt"
+          )
 
-          # Fallback: any asset that looks like a checksum listing
-          if [[ -z "$SHA_URL" ]]; then
-            SHA_URL="$(
-              grep -oE '"browser_download_url":\s*"[^\"]+"' "$RELEASE_JSON" \
-                | sed -E 's/.*"([^"]+)".*/\1/' \
-                | grep -Ei "sha|check|checksum|SHA256|sha256" \
-                | head -n1 || true
-            )"
-          fi
+          for s in "${SHA_CANDIDATES[@]}"; do
+            sha_candidate="https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${s}"
+            TMP_SHA_TMP="${TMP_SHA}.tmp"
+            rm -f "$TMP_SHA_TMP"
+            if curl --fail --max-time 60 --connect-timeout 10 --retry 2 -fsSL "$sha_candidate" -o "$TMP_SHA_TMP"; then
+              if [[ -s "$TMP_SHA_TMP" ]]; then
+                mv "$TMP_SHA_TMP" "$TMP_SHA"
+                break
+              fi
+            fi
+            rm -f "$TMP_SHA_TMP"
+          done
 
-          if [[ -z "$SHA_URL" ]]; then
-            echo "Warnung: Keine Checksum-Asset-URL in Release-JSON gefunden." >&2
-          fi
-          rm -f "$RELEASE_JSON"
-
-          if [[ -n "$SHA_URL" ]]; then
-            echo "Download checksum from: $SHA_URL"
-            if curl --fail --max-time 120 --connect-timeout 10 --retry 3 -fsSL "$SHA_URL" -o "$TMP_SHA"; then
-              if [[ ! -s "$TMP_SHA" ]]; then
-                echo "Gefundene Checksums-Datei ist leer" >&2
+          # Fallback: try to find a checksum asset URL inside the release JSON (existing behavior)
+          if [[ ! -s "$TMP_SHA" ]]; then
+            SHA_URL="$({
+              printf '%s\n' "$ASSET_URLS" \
+                | grep -Ei 'checksums.*\.txt$|checksums$|sha256|sha256sum|SHA256' \
+                | head -n1
+            } || true)"
+            if [[ -n "$SHA_URL" ]]; then
+              echo "Download checksum from: $SHA_URL"
+              if curl --fail --max-time 120 --connect-timeout 10 --retry 3 -fsSL "$SHA_URL" -o "$TMP_SHA"; then
+                [[ -s "$TMP_SHA" ]] || { rm -f "$TMP_SHA"; }
+              else
                 rm -f "$TMP_SHA"
               fi
-            else
-              echo "Warnung: konnte Checksums-Datei nicht herunterladen; Installation wird abgebrochen" >&2
-              rm -f "$TMP_SHA"
             fi
           fi
 
+          rm -f "$RELEASE_JSON"
+
           if [[ ! -s "$TMP_SHA" ]]; then
             echo "Fehler: keine Checksums-Datei gefunden oder leer; Abbruch statt unsicherer Installation" >&2
+            echo "Debug: available release assets:" >&2
+            printf '%s\n' "$ASSET_URLS" >&2
+            echo "If this release intentionally lacks checksums you can either pick a different YQ_VERSION or add a known-good checksum to the workflow." >&2
             exit 1
           fi
 
-          # Calculate actual sha
+          # Calculate and verify
           ACTUAL_SHA="$(sha256sum "$TMP_BIN" | awk '{print $1}')"
-
-          # Try find expected sha from checksums file
-          # Prefer a line that mentions the asset filename
           ASSET_NAME="$(basename "$BIN_URL")"
           EXPECTED_SHA="$(
             grep -iF "$ASSET_NAME" "$TMP_SHA" \
