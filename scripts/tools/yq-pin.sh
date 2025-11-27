@@ -116,8 +116,7 @@ download_yq() {
         fi
 
         # Checksummen herunterladen und prüfen (falls verfügbar)
-        local checksum_asset
-        checksum_asset=""
+        local checksum_asset=""
         local -a checksum_candidates=(
                 "checksums"
                 "checksums.txt"
