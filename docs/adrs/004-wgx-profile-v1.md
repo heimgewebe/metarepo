@@ -1,4 +1,4 @@
-# ADR-004: `.wgx/profile.yml v1` – Minimal-Schema  
+# ADR-004 `.wgx/profile.yml v1` – Minimal-Schema
 ![status: proposed](https://img.shields.io/badge/status-proposed-yellow)
 Datum: 2025-10-05
 Status: Proposed

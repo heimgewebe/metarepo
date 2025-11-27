@@ -1,4 +1,4 @@
-# ADR-003: CI-Reusables & Pinning-Policy  
+# ADR-003 CI-Reusables & Pinning-Policy
 ![status: proposed](https://img.shields.io/badge/status-proposed-yellow)
 Datum: 2025-10-05
 Status: Proposed

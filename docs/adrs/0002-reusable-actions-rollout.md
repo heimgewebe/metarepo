@@ -1,4 +1,4 @@
-# ADR-0002: Fleet-Rollout via reusable GitHub Actions
+# ADR-0002 Fleet-Rollout via reusable GitHub Actions
 Status: Accepted
 Date: 2025-10-12
 

@@ -1,4 +1,4 @@
-# ADR-005: Evidence-Packs (light) & zentraler Link-Health  
+# ADR-005 Evidence-Packs (light) & zentraler Link-Health
 ![status: proposed](https://img.shields.io/badge/status-proposed-yellow)
 Datum: 2025-10-05
 Status: Proposed
