@@ -3052,7 +3052,7 @@ them.
 [funcs-doc]: https://docs.github.com/en/actions/learn-github-actions/expressions#functions
 [needs-doc]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idneeds
 [needs-context-doc]: https://docs.github.com/en/actions/learn-github-actions/contexts#needs-context
-[shell-doc]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#choosing-the-shell-to-run-commands-in
+[shell-doc]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#using-a-specific-shell
 [matrix-doc]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstrategymatrix
 [webhook-doc]: https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows
 [schedule-event-doc]: https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
