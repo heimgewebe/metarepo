@@ -150,8 +150,29 @@ jobs:
             exit 1
           fi
 
-          chmod +x "$TMP_BIN"
-          mv "$TMP_BIN" "$BIN_DIR/yq"
+          # Handle tarball extraction if needed
+          if [[ "$BIN_URL" == *.tar.gz ]]; then
+            echo "Extracting yq from tarball..."
+            TMP_EXTRACT="$(mktemp -d)"
+            tar -xzf "$TMP_BIN" -C "$TMP_EXTRACT"
+            # Find the yq binary in the extracted contents
+            YQ_BIN="$(find "$TMP_EXTRACT" \( -type f -name 'yq' -o -type f -name 'yq_*' \) | grep -v '\.1$' | head -n1)"
+            if [[ -z "$YQ_BIN" ]]; then
+              YQ_BIN="$(find "$TMP_EXTRACT" -type f -executable | head -n1)"
+            fi
+            if [[ -z "$YQ_BIN" ]]; then
+              echo "Fehler: konnte yq-Binary in tarball nicht finden" >&2
+              ls -laR "$TMP_EXTRACT" >&2
+              rm -rf "$TMP_EXTRACT"
+              exit 1
+            fi
+            chmod +x "$YQ_BIN"
+            mv "$YQ_BIN" "$BIN_DIR/yq"
+            rm -rf "$TMP_EXTRACT" "$TMP_BIN"
+          else
+            chmod +x "$TMP_BIN"
+            mv "$TMP_BIN" "$BIN_DIR/yq"
+          fi
           echo "yq erfolgreich installiert und verifiziert."
       - name: Install just
         run: scripts/tools/just-pin.sh
