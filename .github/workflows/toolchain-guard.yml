@@ -77,6 +77,9 @@ jobs:
             )"
           fi
 
+          if [[ -z "$SHA_URL" ]]; then
+            echo "Warnung: Keine Checksum-Asset-URL in Release-JSON gefunden." >&2
+          fi
           rm -f "$RELEASE_JSON"
 
           if [[ -n "$SHA_URL" ]]; then
