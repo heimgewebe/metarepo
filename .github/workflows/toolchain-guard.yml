@@ -87,7 +87,7 @@ jobs:
                 rm -f "$TMP_SHA"
               fi
             else
-              echo "Warnung: konnte Checksums-Datei nicht herunterladen; fahre mit Verifikation nicht fort" >&2
+              echo "Warnung: konnte Checksums-Datei nicht herunterladen; Installation wird abgebrochen" >&2
               rm -f "$TMP_SHA"
             fi
           fi
