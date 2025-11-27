@@ -63,7 +63,7 @@ jobs:
           SHA_URL="$(
             grep -oE '"browser_download_url":\s*"[^\"]+"' "$RELEASE_JSON" \
               | sed -E 's/.*"([^"]+)".*/\1/' \
-              | grep -Ei 'checksums(\.txt)?$' \
+              | grep -Ei 'checksums.*\.txt$|checksums$' \
               | head -n1 || true
           )"
 
