@@ -92,7 +92,7 @@ jobs:
             # damit auch space-separated Einträge korrekt tokenisiert werden.
             tr -s '[:space:]' '\n' < "$TMP_SHA" \
               | awk '
-                BEGIN { target_re = "yq[_-]?linux|yq_linux_amd64|yq-linux-amd64" }
+                BEGIN { target_re = "yq_linux_amd64" }
                 {
                   # Speichere alle Tokens in Reihenfolge
                   all_tokens[++count] = $0
