@@ -39,7 +39,7 @@ conventions:
   ci_platform: github_actions
 
 documentation:
-  adr: docs/adr/
+  adr: docs/adrs/
 
 ai_guidance:
   do:

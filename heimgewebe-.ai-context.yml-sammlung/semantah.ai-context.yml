@@ -46,7 +46,7 @@ conventions:
   ci_platform: github_actions
 
 documentation:
-  adr: docs/adr/
+  adr: docs/adrs/
   runbook: docs/runbook.md
 
 ai_guidance:
