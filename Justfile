@@ -113,8 +113,14 @@ fleet-push-all:
 # Local CI
 validate: yq_ensure
     .github/workflows/validate-local.sh
-    @printf "Running actionlint (Docker)…\n"
-    @if docker info >/dev/null 2>&1; then docker run --rm -v "$PWD:/repo" -w /repo ghcr.io/rhysd/actionlint:1.7.1 -color || (echo "::error::actionlint failed" && exit 1); else echo "::warning::Docker daemon not responding – skipping actionlint. Is Docker running and configured correctly?"; fi
+    @printf "Running actionlint (local CLI preferred, docker fallback)…\n"
+    @if command -v actionlint >/dev/null 2>&1; then \
+      actionlint -color || (echo "::error::actionlint failed" && exit 1); \
+    elif docker info >/dev/null 2>&1; then \
+      docker run --rm -v "$PWD:/repo" -w /repo ghcr.io/rhysd/actionlint:1.7.9 -color || (echo "::error::actionlint failed" && exit 1); \
+    else \
+      echo "::warning::actionlint skipped: no local 'actionlint' binary found and Docker is not available"; \
+    fi
     @if [ -d contracts ]; then echo "contracts folder detected – run 'just contracts-validate' for schema checks"; fi
 
 ci:
