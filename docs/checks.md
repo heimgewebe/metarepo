@@ -3072,7 +3072,7 @@ them.
 [security-doc]: https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
 [reusable-workflow-doc]: https://docs.github.com/en/actions/using-workflows/reusing-workflows
 [create-reusable-workflow-doc]: https://docs.github.com/en/actions/using-workflows/reusing-workflows#creating-a-reusable-workflow
-[reusable-workflow-call-keys]: https://docs.github.com/en/actions/using-workflows/reusing-workflows#supported-keywords-for-calling-a-reusable-workflow
+[reusable-workflow-call-keys]: https://docs.github.com/en/actions/using-workflows/reusing-workflows#supported-keywords-for-reusable-workflows
 [object-filter-syntax]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#filter-pattern-cheat-sheet
 [github-script]: https://github.com/actions/github-script
 [workflow-dispatch-event]: https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#workflow_dispatch
