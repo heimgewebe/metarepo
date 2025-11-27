@@ -13,6 +13,5 @@ jobs:
   guard:
     # metarepo wird selbst wie ein Fleet-Repo behandelt und nutzt
     # die kanonische Guard-Definition aus heimgewebe/wgx.
-    # HINWEIS: @main wird akzeptiert, da wgx noch keine stabilen Tags hat.
-    # Sobald Tags verfügbar sind, sollte dies auf einen stabilen Tag gepinnt werden.
-    uses: heimgewebe/wgx/.github/workflows/reusable-wgx-guard.yml@main
+    # Gepinnt auf Commit SHA für Sicherheit und Reproduzierbarkeit.
+    uses: heimgewebe/wgx/.github/workflows/reusable-wgx-guard.yml@52a12ff97c402d1aa718d534a84b0225e7718c82

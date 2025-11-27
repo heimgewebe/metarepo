@@ -12,7 +12,7 @@ jobs:
       - name: Install yq (robust)
         run: |
           set -euo pipefail
-          YQ_VERSION="v4.44.2"
+          YQ_VERSION="v4.49.2"
           YQ_ARCH="linux_amd64"
           BIN_DIR="${GITHUB_WORKSPACE}/tools/bin"
           mkdir -p "$BIN_DIR"
@@ -36,21 +36,22 @@ jobs:
               | sed -E 's/.*"([^"]+)".*/\1/'
           } || true)"
 
-          # Try deterministic candidate asset names first
+          # Try deterministic candidate asset names first (prefer plain binary for simplicity)
           BIN_CANDIDATES=(
             "yq_linux_amd64"
-            "yq_linux_x86_64"
             "yq_linux_amd64.tar.gz"
+            "yq_linux_x86_64"
             "yq_linux_x86_64.tar.gz"
             "yq_linux_arm64"
             "yq_linux_arm64.tar.gz"
             "yq_linux_ppc64le"
+            "yq_linux_ppc64le.tar.gz"
           )
 
           BIN_URL=""
           for name in "${BIN_CANDIDATES[@]}"; do
             candidate="https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${name}"
-            if curl --head --silent --fail --max-time 10 "$candidate" >/dev/null 2>&1; then
+            if curl -L --head --silent --fail --max-time 10 "$candidate" >/dev/null 2>&1; then
               BIN_URL="$candidate"
               break
             fi
@@ -128,15 +129,43 @@ jobs:
           fi
 
           # Calculate and verify
-          ACTUAL_SHA="$(sha256sum "$TMP_BIN" | awk '{print $1}')"
+          if command -v sha256sum >/dev/null 2>&1; then
+            ACTUAL_SHA="$(sha256sum "$TMP_BIN" | awk '{print $1}')"
+          elif command -v shasum >/dev/null 2>&1; then
+            ACTUAL_SHA="$(shasum -a 256 "$TMP_BIN" | awk '{print $1}')"
+          else
+            echo "No sha256sum or shasum command found for checksum verification." >&2
+            exit 1
+          fi
           ASSET_NAME="$(basename "$BIN_URL")"
-          EXPECTED_SHA="$(
-            grep -iF "$ASSET_NAME" "$TMP_SHA" \
-              | grep -oE '[0-9a-fA-F]{64}' \
-              | head -n1 || true
-          )"
+
+          # yq checksums file has multiple hash types per line, space-separated
+          # SHA-256 is at field 19 (after filename): format is "filename  hash1  hash2  ... hash18(sha256)  ..."
+          # Try to extract the SHA-256 by matching against the actual SHA or by position
+          EXPECTED_SHA=""
+
+          # First try: look for exact match of actual SHA in the checksums file (most reliable)
+          if grep -qF "$ACTUAL_SHA" "$TMP_SHA" 2>/dev/null; then
+            # Verify the line also contains our asset name
+            if grep -iF "$ASSET_NAME" "$TMP_SHA" | grep -qF "$ACTUAL_SHA" 2>/dev/null; then
+              EXPECTED_SHA="$ACTUAL_SHA"
+            fi
+          fi
+
+          # Second try: extract SHA-256 from the line for our asset (field 19 in yq's format)
           if [[ -z "$EXPECTED_SHA" ]]; then
-            EXPECTED_SHA="$(grep -oE '[0-9a-fA-F]{64}' "$TMP_SHA" | head -n1 || true)"
+            LINE="$(grep -E "^${ASSET_NAME}[[:space:]]" "$TMP_SHA" || true)"
+            if [[ -n "$LINE" ]]; then
+              # Split by double-space and get field 19 (SHA-256)
+              EXPECTED_SHA="$(echo "$LINE" | awk -F'  ' '{print $19}' | grep -oE '^[0-9a-fA-F]{64}$' || true)"
+            fi
+          fi
+
+          # Third try: fallback to matching any 64-char hex that equals our actual SHA
+          if [[ -z "$EXPECTED_SHA" ]]; then
+            if grep -iF "$ASSET_NAME" "$TMP_SHA" | grep -oE '[0-9a-fA-F]{64}' | grep -qF "$ACTUAL_SHA" 2>/dev/null; then
+              EXPECTED_SHA="$ACTUAL_SHA"
+            fi
           fi
 
           if [[ -n "$EXPECTED_SHA" && "$EXPECTED_SHA" == "$ACTUAL_SHA" ]]; then
@@ -150,8 +179,29 @@ jobs:
             exit 1
           fi
 
-          chmod +x "$TMP_BIN"
-          mv "$TMP_BIN" "$BIN_DIR/yq"
+          # Handle tarball extraction if needed
+          if [[ "$BIN_URL" == *.tar.gz ]]; then
+            echo "Extracting yq from tarball..."
+            TMP_EXTRACT="$(mktemp -d)"
+            tar -xzf "$TMP_BIN" -C "$TMP_EXTRACT"
+            # Find the yq binary in the extracted contents
+            YQ_BIN="$(find "$TMP_EXTRACT" \( -type f -name 'yq' -o -type f -name 'yq_*' \) | grep -v '\.1$' | head -n1)"
+            if [[ -z "$YQ_BIN" ]]; then
+              YQ_BIN="$(find "$TMP_EXTRACT" -type f -executable | head -n1)"
+            fi
+            if [[ -z "$YQ_BIN" ]]; then
+              echo "Fehler: konnte yq-Binary in tarball nicht finden" >&2
+              ls -laR "$TMP_EXTRACT" >&2
+              rm -rf "$TMP_EXTRACT"
+              exit 1
+            fi
+            chmod +x "$YQ_BIN"
+            mv "$YQ_BIN" "$BIN_DIR/yq"
+            rm -rf "$TMP_EXTRACT" "$TMP_BIN"
+          else
+            chmod +x "$TMP_BIN"
+            mv "$TMP_BIN" "$BIN_DIR/yq"
+          fi
           echo "yq erfolgreich installiert und verifiziert."
       - name: Install just
         run: scripts/tools/just-pin.sh
