@@ -1,4 +1,4 @@
-# ADR-000: ADR-Governance & Format  
+# ADR-000 ADR-Governance & Format
 ![status: proposed](https://img.shields.io/badge/status-proposed-yellow)
 Datum: 2025-10-05
 Status: Proposed

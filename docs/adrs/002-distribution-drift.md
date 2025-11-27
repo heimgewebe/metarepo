@@ -1,4 +1,4 @@
-# ADR-002: Fleet-Distribution & Drift-Regeln  
+# ADR-002 Fleet-Distribution & Drift-Regeln
 ![status: proposed](https://img.shields.io/badge/status-proposed-yellow)
 Datum: 2025-10-05
 Status: Proposed

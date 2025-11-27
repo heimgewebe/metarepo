@@ -1,4 +1,4 @@
-# ADR-001: WGX (Engine) vs. metarepo (Tower)  
+# ADR-001 WGX (Engine) vs. metarepo (Tower)
 ![status: proposed](https://img.shields.io/badge/status-proposed-yellow)
 Datum: 2025-10-05
 Status: Proposed
