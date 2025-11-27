@@ -117,32 +117,35 @@ download_yq() {
 
         # Checksummen herunterladen und prüfen (falls verfügbar)
         local checksum_asset=""
-        local -a checksum_candidates=(
+        local checksum_url=""
+        local checksum_candidates=(
                 "checksums"
                 "checksums.txt"
-                "checksums_sha256"
-                "checksums_sha256.txt"
+                "checksums-bsd"
                 "${binary_name}.sha256"
                 "${binary_name}.sha256.txt"
         )
 
+        rm -f -- "${tmp_checksum}" || true
         for candidate in "${checksum_candidates[@]}"; do
-                rm -f -- "${tmp_checksum}" || true
-                local candidate_url="${checksum_base}/${candidate}"
-                if curl --fail --max-time 60 --connect-timeout 10 --retry 3 -fsSL "${candidate_url}" -o "${tmp_checksum}"; then
+                checksum_url="${checksum_base}/${candidate}"
+                log "Probiere Checksummen-Datei: ${checksum_url}"
+                if curl --fail --max-time 60 --connect-timeout 10 --retry 3 -fsSL "${checksum_url}" -o "${tmp_checksum}"; then
                         checksum_asset="${candidate}"
-                        log "Gefundene Checksummen-Datei: ${candidate}"
+                        log "Gefundene Checksummen-Datei: ${checksum_asset}"
                         break
-                else
-                        log "INFO: Checksummen-Datei nicht verfügbar: ${candidate_url}"
                 fi
         done
 
+        if [[ -z "${checksum_asset}" ]]; then
+                log "WARN: Keine Checksummen-Datei im Release gefunden, überspringe Verifikation."
+        fi
+
         if [[ -n "${checksum_asset}" ]]; then
-             log "Verifiziere Checksumme..."
+             log "Verifiziere Checksumme aus ${checksum_asset}..."
              # Strict regex match: "HASH  binary_name" (anchored start/end)
              local checksum_line
-             checksum_line=$(grep -E "^[a-fA-F0-9]{64}[[:space:]]+${binary_name}[[:space:]]*$" "${tmp_checksum}" || true)
+             checksum_line=$(grep -E "^[a-fA-F0-9]{64}[[:space:]]+${binary_name}([[:space:]]+.*)?$" "${tmp_checksum}" || true)
 
              # Fallback: erste 64-hex Zeichen im File verwenden, falls kein Dateiname enthalten ist
              if [[ -z "${checksum_line}" ]]; then
@@ -163,8 +166,6 @@ download_yq() {
                      log "Checksumme ok (Quelle ${checksum_asset}): ${actual_sum}"
                  fi
              fi
-        else
-             log "WARN: Keine Checksummen-Datei im Release gefunden, überspringe Verifikation."
         fi
 
         if [[ -f "${tmp}" ]]; then
