@@ -1,11 +1,13 @@
 # ADR-006 Umbenennung von `leitstand` zu `chronik` und Einführung eines UI-Repos
 
-- **Status**: Akzeptiert
-- **Datum**: 2025-11-14
-- **Kontext**:
+Status: Accepted
+Datum: 2025-11-14
+
+## Kontext
   - Das bisherige `leitstand`-Repo hatte eine Doppelrolle: Es war sowohl für den Event-Ingest und die Persistenz (als Backend) zuständig als auch als Platzhalter für das zukünftige UI/Dashboard gedacht.
   - Diese semantische Überladung führte zu Unklarheiten. Das "Gedächtnis" des Systems (Event-Store) wurde begrifflich mit dem "Kontrollraum" (Dashboard) vermischt.
-- **Entscheidung**:
+
+## Entscheidung
   1.  Das bestehende Backend-Repository `leitstand` wird in `chronik` umbenannt.
       -   **`chronik`**: Verantwortlich für Event-Ingest, Persistenz und Audit-Trails. Dies ist das "Gedächtnis".
   2.  Ein neues Repository `leitstand` wird für das UI/Dashboard angelegt.
