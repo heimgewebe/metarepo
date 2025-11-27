@@ -3071,7 +3071,7 @@ them.
 [issue-40]: https://github.com/rhysd/actionlint/issues/40
 [security-doc]: https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
 [reusable-workflow-doc]: https://docs.github.com/en/actions/using-workflows/reusing-workflows
-[create-reusable-workflow-doc]: https://docs.github.com/en/actions/using-workflows/reusing-workflows
+[create-reusable-workflow-doc]: https://docs.github.com/en/actions/using-workflows/reusing-workflows#creating-a-reusable-workflow
 [reusable-workflow-call-keys]: https://docs.github.com/en/actions/using-workflows/reusing-workflows#supported-keywords-for-jobs-that-call-a-reusable-workflow
 [object-filter-syntax]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#object-filters
 [github-script]: https://github.com/actions/github-script
