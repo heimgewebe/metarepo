@@ -1,6 +1,6 @@
 # ADR-0002 Fleet-Rollout via reusable GitHub Actions
 Status: Accepted
-Date: 2025-10-12
+Datum: 2025-10-12
 
 ## Kontext
 Viele Repos sollen einheitliche Checks/Validierungen nutzen.

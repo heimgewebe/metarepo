@@ -1,6 +1,6 @@
 # ADR-0001 Contracts v1 & JSONL append-only
 Status: Accepted
-Date: 2025-10-12
+Datum: 2025-10-12
 
 ## Kontext
 Einheitlicher Datenaustausch zwischen Fleet-Repos.
