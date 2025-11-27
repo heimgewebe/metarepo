@@ -158,7 +158,13 @@ download_yq() {
                  local expected_sum
                  expected_sum=$(echo "${checksum_line}" | awk '{print $1}')
                  local actual_sum
-                 actual_sum=$(sha256sum "${tmp}" | awk '{print $1}')
+                 if command -v sha256sum >/dev/null 2>&1; then
+                   actual_sum=$(sha256sum "${tmp}" | awk '{print $1}')
+                 elif command -v shasum >/dev/null 2>&1; then
+                   actual_sum=$(shasum -a 256 "${tmp}" | awk '{print $1}')
+                 else
+                   die "No sha256sum or shasum command found for checksum verification."
+                 fi
 
                  if [[ "${expected_sum}" != "${actual_sum}" ]]; then
                      die "Checksum-Verifikation fehlgeschlagen! Erwartet: ${expected_sum}, Ist: ${actual_sum} (Quelle: ${checksum_asset})"

@@ -129,7 +129,14 @@ jobs:
           fi
 
           # Calculate and verify
-          ACTUAL_SHA="$(sha256sum "$TMP_BIN" | awk '{print $1}')"
+          if command -v sha256sum >/dev/null 2>&1; then
+            ACTUAL_SHA="$(sha256sum "$TMP_BIN" | awk '{print $1}')"
+          elif command -v shasum >/dev/null 2>&1; then
+            ACTUAL_SHA="$(shasum -a 256 "$TMP_BIN" | awk '{print $1}')"
+          else
+            echo "No sha256sum or shasum command found for checksum verification." >&2
+            exit 1
+          fi
           ASSET_NAME="$(basename "$BIN_URL")"
 
           # yq checksums file has multiple hash types per line, space-separated
