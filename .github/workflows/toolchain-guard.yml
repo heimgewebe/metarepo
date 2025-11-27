@@ -107,7 +107,7 @@ jobs:
           # Prefer a line that mentions the asset filename
           ASSET_NAME="$(basename "$BIN_URL")"
           EXPECTED_SHA="$(
-            grep -i "$ASSET_NAME" "$TMP_SHA" \
+            grep -iF "$ASSET_NAME" "$TMP_SHA" \
               | grep -oE '[0-9a-fA-F]{64}' \
               | head -n1 || true
           )"
