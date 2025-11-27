@@ -20,98 +20,105 @@ jobs:
           echo "$BIN_DIR" >> "$GITHUB_PATH"
 
           TMP_BIN="$(mktemp "$BIN_DIR/yq.dl.XXXXXX")"
-          TMP_SHA="$(mktemp "$BIN_DIR/yq.sha256.XXXXXX")"
+          TMP_SHA="$(mktemp "$BIN_DIR/yq.sha.XXXXXX")"
+          RELEASE_JSON="$(mktemp "$BIN_DIR/release.json.XXXXXX")"
 
-          echo "Lade yq $YQ_VERSION herunter..."
-          # Download binary
-          curl --fail --max-time 60 --connect-timeout 10 --retry 3 -fsSL \
-            "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_${YQ_ARCH}" -o "$TMP_BIN"
-
-          # Download checksum for the specific architecture
-          SHA_CANDIDATES=(
-            "yq_${YQ_ARCH}.sha256"
-            "yq_${YQ_ARCH}.sha256.txt"
-            "checksums"
-            "checksums.txt"
-            "SHA256SUMS"
-            "sha256"
-          )
-
-          FOUND_SHA=0
-          for name in "${SHA_CANDIDATES[@]}"; do
-            SHA_URL="https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${name}"
-            echo "Download checksum candidate: ${SHA_URL}"
-            if curl --fail --max-time 60 --connect-timeout 10 --retry 3 -fsSL \
-                "$SHA_URL" -o "$TMP_SHA"; then
-              if [[ -s "$TMP_SHA" ]]; then
-                FOUND_SHA=1
-                break
-              fi
-            fi
-          done
-
-          # Fallback: parse release assets and pick a checksum that mentions the architecture
-          if [[ $FOUND_SHA -eq 0 ]]; then
-            RELEASE_JSON="$(mktemp "$BIN_DIR/release.json.XXXXXX")"
-            if curl --fail --max-time 60 --connect-timeout 10 --retry 3 -fsSL \
-                "https://api.github.com/repos/mikefarah/yq/releases/tags/${YQ_VERSION}" -o "$RELEASE_JSON"; then
-              ASSET_URL="$(grep -oE '"browser_download_url":\s*"[^\"]+"' "$RELEASE_JSON" \
-                | sed -E 's/.*"([^"]+)".*/\1/' \
-                | grep -Ei "(sha|check).*${YQ_ARCH}" \
-                | head -n1 || true)"
-              if [[ -z "$ASSET_URL" ]]; then
-                ASSET_URL="$(grep -oE '"browser_download_url":\s*"[^\"]+"' "$RELEASE_JSON" \
-                  | sed -E 's/.*"([^"]+)".*/\1/' \
-                  | grep -Ei '(sha|check)' \
-                  | head -n1 || true)"
-              fi
-
-              if [[ -n "$ASSET_URL" ]]; then
-                echo "Download checksum from release assets: $ASSET_URL"
-                if curl --fail --max-time 60 --connect-timeout 10 --retry 3 -fsSL "$ASSET_URL" -o "$TMP_SHA"; then
-                  if [[ -s "$TMP_SHA" ]]; then
-                    FOUND_SHA=1
-                  fi
-                fi
-              fi
-            fi
-            rm -f "$RELEASE_JSON" || true
+          echo "Querying release assets for $YQ_VERSION..."
+          if ! curl --fail --max-time 60 --connect-timeout 10 --retry 3 -fsSL \
+              "https://api.github.com/repos/mikefarah/yq/releases/tags/${YQ_VERSION}" -o "$RELEASE_JSON"; then
+            echo "Fehler: konnte Release metadata nicht laden" >&2
+            rm -f "$RELEASE_JSON"
+            exit 1
           fi
 
-          if [[ $FOUND_SHA -eq 0 ]]; then
-            echo "Fehler: Konnte keine Checksums-Datei herunterladen" >&2
+          # Find the binary asset URL that best matches the desired arch
+          BIN_URL="$(
+            grep -oE '"browser_download_url":\s*"[^\"]+"' "$RELEASE_JSON" \
+              | sed -E 's/.*"([^"]+)".*/\1/' \
+              | grep -Ei "yq.*(${YQ_ARCH}|linux.*amd64|amd64|x86_64)" \
+              | head -n1 || true
+          )"
+
+          # Fallback: any yq_linux* binary
+          if [[ -z "$BIN_URL" ]]; then
+            BIN_URL="$(
+              grep -oE '"browser_download_url":\s*"[^\"]+"' "$RELEASE_JSON" \
+                | sed -E 's/.*"([^"]+)".*/\1/' \
+                | grep -Ei "yq(_|-)linux|yq.*linux" \
+                | head -n1 || true
+            )"
+          fi
+
+          if [[ -z "$BIN_URL" ]]; then
+            echo "Fehler: konnte keine passende yq-Binary-URL in Release-Assets finden" >&2
+            sed -n '1,200p' "$RELEASE_JSON" >&2 || true
+            rm -f "$RELEASE_JSON"
+            exit 1
+          fi
+
+          echo "Download binary from: $BIN_URL"
+          curl --fail --max-time 120 --connect-timeout 10 --retry 3 -fsSL "$BIN_URL" -o "$TMP_BIN"
+
+          # Find checksum asset: prefer dedicated checksums files first
+          SHA_URL="$(
+            grep -oE '"browser_download_url":\s*"[^\"]+"' "$RELEASE_JSON" \
+              | sed -E 's/.*"([^"]+)".*/\1/' \
+              | grep -Ei 'checksums(\.txt)?$' \
+              | head -n1 || true
+          )"
+
+          # Fallback: any asset that looks like a checksum listing
+          if [[ -z "$SHA_URL" ]]; then
+            SHA_URL="$(
+              grep -oE '"browser_download_url":\s*"[^\"]+"' "$RELEASE_JSON" \
+                | sed -E 's/.*"([^"]+)".*/\1/' \
+                | grep -Ei "sha|check|checksum|SHA256|sha256" \
+                | head -n1 || true
+            )"
+          fi
+
+          rm -f "$RELEASE_JSON"
+
+          if [[ -n "$SHA_URL" ]]; then
+            echo "Download checksum from: $SHA_URL"
+            if curl --fail --max-time 120 --connect-timeout 10 --retry 3 -fsSL "$SHA_URL" -o "$TMP_SHA"; then
+              if [[ ! -s "$TMP_SHA" ]]; then
+                echo "Gefundene Checksums-Datei ist leer" >&2
+                rm -f "$TMP_SHA"
+              fi
+            else
+              echo "Warnung: konnte Checksums-Datei nicht herunterladen; fahre mit Verifikation nicht fort" >&2
+              rm -f "$TMP_SHA"
+            fi
+          fi
+
+          if [[ ! -s "$TMP_SHA" ]]; then
+            echo "Fehler: keine Checksums-Datei gefunden oder leer; Abbruch statt unsicherer Installation" >&2
             exit 1
           fi
 
           # Calculate actual sha
           ACTUAL_SHA="$(sha256sum "$TMP_BIN" | awk '{print $1}')"
 
-          # Robuste Extraktion der erwarteten SHA256 aus der Checksums-Datei.
-          # Suche nach Varianten des Dateinamens und extrahiere den ersten 64-hex-Hash.
-          # Define patterns outside the command substitution to avoid bash array scoping issues
-          FNAME_PATTERNS="yq_${YQ_ARCH}|yq_${YQ_ARCH}\.tar\.gz|yq_${YQ_ARCH}\.exe|yq_${YQ_ARCH}\.zip"
-
+          # Try find expected sha from checksums file
+          # Prefer a line that mentions the asset filename
+          ASSET_NAME="$(basename "$BIN_URL")"
           EXPECTED_SHA="$(
-            # Try to find a line matching any pattern
-            sha="$(grep -iE "$FNAME_PATTERNS" "$TMP_SHA" \
+            grep -i "$ASSET_NAME" "$TMP_SHA" \
               | grep -oE '[0-9a-fA-F]{64}' \
-              | head -n1 || true)"
-            if [[ -n "$sha" ]]; then
-              printf '%s' "$sha"
-            else
-              # Fallback: first 64-hex token anywhere
-              grep -oE '[0-9a-fA-F]{64}' "$TMP_SHA" | head -n1 || true
-            fi
-          )" || true
+              | head -n1 || true
+          )"
+          if [[ -z "$EXPECTED_SHA" ]]; then
+            EXPECTED_SHA="$(grep -oE '[0-9a-fA-F]{64}' "$TMP_SHA" | head -n1 || true)"
+          fi
 
-          # Endgültige Prüfung
           if [[ -n "$EXPECTED_SHA" && "$EXPECTED_SHA" == "$ACTUAL_SHA" ]]; then
             echo "SHA256-Prüfsumme erfolgreich verifiziert: $ACTUAL_SHA"
           else
             echo "SHA256-Prüfsumme stimmt nicht überein!" >&2
+            echo "Binary: $BIN_URL" >&2
             echo "Gesuchter Hash: $ACTUAL_SHA" >&2
-            echo "Gefundener Hash in Checksums-Datei (falls vorhanden): ${EXPECTED_SHA:-'(kein Hash gefunden)'}" >&2
-            echo "Inhalt der Checksums-Datei (erste 200 Zeilen):" >&2
+            echo "Gefundener Hash in Checksums-Datei: ${EXPECTED_SHA:-'(kein Hash gefunden)'}" >&2
             sed -n '1,200p' "$TMP_SHA" >&2 || true
             exit 1
           fi
