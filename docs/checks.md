@@ -3052,7 +3052,7 @@ them.
 [funcs-doc]: https://docs.github.com/en/actions/learn-github-actions/expressions#functions
 [needs-doc]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idneeds
 [needs-context-doc]: https://docs.github.com/en/actions/learn-github-actions/contexts#needs-context
-[shell-doc]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#choosing-the-shell-to-run-commands-in
+[shell-doc]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsshell
 [matrix-doc]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstrategymatrix
 [webhook-doc]: https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows
 [schedule-event-doc]: https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
@@ -3072,7 +3072,7 @@ them.
 [security-doc]: https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
 [reusable-workflow-doc]: https://docs.github.com/en/actions/using-workflows/reusing-workflows
 [create-reusable-workflow-doc]: https://docs.github.com/en/actions/using-workflows/reusing-workflows#creating-a-reusable-workflow
-[reusable-workflow-call-keys]: https://docs.github.com/en/actions/using-workflows/reusing-workflows#supported-keywords-for-calling-a-reusable-workflow
+[reusable-workflow-call-keys]: https://docs.github.com/en/actions/using-workflows/reusing-workflows#supported-keywords-for-reusable-workflows
 [object-filter-syntax]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#filter-pattern-cheat-sheet
 [github-script]: https://github.com/actions/github-script
 [workflow-dispatch-event]: https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#workflow_dispatch
