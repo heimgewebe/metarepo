@@ -54,7 +54,7 @@ autonomy:
   allowed_actions_level_2:
     - sichter.quick_analysis
     - chronik.append_event
-    - semantah.semantic_context
+    - semantAH.semantic_context
 
   confirm_required:
     - wgx.guard
