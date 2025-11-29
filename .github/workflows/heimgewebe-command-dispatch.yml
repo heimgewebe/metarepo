@@ -56,17 +56,24 @@ jobs:
 
             core.info(`Heimgewebe dispatch invoked for ${repoFull.owner}/${repoFull.repo}#${issue.number || 'n/a'} by ${author || 'unknown'}`);
 
+            // Debug: rohen Kommentar einmal ins Log schreiben, um Parsing-Probleme zu sehen
+            core.info(`Raw comment body: ${JSON.stringify(comment)}`);
+
             if (!comment) {
               core.info('No comment body – abort.');
               return;
             }
 
             // Muster: @heimgewebe/<zielrepo> /<kommando> [arg...]
-            const pattern = /@heimgewebe\/([a-zA-Z0-9_-]+)\s+\/([a-zA-Z0-9_-]+)(.*)$/m;
-            const match = comment.match(pattern);
+            // Robustere Variante:
+            // - erlaubt Klein-/Großschreibung
+            // - erlaubt Punkte und Minus im Repo- und Kommandonamen
+            // - frisst alle weiteren Zeichen (inkl. Zeilenumbrüche) als Args
+            const pattern = /@heimgewebe\/([a-z0-9_.-]+)\s+\/([a-z0-9_.-]+)\b([\s\S]*)/i;
+            const match = pattern.exec(comment);
 
             if (!match) {
-              core.info('No Heimgewebe command found in comment.');
+              core.info('No Heimgewebe command found in comment (pattern did not match).');
               return;
             }
 
