@@ -1,0 +1,159 @@
+name: Heimgewebe command dispatch
+
+on:
+  # Dieser Workflow wird von anderen Repos via "workflow_call" eingebunden.
+  workflow_call:
+    secrets:
+      HEIMGEWEBE_AUTOBOT_TOKEN:
+        required: true
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  dispatch:
+    name: Parse and dispatch Heimgewebe command
+    runs-on: ubuntu-latest
+    env:
+      # Whitelist der Ziel-Repos (kommagetrennt). Kann pro Repo via
+      # Repository-Variable HEIMGEWEBE_ALLOWED_REPOS überschrieben werden.
+      ALLOWED_TARGET_REPOS: ${{ vars.HEIMGEWEBE_ALLOWED_REPOS || 'sichter,wgx,heimgeist,metarepo,hausKI,semantAH,heimlern,chronik,leitstand,tools' }}
+      # Whitelist der erlaubten Kommandos (kommagetrennt). Kann via
+      # Repository-Variable HEIMGEWEBE_ALLOWED_COMMANDS überschrieben werden.
+      ALLOWED_COMMANDS: ${{ vars.HEIMGEWEBE_ALLOWED_COMMANDS || 'quick,deep' }}
+
+    steps:
+      - name: Parse and dispatch command
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.HEIMGEWEBE_AUTOBOT_TOKEN }}
+          script: |
+            const core = require('@actions/core');
+            const allowedRepos = (process.env.ALLOWED_TARGET_REPOS || '')
+              .split(',')
+              .map(s => s.trim())
+              .filter(Boolean);
+            const allowedCommands = (process.env.ALLOWED_COMMANDS || '')
+              .split(',')
+              .map(s => s.trim())
+              .filter(Boolean);
+
+            const comment = (context.payload.comment && context.payload.comment.body) || '';
+            const issue = context.payload.issue || context.payload.pull_request || {};
+            const repoFull = context.repo; // { owner, repo }
+            const author = context.payload.comment && context.payload.comment.user && context.payload.comment.user.login;
+
+            core.info(`Heimgewebe dispatch invoked for ${repoFull.owner}/${repoFull.repo}#${issue.number || 'n/a'} by ${author || 'unknown'}`);
+
+            if (!comment) {
+              core.info('No comment body – abort.');
+              return;
+            }
+
+            // Muster: @heimgewebe/<zielrepo> /<kommando> [arg...]
+            const pattern = /@heimgewebe\/([a-zA-Z0-9_-]+)\s+\/([a-zA-Z0-9_-]+)(.*)$/m;
+            const match = comment.match(pattern);
+
+            if (!match) {
+              core.info('No Heimgewebe command found in comment.');
+              return;
+            }
+
+            const targetRepo = match[1];
+            const command = match[2];
+            const rawArgs = (match[3] || '').trim();
+
+            // Kommentar-Inhalt sanitisieren und kürzen (keine Zeilenumbrüche, max. 2048 Zeichen)
+            const maxCommentLen = 2048;
+            let sanitizedComment = comment.replace(/[\r\n]+/g, ' ');
+            if (sanitizedComment.length > maxCommentLen) {
+              sanitizedComment = sanitizedComment.slice(0, maxCommentLen) + ' …(gekürzt)';
+            }
+
+            async function reply(body) {
+              if (!issue.number) {
+                core.info('No issue / PR number found – cannot post reply.');
+                return;
+              }
+              await github.rest.issues.createComment({
+                owner: repoFull.owner,
+                repo: repoFull.repo,
+                issue_number: issue.number,
+                body,
+              });
+            }
+
+            // Whitelist-Checks
+            if (!allowedRepos.includes(targetRepo)) {
+              await reply(
+                `👋 Heimgewebe hat deinen Befehl erkannt, aber **${targetRepo}** ist kein erlaubtes Ziel-Repo.\n\n` +
+                `Erlaubte Repos: \`${allowedRepos.join(', ')}\`.`
+              );
+              return;
+            }
+
+            if (!allowedCommands.includes(command)) {
+              await reply(
+                `👋 Heimgewebe hat deinen Befehl erkannt, aber das Kommando **${command}** ist hier nicht erlaubt.\n\n` +
+                `Erlaubte Kommandos: \`${allowedCommands.join(', ')}\`.`
+              );
+              return;
+            }
+
+            // Autorisierung: nur aktive Org-Mitglieder
+            let isMember = false;
+            try {
+              const membership = await github.rest.orgs.getMembershipForUser({
+                org: repoFull.owner,
+                username: author,
+              });
+              isMember = membership && membership.status === 200 && membership.data && membership.data.state === 'active';
+            } catch (err) {
+              core.info(`Org membership check failed or user is not a member: ${err.message}`);
+            }
+
+            if (!isMember) {
+              await reply('🚫 Heimgewebe-Befehle können nur von aktiven Mitgliedern der Organisation ausgeführt werden.');
+              return;
+            }
+
+            const payload = {
+              version: 1,
+              source_repository: `${repoFull.owner}/${repoFull.repo}`,
+              source_issue_number: issue.number,
+              source_comment_author: author,
+              command,
+              target_repo: targetRepo,
+              args: rawArgs,
+              raw_comment: sanitizedComment,
+            };
+
+            core.info(`Dispatching Heimgewebe command to ${targetRepo}: ${JSON.stringify(payload)}`);
+
+            await github.rest.repos.createDispatchEvent({
+              owner: repoFull.owner,
+              repo: targetRepo,
+              event_type: 'heimgewebe-command',
+              client_payload: payload,
+            });
+
+            // Acknowledge beim Kommentar
+            if (context.payload.comment && context.payload.comment.id) {
+              try {
+                await github.rest.reactions.createForIssueComment({
+                  owner: repoFull.owner,
+                  repo: repoFull.repo,
+                  comment_id: context.payload.comment.id,
+                  content: 'eyes',
+                });
+              } catch (e) {
+                core.info(`Could not add reaction: ${e.message}`);
+              }
+            }
+
+            await reply(
+              `✅ Heimgewebe-Befehl wurde an \`${targetRepo}\` gesendet.\n\n` +
+              `Kommando: \`${command}\`${rawArgs ? ' `' + rawArgs + '`' : ''}`
+            );
