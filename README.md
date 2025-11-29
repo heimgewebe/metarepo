@@ -146,3 +146,69 @@ actionlint is distributed under [the MIT license](./LICENSE.txt).
 [api]: https://github.com/rhysd/actionlint/blob/v1.7.9/docs/api.md
 [refs]: https://github.com/rhysd/actionlint/blob/v1.7.9/docs/reference.md
 [issue-form]: https://github.com/rhysd/actionlint/issues/new
+
+## MCP / Copilot Integration (heimgewebe-local)
+
+Dieses Repository enthält einen lokalen MCP-Server unter `servers/local-mcp/`, der von GitHub Copilot (Agent Mode) genutzt werden kann, um Werkzeuge wie `git`, `wgx` und einfache Dateizugriffe auszuführen.
+
+### Schnellstart
+
+1. Einmalig die MCP-Abhängigkeiten installieren:
+
+   ```bash
+   tools/mcp-local-setup.sh
+   ```
+
+2. Sicherstellen, dass im Repo-Root eine Datei `.mcp/registry.json` existiert, die den lokalen Server einträgt, zum Beispiel:
+
+   ```json
+   {
+     "version": "1.0",
+     "servers": {
+       "heimgewebe-local": {
+         "type": "process",
+         "command": "node",
+         "args": ["servers/local-mcp/index.js"],
+         "tools": [
+           "git",
+           "wgx",
+           "fs_read",
+           "fs_write",
+           "wgx_guard",
+           "wgx_smoke"
+         ]
+       }
+     }
+   }
+   ```
+
+3. In deiner IDE (z. B. VS Code mit GitHub Copilot Agent Mode) die MCP-Konfiguration so setzen, dass diese Registry-Datei verwendet wird.
+
+4. In Copilot Chat kannst du dann z. B. schreiben:
+   „Nutze das Tool wgx_guard, prüfe dieses Repo und erkläre mir alle Fehler verständlich.“
+
+### Kurz erklärt „für Dummies“
+- Der MCP-Server ist eine kleine Brücke zwischen Copilot und deinen lokalen Werkzeugen.
+- Du gibst im Chat einen Auftrag (zum Beispiel „starte wgx_guard“).
+- Copilot ruft intern eines der Tools im MCP-Server auf (z. B. wgx_guard, git, fs_read).
+- Der MCP-Server führt den Befehl lokal im Repo aus und gibt das Ergebnis zurück.
+- Copilot übersetzt dieses Ergebnis in normale Sprache und kann dir Zusammenfassungen, Erklärungen oder nächste Schritte vorschlagen.
+
+### Typische Stolperfallen (Fehlerprävention)
+
+**Worauf du achten solltest:**
+
+1. **Skript im falschen Ordner ausführen**
+   - Problem: `git rev-parse --show-toplevel` schlägt fehl oder zeigt ein anderes Repo.
+   - Lösung: Skript immer aus einem Verzeichnis innerhalb des metarepo ausführen.
+
+2. **Node oder Paketmanager fehlen**
+   - Wenn `node`, `pnpm` und `npm` fehlen, bricht das Skript sauber mit Fehlermeldung ab.
+   - Lösung: Node installieren (empfohlen Version 20+), und mindestens `npm` im PATH haben.
+
+3. **`servers/local-mcp` noch nicht vorhanden**
+   - Dann sagt das Skript dir explizit, dass der MCP-Server-Ordner fehlt → zuerst den vorherigen Patch mit `servers/local-mcp` und `.mcp/registry.json` einspielen.
+
+4. **Falsche `registry.json`**
+   - Wenn du Tools in der Registry einträgst, die im MCP-Server noch nicht existieren (z. B. `wgx_guard`), ist das harmlos – Copilot kann sie dann nur nicht aufrufen.
+   - Problematisch wird es nur, wenn du die Datei syntaktisch zerschießt (dann meckert Copilot in der MCP-Konfiguration).

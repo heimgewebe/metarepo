@@ -28,3 +28,4 @@ tmp/
 .devcontainer/.devcache/
 .agents/
 metrics.json
+node_modules/

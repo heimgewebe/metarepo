@@ -1,0 +1,18 @@
+{
+  "version": "1.0",
+  "servers": {
+    "heimgewebe-local": {
+      "type": "process",
+      "command": "node",
+      "args": ["servers/local-mcp/index.js"],
+      "tools": [
+        "git",
+        "wgx",
+        "fs_read",
+        "fs_write",
+        "wgx_guard",
+        "wgx_smoke"
+      ]
+    }
+  }
+}
