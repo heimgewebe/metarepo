@@ -52,10 +52,6 @@ jobs:
             const author = context.payload.comment && context.payload.comment.user && context.payload.comment.user.login;
             const requireOrgMembership =
               (process.env.REQUIRE_ORG_MEMBERSHIP || 'true').toLowerCase() === 'true';
-            const isOwner =
-              author &&
-              repoFull.owner &&
-              author.toLowerCase() === repoFull.owner.toLowerCase();
 
             core.info(`Heimgewebe dispatch invoked for ${repoFull.owner}/${repoFull.repo}#${issue.number || 'n/a'} by ${author || 'unknown'}`);
 
@@ -121,34 +117,18 @@ jobs:
               return;
             }
 
-            // Autorisierung:
-            // - Owner: immer erlaubt
-            // - sonst je nach Konfiguration nur aktive Org-Mitglieder
-            let isMember = false;
-            if (isOwner) {
-              core.info('Author is org owner – skipping membership check.');
-            } else if (requireOrgMembership) {
-              try {
-                const membership = await github.rest.orgs.getMembershipForUser({
-                  org: repoFull.owner,
-                  username: author,
-                });
-                isMember =
-                  membership &&
-                  membership.status === 200 &&
-                  membership.data &&
-                  membership.data.state === 'active';
-              } catch (err) {
-                core.info(`Org membership check failed or user is not a member: ${err.message}`);
-                isMember = false;
-              }
+            // Membership check via author_association (OWNER, MEMBER, CONTRIBUTOR, etc.)
+            const assoc = context.payload.comment.author_association;
+            const allowedRoles = ['OWNER', 'MEMBER'];
 
-              if (!isMember) {
-                await reply('🚫 Heimgewebe-Befehle können nur von aktiven Mitgliedern der Organisation ausgeführt werden.');
+            if (requireOrgMembership) {
+              if (!allowedRoles.includes(assoc)) {
+                await reply('🚫 Heimgewebe-Befehle können nur von aktiven Mitgliedern oder dem Owner ausgeführt werden.');
                 return;
               }
+              core.info(`User allowed via author_association = ${assoc}`);
             } else {
-              core.info('Org membership check disabled via REQUIRE_ORG_MEMBERSHIP – allowing all commenters.');
+              core.info(`Org membership check disabled via REQUIRE_ORG_MEMBERSHIP – allowing all commenters (assoc=${assoc}).`);
             }
 
             const payload = {
