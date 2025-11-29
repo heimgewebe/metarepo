@@ -46,30 +46,44 @@ copy_templates_into_repo(){
   done
   
   # Commit and push if changes exist
+  local exit_code=0
   (
     cd "$tmpdir/$repo_name"
     git add .
     if git diff --staged --quiet; then
       log "  No changes to commit"
-      return 0
+      exit 0
     fi
     
     if (( DRYRUN == 1 )); then
       log "  [DRY-RUN] Would commit $copied files"
       git diff --staged --stat
-      return 0
+      exit 0
     fi
     
-    git config user.email "wgx-bot@heimgewebe.local"
-    git config user.name "WGX Bot"
-    git checkout -b "chore/wgx-template-sync" 2>/dev/null || git checkout "chore/wgx-template-sync"
+    # Use configurable git user (with defaults)
+    local git_email="${WGX_GIT_EMAIL:-wgx-bot@heimgewebe.local}"
+    local git_name="${WGX_GIT_NAME:-WGX Bot}"
+    git config user.email "$git_email"
+    git config user.name "$git_name"
+    
+    # Fetch and check for existing branch
+    git fetch origin "chore/wgx-template-sync" 2>/dev/null || true
+    if git rev-parse --verify "origin/chore/wgx-template-sync" >/dev/null 2>&1; then
+      # Branch exists on remote, check it out and merge
+      git checkout -b "chore/wgx-template-sync" "origin/chore/wgx-template-sync" 2>/dev/null || git checkout "chore/wgx-template-sync"
+    else
+      # New branch
+      git checkout -b "chore/wgx-template-sync" 2>/dev/null || true
+    fi
+    
     git commit -m "chore(templates): sync from metarepo via wgx"
     
     if command -v gh >/dev/null 2>&1; then
-      git push -u origin "chore/wgx-template-sync" 2>&1 || {
+      if ! git push -u origin "chore/wgx-template-sync" 2>&1; then
         log "  Push failed - may need manual intervention"
-        return 1
-      }
+        exit 1
+      fi
       gh pr create --title "chore(templates): sync from metarepo" \
         --body "Automated template sync via wgx up" \
         --base "$default_branch" \
@@ -79,5 +93,8 @@ copy_templates_into_repo(){
     fi
     
     log "  ✓ Synced $copied files"
-  )
+    exit 0
+  ) || exit_code=$?
+  
+  return $exit_code
 }
