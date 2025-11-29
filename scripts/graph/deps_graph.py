@@ -131,8 +131,13 @@ def parse_dependencies(path: Path) -> Iterable[str]:
             return _parse_pyproject_dependencies(path)
         if name.endswith(".txt") and name.startswith("requirements"):
             return _parse_requirements_dependencies(path)
-    except (OSError, ValueError, KeyError, TypeError, UnicodeDecodeError) as exc:  # pragma: no cover - defensive logging
+    except (OSError, ValueError, KeyError, TypeError, UnicodeDecodeError, json.JSONDecodeError) as exc:  # pragma: no cover - defensive logging
         print(f"WARNING: Failed to parse {path}: {exc}")
+    except Exception as exc:  # pragma: no cover - catch tomllib.TOMLDecodeError and tomli.TOMLDecodeError
+        if "TOMLDecodeError" in type(exc).__name__:
+            print(f"WARNING: Failed to parse {path}: {exc}")
+        else:
+            raise
     return ()
 
 
