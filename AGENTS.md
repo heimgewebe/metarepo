@@ -6,7 +6,7 @@ Metarepo dient als zentraler, lernender Meta-Layer. Es spiegelt **kanonische Tem
 ## Repos
 - GitHub Organisation: `heimgewebe`
 - Alle Repos öffentlich, außer `vault-privat`.
-- Primäre Kinder: `weltgewebe`, `hauski`, `hauski-audio`, `semantAH`, `wgx`, `metarepo`, `chronik`, `aussensensor`, `heimlern`, `tools`
+- Primäre Kinder: `weltgewebe`, `hausKI`, `hauski-audio`, `semantAH`, `wgx`, `metarepo`, `chronik`, `aussensensor`, `heimlern`, `tools`
 
 ## Rollen
 - **Metarepo**: Quelle der Wahrheit für Templates unter `templates/**`.
