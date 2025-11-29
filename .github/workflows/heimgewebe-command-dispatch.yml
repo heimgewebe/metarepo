@@ -23,6 +23,10 @@ jobs:
       # Whitelist der erlaubten Kommandos (kommagetrennt). Kann via
       # Repository-Variable HEIMGEWEBE_ALLOWED_COMMANDS überschrieben werden.
       ALLOWED_COMMANDS: ${{ vars.HEIMGEWEBE_ALLOWED_COMMANDS || 'quick,deep' }}
+      # Ob Org-Mitgliedschaft als Voraussetzung geprüft werden soll.
+      # true  (Standard): nur aktive Org-Mitglieder (plus Owner) dürfen Heimgewebe-Kommandos ausführen.
+      # false: jeder, der kommentieren darf, kann Heimgewebe-Kommandos auslösen.
+      REQUIRE_ORG_MEMBERSHIP: ${{ vars.HEIMGEWEBE_REQUIRE_ORG_MEMBERSHIP || 'true' }}
 
     steps:
       - name: Parse and dispatch command
@@ -43,8 +47,17 @@ jobs:
             const issue = context.payload.issue || context.payload.pull_request || {};
             const repoFull = context.repo; // { owner, repo }
             const author = context.payload.comment && context.payload.comment.user && context.payload.comment.user.login;
+            const requireOrgMembership =
+              (process.env.REQUIRE_ORG_MEMBERSHIP || 'true').toLowerCase() === 'true';
+            const isOwner =
+              author &&
+              repoFull.owner &&
+              author.toLowerCase() === repoFull.owner.toLowerCase();
 
             core.info(`Heimgewebe dispatch invoked for ${repoFull.owner}/${repoFull.repo}#${issue.number || 'n/a'} by ${author || 'unknown'}`);
+
+            // Debug: rohen Kommentar einmal ins Log schreiben, um Parsing-Probleme zu sehen
+            core.info(`Raw comment body: ${JSON.stringify(comment)}`);
 
             if (!comment) {
               core.info('No comment body – abort.');
@@ -52,11 +65,15 @@ jobs:
             }
 
             // Muster: @heimgewebe/<zielrepo> /<kommando> [arg...]
-            const pattern = /@heimgewebe\/([a-zA-Z0-9_-]+)\s+\/([a-zA-Z0-9_-]+)(.*)$/m;
-            const match = comment.match(pattern);
+            // Robustere Variante:
+            // - erlaubt Klein-/Großschreibung
+            // - erlaubt Punkte und Minus im Repo- und Kommandonamen
+            // - frisst alle weiteren Zeichen (inkl. Zeilenumbrüche) als Args
+            const pattern = /@heimgewebe\/([a-z0-9_.-]+)\s+\/([a-z0-9_.-]+)\b([\s\S]*)/i;
+            const match = pattern.exec(comment);
 
             if (!match) {
-              core.info('No Heimgewebe command found in comment.');
+              core.info('No Heimgewebe command found in comment (pattern did not match).');
               return;
             }
 
@@ -101,21 +118,34 @@ jobs:
               return;
             }
 
-            // Autorisierung: nur aktive Org-Mitglieder
+            // Autorisierung:
+            // - Owner: immer erlaubt
+            // - sonst je nach Konfiguration nur aktive Org-Mitglieder
             let isMember = false;
-            try {
-              const membership = await github.rest.orgs.getMembershipForUser({
-                org: repoFull.owner,
-                username: author,
-              });
-              isMember = membership && membership.status === 200 && membership.data && membership.data.state === 'active';
-            } catch (err) {
-              core.info(`Org membership check failed or user is not a member: ${err.message}`);
-            }
+            if (isOwner) {
+              core.info('Author is org owner – skipping membership check.');
+            } else if (requireOrgMembership) {
+              try {
+                const membership = await github.rest.orgs.getMembershipForUser({
+                  org: repoFull.owner,
+                  username: author,
+                });
+                isMember =
+                  membership &&
+                  membership.status === 200 &&
+                  membership.data &&
+                  membership.data.state === 'active';
+              } catch (err) {
+                core.info(`Org membership check failed or user is not a member: ${err.message}`);
+                isMember = false;
+              }
 
-            if (!isMember) {
-              await reply('🚫 Heimgewebe-Befehle können nur von aktiven Mitgliedern der Organisation ausgeführt werden.');
-              return;
+              if (!isMember) {
+                await reply('🚫 Heimgewebe-Befehle können nur von aktiven Mitgliedern der Organisation ausgeführt werden.');
+                return;
+              }
+            } else {
+              core.info('Org membership check disabled via REQUIRE_ORG_MEMBERSHIP – allowing all commenters.');
             }
 
             const payload = {
