@@ -5,7 +5,7 @@ from pathlib import Path
 
 try:
     import yaml  # type: ignore
-except Exception as e:
+except (ImportError, ModuleNotFoundError):
     print("ERROR: PyYAML required (pip install pyyaml) – aborting.", file=sys.stderr)
     sys.exit(2)
 
@@ -57,13 +57,13 @@ def try_label(repo_dir: Path, label: str) -> None:
 def ensure_gh():
     try:
         sh(["gh", "--version"])
-    except Exception:
+    except (subprocess.CalledProcessError, FileNotFoundError):
         print("ERROR: GitHub CLI `gh` not found.", file=sys.stderr)
         sys.exit(2)
     # auth check (non-fatal)
     try:
         sh(["gh", "auth", "status"])
-    except Exception:
+    except subprocess.CalledProcessError:
         print("WARN: `gh auth status` non-zero; make sure you are logged in.", file=sys.stderr)
     # ensure rollout label exists (best-effort)
     try:
@@ -78,7 +78,7 @@ def ensure_gh():
             "0E8A16",
         ],
            check=False)
-    except Exception:
+    except (subprocess.CalledProcessError, FileNotFoundError):
         pass
 
 def load_repos(repo_single: str | None) -> list[dict]:
