@@ -47,6 +47,7 @@ copy_templates_into_repo(){
   
   # Commit and push if changes exist
   local exit_code=0
+  local dryrun_mode="${DRYRUN:-0}"
   (
     cd "$tmpdir/$repo_name"
     git add .
@@ -55,7 +56,7 @@ copy_templates_into_repo(){
       exit 0
     fi
     
-    if (( DRYRUN == 1 )); then
+    if (( dryrun_mode == 1 )); then
       log "  [DRY-RUN] Would commit $copied files"
       git diff --staged --stat
       exit 0
@@ -69,19 +70,44 @@ copy_templates_into_repo(){
     
     # Fetch and check for existing branch
     git fetch origin "chore/wgx-template-sync" 2>/dev/null || true
+    local branch_exists_remote=0
     if git rev-parse --verify "origin/chore/wgx-template-sync" >/dev/null 2>&1; then
-      # Branch exists on remote, check it out and merge
-      git checkout -b "chore/wgx-template-sync" "origin/chore/wgx-template-sync" 2>/dev/null || git checkout "chore/wgx-template-sync"
+      branch_exists_remote=1
+    fi
+    
+    local branch_exists_local=0
+    if git rev-parse --verify "chore/wgx-template-sync" >/dev/null 2>&1; then
+      branch_exists_local=1
+    fi
+    
+    # Handle branch checkout/creation
+    if (( branch_exists_local == 1 )); then
+      # Local branch exists, just switch to it
+      if ! git checkout "chore/wgx-template-sync" 2>/dev/null; then
+        log "  Failed to checkout existing local branch chore/wgx-template-sync"
+        exit 1
+      fi
+    elif (( branch_exists_remote == 1 )); then
+      # Remote exists but local doesn't, create local tracking branch
+      if ! git checkout -b "chore/wgx-template-sync" "origin/chore/wgx-template-sync" 2>/dev/null; then
+        log "  Failed to create local branch from remote chore/wgx-template-sync"
+        exit 1
+      fi
     else
-      # New branch
-      git checkout -b "chore/wgx-template-sync" 2>/dev/null || true
+      # Neither exists, create new branch
+      if ! git checkout -b "chore/wgx-template-sync"; then
+        log "  Failed to create new branch chore/wgx-template-sync"
+        exit 1
+      fi
     fi
     
     git commit -m "chore(templates): sync from metarepo via wgx"
     
     if command -v gh >/dev/null 2>&1; then
-      if ! git push -u origin "chore/wgx-template-sync" 2>&1; then
+      local push_output
+      if ! push_output=$(git push -u origin "chore/wgx-template-sync" 2>&1); then
         log "  Push failed - may need manual intervention"
+        log "  Error: $push_output"
         exit 1
       fi
       gh pr create --title "chore(templates): sync from metarepo" \
