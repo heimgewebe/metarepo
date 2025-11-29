@@ -30,7 +30,6 @@ jobs:
         with:
           github-token: ${{ secrets.HEIMGEWEBE_AUTOBOT_TOKEN }}
           script: |
-            const core = require('@actions/core');
             const allowedRepos = (process.env.ALLOWED_TARGET_REPOS || '')
               .split(',')
               .map(s => s.trim())
