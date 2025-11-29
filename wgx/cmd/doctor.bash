@@ -9,5 +9,7 @@ cmd_doctor(){
   echo "owner=$(owner)"
   echo "mode=$(mode)"
   echo "PLAN_LIMIT=${PLAN_LIMIT}"
-  command -v gh >/dev/null 2>&1 && gh auth status || true
+  if command -v gh >/dev/null 2>&1; then
+    gh auth status || true
+  fi
 }

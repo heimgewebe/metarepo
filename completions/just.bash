@@ -10,14 +10,14 @@ _just() {
     else
         cur="${COMP_WORDS[COMP_CWORD]}"
         prev="${COMP_WORDS[COMP_CWORD-1]}"
-        words=$COMP_WORDS
+        words=("${COMP_WORDS[@]}")
         cword=$COMP_CWORD
     fi
 
     cmd=""
     opts=""
 
-    for i in ${words[@]}
+    for i in "${words[@]}"
     do
         case "${cmd},${i}" in
             ",$1")
@@ -35,15 +35,17 @@ _just() {
                     COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                     return 0
                 else
-                    local recipes=$(just --summary 2> /dev/null)
+                    local recipes
+                    recipes=$(just --summary 2> /dev/null)
 
                     if echo "${cur}" | \grep -qF '/'; then
-                        local path_prefix=$(echo "${cur}" | sed 's/[/][^/]*$/\//')
-                        local recipes=$(just --summary 2> /dev/null -- "${path_prefix}")
-                        local recipes=$(printf "${path_prefix}%s\t" $recipes)
+                        local path_prefix
+                        path_prefix=$(echo "${cur}" | sed 's/[/][^/]*$/\//')
+                        recipes=$(just --summary 2> /dev/null -- "${path_prefix}")
+                        recipes=$(printf "${path_prefix}%s\t" $recipes)
                     fi
 
-                    if [[ $? -eq 0 ]]; then
+                    if just --summary &>/dev/null; then
                         COMPREPLY=( $(compgen -W "${recipes}" -- "${cur}") )
                         if type __ltrim_colon_completions &>/dev/null; then
                             __ltrim_colon_completions "$cur"
