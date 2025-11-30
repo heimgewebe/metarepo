@@ -41,7 +41,8 @@ _just() {
                         local path_prefix
                         path_prefix=$(echo "${cur}" | sed 's/[/][^/]*$/\//')
                         recipes=$(just --summary 2> /dev/null -- "${path_prefix}")
-                        recipes=$(printf "${path_prefix}%s\t" "$recipes")
+                        # shellcheck disable=SC2086
+                        recipes=$(printf "${path_prefix}%s\t" $recipes)
                     fi
 
                     if just --summary &>/dev/null; then
