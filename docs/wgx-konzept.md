@@ -32,3 +32,10 @@ Kurz: wgx ist der **Bordcomputer**, der die Flotte bedient – nicht das Gehirn 
 3.  **Lokal-First:** `wgx` funktioniert ohne Internetverbindung.
 4.  **Erklärbar:** `--dry-run` und `--verbose` zeigen, was passieren würde und was passiert ist.
 5.  **Mensch & Maschine:** `wgx` ist für Menschen im Terminal und für `hausKI` in Playbooks gleichermaßen bedienbar.
+
+## Siehe auch
+
+- [Fleet Management](./fleet.md) – Template-Synchronisation und Fleet-Operationen
+- [Templates](./templates.md) – Template-Verteilung und Drift-Kontrolle
+- [Heimgewebe Gesamt](./heimgewebe-gesamt.md) – Narrative Gesamtübersicht
+- [Architecture](./architecture.md) – Systemarchitektur und Komponenten

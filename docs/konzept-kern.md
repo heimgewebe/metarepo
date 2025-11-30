@@ -47,3 +47,13 @@ repos:
 - **`owner`**: Der GitHub-Organisationname.
 - **`mode`**: Bestimmt, ob die Liste der Repos dynamisch von GitHub (`github`) oder aus der statischen Liste in `repos` (`static`) bezogen wird.
 - **`repos`**: Eine Liste von Repository-Objekten, die den Namen und optional weitere Metadaten enthalten.
+
+---
+
+## Siehe auch
+
+- [Templates](./templates.md) – Template-Verteilung und Drift-Kontrolle
+- [Fleet Management](./fleet.md) – Fleet-Operationen im Überblick
+- [WGX Konzept](./wgx-konzept.md) – Fleet-Motor und Kommandos
+- [Architecture](./architecture.md) – Systemarchitektur
+- [ADR-002: Distribution & Drift-Regeln](./adrs/002-distribution-drift.md) – Architekturentscheidung
