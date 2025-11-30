@@ -148,8 +148,8 @@ jobs:
 
             core.info(`Dispatching Heimgewebe command to ${targetRepo}: ${JSON.stringify(payload)}`);
 
-            // Use the authenticated client (App Token) to create the dispatch event
-            await github.request('POST /repos/{owner}/{repo}/dispatches', {
+            // Dispatch-Event per GitHub-App-Token auslösen
+            await github.rest.repos.createDispatchEvent({
               owner: repoFull.owner,
               repo: targetRepo,
               event_type: 'heimgewebe-command',
