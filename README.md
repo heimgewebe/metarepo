@@ -59,6 +59,7 @@ scripts/wgx-doctor --repo <repo>  # Drift-Report generieren
 
 ## Dokumentation
 
+### Kerndokumentation
 - [**Architecture**](docs/architecture.md) – Systemübersicht und Schichten
 - [**Vision**](docs/vision.md) – Leitlinien und Roadmap
 - [**Contracts**](docs/contracts.md) – Schema-Versionierung und Validierung
@@ -66,7 +67,13 @@ scripts/wgx-doctor --repo <repo>  # Drift-Report generieren
 - [**WGX Konzept**](docs/wgx-konzept.md) – Fleet-Motor und Kommandos
 - [**AGENTS.md**](AGENTS.md) – Leitfaden für KI-Agenten
 
-Vollständige Dokumentation: [`docs/`](docs/)
+### Entwicklung & Betrieb
+- [**Troubleshooting**](docs/troubleshooting.md) – Häufige Probleme und Lösungen
+- [**ADRs**](docs/adrs/README.md) – Architecture Decision Records
+- [**Runbooks**](docs/runbooks.md) – Betriebsanleitungen
+- [**Environment**](docs/environment.md) – Entwicklungsumgebung einrichten
+
+Vollständige Dokumentation: [`docs/`](docs/) · [Vollständiger Index](docs/README.md)
 
 ## Entwicklung
 

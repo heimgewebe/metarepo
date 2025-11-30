@@ -116,7 +116,7 @@ def iter_dependency_files(repo: Repo) -> Iterator[Path]:
     assert repo_path is not None
     for root, _, files in os.walk(repo_path):
         for filename in files:
-            if filename in patterns or (filename.startswith("requirements") and filename.endswith(".txt")):
+            if filename in patterns or (filename.endswith(".txt") and "requirements" in filename):
                 yield Path(root) / filename
 
 
@@ -131,7 +131,7 @@ def parse_dependencies(path: Path) -> Iterable[str]:
             return _parse_package_dependencies(path)
         if name == "pyproject.toml":
             return _parse_pyproject_dependencies(path)
-        if name.endswith(".txt") and name.startswith("requirements"):
+        if name.endswith(".txt") and "requirements" in name:
             return _parse_requirements_dependencies(path)
     except (OSError, ValueError, KeyError, TypeError, UnicodeDecodeError, json.JSONDecodeError, TOMLDecodeError) as exc:  # pragma: no cover - defensive logging
         print(f"WARNING: Failed to parse {path}: {exc}")

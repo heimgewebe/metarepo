@@ -61,3 +61,6 @@ und unter [Events & Contracts](./contracts/index.md) aufgeführt.
 - [Heimgewebe – Überblick](./heimgewebe-gesamt.md) – narrative Gesamtsicht
 - [Vision](./vision.md) – Leitlinien & Zukunftsbild
 - [Kernkonzepte](./konzept-kern.md) – Governance, Sync, Drift
+- [System Overview](./system-overview.md) – Kurzübersicht der Komponenten
+- [ADRs](./adrs/README.md) – Architekturentscheidungen
+- [Repo Matrix](./repo-matrix.md) – Repository-Rollen im Detail

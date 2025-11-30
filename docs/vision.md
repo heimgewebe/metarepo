@@ -142,3 +142,11 @@ Für eine visuelle Darstellung siehe:
 - [Heimgewebe Datenfluss (Canvas)](./canvas/heimgewebe-dataflow.canvas)
 
 Diese Canvas-Dateien sind in **Obsidian direkt darstellbar** (Datei → Öffnen mit Canvas).
+
+## Siehe auch
+
+- [Architecture](./architecture.md) – Detaillierte Architekturübersicht
+- [Vision Documents](./vision/README.md) – Detaillierte Visionsdokumente
+- [Heimgewebe Gesamt](./heimgewebe-gesamt.md) – Narrative Gesamtübersicht
+- [Contracts](./contracts.md) – Schema-Details
+- [ADRs](./adrs/README.md) – Architekturentscheidungen
