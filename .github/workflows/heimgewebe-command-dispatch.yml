@@ -1,8 +1,15 @@
 name: Heimgewebe command dispatch
 
 on:
-  # Dieser Workflow wird von anderen Repos via "workflow_call" eingebunden.
-  workflow_call: {}
+  # Wird aus anderen Repos via "workflow_call" eingebunden.
+  workflow_call:
+    secrets:
+      HEIMGEWEBE_APP_ID:
+        required: true
+      HEIMGEWEBE_APP_PRIVATE_KEY:
+        required: true
+      HEIMGEWEBE_AUTOBOT_TOKEN:
+        required: true
 
 permissions:
   contents: read
@@ -24,6 +31,8 @@ jobs:
       # true  (Standard): nur aktive Org-Mitglieder (plus Owner) dürfen Heimgewebe-Kommandos ausführen.
       # false: jeder, der kommentieren darf, kann Heimgewebe-Kommandos auslösen.
       REQUIRE_ORG_MEMBERSHIP: ${{ vars.HEIMGEWEBE_REQUIRE_ORG_MEMBERSHIP || 'true' }}
+      # PAT für das eigentliche Dispatch-Event
+      AUTOBOT_TOKEN: ${{ secrets.HEIMGEWEBE_AUTOBOT_TOKEN }}
 
     steps:
       - name: Create GitHub App token
@@ -37,63 +46,79 @@ jobs:
       - name: Parse and dispatch command
         uses: actions/github-script@v7
         with:
+          # Für Lesen/Kommentieren nutzen wir das App-Token
           github-token: ${{ steps.app-token.outputs.token }}
           script: |
-            const allowedRepos = (process.env.ALLOWED_TARGET_REPOS || '')
-              .split(',')
-              .map(s => s.trim())
-              .filter(Boolean);
-            const allowedCommands = (process.env.ALLOWED_COMMANDS || '')
-              .split(',')
-              .map(s => s.trim())
+            const allowedRepos = (process.env.ALLOWED_TARGET_REPOS || "")
+              .split(",")
+              .map((s) => s.trim())
               .filter(Boolean);
 
-            const comment = (context.payload.comment && context.payload.comment.body) || '';
-            const issue = context.payload.issue || context.payload.pull_request || {};
+            const allowedCommands = (process.env.ALLOWED_COMMANDS || "")
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean);
+
+            const comment =
+              (context.payload.comment && context.payload.comment.body) || "";
+            const issue =
+              context.payload.issue || context.payload.pull_request || {};
             const repoFull = context.repo; // { owner, repo }
-            const author = context.payload.comment && context.payload.comment.user && context.payload.comment.user.login;
+            const author =
+              context.payload.comment &&
+              context.payload.comment.user &&
+              context.payload.comment.user.login;
+
             const requireOrgMembership =
-              (process.env.REQUIRE_ORG_MEMBERSHIP || 'true').toLowerCase() === 'true';
+              (process.env.REQUIRE_ORG_MEMBERSHIP || "true")
+                .toLowerCase()
+                === "true";
 
-            core.info(`User allowed via author_association = ${context.payload.comment && context.payload.comment.author_association}`);
+            const assoc =
+              (context.payload.comment &&
+                context.payload.comment.author_association) ||
+              "UNKNOWN";
 
-            core.info(`Heimgewebe dispatch invoked for ${repoFull.owner}/${repoFull.repo}#${issue.number || 'n/a'} by ${author || 'unknown'}`);
-
-            // Debug: rohen Kommentar einmal ins Log schreiben, um Parsing-Probleme zu sehen
+            core.info(
+              `Heimgewebe dispatch invoked for ${repoFull.owner}/${repoFull.repo}#${issue.number || "n/a"} by ${author || "unknown"}`
+            );
+            core.info(`author_association = ${assoc}`);
             core.info(`Raw comment body: ${JSON.stringify(comment)}`);
 
             if (!comment) {
-              core.info('No comment body – abort.');
+              core.info("No comment body – abort.");
               return;
             }
 
             // Muster: @heimgewebe/<zielrepo> /<kommando> [arg...]
-            // Robustere Variante:
-            // - erlaubt Klein-/Großschreibung
-            // - erlaubt Punkte und Minus im Repo- und Kommandonamen
-            // - frisst alle weiteren Zeichen (inkl. Zeilenumbrüche) als Args
-            const pattern = /@heimgewebe\/([a-z0-9_.-]+)\s+\/([a-z0-9_.-]+)\b([\s\S]*)/i;
+            const pattern =
+              /@heimgewebe\/([a-z0-9_.-]+)\s+\/([a-z0-9_.-]+)\b([\s\S]*)/i;
             const match = pattern.exec(comment);
 
             if (!match) {
-              core.info('No Heimgewebe command found in comment (pattern did not match).');
+              core.info(
+                "No Heimgewebe command found in comment (pattern did not match)."
+              );
               return;
             }
 
             const targetRepo = match[1];
             const command = match[2];
-            const rawArgs = (match[3] || '').trim();
+            const rawArgs = (match[3] || "").trim();
 
-            // Kommentar-Inhalt sanitisieren und kürzen (keine Zeilenumbrüche, max. 2048 Zeichen)
+            // Kommentar sanitisieren (eine Zeile, max. 2048 Zeichen)
             const maxCommentLen = 2048;
-            let sanitizedComment = comment.replace(/[\r\n]+/g, ' ');
+            let sanitizedComment = comment.replace(/[\r\n]+/g, " ");
             if (sanitizedComment.length > maxCommentLen) {
-              sanitizedComment = sanitizedComment.slice(0, maxCommentLen) + ' …(gekürzt)';
+              sanitizedComment =
+                sanitizedComment.slice(0, maxCommentLen) + " …(gekürzt)";
             }
 
             async function reply(body) {
               if (!issue.number) {
-                core.info('No issue / PR number found – cannot post reply.');
+                core.info(
+                  "No issue / PR number found – cannot post reply."
+                );
                 return;
               }
               await github.rest.issues.createComment({
@@ -108,7 +133,7 @@ jobs:
             if (!allowedRepos.includes(targetRepo)) {
               await reply(
                 `👋 Heimgewebe hat deinen Befehl erkannt, aber **${targetRepo}** ist kein erlaubtes Ziel-Repo.\n\n` +
-                `Erlaubte Repos: \`${allowedRepos.join(', ')}\`.`
+                  `Erlaubte Repos: \`${allowedRepos.join(", ")}\`.`
               );
               return;
             }
@@ -116,23 +141,25 @@ jobs:
             if (!allowedCommands.includes(command)) {
               await reply(
                 `👋 Heimgewebe hat deinen Befehl erkannt, aber das Kommando **${command}** ist hier nicht erlaubt.\n\n` +
-                `Erlaubte Kommandos: \`${allowedCommands.join(', ')}\`.`
+                  `Erlaubte Kommandos: \`${allowedCommands.join(", ")}\`.`
               );
               return;
             }
 
-            // Membership check via author_association (OWNER, MEMBER, CONTRIBUTOR, etc.)
-            const assoc = context.payload.comment.author_association;
-            const allowedRoles = ['OWNER', 'MEMBER'];
-
+            // Membership check nur über author_association (kein extra API-Call)
+            const allowedRoles = ["OWNER", "MEMBER"];
             if (requireOrgMembership) {
               if (!allowedRoles.includes(assoc)) {
-                await reply('🚫 Heimgewebe-Befehle können nur von aktiven Mitgliedern oder dem Owner ausgeführt werden.');
+                await reply(
+                  "🚫 Heimgewebe-Befehle können nur von aktiven Mitgliedern oder dem Owner ausgeführt werden."
+                );
                 return;
               }
               core.info(`User allowed via author_association = ${assoc}`);
             } else {
-              core.info(`Org membership check disabled via REQUIRE_ORG_MEMBERSHIP – allowing all commenters (assoc=${assoc}).`);
+              core.info(
+                `Org membership check disabled via REQUIRE_ORG_MEMBERSHIP – allowing all commenters (assoc=${assoc}).`
+              );
             }
 
             const payload = {
@@ -146,14 +173,29 @@ jobs:
               raw_comment: sanitizedComment,
             };
 
-            core.info(`Dispatching Heimgewebe command to ${targetRepo}: ${JSON.stringify(payload)}`);
+            core.info(
+              `Dispatching Heimgewebe command to ${targetRepo}: ${JSON.stringify(
+                payload
+              )}`
+            );
 
-            // Dispatch-Event per GitHub-App-Token auslösen
-            await github.rest.repos.createDispatchEvent({
+            const autobotToken = process.env.AUTOBOT_TOKEN;
+            if (!autobotToken) {
+              core.setFailed(
+                "AUTOBOT_TOKEN ist nicht gesetzt – kann kein Dispatch-Event auslösen."
+              );
+              return;
+            }
+
+            // Dispatch mit PAT (damit keine "Resource not accessible by integration"-Fehler auftreten)
+            await github.request("POST /repos/{owner}/{repo}/dispatches", {
               owner: repoFull.owner,
               repo: targetRepo,
-              event_type: 'heimgewebe-command',
+              event_type: "heimgewebe-command",
               client_payload: payload,
+              headers: {
+                authorization: `token ${autobotToken}`,
+              },
             });
 
             // Acknowledge beim Kommentar
@@ -163,7 +205,7 @@ jobs:
                   owner: repoFull.owner,
                   repo: repoFull.repo,
                   comment_id: context.payload.comment.id,
-                  content: 'eyes',
+                  content: "eyes",
                 });
               } catch (e) {
                 core.info(`Could not add reaction: ${e.message}`);
@@ -172,5 +214,7 @@ jobs:
 
             await reply(
               `✅ Heimgewebe-Befehl wurde an \`${targetRepo}\` gesendet.\n\n` +
-              `Kommando: \`${command}\`${rawArgs ? ' `' + rawArgs + '`' : ''}`
+                `Kommando: \`${command}\`${
+                  rawArgs ? " `" + rawArgs + "`" : ""
+                }`
             );
