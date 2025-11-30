@@ -11,7 +11,12 @@ max_concurrency = 16
 exclude_path = ["docs/canvas/"]
 github_token = "env:GITHUB_TOKEN"
 user_agent = "heimgewebe-linkcheck (+https://github.com/heimgewebe/metarepo)"
-exclude = ["http://localhost:*", "http://127.0.0.1:*", "https://img.shields.io/*"]
+exclude = [
+  "http://localhost:*",
+  "http://127.0.0.1:*",
+  "https://img.shields.io/*",
+  "https://archlinux.org/*"
+]
 
 # Optional: Domains lassen sich hier ausschließen, falls einzelne Ziele drosseln oder 429 liefern.
 # exclude = ["https://raw.githubusercontent.com/heimgewebe/.*/large-assets/.*"]
