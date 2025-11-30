@@ -67,6 +67,11 @@ jobs:
       - name: Check toolchain.versions.yml exists
         run: test -f toolchain.versions.yml || { echo "toolchain.versions.yml fehlt"; exit 1; }
 
+      - name: Setup Python for yq setup
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
       - uses: ./.github/actions/setup-yq
 
       - name: Read toolchain versions

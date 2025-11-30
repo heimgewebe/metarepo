@@ -43,8 +43,8 @@ just fleet.push-all
 ```
 
 ## Was passiert
-1. `gh repo clone` in ein Temp-Verzeichnis  
-2. Branch `feat/agents-and-contracts-wave-1` anlegen  
+1. `gh repo clone` in ein Temp-Verzeichnis
+2. Branch `feat/agents-and-contracts-wave-1` anlegen
 3. Kopieren:
    - `templates/agent-kit/**` → `<repo>/templates/agent-kit/**`
    - `contracts/agent.tool.schema.json` → `<repo>/contracts/agent.tool.schema.json`

@@ -14,7 +14,7 @@ Die Versionen für `yq`, `uv` und `rust` werden anhand von `toolchain.versions.y
    # oder
    cp .devcontainer/devcontainer-dind.json .devcontainer/devcontainer.json
    ```
-2. **(Optional) Versionen neu synchronisieren:**  
+2. **(Optional) Versionen neu synchronisieren:**
    Wenn sich `toolchain.versions.yml` ändert:
    ```bash
    bash .devcontainer/sync-from-toolchain.sh

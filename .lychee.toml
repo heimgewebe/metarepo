@@ -15,7 +15,8 @@ exclude = [
   "http://localhost:*",
   "http://127.0.0.1:*",
   "https://img.shields.io/*",
-  "https://archlinux.org/*"
+  "https://archlinux.org/*",
+  "https://www.gnu.org/software/emacs/manual/html_node/flymake/"
 ]
 
 # Optional: Domains lassen sich hier ausschließen, falls einzelne Ziele drosseln oder 429 liefern.

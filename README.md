@@ -119,7 +119,7 @@ metarepo/
 
 Dieses Projekt steht unter der [CC0 1.0 Universal](LICENSE) Public Domain Dedication.
 
-**Hinweis:** Der Ordner `actionlint` Binary und zugehörige Dokumentation (`LICENSE.txt`, einige `docs/*.md` Dateien) stammen vom [actionlint-Projekt](https://github.com/rhysd/actionlint) und sind unter der MIT-Lizenz (siehe `LICENSE.txt`) verfügbar. Diese werden als Tool in diesem Repository verwendet.
+**Hinweis:** Die actionlint-Dokumentation (`LICENSE.txt`, `man/actionlint.1`) stammt vom [actionlint-Projekt](https://github.com/rhysd/actionlint) und ist unter der MIT-Lizenz (siehe `LICENSE.txt`) verfügbar.
 
 ## Contributing
 
