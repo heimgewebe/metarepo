@@ -1,6 +1,6 @@
 # Metarepo – Heimgewebe Control Plane
 
-> **Zentraler Meta-Layer für die Heimgewebe-Fleet**  
+> **Zentraler Meta-Layer für die Heimgewebe-Fleet**
 > Spiegelt kanonische Templates (Workflows, Justfile, Docs, WGX-Profile) in Sub-Repos und zieht Verbesserungen zurück (dialektisches Lernen).
 
 [![CI Status](https://github.com/heimgewebe/metarepo/actions/workflows/ci.yml/badge.svg)](https://github.com/heimgewebe/metarepo/actions/workflows/ci.yml)
