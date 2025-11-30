@@ -78,8 +78,8 @@ runs:
         fi
 
         if command -v just >/dev/null 2>&1; then
-        just --version
+          just --version
         else
-        echo "Installation of just failed; please update CI step to a valid installer or vendor the action." >&2
-        exit 1
+          echo "Installation of just failed; please update CI step to a valid installer or vendor the action." >&2
+          exit 1
         fi
