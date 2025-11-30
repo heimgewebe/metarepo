@@ -26,8 +26,12 @@
 
 | Workflow | Beschreibung | Trigger | Status |
 |----------|--------------|---------|--------|
-| **docs-linkcheck.yml** | Link-Validierung mit lychee | Schedule (täglich 3:00), Manual | ✅ Aktiv |
-| **linkcheck.yml** | Alternativer Linkcheck | (siehe docs-linkcheck.yml) | ⚠️ Dupliziert? |
+| **docs-linkcheck.yml** | Link-Validierung mit lychee (scheduled) | Schedule (täglich 3:00), Manual | ✅ Aktiv |
+| **linkcheck.yml** | Link-Validierung mit lychee (CI, custom install) | Push (main), PR auf docs/README | ✅ Aktiv |
+
+**Hinweis:** Zwei Linkcheck-Workflows existieren mit unterschiedlichen Zwecken:
+- `linkcheck.yml` läuft bei jedem Push/PR und nutzt ein custom Install-Script
+- `docs-linkcheck.yml` läuft scheduled und nutzt die lychee-action direkt
 | **adr-lint.yml** | ADR-Dokumentations-Lint | Push/PR auf `docs/adrs/**` | ✅ Aktiv |
 | **render-diagrams.yml** | Diagram-Rendering (Mermaid, etc.) | Push/PR auf Diagram-Dateien | ✅ Aktiv |
 
@@ -95,7 +99,7 @@ graph TD
 ## Best Practices in den Workflows
 
 ### Sicherheit
-- ✅ Actions auf Tags/SHAs gepinnt (siehe [github-actions-pinning.md](policies/github-actions-pinning.md))
+- ✅ Actions auf Tags/SHAs gepinnt (siehe [github-actions-pinning.md](./policies/github-actions-pinning.md))
 - ✅ `permissions: contents: read` als Default
 - ✅ `persist-credentials: false` wo möglich
 - ✅ SHA-256 Checksummen für externe Downloads

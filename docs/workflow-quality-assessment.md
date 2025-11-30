@@ -113,7 +113,7 @@ Einige Code-Duplikationen zwischen Workflows:
 Während die einzelnen Workflows gut kommentiert sind, fehlt eine Gesamtübersicht.
 
 **Empfehlung:**
-- Workflow-Katalog erstellen (`docs/workflows.md`):
+- ✅ Workflow-Katalog erstellt (`docs/workflows.md`):
   ```markdown
   | Workflow | Zweck | Trigger | Abhängigkeiten |
   |----------|-------|---------|----------------|
