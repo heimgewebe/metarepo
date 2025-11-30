@@ -88,17 +88,31 @@ jobs:
               return;
             }
 
-            // Muster (fehlertolerant):
-            //   @heimgewebe/<zielrepo> /<kommando> [arg...]
-            //   @heimgewebe/<zielrepo> <kommando> [arg...]
-            // Der Slash vor dem Kommando ist also optional.
-            const pattern =
-              /@heimgewebe\/([a-z0-9_.-]+)\s+\/?([a-z0-9_.-]+)\b([\s\S]*)/i;
-            const match = pattern.exec(comment);
+            // ROBUSTER ERKENNER FÜR KOMMANDOS
+            // Erlaubt u. a.:
+            // @heimgewebe/sichter quick
+            // @heimgewebe/sichter    quick
+            // @heimgewebe/sichter /quick
+            // @heimgewebe/sichter
+            //     /quick extra
+            // @HEIMGEWEBE/SICHTER /QUICK
+            // @heimgewebe/sichter        / quick foo bar
+            //
+            // Strategie:
+            // 1. Finde @heimgewebe/<repo>
+            // 2. Dahinter beliebiger Whitespace
+            // 3. Dann entweder direkt "/" oder erst Whitespace und dann optional "/"
+            // 4. Dann das Kommando
+            // 5. Rest = Args
+
+            const tolerantPattern =
+              /@heimgewebe\/([a-z0-9_.-]+)\s*(?:\/\s*)?([a-z0-9_.-]+)\b([\s\S]*)/i;
+
+            const match = tolerantPattern.exec(comment || "");
 
             if (!match) {
               core.info(
-                "No Heimgewebe command found in comment (pattern did not match)."
+                "No Heimgewebe command found (tolerant pattern did not match)."
               );
               return;
             }
