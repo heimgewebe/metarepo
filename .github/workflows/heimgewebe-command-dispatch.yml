@@ -39,7 +39,6 @@ jobs:
         with:
           app-id: ${{ secrets.HEIMGEWEBE_APP_ID }}
           private-key: ${{ secrets.HEIMGEWEBE_APP_PRIVATE_KEY }}
-          # Org, auf der die App installiert ist
           owner: heimgewebe
 
       - name: Parse and dispatch command
@@ -58,30 +57,29 @@ jobs:
               .map((s) => s.trim())
               .filter(Boolean);
 
-            const comment =
-              (context.payload.comment && context.payload.comment.body) || "";
-            const issue =
-              context.payload.issue || context.payload.pull_request || {};
+            const comment = (context.payload.comment && context.payload.comment.body) || "";
+            const issue = context.payload.issue || context.payload.pull_request || {};
             const repoFull = context.repo; // { owner, repo }
-            const author =
-              context.payload.comment &&
-              context.payload.comment.user &&
-              context.payload.comment.user.login;
+            const author = context.payload.comment?.user?.login;
+            const authorType = context.payload.comment?.user?.type || "unknown";
 
             const requireOrgMembership =
-              (process.env.REQUIRE_ORG_MEMBERSHIP || "true")
-                .toLowerCase() === "true";
+              (process.env.REQUIRE_ORG_MEMBERSHIP || "true").toLowerCase() === "true";
 
             const assoc =
-              (context.payload.comment &&
-                context.payload.comment.author_association) ||
-              "UNKNOWN";
+              context.payload.comment?.author_association || "UNKNOWN";
 
             core.info(
               `Heimgewebe dispatch invoked for ${repoFull.owner}/${repoFull.repo}#${issue.number || "n/a"} by ${author || "unknown"}`
             );
-            core.info(`author_association = ${assoc}`);
+            core.info(`author_association = ${assoc}, author_type = ${authorType}`);
             core.info(`Raw comment body: ${JSON.stringify(comment)}`);
+
+            // Bot-Kommentare grundsätzlich ignorieren (Schutz vor Loops)
+            if (authorType === "Bot" || (author && author.endsWith("[bot]"))) {
+              core.info("Ignoring bot comment.");
+              return;
+            }
 
             if (!comment) {
               core.info("No comment body – abort.");
@@ -89,6 +87,7 @@ jobs:
             }
 
             // ROBUSTER ERKENNER FÜR KOMMANDOS
+            //
             // Erlaubt u. a.:
             // @heimgewebe/sichter quick
             // @heimgewebe/sichter    quick
@@ -101,19 +100,16 @@ jobs:
             // Strategie:
             // 1. Finde @heimgewebe/<repo>
             // 2. Dahinter beliebiger Whitespace
-            // 3. Dann entweder direkt "/" oder erst Whitespace und dann optional "/"
-            // 4. Dann das Kommando
+            // 3. Optional "/" vor dem Kommando
+            // 4. Kommando
             // 5. Rest = Args
-
             const tolerantPattern =
               /@heimgewebe\/([a-z0-9_.-]+)\s*(?:\/\s*)?([a-z0-9_.-]+)\b([\s\S]*)/i;
 
-            const match = tolerantPattern.exec(comment || "");
+            const match = tolerantPattern.exec(comment);
 
             if (!match) {
-              core.info(
-                "No Heimgewebe command found (tolerant pattern did not match)."
-              );
+              core.info("No Heimgewebe command found (tolerant pattern did not match).");
               return;
             }
 
@@ -125,15 +121,12 @@ jobs:
             const maxCommentLen = 2048;
             let sanitizedComment = comment.replace(/[\r\n]+/g, " ");
             if (sanitizedComment.length > maxCommentLen) {
-              sanitizedComment =
-                sanitizedComment.slice(0, maxCommentLen) + " …(gekürzt)";
+              sanitizedComment = sanitizedComment.slice(0, maxCommentLen) + " …(gekürzt)";
             }
 
             async function reply(body) {
               if (!issue.number) {
-                core.info(
-                  "No issue / PR number found – cannot post reply."
-                );
+                core.info("No issue / PR number found – cannot post reply.");
                 return;
               }
               await github.rest.issues.createComment({
@@ -148,7 +141,7 @@ jobs:
             if (!allowedRepos.includes(targetRepo)) {
               await reply(
                 `👋 Heimgewebe hat deinen Befehl erkannt, aber **${targetRepo}** ist kein erlaubtes Ziel-Repo.\n\n` +
-                  `Erlaubte Repos: \`${allowedRepos.join(", ")}\`.`
+                `Erlaubte Repos: \`${allowedRepos.join(", ")}\`.`
               );
               return;
             }
@@ -156,7 +149,7 @@ jobs:
             if (!allowedCommands.includes(command)) {
               await reply(
                 `👋 Heimgewebe hat deinen Befehl erkannt, aber das Kommando **${command}** ist hier nicht erlaubt.\n\n` +
-                  `Erlaubte Kommandos: \`${allowedCommands.join(", ")}\`.`
+                `Erlaubte Kommandos: \`${allowedCommands.join(", ")}\`.`
               );
               return;
             }
@@ -189,12 +182,9 @@ jobs:
             };
 
             core.info(
-              `Dispatching Heimgewebe command to ${targetRepo}: ${JSON.stringify(
-                payload
-              )}`
+              `Dispatching Heimgewebe command to ${targetRepo}: ${JSON.stringify(payload)}`
             );
 
-            // Dispatch als GitHub-App (kein PAT, keine eigenen Header)
             await github.request("POST /repos/{owner}/{repo}/dispatches", {
               owner: "heimgewebe",
               repo: targetRepo,
@@ -203,7 +193,7 @@ jobs:
             });
 
             // Acknowledge beim Kommentar
-            if (context.payload.comment && context.payload.comment.id) {
+            if (context.payload.comment?.id) {
               try {
                 await github.rest.reactions.createForIssueComment({
                   owner: repoFull.owner,
@@ -218,7 +208,5 @@ jobs:
 
             await reply(
               `✅ Heimgewebe-Befehl wurde an \`${targetRepo}\` gesendet.\n\n` +
-                `Kommando: \`${command}\`${
-                  rawArgs ? " `" + rawArgs + "`" : ""
-                }`
+              `Kommando: \`${command}\`${rawArgs ? " `" + rawArgs + "`" : ""}`
             );
