@@ -99,7 +99,7 @@ graph TD
 ## Best Practices in den Workflows
 
 ### Sicherheit
-- ✅ Actions auf Tags/SHAs gepinnt (siehe [github-actions-pinning.md](./policies/github-actions-pinning.md))
+- ✅ Actions auf Tags/SHAs gepinnt (siehe [github-actions-pinning.md](policies/github-actions-pinning.md))
 - ✅ `permissions: contents: read` als Default
 - ✅ `persist-credentials: false` wo möglich
 - ✅ SHA-256 Checksummen für externe Downloads
@@ -124,7 +124,7 @@ graph TD
 
 ## Nächste Schritte
 
-Siehe [workflow-quality-assessment.md](workflow-quality-assessment.md) für:
+Siehe [workflow-quality-assessment.md](./workflow-quality-assessment.md) für:
 - Detaillierte Qualitätsbewertung
 - Verbesserungsvorschläge
 - Priorisierte Action Items

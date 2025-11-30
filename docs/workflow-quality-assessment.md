@@ -115,10 +115,10 @@ Während die einzelnen Workflows gut kommentiert sind, fehlt eine Gesamtübersic
 **Empfehlung:**
 - ✅ Workflow-Katalog erstellt (`docs/workflows.md`):
   ```markdown
-  | Workflow | Zweck | Trigger | Abhängigkeiten |
-  |----------|-------|---------|----------------|
-  | ci.yml   | Main CI | push, PR | Rust, Python, Node |
-  | ...      | ...     | ...     | ... |
+  | Workflow | Beschreibung | Trigger | Status |
+  |----------|--------------|---------|--------|
+  | ci.yml   | Haupt-CI-Pipeline: Rust, Python, Node.js Tests | Push (main), PR, Schedule | ✅ Aktiv |
+  | ...      | ...          | ...     | ...    |
   ```
 
 ### 5. Monitoring & Metriken
@@ -221,7 +221,7 @@ Es ist nicht ersichtlich, ob Code Coverage gemessen wird.
 ### Mittel 🟡
 1. [ ] `ci.yml` in spezialisierte Workflows aufteilen
 2. [ ] Zentrale composite actions für Tool-Setup erstellen
-3. [ ] Workflow-Katalog-Dokumentation erstellen
+3. [x] Workflow-Katalog-Dokumentation erstellen
 
 ### Niedrig 🟢
 1. [ ] YAML-Lint Warnings beheben (kosmetisch)
