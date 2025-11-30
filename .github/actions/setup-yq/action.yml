@@ -1,0 +1,86 @@
+name: 'Setup yq'
+description: 'Install yq using version from toolchain.versions.yml and verify checksum'
+runs:
+  using: 'composite'
+  steps:
+    - name: Load yq version pin
+      shell: bash
+      run: |
+        test -f toolchain.versions.yml || { echo "toolchain.versions.yml not found" >&2; exit 1; }
+        PYTHON_BIN=""
+        if command -v python3 >/dev/null; then
+          PYTHON_BIN=python3
+        elif command -v python >/dev/null; then
+          PYTHON_BIN=python
+        else
+          echo "Python interpreter required to parse toolchain.versions.yml" >&2
+          exit 1
+        fi
+
+        YQ_VER=""
+        if [[ -f .github/workflows/get-yq-version.py ]]; then
+          YQ_VER="$($PYTHON_BIN .github/workflows/get-yq-version.py)"
+        else
+          # Fallback to embedded Python script if the dedicated file is missing
+          YQ_VER=$($PYTHON_BIN - <<'EOF'
+        import pathlib
+        import re
+        import sys
+        try:
+            p = pathlib.Path("toolchain.versions.yml")
+            c = p.read_text(encoding="utf-8")
+            m = re.search(r"^yq:\s*['\"]?v?([^'\"#\n]+)['\"]?", c, re.M)
+            if m:
+                print(m.group(1).strip())
+            else:
+                sys.exit("yq version missing in toolchain.versions.yml")
+        except Exception as e:
+            print(f"Error parsing toolchain.versions.yml: {e}", file=sys.stderr)
+            sys.exit(1)
+        EOF
+        )
+        fi
+
+        test -n "${YQ_VER}" || { echo "Failed to resolve yq version" >&2; exit 1; }
+        echo "YQ_VERSION=${YQ_VER}" >> "$GITHUB_ENV"
+        echo "Resolved yq version ${YQ_VER}"
+
+    - name: Cache yq binary
+      uses: actions/cache@v4
+      with:
+        path: ~/.local/bin/yq
+        key: ${{ runner.os }}-yq-${{ hashFiles('toolchain.versions.yml') }}
+        restore-keys: |
+          ${{ runner.os }}-yq-
+          yq-
+
+    - name: Ensure yq is available
+      shell: bash
+      run: |
+        set -euo pipefail
+        # Add tools/bin to PATH (subsequent steps in this action and caller workflow)
+        echo "$PWD/tools/bin" >> "$GITHUB_PATH"
+        export PATH="$PWD/tools/bin:$PATH"
+
+        YQ_VER_TRIM="${YQ_VERSION#v}"
+
+        # Ensure scripts are executable
+        chmod +x scripts/tools/yq-pin.sh
+
+        # Pinned Version erzwingen (Download + Verifikation)
+        scripts/tools/yq-pin.sh ensure
+
+        # Final verification
+        if ! command -v yq >/dev/null; then
+          echo "yq installation failed: command not found after install attempt." >&2
+          exit 1
+        fi
+
+        YQ_VERSION_OUTPUT="$(yq --version)"
+        echo "${YQ_VERSION_OUTPUT}"
+        if ! echo "${YQ_VERSION_OUTPUT}" | grep -q "version v${YQ_VER_TRIM}"; then
+          echo "yq version check failed. Expected v${YQ_VER_TRIM}, got: ${YQ_VERSION_OUTPUT}" >&2
+          exit 1
+        fi
+
+        echo "✅ yq ${YQ_VER_TRIM} verified OK"

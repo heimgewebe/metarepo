@@ -14,7 +14,8 @@ jobs:
           failed=0
           while IFS= read -r -d '' f; do
             # erlaubt: @v*, @contracts-*, @metarepo-*, @
-            if grep -E 'uses:\s*[^@]+@main' -n "$f"; then
+            # Exception: heimgewebe-command-dispatch.yml@main is allowed (documented in docs/github-actions-pinning.md)
+            if grep -E 'uses:\s*[^@]+@main' -n "$f" | grep -v 'heimgewebe-command-dispatch.yml@main'; then
               echo "::error file=$f::Found @main reference – pin Actions by tag or SHA."
               failed=1
             fi
