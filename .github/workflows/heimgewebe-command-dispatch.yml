@@ -55,6 +55,8 @@ jobs:
             const requireOrgMembership =
               (process.env.REQUIRE_ORG_MEMBERSHIP || 'true').toLowerCase() === 'true';
 
+            core.info(`User allowed via author_association = ${context.payload.comment && context.payload.comment.author_association}`);
+
             core.info(`Heimgewebe dispatch invoked for ${repoFull.owner}/${repoFull.repo}#${issue.number || 'n/a'} by ${author || 'unknown'}`);
 
             // Debug: rohen Kommentar einmal ins Log schreiben, um Parsing-Probleme zu sehen
