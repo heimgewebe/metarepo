@@ -150,3 +150,13 @@ Ein klar getrenntes, lokal-erstes System:
 
 - **semantAH** liefert Sinn, **hausKI** entscheidet & behält Gedächtnis, **heimlern** verbessert Entscheidungen, **wgx** handelt, **chronik** persistiert, **leitstand** erklärt, **aussensensor/weltgewebe** verknüpfen die Außenwelt.
 - **Sync:** Dateien & Code live, **State nie**, **Events immer** – so bleibt alles robust, erklärbar und erweiterbar.
+
+---
+
+## Siehe auch
+
+- [Architecture](./architecture.md) – Systemarchitektur im Detail
+- [Vision](./vision.md) – Leitlinien und Roadmap
+- [System Overview](./system-overview.md) – Kurzübersicht
+- [Repo Matrix](./repo-matrix.md) – Repository-Rollen und Status
+- [Contracts](./contracts.md) – Schema-Übersicht
