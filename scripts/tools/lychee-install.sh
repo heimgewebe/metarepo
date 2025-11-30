@@ -12,8 +12,19 @@ if command -v lychee >/dev/null 2>&1; then
 	exit 0
 fi
 
+# Use GITHUB_TOKEN if available to avoid rate limits
+: "${GITHUB_TOKEN:=}"
+AUTH_HEADER=""
+if [[ -n "${GITHUB_TOKEN}" ]]; then
+	AUTH_HEADER="Authorization: token ${GITHUB_TOKEN}"
+fi
+
 echo "Fetching latest lychee release from GitHub API"
-RELEASE_INFO=$(curl -sSf "https://api.github.com/repos/lycheeverse/lychee/releases/latest")
+if [[ -n "${AUTH_HEADER}" ]]; then
+	RELEASE_INFO=$(curl -sSf -H "${AUTH_HEADER}" "https://api.github.com/repos/lycheeverse/lychee/releases/latest")
+else
+	RELEASE_INFO=$(curl -sSf "https://api.github.com/repos/lycheeverse/lychee/releases/latest")
+fi
 URL=$(echo "$RELEASE_INFO" | jq -r '.assets[] | select(.name | endswith("x86_64-unknown-linux-gnu.tar.gz")) | .browser_download_url')
 
 if [[ -z "$URL" ]]; then
