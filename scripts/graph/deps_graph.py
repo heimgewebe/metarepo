@@ -116,7 +116,7 @@ def iter_dependency_files(repo: Repo) -> Iterator[Path]:
     assert repo_path is not None
     for root, _, files in os.walk(repo_path):
         for filename in files:
-            if filename in patterns or filename.startswith("requirements") and filename.endswith(".txt"):
+            if filename in patterns or (filename.startswith("requirements") and filename.endswith(".txt")):
                 yield Path(root) / filename
 
 
