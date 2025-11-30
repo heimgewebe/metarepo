@@ -108,22 +108,6 @@ metarepo/
 └── Justfile             # Haupt-Kommandos
 ```
 
-## MCP / Copilot Integration
-
-Dieses Repository enthält einen lokalen MCP-Server unter `servers/local-mcp/`, der von GitHub Copilot (Agent Mode) genutzt werden kann.
-
-### Schnellstart
-
-```bash
-# 1. MCP-Abhängigkeiten installieren
-tools/mcp-local-setup.sh
-
-# 2. In Copilot Chat verwenden
-# "Nutze das Tool wgx_guard, prüfe dieses Repo und erkläre mir alle Fehler verständlich."
-```
-
-Details: Siehe Abschnitt "MCP / Copilot Integration" in der originalen README (bei Bedarf behalten).
-
 ## Lizenz
 
 Dieses Projekt steht unter der [CC0 1.0 Universal](LICENSE) Public Domain Dedication.
