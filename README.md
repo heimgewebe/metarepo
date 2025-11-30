@@ -1,151 +1,138 @@
-actionlint
-==========
-[![CI Status][ci-badge]][ci]
-[![API Document][apidoc-badge]][apidoc]
+# Metarepo – Heimgewebe Control Plane
 
-[actionlint][repo] is a static checker for GitHub Actions workflow files. [Try it online!][playground]
+> **Zentraler Meta-Layer für die Heimgewebe-Fleet**
+> Spiegelt kanonische Templates (Workflows, Justfile, Docs, WGX-Profile) in Sub-Repos und zieht Verbesserungen zurück (dialektisches Lernen).
 
-Features:
+[![CI Status](https://github.com/heimgewebe/metarepo/actions/workflows/ci.yml/badge.svg)](https://github.com/heimgewebe/metarepo/actions/workflows/ci.yml)
 
-- **Syntax check for workflow files** to check unexpected or missing keys following [workflow syntax][syntax-doc]
-- **Strong type check for `${{ }}` expressions** to catch several semantic errors like access to not existing property,
-  type mismatches, ...
-- **Actions usage check** to check that inputs at `with:` and outputs in `steps.{id}.outputs` are correct
-- **Reusable workflow check** to check inputs/outputs/secrets of reusable workflows and workflow calls
-- **[shellcheck][] and [pyflakes][] integrations** for scripts at `run:`
-- **Security checks**; [script injection][script-injection-doc] by untrusted inputs, hard-coded credentials
-- **Other several useful checks**; [glob syntax][filter-pattern-doc] validation, dependencies check for `needs:`,
-  runner label validation, cron syntax validation, ...
+## Überblick
 
-See the [full list][checks] of checks done by actionlint.
+Das **metarepo** ist die Quelle der Wahrheit für:
 
-<img src="https://github.com/rhysd/ss/blob/master/actionlint/main.gif?raw=true" alt="actionlint reports 7 errors" width="806" height="492"/>
+- **Templates** – Gemeinsame Workflows, Justfiles, Docs und WGX-Profile unter `templates/`
+- **Contracts** – JSON-Schemas und OpenAPI-Specs unter `contracts/`
+- **Reusable Workflows** – Wiederverwendbare CI-Pipelines unter `.github/workflows/reusable-*.yml`
+- **Fleet-Management** – Zentrale Konfiguration aller Heimgewebe-Repos in `repos.yml`
 
-**Example of broken workflow:**
+### Heimgewebe-Fleet
 
-```yaml
-on:
-  push:
-    branch: main
-    tags:
-      - 'v\d+'
-jobs:
-  test:
-    strategy:
-      matrix:
-        os: [macos-latest, linux-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - run: echo "Checking commit '${{ github.event.head_commit.message }}'"
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node_version: 18.x
-      - uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: ${{ matrix.platform }}-node-${{ hashFiles('**/package-lock.json') }}
-        if: ${{ github.repository.permissions.admin == true }}
-      - run: npm install && npm test
+Die Fleet umfasst folgende Core-Repos:
+- **weltgewebe** – Externe Events und Signale
+- **hausKI** – KI-Orchestrator (Rust, GPU, Offline)
+- **hauski-audio** – Audio-Pipeline und Telemetrie
+- **semantAH** – Wissensextraktion und Embeddings
+- **wgx** – Flottenmotor für Sync, Doctor, Metrics
+- **chronik** – Event-Ingest und Persistenz
+- **aussensensor** – Außen-Signalgeber
+- **heimlern** – Lern- und Policy-Engine
+- **tools** – Gemeinsame Utilities
+
+## Schnellstart
+
+### Installation
+
+```bash
+# 1. Dependencies installieren
+just deps          # oder: uv sync --frozen
+
+# 2. Tooling prüfen
+just validate      # Linting, Format-Checks, actionlint
 ```
 
-**actionlint reports 7 errors:**
+### Häufige Kommandos
 
-```
-test.yaml:3:5: unexpected key "branch" for "push" section. expected one of "branches", "branches-ignore", "paths", "paths-ignore", "tags", "tags-ignore", "types", "workflows" [syntax-check]
-  |
-3 |     branch: main
-  |     ^~~~~~~
-test.yaml:5:11: character '\' is invalid for branch and tag names. only special characters [, ?, +, *, \, ! can be escaped with \. see `man git-check-ref-format` for more details. note that regular expression is unavailable. note: filter pattern syntax is explained at https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#filter-pattern-cheat-sheet [glob]
-  |
-5 |       - 'v\d+'
-  |           ^~~~
-test.yaml:10:28: label "linux-latest" is unknown. available labels are "windows-latest", "windows-latest-8-cores", "windows-2025", "windows-2022", "windows-11-arm", "ubuntu-slim", "ubuntu-latest", "ubuntu-latest-4-cores", "ubuntu-latest-8-cores", "ubuntu-latest-16-cores", "ubuntu-24.04", "ubuntu-24.04-arm", "ubuntu-22.04", "ubuntu-22.04-arm", "macos-latest", "macos-latest-xl", "macos-latest-xlarge", "macos-latest-large", "macos-26-xlarge", "macos-26", "macos-15-intel", "macos-15-xlarge", "macos-15-large", "macos-15", "macos-14-xl", "macos-14-xlarge", "macos-14-large", "macos-14", "macos-13-xl", "macos-13-xlarge", "macos-13-large", "macos-13", "self-hosted", "x64", "arm", "arm64", "linux", "macos", "windows". if it is a custom label for self-hosted runner, set list of labels in actionlint.yaml config file [runner-label]
-   |
-10 |         os: [macos-latest, linux-latest]
-   |                            ^~~~~~~~~~~~~
-test.yaml:13:41: "github.event.head_commit.message" is potentially untrusted. avoid using it directly in inline scripts. instead, pass it through an environment variable. see https://docs.github.com/en/actions/reference/security/secure-use#good-practices-for-mitigating-script-injection-attacks for more details [expression]
-   |
-13 |       - run: echo "Checking commit '${{ github.event.head_commit.message }}'"
-   |                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-test.yaml:17:11: input "node_version" is not defined in action "actions/setup-node@v4". available inputs are "always-auth", "architecture", "cache", "cache-dependency-path", "check-latest", "node-version", "node-version-file", "registry-url", "scope", "token" [action]
-   |
-17 |           node_version: 18.x
-   |           ^~~~~~~~~~~~~
-test.yaml:21:20: property "platform" is not defined in object type {os: string} [expression]
-   |
-21 |           key: ${{ matrix.platform }}-node-${{ hashFiles('**/package-lock.json') }}
-   |                    ^~~~~~~~~~~~~~~
-test.yaml:22:17: receiver of object dereference "permissions" must be type of object but got "string" [expression]
-   |
-22 |         if: ${{ github.repository.permissions.admin == true }}
-   |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```bash
+# Fleet-Übersicht
+just list          # WGX-Liste aller Repos
+
+# Templates synchronisieren
+just up            # Templates an alle Repos verteilen
+just sync          # Manuelle Sync (siehe scripts/sync-templates.sh)
+
+# Validierung
+just validate      # Lokale Checks
+just smoke         # Schneller Integrationslauf
+
+# Drift-Analyse
+scripts/wgx-doctor --repo <repo>  # Drift-Report generieren
 ```
 
-## Quick start
+## Dokumentation
 
-Install `actionlint` command by downloading [the released binary][releases] or by Homebrew or by `go install`. See
-[the installation document][install] for more details like how to manage the command with several package managers
-or run via Docker container.
+- [**Architecture**](docs/architecture.md) – Systemübersicht und Schichten
+- [**Vision**](docs/vision.md) – Leitlinien und Roadmap
+- [**Contracts**](docs/contracts.md) – Schema-Versionierung und Validierung
+- [**Fleet Management**](docs/fleet.md) – Template-Sync und Push-Workflows
+- [**WGX Konzept**](docs/wgx-konzept.md) – Fleet-Motor und Kommandos
+- [**AGENTS.md**](AGENTS.md) – Leitfaden für KI-Agenten
 
-```sh
-go install github.com/rhysd/actionlint/cmd/actionlint@latest
+Vollständige Dokumentation: [`docs/`](docs/)
+
+## Entwicklung
+
+### Template-Synchronisation
+
+```bash
+# Template aus Sub-Repo lernen (Pull)
+./scripts/sync-templates.sh --pull-from weltgewebe --pattern "templates/docs/**"
+
+# Template in Sub-Repo pushen
+./scripts/sync-templates.sh --push-to hausKI --pattern "templates/.github/workflows/*.yml"
+
+# Drift-Check durchführen
+./scripts/wgx-doctor --repo wgx --patterns "templates/.github/workflows/*.yml,templates/Justfile"
 ```
 
-Basically all you need to do is run the `actionlint` command in your repository. actionlint automatically detects workflows and
-checks errors. actionlint focuses on finding out mistakes. It tries to catch errors as much as possible and make false positives
-as minimal as possible.
+### Beitragen
 
-```sh
-actionlint
+Siehe [CONTRIBUTING.md](CONTRIBUTING.md) für:
+- Setup und Grundprinzipien
+- Patch-Flow und Validierung
+- Pull Request Guidelines
+- Fleet-Push nach Merge
+
+## Projekt-Struktur
+
+```
+metarepo/
+├── templates/           # Kanonische Templates für Fleet
+│   ├── .github/workflows/
+│   ├── docs/
+│   ├── Justfile
+│   └── .wgx/profile.yml
+├── contracts/           # JSON-Schemas und OpenAPI-Specs
+├── scripts/             # Sync-, Drift- und Fleet-Tools
+├── docs/                # Projektdokumentation
+├── reports/             # Sync-Logs und Drift-Reports
+├── repos.yml            # Fleet-Konfiguration
+└── Justfile             # Haupt-Kommandos
 ```
 
-Another option to try actionlint is [the online playground][playground]. Your browser can run actionlint through WebAssembly.
+## MCP / Copilot Integration
 
-See [the usage document][usage] for more details.
+Dieses Repository enthält einen lokalen MCP-Server unter `servers/local-mcp/`, der von GitHub Copilot (Agent Mode) genutzt werden kann.
 
-## Documents
+### Schnellstart
 
-- [Checks][checks]: Full list of all checks done by actionlint with example inputs, outputs, and playground links.
-- [Installation][install]: Installation instructions. Prebuilt binaries, a Docker image, building from source, a download script
-  (for CI), supports by several package managers are available.
-- [Usage][usage]: How to use `actionlint` command locally or on GitHub Actions, the online playground, an official Docker image,
-  and integrations with reviewdog, Problem Matchers, super-linter, pre-commit, VS Code.
-- [Configuration][config]: How to configure actionlint behavior. Currently, the labels of self-hosted runners, the configuration
-  variables, and ignore patterns of errors for each file paths can be set.
-- [Go API][api]: How to use actionlint as Go library.
-- [References][refs]: Links to resources.
+```bash
+# 1. MCP-Abhängigkeiten installieren
+tools/mcp-local-setup.sh
 
-## Bug reporting
+# 2. In Copilot Chat verwenden
+# "Nutze das Tool wgx_guard, prüfe dieses Repo und erkläre mir alle Fehler verständlich."
+```
 
-When you see some bugs or false positives, it is helpful to [file a new issue][issue-form] with a minimal example
-of input. Giving me some feedbacks like feature requests or ideas of additional checks is also welcome.
+Details: Siehe Abschnitt "MCP / Copilot Integration" in der originalen README (bei Bedarf behalten).
 
-See the [contribution guide](./CONTRIBUTING.md) for more details.
+## Lizenz
 
-## License
+Dieses Projekt steht unter der [CC0 1.0 Universal](LICENSE) Public Domain Dedication.
 
-actionlint is distributed under [the MIT license](./LICENSE.txt).
+**Hinweis:** Der Ordner `actionlint` Binary und zugehörige Dokumentation (`LICENSE.txt`, einige `docs/*.md` Dateien) stammen vom [actionlint-Projekt](https://github.com/rhysd/actionlint) und sind unter der MIT-Lizenz (siehe `LICENSE.txt`) verfügbar. Diese werden als Tool in diesem Repository verwendet.
 
-[ci-badge]: https://github.com/rhysd/actionlint/actions/workflows/ci.yaml/badge.svg
-[ci]: https://github.com/rhysd/actionlint/actions/workflows/ci.yaml
-[apidoc-badge]: https://pkg.go.dev/badge/github.com/rhysd/actionlint.svg
-[apidoc]: https://pkg.go.dev/github.com/rhysd/actionlint
-[repo]: https://github.com/rhysd/actionlint
-[playground]: https://rhysd.github.io/actionlint/
-[shellcheck]: https://github.com/koalaman/shellcheck
-[pyflakes]: https://github.com/PyCQA/pyflakes
-[syntax-doc]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
-[filter-pattern-doc]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#filter-pattern-cheat-sheet
-[script-injection-doc]: https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-[releases]: https://github.com/rhysd/actionlint/releases
-[checks]: https://github.com/rhysd/actionlint/blob/v1.7.9/docs/checks.md
-[install]: https://github.com/rhysd/actionlint/blob/v1.7.9/docs/install.md
-[usage]: https://github.com/rhysd/actionlint/blob/v1.7.9/docs/usage.md
-[config]: https://github.com/rhysd/actionlint/blob/v1.7.9/docs/config.md
-[api]: https://github.com/rhysd/actionlint/blob/v1.7.9/docs/api.md
-[refs]: https://github.com/rhysd/actionlint/blob/v1.7.9/docs/reference.md
-[issue-form]: https://github.com/rhysd/actionlint/issues/new
+## Contributing
+
+Contributions sind willkommen! Bitte lies [CONTRIBUTING.md](CONTRIBUTING.md) für Details zum Entwicklungsprozess.
 
 ## MCP / Copilot Integration (heimgewebe-local)
 
