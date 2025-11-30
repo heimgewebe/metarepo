@@ -88,9 +88,12 @@ jobs:
               return;
             }
 
-            // Muster: @heimgewebe/<zielrepo> /<kommando> [arg...]
+            // Muster (fehlertolerant):
+            //   @heimgewebe/<zielrepo> /<kommando> [arg...]
+            //   @heimgewebe/<zielrepo> <kommando> [arg...]
+            // Der Slash vor dem Kommando ist also optional.
             const pattern =
-              /@heimgewebe\/([a-z0-9_.-]+)\s+\/([a-z0-9_.-]+)\b([\s\S]*)/i;
+              /@heimgewebe\/([a-z0-9_.-]+)\s+\/?([a-z0-9_.-]+)\b([\s\S]*)/i;
             const match = pattern.exec(comment);
 
             if (!match) {
