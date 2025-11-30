@@ -28,12 +28,12 @@
 |----------|--------------|---------|--------|
 | **docs-linkcheck.yml** | Link-Validierung mit lychee (scheduled) | Schedule (täglich 3:00), Manual | ✅ Aktiv |
 | **linkcheck.yml** | Link-Validierung mit lychee (CI, custom install) | Push (main), PR auf docs/README | ✅ Aktiv |
+| **adr-lint.yml** | ADR-Dokumentations-Lint | Push/PR auf `docs/adrs/**` | ✅ Aktiv |
+| **render-diagrams.yml** | Diagram-Rendering (Mermaid, etc.) | Push/PR auf Diagram-Dateien | ✅ Aktiv |
 
 **Hinweis:** Zwei Linkcheck-Workflows existieren mit unterschiedlichen Zwecken:
 - `linkcheck.yml` läuft bei jedem Push/PR und nutzt ein custom Install-Script
 - `docs-linkcheck.yml` läuft scheduled und nutzt die lychee-action direkt
-| **adr-lint.yml** | ADR-Dokumentations-Lint | Push/PR auf `docs/adrs/**` | ✅ Aktiv |
-| **render-diagrams.yml** | Diagram-Rendering (Mermaid, etc.) | Push/PR auf Diagram-Dateien | ✅ Aktiv |
 
 ### Metriken & Monitoring
 
