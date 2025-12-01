@@ -1,6 +1,8 @@
 name: adr-lint
+
 permissions:
   contents: read
+
 concurrency:
   group: adr-lint-${{ github.ref }}
   cancel-in-progress: true
@@ -11,50 +13,24 @@ defaults:
 
 on:
   pull_request:
-    paths: ['docs/adrs/**']
+    paths:
+      - 'docs/adrs/**'
   workflow_dispatch:
+
 jobs:
   lint:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v6
-      - name: Check filenames & headers
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Run ADR lint script
         run: |
-          fail=0
-          shopt -s nullglob
-          for f in docs/adrs/[0-9][0-9][0-9]-*.md; do
-            bn=$(basename "$f")
-            head -n 1 "$f" | grep -q "^# ADR-" || { echo "::error Missing H1 ADR header in $bn"; fail=1; }
-          done
-          exit $fail
-      - name: Stale proposed ADRs (>7d)
-        run: |
-          set -e
-          fail=0
-          now_ts=$(date +%s)
-          while IFS= read -r -d '' f; do
-            bn=$(basename "$f")
-            if [ "$bn" = "000-template.md" ]; then
-              continue
-            fi
-            stat=$(grep -m1 '^Status:' "$f" | awk '{print tolower($2)}')
-            date=$(grep -m1 '^Datum:' "$f" | awk '{print $2}')
-            if [ "$stat" = "proposed" ]; then
-              if ! [[ "$date" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
-                echo "::error file=$bn::Invalid or missing Datum '$date' (expected YYYY-MM-DD)"
-                fail=1
-                continue
-              fi
-              if ! build_ts=$(date -d "$date" +%s); then
-                echo "::error file=$bn::Unable to parse Datum '$date'"
-                fail=1
-                continue
-              fi
-              days=$(( ( now_ts - build_ts ) / 86400 ))
-              if [ $days -gt 7 ]; then
-                echo "::warning ::ADR $bn is Proposed for $days days"
-              fi
-            fi
-          done < <(find docs/adrs -maxdepth 1 -name '*.md' -print0)
-          exit $fail
+          if [ -x tools/adr-lint.sh ]; then
+            tools/adr-lint.sh
+          else
+            echo "::error::tools/adr-lint.sh not found or not executable."
+            echo "hint: lokal 'just adr-lint' ausprobieren und sicherstellen, dass tools/adr-lint.sh vorhanden und ausführbar ist." >&2
+            exit 1
+          fi

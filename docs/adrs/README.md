@@ -14,3 +14,20 @@ Kurzer Index der akzeptierten Entscheidungen:
 - [.wgx/profile.yml v1 – Minimal-Schema](./004-wgx-profile-v1.md)
 - [Evidence-Packs & Link-Health](./005-evidence-linkhealth.md)
 - [ADR-Template](./000-template.md)
+
+## CI-Linting für ADRs
+
+Die ADR-Dateien werden automatisiert in CI geprüft:
+
+- Dateinamen: `docs/adrs/NNN-title.md` oder `docs/adrs/NNNN-title.md` mit führenden Nullen.
+- Erste Zeile: `# ADR-<NUM> <Title>`; die Nummer im Header muss mit der Nummer im Dateinamen übereinstimmen.
+- Metadaten:
+  - `Datum: YYYY-MM-DD`
+  - `Status: Proposed | Accepted | Superseded` (weitere Status sind erlaubt, erzeugen aktuell aber nur Warnungen).
+- Stale-Check: ADRs mit `Status: Proposed`, deren `Datum` mehr als 7 Tage zurückliegt, werden in CI als „bitte entscheiden“ markiert (Warning).
+
+Lokal kannst du dieselben Prüfungen ausführen mit:
+
+```bash
+just adr-lint
+```
