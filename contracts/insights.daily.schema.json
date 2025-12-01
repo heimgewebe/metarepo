@@ -14,10 +14,11 @@
         "type": "array",
         "minItems": 2,
         "maxItems": 2,
-        "items": [
+        "prefixItems": [
           { "type": "string" },
           { "type": "number", "minimum": 0, "maximum": 1 }
-        ]
+        ],
+        "items": false
       }
     },
     "questions": { "type": "array", "items": { "type": "string" } },
