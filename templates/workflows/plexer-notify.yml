@@ -1,0 +1,73 @@
+name: Notify Plexer
+
+on:
+  workflow_call:
+    inputs:
+      event_type:
+        description: "Logical event type, e.g. ci.result"
+        required: true
+        type: string
+      status:
+        description: "Optional status field for payload"
+        required: false
+        type: string
+      plexer_url:
+        description: "Base URL of Plexer (e.g. https://plexer.local)"
+        required: true
+        type: string
+    secrets:
+      PLEXER_TOKEN:
+        required: false
+
+jobs:
+  notify-plexer:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Build event payload
+        id: build
+        run: |
+          ts="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+          cat > event.json <<'JSON'
+          {
+            "type": "${{ inputs.event_type }}",
+            "source": "${{ github.repository }}",
+            "timestamp": "__TS__",
+            "payload": {
+              "status": "${{ inputs.status || '' }}",
+              "workflow": "${{ github.workflow }}",
+              "run_id": "${{ github.run_id }}",
+              "run_attempt": "${{ github.run_attempt }}",
+              "ref": "${{ github.ref }}",
+              "sha": "${{ github.sha }}"
+            }
+          }
+          JSON
+          # simple timestamp replace
+          sed -i "s/__TS__/${ts}/" event.json
+          echo "payload=$(cat event.json)" >> "$GITHUB_OUTPUT"
+
+      - name: POST to Plexer
+        env:
+          PLEXER_URL: ${{ inputs.plexer_url }}
+          PLEXER_TOKEN: ${{ secrets.PLEXER_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${PLEXER_URL:-}" ]; then
+            echo "PLEXER_URL is required"
+            exit 1
+          fi
+
+          header_auth=""
+          if [ -n "${PLEXER_TOKEN:-}" ]; then
+            header_auth="-H \"Authorization: Bearer ${PLEXER_TOKEN}\""
+          fi
+
+          # shellcheck disable=SC2086
+          curl -sS -X POST \
+            -H "Content-Type: application/json" \
+            ${header_auth} \
+            "${PLEXER_URL%/}/events" \
+            -d @"event.json"
