@@ -1,7 +1,7 @@
-# ADR-0021: Scope & Boundaries of Plexer in the Heimgewebe Organism
+# ADR-0021 Scope & Boundaries of Plexer in the Heimgewebe Organism
 
-## Status
-Accepted – 2025-12-01
+Status: Accepted
+Datum: 2025-12-01
 
 ## Context
 The Heimgewebe ecosystem introduces **Plexer** as the Event Router (Ereignisnetz)
