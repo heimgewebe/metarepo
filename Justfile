@@ -76,6 +76,14 @@ wgx_validate:
 smoke:
     just _wgx smoke
 
+adr-lint:
+    @if [ -x tools/adr-lint.sh ]; then \
+      tools/adr-lint.sh; \
+    else \
+      echo "hint: tools/adr-lint.sh fehlt – bitte metarepo-Templates/Scripts aktualisieren." >&2; \
+      exit 1; \
+    fi
+
 sync:
     scripts/sync-templates.sh
 
