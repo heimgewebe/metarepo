@@ -41,7 +41,7 @@ for f in docs/adrs/[0-9]*-*.md; do
 
   # Status prüfen (Governance: Proposed → Accepted → Superseded; andere Werte = Warning)
   status_raw="$(grep -m1 '^Status:' "$f" | awk '{print $2}' || true)"
-  status="$(printf '%s' "${status_raw:-}" | tr 'A-Z' 'a-z')"
+  status="$(printf '%s' "${status_raw:-}" | tr '[:upper:]' '[:lower:]')"
 
   if [[ -z "${status:-}" ]]; then
     echo "::error file=$bn::Missing 'Status:' line"
@@ -66,7 +66,7 @@ for f in docs/adrs/[0-9]*-*.md; do
   fi
 
   status_raw="$(grep -m1 '^Status:' "$f" | awk '{print $2}' || true)"
-  status="$(printf '%s' "${status_raw:-}" | tr 'A-Z' 'a-z')"
+  status="$(printf '%s' "${status_raw:-}" | tr '[:upper:]' '[:lower:]')"
   date_str="$(grep -m1 '^Datum:' "$f" | awk '{print $2}' || true)"
 
   if [[ "$status" == "proposed" ]]; then
