@@ -202,6 +202,23 @@ def test_metadata_extraction() -> None:
     assert "metadata" in chunk and chunk["metadata"] == {"lang": "de", "ver": 1}
 
 
+def test_columnar_mapping_is_coerced_to_rows() -> None:
+    columnar = {
+        "doc_id": ["a", "b"],
+        "text": ["hello", "world"],
+        "embedding": [[0.1], [0.2]],
+    }
+
+    batches = list(to_batches(columnar, default_namespace="ns-default"))
+
+    assert [batch["doc_id"] for batch in batches] == ["a", "b"]
+    assert all(batch["namespace"] == "ns-default" for batch in batches)
+    assert [chunk["text"] for batch in batches for chunk in batch["chunks"]] == [
+        "hello",
+        "world",
+    ]
+
+
 @pytest.mark.parametrize(
     "value",
     [None, math.nan],

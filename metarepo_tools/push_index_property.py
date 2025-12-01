@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+import math
 from collections import OrderedDict
 from collections.abc import Iterable, Iterator, Mapping, Sequence
-import math
 from typing import Any, Dict, List
 
 __all__ = ["to_batches"]
@@ -47,7 +47,10 @@ def to_batches(frame: Any, *, default_namespace: str) -> Iterator[Dict[str, Any]
 
 def _coerce_records(frame: Any) -> Iterator[Dict[str, Any]]:
     if isinstance(frame, Mapping):
-        yield dict(frame)
+        if _looks_like_columnar_mapping(frame):
+            yield from _from_columnar_mapping(frame)
+        else:
+            yield dict(frame)
         return
 
     if hasattr(frame, "to_dict"):
@@ -130,13 +133,22 @@ def _is_nan(value: Any) -> bool:
         return False
 
 
+def _looks_like_columnar_mapping(data: Mapping[str, Any]) -> bool:
+    sequence_values = [value for value in data.values() if _is_sequence_like(value)]
+    return len(sequence_values) > 1 and len(sequence_values) == len(data)
+
+
+def _is_sequence_like(value: Any) -> bool:
+    return isinstance(value, Sequence) and not isinstance(value, (str, bytes, bytearray))
+
+
 def _from_columnar_mapping(data: Mapping[str, Any]) -> Iterator[Dict[str, Any]]:
     columns: List[str] = list(data.keys())
     normalised: List[List[Any]] = []
     max_len = 0
     for key in columns:
         value = data[key]
-        if isinstance(value, Sequence) and not isinstance(value, (str, bytes, bytearray)):
+        if _is_sequence_like(value):
             values_list = list(value)
         else:
             values_list = [value]
