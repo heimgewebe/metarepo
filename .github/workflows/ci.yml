@@ -76,6 +76,7 @@ jobs:
 
       - name: Read toolchain versions
         run: |
+          echo "${{ github.workspace }}/tools/bin" >> "$GITHUB_PATH"
           test -f toolchain.versions.yml || { echo "toolchain.versions.yml not found"; exit 1; }
           RUST=$(yq -r '.rust' toolchain.versions.yml)
           test -n "${RUST}" || { echo "rust version missing in toolchain.versions.yml"; exit 1; }
@@ -89,7 +90,13 @@ jobs:
           JUST=$(yq -r '.just' toolchain.versions.yml)
           test -n "${JUST}" || { echo "just version missing in toolchain.versions.yml"; exit 1; }
           echo "JUST_VERSION=${JUST}" >> "$GITHUB_ENV"
-          echo "Detected toolchain versions: Rust=${RUST}, Python=${PY}, uv=${UV}, yq=${YQ_VERSION}, just=${JUST}"
+          SCCACHE=$(yq -r '.sccache' toolchain.versions.yml)
+          test -n "${SCCACHE}" || { echo "sccache version missing in toolchain.versions.yml"; exit 1; }
+          echo "SCCACHE_VERSION=${SCCACHE}" >> "$GITHUB_ENV"
+          ACTIONLINT=$(yq -r '.actionlint' toolchain.versions.yml)
+          test -n "${ACTIONLINT}" || { echo "actionlint version missing in toolchain.versions.yml"; exit 1; }
+          echo "ACTIONLINT_VERSION=${ACTIONLINT}" >> "$GITHUB_ENV"
+          echo "Detected toolchain versions: Rust=${RUST}, Python=${PY}, uv=${UV}, yq=${YQ_VERSION}, just=${JUST}, sccache=${SCCACHE}, actionlint=${ACTIONLINT}"
 
       - name: Setup Rust
         if: ${{ hashFiles('**/Cargo.toml') != '' }}
@@ -104,43 +111,8 @@ jobs:
       - name: Install sccache
         if: ${{ hashFiles('**/Cargo.toml') != '' }}
         run: |
-          SCCACHE_VERSION="v0.12.0"
-          BIN_DIR="$HOME/.local/bin"
-          mkdir -p "$BIN_DIR"
-          case "${RUNNER_OS}" in
-            Linux)
-              ARCH=$(uname -m)
-              case "$ARCH" in
-                x86_64) TARGET="x86_64-unknown-linux-gnu" ;;
-                aarch64) TARGET="aarch64-unknown-linux-gnu" ;;
-                *) echo "Unsupported Linux architecture for sccache: $ARCH" >&2; exit 1 ;;
-              esac
-              URL="https://github.com/mozilla/sccache/releases/download/${SCCACHE_VERSION}/sccache-${SCCACHE_VERSION}-${TARGET}.tar.gz"
-              curl -LsSf "$URL" |
-                tar -xz --strip-components=1 -C "$BIN_DIR" "sccache-${SCCACHE_VERSION}-${TARGET}/sccache"
-              ;;
-            macOS)
-              if ! command -v xz >/dev/null; then
-                echo "Installing xz to support sccache archive extraction"
-                brew install xz
-              fi
-              ARCH=$(uname -m)
-              case "$ARCH" in
-                x86_64) TARGET="x86_64-apple-darwin" ;;
-                arm64|aarch64) TARGET="aarch64-apple-darwin" ;;
-                *) echo "Unsupported macOS architecture for sccache: $ARCH" >&2; exit 1 ;;
-              esac
-              URL="https://github.com/mozilla/sccache/releases/download/${SCCACHE_VERSION}/sccache-${SCCACHE_VERSION}-${TARGET}.tar.gz"
-              curl -LsSf "$URL" |
-                tar -xz --strip-components=1 -C "$BIN_DIR" "sccache-${SCCACHE_VERSION}-${TARGET}/sccache"
-              ;;
-            *)
-              echo "Unsupported runner OS for sccache: ${RUNNER_OS}" >&2
-              exit 1
-              ;;
-          esac
-          chmod +x "$BIN_DIR/sccache"
-          echo "$BIN_DIR" >> "$GITHUB_PATH"
+          chmod +x scripts/tools/sccache-pin.sh
+          scripts/tools/sccache-pin.sh ensure
           sccache --version
 
       - name: Configure sccache
@@ -361,66 +333,8 @@ jobs:
 
       - name: Install actionlint CLI
         run: |
-          set -euo pipefail
-          mkdir -p "$HOME/.local/bin"
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-          ACTIONLINT_VERSION="1.7.9"
-          ARCH=$(uname -m)
-          case "${RUNNER_OS}" in
-            Linux)
-              case "$ARCH" in
-                x86_64)
-                  ARCH_TAG="amd64"
-                  EXPECTED_SHA="233b280d05e100837f4af1433c7b40a5dcb306e3aa68fb4f17f8a7f45a7df7b4"
-                  ;;
-                aarch64)
-                  ARCH_TAG="arm64"
-                  EXPECTED_SHA="6b82a3b8c808bf1bcd39a95aced22fc1a026eef08ede410f81e274af8deadbbc"
-                  ;;
-                *) echo "Unsupported arch: $ARCH"; exit 1 ;;
-              esac
-              URL="https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_${ARCH_TAG}.tar.gz"
-              ;;
-            macOS)
-              case "$ARCH" in
-                x86_64)
-                  ARCH_TAG="amd64"
-                  EXPECTED_SHA="f89a910e90e536f60df7c504160247db01dd67cab6f08c064c1c397b76c91a79"
-                  ;;
-                arm64)
-                  ARCH_TAG="arm64"
-                  EXPECTED_SHA="855e49e823fc68c6371fd6967e359cde11912d8d44fed343283c8e6e943bd789"
-                  ;;
-                *) echo "Unsupported arch: $ARCH"; exit 1 ;;
-              esac
-              URL="https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_darwin_${ARCH_TAG}.tar.gz"
-              ;;
-            *)
-              echo "Unsupported OS: ${RUNNER_OS}"
-              exit 1
-              ;;
-          esac
-          TMP_TARBALL="$(mktemp)"
-          curl -fsSL "$URL" -o "$TMP_TARBALL" || { echo "Failed to download actionlint"; exit 1; }
-          if command -v sha256sum >/dev/null 2>&1; then
-            ACTUAL_SHA="$(sha256sum "$TMP_TARBALL" | awk '{print $1}')"
-          elif command -v shasum >/dev/null 2>&1; then
-            ACTUAL_SHA="$(shasum -a 256 "$TMP_TARBALL" | awk '{print $1}')"
-          else
-            echo "No sha256sum or shasum command found for checksum verification." >&2
-            exit 1
-          fi
-          if [[ "$ACTUAL_SHA" != "$EXPECTED_SHA" ]]; then
-            echo "SHA256 checksum mismatch for actionlint!" >&2
-            echo "Expected: $EXPECTED_SHA" >&2
-            echo "Actual:   $ACTUAL_SHA" >&2
-            rm -f "$TMP_TARBALL"
-            exit 1
-          fi
-          echo "SHA256 checksum verified: $ACTUAL_SHA"
-          tar -xzf "$TMP_TARBALL" -C "$HOME/.local/bin" actionlint
-          rm -f "$TMP_TARBALL"
-          chmod +x "$HOME/.local/bin/actionlint"
+          chmod +x scripts/tools/actionlint-pin.sh
+          scripts/tools/actionlint-pin.sh ensure
           actionlint -version
 
       - name: Validate project
