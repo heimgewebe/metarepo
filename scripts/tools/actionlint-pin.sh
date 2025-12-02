@@ -20,7 +20,7 @@ have_cmd() { command -v "$1" >/dev/null 2>&1; }
 
 read_pinned_version() {
 	local version
-	version=$(grep -E "^\s*${TOOLCHAIN_KEY}:" "${ROOT_DIR}/toolchain.versions.yml" | sed -E "s/^\s*${TOOLCHAIN_KEY}:\s*[\"'\'']?([^\"'\'']+)[\"'\'']?/\1/" | xargs)
+	version=$(grep -E "^\s*${TOOLCHAIN_KEY}:" "${ROOT_DIR}/toolchain.versions.yml" | sed -E 's/^\s*[^:]+:\s*"?([^"]+)"?/\1/' | tr -d "'" | xargs)
 	if [[ -z "${version}" ]]; then
 		die "Konnte gewünschte Version für ${TOOLCHAIN_KEY} nicht ermitteln."
 	fi
