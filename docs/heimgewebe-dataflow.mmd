@@ -44,8 +44,8 @@ flowchart LR
     AUS -->|feed.jsonl → HTTP /ingest/aussen| CHRONIK
 
     HKI -->|/v1/policy/decide| HLM
-    HLM -->|{action,score,why}| HKI
-    HKI -->|/v1/policy/feedback {reward}| HLM
+    HLM -->|action, score, why| HKI
+    HKI -->|/v1/policy/feedback reward| HLM
 
     HKI -->|events JSONL| CHRONIK
 ```
