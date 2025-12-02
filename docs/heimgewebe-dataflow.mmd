@@ -2,20 +2,20 @@
 %%{init: {'theme':'neutral'}}%%
 flowchart LR
     subgraph Producer
-      SEM[semantAH<br>insights/today.json]
-      WGX[wgx<br>metrics.json (Snapshot)]
-      AUD[hausKI-audio<br>audio.session_*,<br>audio.latency_ms]
-      AUS[aussensensor<br>export/feed.jsonl]
+      SEM["semantAH<br/>insights/today.json"]
+      WGX["wgx<br/>metrics.json (Snapshot)"]
+      AUD["hausKI-audio<br/>audio.session_*,<br/>audio.latency_ms"]
+      AUS["aussensensor<br/>export/feed.jsonl"]
     end
 
     subgraph Core
-      HKI[hausKI<br>State (SQLite)<br>Events (~/.hauski/events/*.jsonl)]
-      HLM[heimlern<br>Decisions {action,score,why}]
+      HKI["hausKI<br/>State (SQLite)<br/>Events (~/.hauski/events/*.jsonl)"]
+      HLM["heimlern<br/>Decisions {action,score,why}"]
     end
 
     subgraph Persistence_UI["Persistenz & UI"]
-      CHRONIK[chronik<br>/data/{domain}.jsonl]
-      LST[leitstand<br>UI/Dashboard]
+      CHRONIK["chronik<br/>/data/{domain}.jsonl"]
+      LST["leitstand<br/>UI/Dashboard"]
       CHRONIK -- "Events" --> LST
     end
 
@@ -36,7 +36,7 @@ flowchart LR
     SEM -->|insights/today.json| CHRONIK
 
     WGX -->|metrics.json| HKI
-    HKI -->|/v1/ingest/metrics<br>(append Event)| HKI
+    HKI -->|"/v1/ingest/metrics<br/>(append Event)"| HKI
 
     AUD -->|audio.events| HKI
     AUD -->|audio.events| CHRONIK
