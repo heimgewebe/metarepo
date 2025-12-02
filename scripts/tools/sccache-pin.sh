@@ -20,7 +20,7 @@ have_cmd() { command -v "$1" >/dev/null 2>&1; }
 
 read_pinned_version() {
 	local version
-	version=$(grep -E "^\s*${TOOLCHAIN_KEY}:" "${ROOT_DIR}/toolchain.versions.yml" | sed -E "s/^\s*${TOOLCHAIN_KEY}:\s*[\"'\'']?([^\"'\'']+)[\"'\'']?/\1/" | xargs)
+	version=$(grep -E "^\s*${TOOLCHAIN_KEY}:" "${ROOT_DIR}/toolchain.versions.yml" | sed -E 's/^\s*[^:]+:\s*"?([^"]+)"?/\1/' | tr -d "'" | xargs)
 	if [[ -z "${version}" ]]; then
 		die "Konnte gewünschte Version für ${TOOLCHAIN_KEY} nicht ermitteln."
 	fi
@@ -44,7 +44,7 @@ detect_libc() {
 }
 
 compute_target() {
-	local os arch libc
+	local os libc
 	os="$(uname -s | tr '[:upper:]' '[:lower:]')"
 	libc="$(detect_libc)"
 
@@ -70,7 +70,6 @@ compute_target() {
 download_tool() {
 	local req_version_raw
 	req_version_raw="$(read_pinned_version)"
-	local ver_numeric="${req_version_raw#v}"
 
 	log "${TOOL_NAME} nicht gefunden/inkompatibel. Lade ${req_version_raw} herunter..."
 
