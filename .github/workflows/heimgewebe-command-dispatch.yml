@@ -42,7 +42,7 @@ jobs:
           owner: heimgewebe
 
       - name: Parse and dispatch command
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           # Lesen, Antworten und Dispatch mit dem App-Installationstoken
           github-token: ${{ steps.app-token.outputs.token }}
