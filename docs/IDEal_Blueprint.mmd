@@ -58,7 +58,8 @@ Policies/Bandits")]
   SI -- "report → episode" --> LS
   LS -- "provenance → upsert" --> SA
 
-  HK <-->"decide/feedback<br/>(contracts/policy.decision.schema.json)" POL
+  HK -- "decide<br/>(contracts/policy.decision.schema.json)" --> POL
+  POL -- "feedback<br/>(contracts/policy.decision.schema.json)" --> HK
 
   %% -------- Hinweise --------
   classDef contract fill:#eef,stroke:#88a,stroke-width:1px,color:#223;
