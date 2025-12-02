@@ -34,7 +34,7 @@ for f in docs/adrs/[0-9]*-*.md; do
   elif ! [[ "$datum" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
     echo "::error file=$bn::Invalid Datum '$datum' (expected YYYY-MM-DD)"
     fail=1
-  elif ! date -d "$datum" +%s >/dev/null 2>&1; then
+  elif ! date -d "$datum" +%s > /dev/null 2>&1; then
     echo "::error file=$bn::Unable to parse Datum '$datum'"
     fail=1
   fi
@@ -76,14 +76,14 @@ for f in docs/adrs/[0-9]*-*.md; do
       continue
     fi
 
-    if ! build_ts="$(date -d "$date_str" +%s 2>/dev/null)"; then
+    if ! build_ts="$(date -d "$date_str" +%s 2> /dev/null)"; then
       echo "::error file=$bn::Unable to parse Datum '$date_str'"
       fail=1
       continue
     fi
 
-    days=$(( ( now_ts - build_ts ) / 86400 ))
-    if (( days > 7 )); then
+    days=$(((now_ts - build_ts) / 86400))
+    if ((days > 7)); then
       echo "::warning file=$bn::ADR is still 'Proposed' after $days days – please review, accept, reject or update it"
     fi
   fi

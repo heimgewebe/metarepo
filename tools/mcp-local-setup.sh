@@ -13,12 +13,12 @@ set -euo pipefail
 
 echo "== heimgewebe MCP local setup =="
 
-if ! command -v git >/dev/null 2>&1; then
+if ! command -v git > /dev/null 2>&1; then
   echo "error: git not found; run this inside a git repository clone." >&2
   exit 1
 fi
 
-ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+ROOT="$(git rev-parse --show-toplevel 2> /dev/null || pwd)"
 SERVER_DIR="${ROOT}/servers/local-mcp"
 
 echo "-> Repo root: ${ROOT}"
@@ -40,9 +40,9 @@ fi
 
 PKG_MANAGER=""
 
-if command -v pnpm >/dev/null 2>&1; then
+if command -v pnpm > /dev/null 2>&1; then
   PKG_MANAGER="pnpm"
-elif command -v npm >/dev/null 2>&1; then
+elif command -v npm > /dev/null 2>&1; then
   PKG_MANAGER="npm"
 fi
 
@@ -62,7 +62,7 @@ fi
 
 NODE_BIN="${NODE_BIN:-node}"
 
-if ! command -v "${NODE_BIN}" >/dev/null 2>&1; then
+if ! command -v "${NODE_BIN}" > /dev/null 2>&1; then
   echo "error: node not found." >&2
   echo "       Please install Node.js (empfohlen: v20 oder neuer) or set NODE_BIN." >&2
   exit 1
@@ -70,7 +70,7 @@ fi
 
 echo "-> Verifying MCP SDK usability..."
 # Check for specific entry point because root export might be missing in some versions
-if ! "${NODE_BIN}" --input-type=module -e "import '@modelcontextprotocol/sdk/server/mcp.js';" >/dev/null 2>&1; then
+if ! "${NODE_BIN}" --input-type=module -e "import '@modelcontextprotocol/sdk/server/mcp.js';" > /dev/null 2>&1; then
   echo "error: unable to load '@modelcontextprotocol/sdk/server/mcp.js'." >&2
   echo "       Check node version and node_modules in ${SERVER_DIR}." >&2
   exit 1

@@ -17,7 +17,7 @@ set -euo pipefail
 #
 # Exit-Codes sind streng; bei Fehlern bricht das Script ab.
 
-ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+ROOT="$(git rev-parse --show-toplevel 2> /dev/null || pwd)"
 LOG_DIR="${LOG_DIR:-${ROOT}/.e2e-logs}"
 mkdir -p "${LOG_DIR}"
 
@@ -27,20 +27,20 @@ ok() { printf "✓ %s %s\n" "$(ts)" "$*" | tee -a "${LOG_DIR}/e2e.log"; }
 err() { printf "✗ %s %s\n" "$(ts)" "$*" | tee -a "${LOG_DIR}/e2e.log" >&2; }
 
 [[ -d "${AUSSENSENSOR_DIR:-}" ]] || {
-	err "AUSSENSENSOR_DIR fehlt/ungültig"
-	exit 2
+  err "AUSSENSENSOR_DIR fehlt/ungültig"
+  exit 2
 }
 [[ -n "${CHRONIK_INGEST_URL:-}" ]] || {
-	err "CHRONIK_INGEST_URL fehlt"
-	exit 2
+  err "CHRONIK_INGEST_URL fehlt"
+  exit 2
 }
 [[ -n "${CHRONIK_TOKEN:-}" ]] || {
-	err "CHRONIK_TOKEN fehlt"
-	exit 2
+  err "CHRONIK_TOKEN fehlt"
+  exit 2
 }
 [[ -n "${HEIMLERN_INGEST_URL:-}" ]] || {
-	err "HEIMLERN_INGEST_URL fehlt"
-	exit 2
+  err "HEIMLERN_INGEST_URL fehlt"
+  exit 2
 }
 
 export CHRONIK_INGEST_URL="${CHRONIK_INGEST_URL}"
@@ -50,39 +50,39 @@ export HEIMLERN_INGEST_URL="${HEIMLERN_INGEST_URL}"
 AS="${AUSSENSENSOR_DIR}"
 
 log "Starte E2E in ${AS}"
-pushd "${AS}" >/dev/null
+pushd "${AS}" > /dev/null
 trap 'popd >/dev/null || true' EXIT
 
 log "Validiere JSONL (aussensensor/scripts/validate.sh)"
 if [[ -x scripts/validate.sh ]]; then
-	scripts/validate.sh export/feed.jsonl | tee "${LOG_DIR}/01_validate.out"
+  scripts/validate.sh export/feed.jsonl | tee "${LOG_DIR}/01_validate.out"
 else
-	err "scripts/validate.sh nicht gefunden/ausführbar"
-	exit 3
+  err "scripts/validate.sh nicht gefunden/ausführbar"
+  exit 3
 fi
 ok "Validierung abgeschlossen"
 
 log "Trockenlauf: push_chronik.sh --dry-run (chronik ingest)"
 if [[ -x scripts/push_chronik.sh ]]; then
-	scripts/push_chronik.sh --dry-run | tee "${LOG_DIR}/02_push_chronik_dry.out"
+  scripts/push_chronik.sh --dry-run | tee "${LOG_DIR}/02_push_chronik_dry.out"
 else
-	err "scripts/push_chronik.sh fehlt"
-	exit 3
+  err "scripts/push_chronik.sh fehlt"
+  exit 3
 fi
 ok "Trockenlauf zu Chronik ok"
 
 log "Trockenlauf: push_heimlern.sh --dry-run"
 if [[ -x scripts/push_heimlern.sh ]]; then
-	scripts/push_heimlern.sh --dry-run | tee "${LOG_DIR}/03_push_heimlern_dry.out"
+  scripts/push_heimlern.sh --dry-run | tee "${LOG_DIR}/03_push_heimlern_dry.out"
 else
-	err "scripts/push_heimlern.sh fehlt"
-	exit 3
+  err "scripts/push_heimlern.sh fehlt"
+  exit 3
 fi
 ok "Trockenlauf zu Heimlern ok"
 
 if [[ "${DRY_RUN:-0}" == "1" ]]; then
-	ok "DRY_RUN=1 aktiv – beende nach Trockenläufen"
-	exit 0
+  ok "DRY_RUN=1 aktiv – beende nach Trockenläufen"
+  exit 0
 fi
 
 log "REAL: push_chronik.sh (chronik ingest)"
