@@ -63,7 +63,10 @@
   "allOf": [
     {
       "if": { "properties": { "type": { "const": "link" } } },
-      "then": { "required": ["url"] }
+      "then": {
+        "properties": { "url": { "type": "string", "format": "uri" } },
+        "required": ["url"]
+      }
     }
   ]
 }
