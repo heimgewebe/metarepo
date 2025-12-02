@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
-# Pin & Ensure für casey/just – ohne Netz zur Laufzeit.
+# Pin & Ensure für casey/just – robust & sicher.
 # Erwartet, dass ein kompatibles Binary entweder in ./tools/bin/just liegt oder im PATH verfügbar ist.
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 TOOLS_DIR="${ROOT_DIR}/tools"
 BIN_DIR="${TOOLS_DIR}/bin"
 JUST_LOCAL="${BIN_DIR}/just"
-YQ_BIN="${BIN_DIR}/yq"
 
 log() { printf '%s\n' "$*" >&2; }
 die() {
@@ -15,26 +14,31 @@ die() {
 	exit 1
 }
 
-_REQ_VERSION_RAW=""
-get_req_version_raw() {
-	if [ -z "${_REQ_VERSION_RAW}" ]; then
-		# Sicherstellen, dass yq verfügbar ist
-		if ! "${ROOT_DIR}/scripts/tools/yq-pin.sh" ensure >&2; then
-			die "yq-pin.sh failed"
-		fi
-		_REQ_VERSION_RAW=$("${YQ_BIN}" '.just' "${ROOT_DIR}/toolchain.versions.yml")
-	fi
-	echo "${_REQ_VERSION_RAW}"
-}
-
 ensure_dir() { mkdir -p -- "${BIN_DIR}"; }
 
 have_cmd() { command -v "$1" >/dev/null 2>&1; }
 
+# Parse version from toolchain.versions.yml using simple tools to avoid circular dependency on yq
+read_pinned_version() {
+	local version
+	# Parse version from toolchain.versions.yml robustly:
+	# 1. Remove key prefix (up to and including ':')
+	# 2. Strip comments (everything after '#')
+	# 3. Trim leading and trailing whitespace
+	# 4. Remove surrounding quotes (double or single)
+	# 5. Remove line breaks
+	version=$(grep -E '^\s*just:' "${ROOT_DIR}/toolchain.versions.yml" | \
+		sed -E 's/^\s*[^:]+:\s*//; s/#.*$//; s/^[[:space:]]*//; s/[[:space:]]*$//; s/^"//; s/"$//; s/^'\''//; s/'\''$//' | \
+		tr -d '\n\r')
+	if [[ -z "${version}" ]]; then
+		die "Konnte gewünschte just-Version aus toolchain.versions.yml nicht ermitteln."
+	fi
+	printf '%s' "${version}"
+}
+
 version_ok() {
-	local v_to_check="$1" # this is from `just --version`, e.g. "1.14.0"
-	local req_version_raw
-	req_version_raw="$(get_req_version_raw)" # e.g. "v1.25.0"
+	local v_to_check="$1" # e.g. "1.14.0"
+	local req_version_raw="$2" # e.g. "v1.14.0"
 	# compare them without the 'v'
 	[[ "${v_to_check#v}" == "${req_version_raw#v}" ]]
 }
@@ -54,7 +58,7 @@ detect_libc() {
 	elif [ "$(uname -s | tr '[:upper:]' '[:lower:]')" = "linux" ]; then
 		# just v1.43.0 only has musl builds for linux
 		local req_version_raw
-		req_version_raw="$(get_req_version_raw)"
+		req_version_raw="$(read_pinned_version)"
 		if [ "${req_version_raw#v}" = "1.43.0" ]; then
 			echo "musl"
 			return
@@ -81,52 +85,76 @@ compute_target() {
 	fi
 }
 
-compute_url() {
-	local ver_tag
-	# For tests, JUST_VERSION overrides. Assume it doesn't have a 'v' like old tests.
-	if [ -n "${JUST_VERSION:-}" ]; then
-		ver_tag="${JUST_VERSION}"
-	else
-		ver_tag="$(get_req_version_raw)" # this will be "v1.25.0"
-	fi
-
-	local ver_numeric="${ver_tag#v}" # strip 'v' for the filename
-	local target
-	target="$(compute_target)"
-	echo "https://github.com/casey/just/releases/download/${ver_numeric}/just-${ver_numeric}-${target}.tar.gz"
-}
-
-# DRY-RUN mode for tests: only print the URL and exit 0
-if [ "${DRY_RUN:-0}" = "1" ]; then
-	compute_url
-	exit 0
-fi
-
 download_just() {
 	local req_version_raw
-	req_version_raw="$(get_req_version_raw)"
+	req_version_raw="$(read_pinned_version)"
+	local ver_numeric="${req_version_raw#v}"
+
 	log "just nicht gefunden/inkompatibel. Lade ${req_version_raw} herunter..."
-	local just_url
-	just_url="$(compute_url)"
+
+	local target
+	target="$(compute_target)"
+	local filename="just-${ver_numeric}-${target}.tar.gz"
+	# Just releases use tags without 'v' (e.g. 1.43.0)
+	local tag="${req_version_raw#v}"
+	local url="https://github.com/casey/just/releases/download/${tag}/${filename}"
+	local checksum_base="https://github.com/casey/just/releases/download/${tag}"
 
 	ensure_dir
+	local tmp_bin tmp_checksum
+	tmp_bin="$(mktemp)"
+	tmp_checksum="$(mktemp)"
+	# Safe cleanup
+	trap 'rm -f -- "${tmp_bin-}" "${tmp_checksum-}" 2>/dev/null || true' EXIT
 
-	local tmp
-	tmp="$(mktemp)"
-	log "Downloading from ${just_url}"
-	if curl -fSL "${just_url}" -o "${tmp}"; then
-		tar -xzf "${tmp}" -C "${BIN_DIR}" just
-		chmod +x "${JUST_LOCAL}" || true
-		rm -f -- "${tmp}"
-		log "just erfolgreich nach ${JUST_LOCAL} heruntergeladen."
-	else
-		rm -f -- "${tmp}"
-		if [[ -x "${JUST_LOCAL}" ]]; then
-			log "Download fehlgeschlagen – benutze vorhandenen Pin unter ${JUST_LOCAL} (offline fallback)."
-		else
-			die "Download von just fehlgeschlagen und kein nutzbarer Pin vorhanden."
-		fi
+	log "Downloading binary from ${url}"
+	if ! curl -fSL --retry 3 --connect-timeout 10 "${url}" -o "${tmp_bin}"; then
+		die "Download fehlgeschlagen: ${url}"
 	fi
+
+	local checksum_candidates=( "checksums.txt" "checksums" "SHA256SUMS" )
+	local checksum_found=false
+
+	for cand in "${checksum_candidates[@]}"; do
+		local c_url="${checksum_base}/${cand}"
+		log "Versuche Checksummen von ${c_url}..."
+		if curl -fSL --retry 3 --connect-timeout 10 "${c_url}" -o "${tmp_checksum}"; then
+			log "Checksummen geladen: ${cand}"
+			checksum_found=true
+			break
+		fi
+	done
+
+	if $checksum_found; then
+		log "Verifiziere Checksumme..."
+		local expected_sum
+		# Format: SHA256  filename
+		expected_sum=$(grep "${filename}$" "${tmp_checksum}" | awk '{print $1}' || true)
+
+		if [[ -z "${expected_sum}" ]]; then
+			log "WARN: Keine Checksumme für ${filename} in Datei gefunden."
+		else
+			local actual_sum
+			if have_cmd sha256sum; then
+				actual_sum=$(sha256sum "${tmp_bin}" | awk '{print $1}')
+			elif have_cmd shasum; then
+				actual_sum=$(shasum -a 256 "${tmp_bin}" | awk '{print $1}')
+			else
+				die "Weder sha256sum noch shasum verfügbar."
+			fi
+
+			if [[ "${expected_sum}" != "${actual_sum}" ]]; then
+				die "Checksum-Fehler! Erwartet: ${expected_sum}, Ist: ${actual_sum}"
+			fi
+			log "Checksumme OK: ${actual_sum}"
+		fi
+	else
+		log "WARN: Konnte keine Checksummen-Datei laden. Überspringe Verifikation."
+	fi
+
+	tar -xzf "${tmp_bin}" -C "${BIN_DIR}" just
+	chmod +x "${JUST_LOCAL}" || true
+	log "just erfolgreich nach ${JUST_LOCAL} installiert."
 }
 
 resolved_just() {
@@ -146,13 +174,18 @@ cmd_ensure() {
 	local just_bin
 	local v
 	local version_is_ok=false
+	local req_version_raw
+	req_version_raw="$(read_pinned_version)"
+
+	# Prioritize local bin
+	export PATH="${BIN_DIR}:${PATH}"
 
 	if just_bin="$(resolved_just)"; then
 		if v="$("${just_bin}" --version 2>/dev/null | cut -d' ' -f2)"; then
-			if version_ok "${v}"; then
+			if version_ok "${v}" "${req_version_raw}"; then
 				version_is_ok=true
 			else
-				log "WARN: Found just is wrong version: ${v}"
+				log "WARN: Gefundenes just hat falsche Version: ${v} (erwartet: ${req_version_raw})"
 			fi
 		fi
 	fi
@@ -160,20 +193,20 @@ cmd_ensure() {
 	if ! $version_is_ok; then
 		download_just
 		if ! just_bin="$(resolved_just)"; then
-			die "just nach Download immer noch nicht gefunden."
+			die "just nach Download nicht verfügbar."
 		fi
-		if ! v="$("${just_bin}" --version 2>/dev/null | cut -d' ' -f2)"; then
-			die "konnte just-Version nach Download nicht ermitteln"
-		fi
-		if ! version_ok "${v}"; then
-			die "Heruntergeladenes just hat falsche Version: ${v}"
+		# Verify again
+		v="$("${just_bin}" --version | cut -d' ' -f2)"
+		if ! version_ok "${v}" "${req_version_raw}"; then
+			die "Installiertes just hat immer noch falsche Version: ${v}"
 		fi
 	fi
 
+	# Symlink if needed
 	if [[ "${just_bin}" != "${JUST_LOCAL}" && ! -e "${JUST_LOCAL}" ]]; then
 		ln -s -- "${just_bin}" "${JUST_LOCAL}" || true
 	fi
-	log "OK: just ${v} verfügbar"
+	log "OK: just ${v} verfügbar."
 }
 
 case "${1:-ensure}" in
