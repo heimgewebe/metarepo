@@ -20,6 +20,10 @@ have_cmd() { command -v "$1" >/dev/null 2>&1; }
 
 # Parse version from toolchain.versions.yml using simple tools to avoid circular dependency on yq
 read_pinned_version() {
+	if [[ -n "${JUST_VERSION:-}" ]]; then
+		printf '%s' "${JUST_VERSION}"
+		return 0
+	fi
 	local version
 	# Parse version from toolchain.versions.yml robustly:
 	# 1. Remove key prefix (up to and including ':')
@@ -100,6 +104,11 @@ download_just() {
 	local url="https://github.com/casey/just/releases/download/${tag}/${filename}"
 	local checksum_base="https://github.com/casey/just/releases/download/${tag}"
 
+	if [ "${DRY_RUN:-}" = "1" ]; then
+		echo "${url}"
+		return 0
+	fi
+
 	ensure_dir
 	local tmp_bin tmp_checksum
 	tmp_bin="$(mktemp)"
@@ -112,13 +121,13 @@ download_just() {
 		die "Download fehlgeschlagen: ${url}"
 	fi
 
-	local checksum_candidates=( "checksums.txt" "checksums" "SHA256SUMS" )
+	local checksum_candidates=( "SHA256SUMS" "checksums.txt" "checksums" )
 	local checksum_found=false
 
 	for cand in "${checksum_candidates[@]}"; do
 		local c_url="${checksum_base}/${cand}"
-		log "Versuche Checksummen von ${c_url}..."
-		if curl -fSL --retry 3 --connect-timeout 10 "${c_url}" -o "${tmp_checksum}"; then
+		# Only log if we fail or if verbose
+		if curl -fSL --retry 3 --connect-timeout 10 "${c_url}" -o "${tmp_checksum}" 2>/dev/null; then
 			log "Checksummen geladen: ${cand}"
 			checksum_found=true
 			break
@@ -192,6 +201,9 @@ cmd_ensure() {
 
 	if ! $version_is_ok; then
 		download_just
+		if [ "${DRY_RUN:-}" = "1" ]; then
+			return 0
+		fi
 		if ! just_bin="$(resolved_just)"; then
 			die "just nach Download nicht verfügbar."
 		fi

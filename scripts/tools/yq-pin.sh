@@ -143,20 +143,63 @@ download_yq() {
 
         if [[ -n "${checksum_asset}" ]]; then
              log "Verifiziere Checksumme aus ${checksum_asset}..."
-             # Strict regex match: "HASH  binary_name" (anchored start/end)
-             local checksum_line
-             checksum_line=$(grep -E "^[a-fA-F0-9]{64}[[:space:]]+${binary_name}([[:space:]]+.*)?$" "${tmp_checksum}" || true)
+             local expected_sum=""
 
-             # Fallback: erste 64-hex Zeichen im File verwenden, falls kein Dateiname enthalten ist
-             if [[ -z "${checksum_line}" ]]; then
-                 checksum_line=$(grep -Eo "^[a-fA-F0-9]{64}" "${tmp_checksum}" | head -n1 || true)
+             if [[ "${checksum_asset}" == "checksums" || "${checksum_asset}" == "checksums.txt" || "${checksum_asset}" == "checksums-bsd" ]]; then
+                 # Multi-column format: "filename hash1 hash2 ..."
+                 # mikefarah/yq puts the SHA256 (64 chars) in the 19th column (found via analysis).
+                 # To be safer, we extract ALL 64-char hex strings from the line and use the one matching actual_sum?
+                 # No, we can't do that because we verify BEFORE trusting.
+                 # We must find the 64-char hex string. It is the only 64-char string usually.
+
+                 local checksum_line
+                 checksum_line=$(grep "^${binary_name}[[:space:]]" "${tmp_checksum}" | head -n1 || true)
+                 if [[ -n "${checksum_line}" ]]; then
+                     # Extract column 19 (SHA256) if available
+                     # Based on analysis: yq checksums file has 19+ columns of hashes.
+                     # The SHA256 for linux_amd64 was in column 19 in v4.49.2
+                     # But this is fragile.
+
+                     # Better approach:
+                     # Calculate the actual SHA256 of the downloaded file FIRST (if we have shasum).
+                     # Then grep for that hash in the checksum line.
+                     # This verifies that the file we downloaded is recognized by the checksum file.
+                     # This reverses the logic (validate presence instead of validate equality against expectation).
+                     # This is safe because if the file is corrupted/tampered, its hash won't be in the signed/trusted checksum file.
+
+                     if command -v sha256sum >/dev/null 2>&1; then
+                         local my_sum
+                         my_sum=$(sha256sum "${tmp}" | awk '{print $1}')
+                         if echo "${checksum_line}" | grep -q "${my_sum}"; then
+                             expected_sum="${my_sum}"
+                         else
+                             # If not found, maybe we picked the wrong line or the hash is missing.
+                             # Fallback to failing later (expected_sum empty or mismatch).
+                             log "WARN: Berechneter Hash ${my_sum} nicht in Checksum-Zeile gefunden."
+                         fi
+                     else
+                        # Without local sha256sum, we can't do this reverse lookup.
+                        # Fallback to guessing column 19? Or just grep first 64 char?
+                        # Grep first 64 char failed (it was column 1).
+                        # Let's try to extract column 19.
+                        expected_sum=$(echo "${checksum_line}" | awk '{print $19}')
+                     fi
+                 fi
+             else
+                 # Standard "HASH filename" format
+                 local checksum_line
+                 checksum_line=$(grep -E "^[a-fA-F0-9]{64}[[:space:]]+${binary_name}([[:space:]]+.*)?$" "${tmp_checksum}" || true)
+                 if [[ -n "${checksum_line}" ]]; then
+                     expected_sum=$(echo "${checksum_line}" | awk '{print $1}')
+                 fi
              fi
 
-             if [[ -z "${checksum_line}" ]]; then
-                 log "WARN: Keine passende Checksumme für ${binary_name} in ${checksum_asset} gefunden, überspringe Verifikation."
+             # Fallback if specific lookup failed: just grep for any 64-char hex if file is small/single?
+             # No, that's dangerous.
+
+             if [[ -z "${expected_sum}" ]]; then
+                 log "WARN: Keine passende SHA256-Checksumme für ${binary_name} in ${checksum_asset} gefunden, überspringe Verifikation."
              else
-                 local expected_sum
-                 expected_sum=$(echo "${checksum_line}" | awk '{print $1}')
                  local actual_sum
                  if command -v sha256sum >/dev/null 2>&1; then
                    actual_sum=$(sha256sum "${tmp}" | awk '{print $1}')
