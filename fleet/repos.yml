@@ -1,13 +1,31 @@
 repos:
+  - name: heimgewebe/metarepo
+    default_branch: main
+  - name: heimgewebe/wgx
+    default_branch: main
   - name: heimgewebe/hausKI
     default_branch: main
-  - name: heimgewebe/semantAH
-    default_branch: main
-  - name: heimgewebe/mitschreiber
-    default_branch: main
-  - name: heimgewebe/chronik
+  - name: heimgewebe/hausKi-audio
     default_branch: main
   - name: heimgewebe/heimlern
     default_branch: main
+  - name: heimgewebe/semantAH
+    default_branch: main
   - name: heimgewebe/aussensensor
+    default_branch: main
+  - name: heimgewebe/chronik
+    default_branch: main
+  - name: heimgewebe/contracts
+    default_branch: main
+  - name: heimgewebe/mitschreiber
+    default_branch: main
+  - name: heimgewebe/weltgewebe
+    default_branch: main
+  - name: heimgewebe/sichter
+    default_branch: main
+  - name: heimgewebe/tools
+    default_branch: main
+  - name: heimgewebe/heimgeist
+    default_branch: main
+  - name: heimgewebe/plexer
     default_branch: main
