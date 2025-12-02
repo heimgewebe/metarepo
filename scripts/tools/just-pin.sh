@@ -21,7 +21,12 @@ have_cmd() { command -v "$1" >/dev/null 2>&1; }
 # Parse version from toolchain.versions.yml using simple tools to avoid circular dependency on yq
 read_pinned_version() {
 	local version
-	# Remove quotes and comments, trim whitespace
+	# Parse version from toolchain.versions.yml robustly:
+	# 1. Remove key prefix (up to and including ':')
+	# 2. Strip comments (everything after '#')
+	# 3. Trim leading and trailing whitespace
+	# 4. Remove surrounding quotes (double or single)
+	# 5. Remove line breaks
 	version=$(grep -E '^\s*just:' "${ROOT_DIR}/toolchain.versions.yml" | \
 		sed -E 's/^\s*[^:]+:\s*//; s/#.*$//; s/^[[:space:]]*//; s/[[:space:]]*$//; s/^"//; s/"$//; s/^'\''//; s/'\''$//' | \
 		tr -d '\n\r')
