@@ -119,7 +119,7 @@ fleet-push-all:
       --message "feat: adopt agent-kit + contracts (wave 1)"
 
 # Local CI
-validate: yq_ensure
+validate: yq_ensure lint
     .github/workflows/validate-local.sh
     @printf "Running actionlint (local CLI preferred, docker fallback)…\n"
     @if command -v actionlint >/dev/null 2>&1; then \
@@ -160,7 +160,10 @@ _yq *args:
 # Lokaler Helper: Schnelltests & Linter – sicher mit Null-Trennung und Quoting
 lint:
     @set -euo pipefail; \
-    mapfile -d '' files < <(git ls-files -z -- '*.sh' '*.bash' || true); \
+    files=(); \
+    while IFS= read -r -d '' file; do \
+      files+=("$file"); \
+    done < <(git ls-files -z -- '*.sh' '*.bash' 'scripts/wgx' 'wgx/wgx' || true); \
     if [ "${#files[@]}" -eq 0 ]; then echo "keine Shell-Dateien"; exit 0; fi; \
     printf '%s\0' "${files[@]}" | xargs -0 bash -n; \
     if command -v shfmt >/dev/null 2>&1; then \
