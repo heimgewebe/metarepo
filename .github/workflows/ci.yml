@@ -304,9 +304,20 @@ jobs:
 
       - name: Lint GitHub Actions workflows
         if: runner.os == 'Linux'
-        uses: rhysd/actionlint@v1.7.9
-        with:
-          args: -color
+        run: |
+          chmod +x scripts/tools/actionlint-pin.sh
+          scripts/tools/actionlint-pin.sh ensure
+          echo "${PWD}/tools/bin" >> $GITHUB_PATH
+          tools/bin/actionlint -color
+
+      - name: Lint Shell scripts
+        if: runner.os == 'Linux'
+        run: |
+          chmod +x scripts/tools/shfmt-pin.sh scripts/tools/shellcheck-pin.sh
+          scripts/tools/shfmt-pin.sh ensure
+          scripts/tools/shellcheck-pin.sh ensure
+          echo "${PWD}/tools/bin" >> $GITHUB_PATH
+          just lint
 
       - name: Check Rust formatting
         if: ${{ hashFiles('**/Cargo.toml') != '' }}
@@ -331,11 +342,6 @@ jobs:
       - name: Show available Just targets
         run: just -l || true
 
-      - name: Install actionlint CLI
-        run: |
-          chmod +x scripts/tools/actionlint-pin.sh
-          scripts/tools/actionlint-pin.sh ensure
-          actionlint -version
 
       - name: Validate project
         run: |

@@ -48,3 +48,7 @@ Hier ist die Übersicht der zentralen Datenverträge (Schemas), die die Kommunik
 - [Architecture](./architecture.md) – Systemarchitektur
 
 [Zurück zur Übersicht](./README.md)
+contracts/agent.tool.schema.json: Canonical Fleet-Contract für Tool-Definitionen (wgx, Fleet-Push).
+contracts/dev.tooling.schema.json: Internes Metadaten-Schema für Metarepo-Tools (wgx doctor).
+contracts/agent.tool.schema.json: Canonical Fleet-Contract für Tool-Definitionen (wgx, Fleet-Push).
+contracts/dev.tooling.schema.json: Internes Metadaten-Schema für Metarepo-Tools (wgx doctor).

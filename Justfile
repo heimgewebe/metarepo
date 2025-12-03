@@ -120,15 +120,10 @@ fleet-push-all:
 
 # Local CI
 validate: yq_ensure lint
-    .github/workflows/validate-local.sh
-    @printf "Running actionlint (local CLI preferred, docker fallback)…\n"
-    @if command -v actionlint >/dev/null 2>&1; then \
-      actionlint -color || (echo "::error::actionlint failed" && exit 1); \
-    elif docker info >/dev/null 2>&1; then \
-      docker run --rm -v "$PWD:/repo" -w /repo ghcr.io/rhysd/actionlint:1.7.9 -color || (echo "::error::actionlint failed" && exit 1); \
-    else \
-      echo "::warning::actionlint skipped: no local 'actionlint' binary found and Docker is not available"; \
-    fi
+    scripts/ci/validate-local.sh
+    @printf "Running actionlint...\n"
+    @scripts/tools/actionlint-pin.sh ensure
+    @tools/bin/actionlint -color || (echo "::error::actionlint failed" && exit 1)
     @if [ -d contracts ]; then echo "contracts folder detected – run 'just contracts-validate' for schema checks"; fi
 
 ci:
@@ -166,13 +161,7 @@ lint:
     done < <(git ls-files -z -- '*.sh' '*.bash' 'scripts/wgx' 'wgx/wgx' || true); \
     if [ "${#files[@]}" -eq 0 ]; then echo "keine Shell-Dateien"; exit 0; fi; \
     printf '%s\0' "${files[@]}" | xargs -0 bash -n; \
-    if command -v shfmt >/dev/null 2>&1; then \
-      shfmt -d -i 2 -ci -sr -- "${files[@]}"; \
-    else \
-      echo "::warning::shfmt skipped: not found"; \
-    fi; \
-    if command -v shellcheck >/dev/null 2>&1; then \
-      shellcheck -S style -- "${files[@]}"; \
-    else \
-      echo "::warning::shellcheck skipped: not found"; \
-    fi
+    scripts/tools/shfmt-pin.sh ensure; \
+    tools/bin/shfmt -d -i 2 -ci -sr -- "${files[@]}"; \
+    scripts/tools/shellcheck-pin.sh ensure; \
+    tools/bin/shellcheck -S style -- "${files[@]}";
