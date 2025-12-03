@@ -314,9 +314,6 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           chmod +x scripts/tools/shfmt-pin.sh scripts/tools/shellcheck-pin.sh
-          scripts/tools/shfmt-pin.sh ensure
-          scripts/tools/shellcheck-pin.sh ensure
-          echo "${PWD}/tools/bin" >> $GITHUB_PATH
           just lint
 
       - name: Check Rust formatting
