@@ -5,51 +5,61 @@
 flowchart LR
   %% -------- Subsysteme / Ebenen --------
   subgraph Dialogisch
-    MS[Mitschreiber / UI]\nintent capture
+    MS["Mitschreiber / UI
+intent capture"]
   end
 
   subgraph Semantisch
-    SA[semantAH]\nGraph • Embeddings • Insights
+    SA["semantAH
+Graph • Embeddings • Insights"]
   end
 
   subgraph Operativ
-    HK[hausKI]\nPlan • Orchestrierung • State
-    HA[hausKI-audio]\nAudio Sessions • Telemetrie
+    HK["hausKI
+Plan • Orchestrierung • State"]
+    HA["hausKI-audio
+Audio Sessions • Telemetrie"]
   end
 
   subgraph Reflexiv
-    SI[sichter]\nDiagnose • Review • Korrektur
+    SI["sichter
+Diagnose • Review • Korrektur"]
   end
 
   subgraph Memorativ
-    LS[chronik]\nIngest • Episoden • Audit
+    LS["chronik
+Ingest • Episoden • Audit"]
   end
 
   subgraph Motorik & Außen
-    WGX[wgx]\nPlaybooks • Systempflege • Metrics
-    AS[aussensensor]\nFeeds • Webhooks → feed.jsonl
+    WGX["wgx
+Playbooks • Systempflege • Metrics"]
+    AS["aussensensor
+Feeds • Webhooks → feed.jsonl"]
   end
 
-  POL[(heimlern\nPolicies/Bandits)]
+  POL[("heimlern
+Policies/Bandits")]
 
   %% -------- Datenflüsse / Contracts --------
-  MS -- "intent/declare\n(events/intent.schema.json)" --> SA
+  MS -- "intent/declare<br/>(events/intent.schema.json)" --> SA
   SA -- "graph/query" --> HK
 
-  AS -- "aussen.event\n(contracts/aussen.event.schema.json)" --> LS
-  AS -- "aussen.event\n(contracts/aussen.event.schema.json)" --> HK
+  AS -- "aussen.event<br/>(contracts/aussen.event.schema.json)" --> LS
+  AS -- "aussen.event<br/>(contracts/aussen.event.schema.json)" --> HK
 
-  SA -- "insights\n(contracts/insights.schema.json)" --> HK
-  WGX -- "metrics.snapshot\n(contracts/metrics.snapshot.schema.json)" --> HK
-  HA -- "audio.events\n(contracts/audio.events.schema.json)" --> HK
-  HA -- "audio.events\n(contracts/audio.events.schema.json)" --> LS
+  SA -- "insights<br/>(contracts/insights.schema.json)" --> HK
+  WGX -- "metrics.snapshot<br/>(contracts/metrics.snapshot.schema.json)" --> HK
+  HA -- "audio.events<br/>(contracts/audio.events.schema.json)" --> HK
+  HA -- "audio.events<br/>(contracts/audio.events.schema.json)" --> LS
 
   HK -- "jobs / exec" --> WGX
-  HK -- "review/report\n(events/review.schema.json · skizze)" --> SI
+  HK -- "review/report<br/>(events/review.schema.json · skizze)" --> SI
   SI -- "report → episode" --> LS
   LS -- "provenance → upsert" --> SA
 
-  HK <-->"decide/feedback\n(contracts/policy.decision.schema.json)" POL
+  HK -- "decide<br/>(contracts/policy.decision.schema.json)" --> POL
+  POL -- "feedback<br/>(contracts/policy.decision.schema.json)" --> HK
 
   %% -------- Hinweise --------
   classDef contract fill:#eef,stroke:#88a,stroke-width:1px,color:#223;

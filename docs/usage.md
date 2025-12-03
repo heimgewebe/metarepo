@@ -461,7 +461,7 @@ You can also see actionlint issues inline in VS Code via the [Trunk VS Code exte
 [sarif]: https://docs.oasis-open.org/sarif/sarif/v2.1.0/sarif-v2.1.0.html
 [problem-matchers]: https://github.com/actions/toolkit/blob/main/docs/problem-matchers.md
 [super-linter]: https://github.com/github/super-linter
-[super-linter-env-var]: https://github.com/super-linter/super-linter#environment-variables
+[super-linter-env-var]: https://github.com/super-linter/super-linter#configure-super-linter
 [actionlint-matcher]: https://raw.githubusercontent.com/rhysd/actionlint/main/.github/actionlint-matcher.json
 [preinstall-ubuntu]: https://github.com/actions/runner-images/tree/main/images/ubuntu
 [pre-commit]: https://pre-commit.com

@@ -1,22 +1,41 @@
 %% Heimgewebe – Systemübersicht (Mermaid)
 flowchart LR
   subgraph Core Fleet
-    META[metarepo\nControl-Plane\nContracts/CI/Templates]
-    WGX[wgx\nSystem-Tasks\nMetrics Snapshots]
-    HKI[hausKI\nOrchestrator\nState/Jobs/Decisions]
-    HLN[heimlern\nPolicies/Bandits\nwhy/score]
-    SEMA[semantAH\nInsights/Graph]
-    HKA[hausKI-audio\nAudio Events/Sessions]
-    AUSS[aussensensor\nAußen-Events\nfeed.jsonl]
-    CHRONIK[chronik\nHTTP Ingest\nEvent-Store]
-    LEIT[leitstand\nUI/Dashboard]
+    META["metarepo
+Control-Plane
+Contracts/CI/Templates"]
+    WGX["wgx
+System-Tasks
+Metrics Snapshots"]
+    HKI["hausKI
+Orchestrator
+State/Jobs/Decisions"]
+    HLN["heimlern
+Policies/Bandits
+why/score"]
+    SEMA["semantAH
+Insights/Graph"]
+    HKA["hausKI-audio
+Audio Events/Sessions"]
+    AUSS["aussensensor
+Außen-Events
+feed.jsonl"]
+    CHRONIK["chronik
+HTTP Ingest
+Event-Store"]
+    LEIT["leitstand
+UI/Dashboard"]
 
     CHRONIK --> LEIT
   end
 
   subgraph Related
-    WELT[weltgewebe\nCommunity/Maps\n(related)]
-    VAULT[vault-gewebe\npersönlicher Vault\n(nicht Fleet)]
+    WELT["weltgewebe
+Community/Maps
+(related)"]
+    VAULT["vault-gewebe
+persönlicher Vault
+(nicht Fleet)"]
   end
 
   %% Datenflüsse
