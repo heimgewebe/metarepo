@@ -94,6 +94,11 @@ download_yq() {
   local url="https://github.com/mikefarah/yq/releases/download/${yq_version}/${binary_name}"
   local checksum_base="https://github.com/mikefarah/yq/releases/download/${yq_version}"
 
+  if [ "${DRY_RUN:-}" = "1" ]; then
+    echo "${url}"
+    return 0
+  fi
+
   ensure_dir
 
   # Force cleanup of existing binaries in target location
@@ -147,42 +152,27 @@ download_yq() {
 
     if [[ "${checksum_asset}" == "checksums" || "${checksum_asset}" == "checksums.txt" || "${checksum_asset}" == "checksums-bsd" ]]; then
       # Multi-column format: "filename hash1 hash2 ..."
-      # mikefarah/yq puts the SHA256 (64 chars) in the 19th column (found via analysis).
-      # To be safer, we extract ALL 64-char hex strings from the line and use the one matching actual_sum?
-      # No, we can't do that because we verify BEFORE trusting.
-      # We must find the 64-char hex string. It is the only 64-char string usually.
+      # Use reverse lookup: Calculate local hash first, then check if it is present in the line.
+      # This avoids fragile column guessing.
 
       local checksum_line
       checksum_line=$(grep "^${binary_name}[[:space:]]" "${tmp_checksum}" | head -n1 || true)
       if [[ -n "${checksum_line}" ]]; then
-        # Extract column 19 (SHA256) if available
-        # Based on analysis: yq checksums file has 19+ columns of hashes.
-        # The SHA256 for linux_amd64 was in column 19 in v4.49.2
-        # But this is fragile.
-
-        # Better approach:
-        # Calculate the actual SHA256 of the downloaded file FIRST (if we have shasum).
-        # Then grep for that hash in the checksum line.
-        # This verifies that the file we downloaded is recognized by the checksum file.
-        # This reverses the logic (validate presence instead of validate equality against expectation).
-        # This is safe because if the file is corrupted/tampered, its hash won't be in the signed/trusted checksum file.
-
+        local my_sum=""
         if command -v sha256sum > /dev/null 2>&1; then
-          local my_sum
           my_sum=$(sha256sum "${tmp}" | awk '{print $1}')
+        elif command -v shasum > /dev/null 2>&1; then
+          my_sum=$(shasum -a 256 "${tmp}" | awk '{print $1}')
+        fi
+
+        if [[ -n "${my_sum}" ]]; then
           if echo "${checksum_line}" | grep -q "${my_sum}"; then
             expected_sum="${my_sum}"
           else
-            # If not found, maybe we picked the wrong line or the hash is missing.
-            # Fallback to failing later (expected_sum empty or mismatch).
             log "WARN: Berechneter Hash ${my_sum} nicht in Checksum-Zeile gefunden."
           fi
         else
-          # Without local sha256sum, we can't do this reverse lookup.
-          # Fallback to guessing column 19? Or just grep first 64 char?
-          # Grep first 64 char failed (it was column 1).
-          # Let's try to extract column 19.
-          expected_sum=$(echo "${checksum_line}" | awk '{print $19}')
+            log "WARN: Weder sha256sum noch shasum verfügbar - kann Multi-Column-Checksumme nicht verifizieren."
         fi
       fi
     else
@@ -194,11 +184,8 @@ download_yq() {
       fi
     fi
 
-    # Fallback if specific lookup failed: just grep for any 64-char hex if file is small/single?
-    # No, that's dangerous.
-
     if [[ -z "${expected_sum}" ]]; then
-      log "WARN: Keine passende SHA256-Checksumme für ${binary_name} in ${checksum_asset} gefunden, überspringe Verifikation."
+      log "WARN: Keine passende SHA256-Checksumme für ${binary_name} in ${checksum_asset} gefunden (oder Tool fehlt), überspringe Verifikation."
     else
       local actual_sum
       if command -v sha256sum > /dev/null 2>&1; then
@@ -269,6 +256,9 @@ cmd_ensure() {
 
   if ! $version_is_ok; then
     download_yq
+    if [ "${DRY_RUN:-}" = "1" ]; then
+      return 0
+    fi
     # After download, resolved_yq should find the local binary first.
     if ! yq_bin="$(resolved_yq)"; then
       die "yq nach Download immer noch nicht gefunden."
