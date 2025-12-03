@@ -79,8 +79,8 @@ jobs:
 
           # Try a list of likely checksum filenames hosted under the release /download/{tag}/
           SHA_CANDIDATES=(
-            "checksums.txt"
             "checksums"
+            "checksums.txt"
             "SHA256SUMS.txt"
             "sha256sum.txt"
             "sha256sums.txt"

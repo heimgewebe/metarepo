@@ -307,7 +307,7 @@ jobs:
         run: |
           chmod +x scripts/tools/actionlint-pin.sh
           scripts/tools/actionlint-pin.sh ensure
-          echo "${PWD}/tools/bin" >> $GITHUB_PATH
+          echo "${PWD}/tools/bin" >> "$GITHUB_PATH"
           tools/bin/actionlint -color
 
       - name: Lint Shell scripts
@@ -316,7 +316,7 @@ jobs:
           chmod +x scripts/tools/shfmt-pin.sh scripts/tools/shellcheck-pin.sh
           scripts/tools/shfmt-pin.sh ensure
           scripts/tools/shellcheck-pin.sh ensure
-          echo "${PWD}/tools/bin" >> $GITHUB_PATH
+          echo "${PWD}/tools/bin" >> "$GITHUB_PATH"
           just lint
 
       - name: Check Rust formatting
