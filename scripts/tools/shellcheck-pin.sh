@@ -50,7 +50,15 @@ compute_target() {
 
   case "$(uname -m)" in
     x86_64) arch="x86_64" ;;
-    aarch64 | arm64) arch="aarch64" ;;
+    aarch64 | arm64)
+      # ShellCheck doesn't provide darwin.aarch64 binaries for v0.9.0
+      # Use x86_64 version which runs via Rosetta 2 on ARM64 Macs
+      if [[ "$os" == "darwin" ]]; then
+        arch="x86_64"
+      else
+        arch="aarch64"
+      fi
+      ;;
     *) die "Arch $(uname -m) not supported" ;;
   esac
 
