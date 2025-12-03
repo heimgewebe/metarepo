@@ -154,7 +154,7 @@ download_yq() {
     log "WARN: Keine Checksummen-Datei im Release gefunden, überspringe Verifikation."
     log "Versuchte Dateinamen: ${checksum_candidates[*]}"
     log "Wenn das Release absichtlich keine Checksums hat, können Sie:"
-    log "  1. Eine andere YQ_VERSION wählen die Checksums hat"
+    log "  1. Eine andere YQ_VERSION wählen, die Checksums hat"
     log "  2. Einen bekannten Hash in toolchain.versions.yml hinzufügen"
   fi
 
