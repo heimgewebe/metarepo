@@ -95,8 +95,15 @@ download_tool() {
   tmp_extract="$(mktemp -d)"
   trap 'rm -f -- "${tmp_bin-}" "${tmp_checksum-}"; rm -rf -- "${tmp_extract-}" 2>/dev/null || true' EXIT
 
-  log "Downloading from ${url}"
+  log "Downloading sccache from ${url}"
+  log "Version: ${req_version_raw}, Target: ${target}, Filename: ${filename}"
   if ! curl -fSL --retry 3 --connect-timeout 10 "${url}" -o "${tmp_bin}"; then
+    log "FEHLER: Download von sccache fehlgeschlagen"
+    log "URL: ${url}"
+    log "Mögliche Ursachen:"
+    log "  - Netzwerkproblem oder GitHub API-Limit"
+    log "  - Release ${req_version_raw} hat kein Asset ${filename}"
+    log "  - Überprüfen Sie: https://github.com/mozilla/sccache/releases/tag/${req_version_raw}"
     die "Download fehlgeschlagen: ${url}"
   fi
 

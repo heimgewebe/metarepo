@@ -116,8 +116,15 @@ download_just() {
   # Safe cleanup
   trap 'rm -f -- "${tmp_bin-}" "${tmp_checksum-}" 2>/dev/null || true' EXIT
 
-  log "Downloading binary from ${url}"
+  log "Downloading just binary from ${url}"
+  log "Version: ${req_version_raw}, Target: ${target}, Filename: ${filename}"
   if ! curl -fSL --retry 3 --connect-timeout 10 "${url}" -o "${tmp_bin}"; then
+    log "FEHLER: Download von just fehlgeschlagen"
+    log "URL: ${url}"
+    log "Mögliche Ursachen:"
+    log "  - Netzwerkproblem oder GitHub API-Limit"
+    log "  - Release ${tag} hat kein Asset ${filename}"
+    log "  - Überprüfen Sie: https://github.com/casey/just/releases/tag/${tag}"
     die "Download fehlgeschlagen: ${url}"
   fi
 
