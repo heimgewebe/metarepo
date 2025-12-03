@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-cmd_agent(){
-  local sub="${1:-}"; shift || true
+cmd_agent() {
+  local sub="${1:-}"
+  shift || true
   case "$sub" in
     run)
       local wf="${1:-agents/sample.workflow.json}"
@@ -38,15 +39,20 @@ cmd_agent(){
       fi
       if [[ -z "$runfile" ]]; then
         runfile=$(find .agents/runs -name '*.jsonl' -print0 | xargs -0 ls -1t | head -n1 || true)
-        [[ -n "$runfile" ]] || { echo "Kein Run gefunden unter .agents/runs/*.jsonl"; exit 2; }
+        [[ -n "$runfile" ]] || {
+          echo "Kein Run gefunden unter .agents/runs/*.jsonl"
+          exit 2
+        }
       fi
       bash "$trc" "$runfile"
       ;;
     validate)
-      local manifest="${1:-}"; [[ -n "$manifest" ]] || die "wgx agent validate <manifest.yaml>"
+      local manifest="${1:-}"
+      [[ -n "$manifest" ]] || die "wgx agent validate <manifest.yaml>"
       # naive yaml->json (nur sehr einfacher Fall) – für echte Nutzung: yq
-      if command -v yq >/dev/null 2>&1 && command -v npx >/dev/null 2>&1; then
-        tmp="$(mktemp)"; yq -o=json '.' "$manifest" >"$tmp"
+      if command -v yq > /dev/null 2>&1 && command -v npx > /dev/null 2>&1; then
+        tmp="$(mktemp)"
+        yq -o=json '.' "$manifest" > "$tmp"
         npx --yes ajv-cli@5 validate --spec=draft2020 -s "${ROOT_DIR}/contracts/agent.workflow.schema.json" -d "$tmp" || die "Manifest verletzt Contract"
         rm -f "$tmp"
         log "OK: Agent-Manifest valid."
@@ -55,8 +61,8 @@ cmd_agent(){
         [[ -s "$manifest" ]] || die "Manifest leer"
       fi
       ;;
-    ""|-h|--help|help)
-      cat <<'HLP'
+    "" | -h | --help | help)
+      cat << 'HLP'
 wgx agent run [agents/<workflow>.json]   # Workflow lokal orchestrieren (sequential/parallel)
 wgx agent trace [path/to/run.jsonl]      # Kompakte Trace-Ansicht des letzten/angegebenen Runs
 wgx agent validate <manifest.yaml>       # Manifest gegen Contract prüfen

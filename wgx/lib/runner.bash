@@ -7,12 +7,12 @@ wgx_run_task() {
   local yq_bin="./tools/bin/yq"
 
   if [[ ! -x "$yq_bin" ]]; then
-      # Fallback to system yq if the pinned one isn't there
-      if command -v yq >/dev/null 2>&1; then
-          yq_bin=$(command -v yq)
-      else
-          die "yq binary not found. Please run scripts/tools/yq-pin.sh or install yq."
-      fi
+    # Fallback to system yq if the pinned one isn't there
+    if command -v yq > /dev/null 2>&1; then
+      yq_bin=$(command -v yq)
+    else
+      die "yq binary not found. Please run scripts/tools/yq-pin.sh or install yq."
+    fi
   fi
 
   if [[ ! -f "$profile_file" ]]; then
