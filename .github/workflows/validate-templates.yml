@@ -58,4 +58,4 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyyaml
       - name: Run local validation script
-        run: ./.github/workflows/validate-local.sh
+        run: ./scripts/ci/validate-local.sh
