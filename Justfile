@@ -123,7 +123,7 @@ validate: yq_ensure lint
     scripts/ci/validate-local.sh
     @printf "Running actionlint...\n"
     @scripts/tools/actionlint-pin.sh ensure
-    @export PATH="${PWD}/tools/bin:${PATH}"; actionlint -color || (echo "::error::actionlint failed" && exit 1)
+    @actionlint -color || (echo "::error::actionlint failed" && exit 1)
     @if [ -d contracts ]; then echo "contracts folder detected – run 'just contracts-validate' for schema checks"; fi
 
 ci:
@@ -162,7 +162,6 @@ lint:
     if [ "${#files[@]}" -eq 0 ]; then echo "keine Shell-Dateien"; exit 0; fi; \
     printf '%s\0' "${files[@]}" | xargs -0 bash -n; \
     scripts/tools/shfmt-pin.sh ensure; \
-    export PATH="${PWD}/tools/bin:${PATH}"; \
-    shfmt -d -i 2 -ci -sr -- "${files[@]}"; \
     scripts/tools/shellcheck-pin.sh ensure; \
+    shfmt -d -i 2 -ci -sr -- "${files[@]}"; \
     shellcheck -S style -- "${files[@]}";
