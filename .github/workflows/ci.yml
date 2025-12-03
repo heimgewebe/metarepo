@@ -70,6 +70,15 @@ jobs:
           if ! command -v sha256sum >/dev/null 2>&1; then
             echo "Installing coreutils for sha256sum..."
             brew install coreutils
+            # On macOS, coreutils installs with 'g' prefix, ensure PATH includes them
+            echo "$(brew --prefix coreutils)/libexec/gnubin" >> "$GITHUB_PATH"
+            export PATH="$(brew --prefix coreutils)/libexec/gnubin:$PATH"
+            # Verify installation
+            if command -v sha256sum >/dev/null 2>&1; then
+              echo "sha256sum is now available"
+            else
+              echo "Warning: sha256sum still not available after coreutils install"
+            fi
           else
             echo "sha256sum already available"
           fi

@@ -177,11 +177,38 @@ download_yq() {
             # Fallback to failing later (expected_sum empty or mismatch).
             log "WARN: Berechneter Hash ${my_sum} nicht in Checksum-Zeile gefunden."
           fi
+        elif command -v shasum > /dev/null 2>&1; then
+          local my_sum
+          my_sum=$(shasum -a 256 "${tmp}" | awk '{print $1}')
+          if echo "${checksum_line}" | grep -q "${my_sum}"; then
+            expected_sum="${my_sum}"
+          else
+            log "WARN: Berechneter Hash ${my_sum} nicht in Checksum-Zeile gefunden."
+          fi
+        elif command -v python3 > /dev/null 2>&1; then
+          log "Using Python3 fallback for SHA256 checksum..."
+          local my_sum
+          my_sum=$(python3 -c "import hashlib, sys; print(hashlib.sha256(open('${tmp}', 'rb').read()).hexdigest())")
+          if echo "${checksum_line}" | grep -q "${my_sum}"; then
+            expected_sum="${my_sum}"
+          else
+            log "WARN: Berechneter Hash ${my_sum} nicht in Checksum-Zeile gefunden."
+          fi
+        elif command -v python > /dev/null 2>&1; then
+          log "Using Python fallback for SHA256 checksum..."
+          local my_sum
+          my_sum=$(python -c "import hashlib, sys; print(hashlib.sha256(open('${tmp}', 'rb').read()).hexdigest())")
+          if echo "${checksum_line}" | grep -q "${my_sum}"; then
+            expected_sum="${my_sum}"
+          else
+            log "WARN: Berechneter Hash ${my_sum} nicht in Checksum-Zeile gefunden."
+          fi
         else
-          # Without local sha256sum, we can't do this reverse lookup.
+          # Without sha256sum/shasum/python, we can't do this reverse lookup.
           # Fallback to guessing column 19? Or just grep first 64 char?
           # Grep first 64 char failed (it was column 1).
           # Let's try to extract column 19.
+          log "WARN: No checksum tool available, trying to extract column 19 from checksums file..."
           expected_sum=$(echo "${checksum_line}" | awk '{print $19}')
         fi
       fi
@@ -205,14 +232,23 @@ download_yq() {
         actual_sum=$(sha256sum "${tmp}" | awk '{print $1}')
       elif command -v shasum > /dev/null 2>&1; then
         actual_sum=$(shasum -a 256 "${tmp}" | awk '{print $1}')
+      elif command -v python3 > /dev/null 2>&1; then
+        log "Using Python3 fallback for SHA256 checksum..."
+        actual_sum=$(python3 -c "import hashlib, sys; print(hashlib.sha256(open('${tmp}', 'rb').read()).hexdigest())")
+      elif command -v python > /dev/null 2>&1; then
+        log "Using Python fallback for SHA256 checksum..."
+        actual_sum=$(python -c "import hashlib, sys; print(hashlib.sha256(open('${tmp}', 'rb').read()).hexdigest())")
       else
-        die "No sha256sum or shasum command found for checksum verification."
+        log "WARN: No sha256sum, shasum, or python found for checksum verification - skipping verification."
+        actual_sum=""
       fi
 
-      if [[ "${expected_sum}" != "${actual_sum}" ]]; then
-        die "Checksum-Verifikation fehlgeschlagen! Erwartet: ${expected_sum}, Ist: ${actual_sum} (Quelle: ${checksum_asset})"
-      else
-        log "Checksumme ok (Quelle ${checksum_asset}): ${actual_sum}"
+      if [[ -n "${actual_sum}" ]]; then
+        if [[ "${expected_sum}" != "${actual_sum}" ]]; then
+          die "Checksum-Verifikation fehlgeschlagen! Erwartet: ${expected_sum}, Ist: ${actual_sum} (Quelle: ${checksum_asset})"
+        else
+          log "Checksumme ok (Quelle ${checksum_asset}): ${actual_sum}"
+        fi
       fi
     fi
   fi

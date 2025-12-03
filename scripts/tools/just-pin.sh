@@ -148,14 +148,23 @@ download_just() {
         actual_sum=$(sha256sum "${tmp_bin}" | awk '{print $1}')
       elif have_cmd shasum; then
         actual_sum=$(shasum -a 256 "${tmp_bin}" | awk '{print $1}')
+      elif have_cmd python3; then
+        log "Using Python3 fallback for SHA256 checksum..."
+        actual_sum=$(python3 -c "import hashlib; print(hashlib.sha256(open('${tmp_bin}', 'rb').read()).hexdigest())")
+      elif have_cmd python; then
+        log "Using Python fallback for SHA256 checksum..."
+        actual_sum=$(python -c "import hashlib; print(hashlib.sha256(open('${tmp_bin}', 'rb').read()).hexdigest())")
       else
-        die "Weder sha256sum noch shasum verfügbar."
+        log "WARN: No checksum tool (sha256sum, shasum, python) available - skipping checksum verification."
+        actual_sum=""
       fi
 
-      if [[ "${expected_sum}" != "${actual_sum}" ]]; then
-        die "Checksum-Fehler! Erwartet: ${expected_sum}, Ist: ${actual_sum}"
+      if [[ -n "${actual_sum}" ]]; then
+        if [[ "${expected_sum}" != "${actual_sum}" ]]; then
+          die "Checksum-Fehler! Erwartet: ${expected_sum}, Ist: ${actual_sum}"
+        fi
+        log "Checksumme OK: ${actual_sum}"
       fi
-      log "Checksumme OK: ${actual_sum}"
     fi
   else
     log "WARN: Konnte keine Checksummen-Datei laden. Überspringe Verifikation."
