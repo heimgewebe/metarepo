@@ -12,34 +12,48 @@ WGX_OWNER="${WGX_OWNER:-${GITHUB_OWNER:-}}"
 
 # tmp handling
 _tmp_dirs=()
-cleanup(){ local d; for d in "${_tmp_dirs[@]:-}"; do [[ -n "$d" && -e "$d" ]] && rm -rf -- "$d"; done; }
+cleanup() {
+  local d
+  for d in "${_tmp_dirs[@]:-}"; do [[ -n "$d" && -e "$d" ]] && rm -rf -- "$d"; done
+}
 trap cleanup EXIT INT TERM
 
 source "$ROOT_DIR/wgx/lib/logging.bash"
 source "$ROOT_DIR/wgx/lib/runner.bash"
 source "$ROOT_DIR/wgx/lib/templates.bash"
-need(){ command -v "$1" >/dev/null 2>&1 || die "Fehlt: $1"; }
+need() { command -v "$1" > /dev/null 2>&1 || die "Fehlt: $1"; }
 
 [[ -f "$REPOS_YML" ]] || die "repos.yml fehlt (erwartet: $REPOS_YML)"
 [[ "$PLAN_LIMIT" =~ ^[0-9]+$ ]] || die "PLAN_LIMIT muss eine nicht-negative Ganzzahl sein"
 
 # ---------- Repo config bridge (Python) ----------
-mode()  { python3 "$REPO_CONFIG" --file "$REPOS_YML" mode; }
+mode() { python3 "$REPO_CONFIG" --file "$REPOS_YML" mode; }
 owner() {
-  if [[ -n "$WGX_OWNER" ]]; then echo "$WGX_OWNER"; return; fi
-  local o; o="$(python3 "$REPO_CONFIG" --file "$REPOS_YML" owner || true)"
-  if [[ -n "$o" ]]; then echo "$o"; return; fi
-  [[ -n "${GITHUB_OWNER:-}" ]] && { echo "$GITHUB_OWNER"; return; }
+  if [[ -n "$WGX_OWNER" ]]; then
+    echo "$WGX_OWNER"
+    return
+  fi
+  local o
+  o="$(python3 "$REPO_CONFIG" --file "$REPOS_YML" owner || true)"
+  if [[ -n "$o" ]]; then
+    echo "$o"
+    return
+  fi
+  [[ -n "${GITHUB_OWNER:-}" ]] && {
+    echo "$GITHUB_OWNER"
+    return
+  }
   die "Kein Owner gefunden (repos.yml github.owner, WGX_OWNER oder GITHUB_OWNER)."
 }
-default_branch_of(){ python3 "$REPO_CONFIG" --file "$REPOS_YML" default-branch "$1"; }
+default_branch_of() { python3 "$REPO_CONFIG" --file "$REPOS_YML" default-branch "$1"; }
 
-check_tools(){
+check_tools() {
   need rsync
   need git
   need python3
   need yq
-  local m; m="$(mode)"
+  local m
+  m="$(mode)"
   if [[ "$m" == "github" ]]; then
     need jq
     need gh
@@ -49,28 +63,33 @@ check_tools
 
 # ---------- Repo sets ----------
 repos_from_github() {
-  local ow; ow="$(owner)"
-  need gh; need jq
-  gh repo list "$ow" --json name,isPrivate,isFork --limit 200 \
-    | jq -r '.[] | select(.isFork==false) | select(.isPrivate==false) | .name'
+  local ow
+  ow="$(owner)"
+  need gh
+  need jq
+  gh repo list "$ow" --json name,isPrivate,isFork --limit 200 |
+    jq -r '.[] | select(.isFork==false) | select(.isPrivate==false) | .name'
 }
-repos_from_static(){ python3 "$REPO_CONFIG" --file "$REPOS_YML" repos || true; }
-repos(){
-  local m; m="$(mode)"
+repos_from_static() { python3 "$REPO_CONFIG" --file "$REPOS_YML" repos || true; }
+repos() {
+  local m
+  m="$(mode)"
   if [[ "$m" == "github" ]]; then repos_from_github; else repos_from_static; fi
 }
-ordered_repos(){
-  local m; m="$(mode)"
+ordered_repos() {
+  local m
+  m="$(mode)"
   if [[ "$m" == "github" ]]; then repos | sort; else python3 "$REPO_CONFIG" --file "$REPOS_YML" ordered-repos; fi
 }
 
 # ---------- Commands ----------
 for cmd_file in "$ROOT_DIR"/wgx/cmd/*.bash; do
+  # shellcheck source=/dev/null
   source "$cmd_file"
 done
 
-cmd_help(){
-  cat <<'HLP'
+cmd_help() {
+  cat << 'HLP'
 wgx – weave ground eXtensions
   usage:
     wgx <command> [args]
@@ -83,20 +102,47 @@ HLP
 }
 
 case "${1:-}" in
-  list)      cmd_list ;;
-  plan)      cmd_plan ;;
-  up)        shift || true; old_dryrun=$DRYRUN
-             if [[ -n "${1:-}" ]]; then
-               case "$1" in 0|1) DRYRUN=$1; shift || true ;; *) echo "Usage: $0 up [0|1]" >&2; exit 2 ;; esac
-             fi
-             cmd_up; DRYRUN=$old_dryrun ;;
-  run)       shift; cmd_run "${1:-ci}" ;;
-  doctor)    cmd_doctor ;;
-  validate)  cmd_validate ;;
-  smoke)     cmd_smoke ;;
-  guard)     cmd_guard ;;
-  code)      shift; cmd_code "$@";;
-  knowledge) shift; cmd_knowledge "$@";;
-  agent)     shift; cmd_agent "$@";;
-  *)         cmd_help; exit 1;;
+  list) cmd_list ;;
+  plan) cmd_plan ;;
+  up)
+    shift || true
+    old_dryrun=$DRYRUN
+    if [[ -n "${1:-}" ]]; then
+      case "$1" in 0 | 1)
+        DRYRUN=$1
+        shift || true
+        ;;
+      *)
+        echo "Usage: $0 up [0|1]" >&2
+        exit 2
+        ;;
+      esac
+    fi
+    cmd_up
+    DRYRUN=$old_dryrun
+    ;;
+  run)
+    shift
+    cmd_run "${1:-ci}"
+    ;;
+  doctor) cmd_doctor ;;
+  validate) cmd_validate ;;
+  smoke) cmd_smoke ;;
+  guard) cmd_guard ;;
+  code)
+    shift
+    cmd_code "$@"
+    ;;
+  knowledge)
+    shift
+    cmd_knowledge "$@"
+    ;;
+  agent)
+    shift
+    cmd_agent "$@"
+    ;;
+  *)
+    cmd_help
+    exit 1
+    ;;
 esac
