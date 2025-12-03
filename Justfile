@@ -162,17 +162,17 @@ lint:
     @set -euo pipefail; \
     files=(); \
     while IFS= read -r -d '' file; do \
-      files+=("$$file"); \
+      files+=("$file"); \
     done < <(git ls-files -z -- '*.sh' '*.bash' 'scripts/wgx' 'wgx/wgx' || true); \
-    if [ "$${#files[@]}" -eq 0 ]; then echo "keine Shell-Dateien"; exit 0; fi; \
-    printf '%s\0' "$${files[@]}" | xargs -0 bash -n; \
+    if [ "${#files[@]}" -eq 0 ]; then echo "keine Shell-Dateien"; exit 0; fi; \
+    printf '%s\0' "${files[@]}" | xargs -0 bash -n; \
     if command -v shfmt >/dev/null 2>&1; then \
-      shfmt -d -i 2 -ci -sr -- "$${files[@]}"; \
+      shfmt -d -i 2 -ci -sr -- "${files[@]}"; \
     else \
       echo "::warning::shfmt skipped: not found"; \
     fi; \
     if command -v shellcheck >/dev/null 2>&1; then \
-      shellcheck -S style -- "$${files[@]}"; \
+      shellcheck -S style -- "${files[@]}"; \
     else \
       echo "::warning::shellcheck skipped: not found"; \
     fi
