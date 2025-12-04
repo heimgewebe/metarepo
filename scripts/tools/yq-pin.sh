@@ -215,7 +215,7 @@ download_yq() {
             log "WARN: Berechneter Hash ${my_sum} nicht in Checksum-Zeile gefunden."
           fi
         else
-            log "WARN: Weder sha256sum noch shasum verfügbar - kann Multi-Column-Checksumme nicht verifizieren."
+          log "WARN: Weder sha256sum noch shasum verfügbar - kann Multi-Column-Checksumme nicht verifizieren."
         fi
       fi
     else
