@@ -27,7 +27,7 @@ bestehenden Diagramme sowie Detaildokumente.
   Daten aus chronik, semantAH und hausKI.
 - **wgx** – Flottenmotor für Sync, Doctor, Smoke & Automatisierung.
 - **semantAH** – erzeugt Insights & Graph-Artefakte für Berichte.
-- **hauski-audio** – liefert Audio-/Telemetrie-Events.
+- **hausKI-audio** – liefert Audio-/Telemetrie-Events.
 
 Ausführliche Rollenbeschreibungen findest du in der [Systemübersicht](./system-overview.md) und in der
 [Repo-Matrix](./repo-matrix.md).
