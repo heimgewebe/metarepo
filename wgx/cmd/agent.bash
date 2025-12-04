@@ -52,9 +52,9 @@ cmd_agent() {
       # naive yaml->json (nur sehr einfacher Fall) – für echte Nutzung: yq
       if command -v yq > /dev/null 2>&1 && command -v npx > /dev/null 2>&1; then
         tmp="$(mktemp)"
+        _tmp_dirs+=("$tmp")
         yq -o=json '.' "$manifest" > "$tmp"
         npx --yes ajv-cli@5 validate --spec=draft2020 -s "${ROOT_DIR}/contracts/agent.workflow.schema.json" -d "$tmp" || die "Manifest verletzt Contract"
-        rm -f "$tmp"
         log "OK: Agent-Manifest valid."
       else
         log "Hinweis: yq/npx fehlen – nur Format-Anwesenheit geprüft."
