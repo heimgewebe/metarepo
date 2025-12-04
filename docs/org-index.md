@@ -7,6 +7,7 @@ Quelle: [`repos.yml`](../repos.yml).
 | Repo | Default Branch | Domain | Scope | Metrics | Depends On |
 | --- | --- | --- | --- | --- | --- |
 | [aussensensor](https://github.com/heimgewebe/aussensensor) | main | aussen | events | – | – |
+| [chronik](https://github.com/heimgewebe/chronik) | main | chronik | ingest | – | – |
 | [hausKI](https://github.com/heimgewebe/hausKI) | main | assistant | policy | ✅ | – |
 | [hauski-audio](https://github.com/heimgewebe/hauski-audio) | main | audio | events | – | hausKI |
 | [heimlern](https://github.com/heimgewebe/heimlern) | main | policy | library | – | – |
