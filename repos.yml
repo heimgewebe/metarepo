@@ -49,13 +49,13 @@ repos:
     scope: shared
     metrics:
       enable: false
-  # - name: chronik
-  #   url: https://github.com/heimgewebe/chronik
-  #   default_branch: main
-  #   domain: chronik
-  #   scope: ingest
-  #   metrics:
-  #     enable: false
+  - name: chronik
+    url: https://github.com/heimgewebe/chronik
+    default_branch: main
+    domain: chronik
+    scope: ingest
+    metrics:
+      enable: false
   - name: aussensensor
     url: https://github.com/heimgewebe/aussensensor
     default_branch: main

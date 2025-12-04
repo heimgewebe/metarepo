@@ -64,6 +64,26 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      - name: Install checksum utilities (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          if ! command -v sha256sum >/dev/null 2>&1; then
+            echo "Installing coreutils for sha256sum..."
+            brew install coreutils
+            # On macOS, coreutils installs with 'g' prefix, ensure PATH includes them
+            COREUTILS_GNUBIN="$(brew --prefix coreutils)/libexec/gnubin"
+            echo "$COREUTILS_GNUBIN" >> "$GITHUB_PATH"
+            export PATH="$COREUTILS_GNUBIN:$PATH"
+            # Verify installation
+            if command -v sha256sum >/dev/null 2>&1; then
+              echo "sha256sum is now available"
+            else
+              echo "Warning: sha256sum still not available after coreutils install"
+            fi
+          else
+            echo "sha256sum already available"
+          fi
+
       - name: Check toolchain.versions.yml exists
         run: test -f toolchain.versions.yml || { echo "toolchain.versions.yml fehlt"; exit 1; }
 
@@ -304,9 +324,20 @@ jobs:
 
       - name: Lint GitHub Actions workflows
         if: runner.os == 'Linux'
-        uses: rhysd/actionlint@v1.7.9
-        with:
-          args: -color
+        run: |
+          chmod +x scripts/tools/actionlint-pin.sh
+          scripts/tools/actionlint-pin.sh ensure
+          echo "${PWD}/tools/bin" >> "$GITHUB_PATH"
+          tools/bin/actionlint -color
+
+      - name: Lint Shell scripts
+        if: runner.os == 'Linux'
+        run: |
+          chmod +x scripts/tools/shfmt-pin.sh scripts/tools/shellcheck-pin.sh
+          scripts/tools/shfmt-pin.sh ensure
+          scripts/tools/shellcheck-pin.sh ensure
+          echo "${PWD}/tools/bin" >> "$GITHUB_PATH"
+          just lint
 
       - name: Check Rust formatting
         if: ${{ hashFiles('**/Cargo.toml') != '' }}
@@ -331,11 +362,6 @@ jobs:
       - name: Show available Just targets
         run: just -l || true
 
-      - name: Install actionlint CLI
-        run: |
-          chmod +x scripts/tools/actionlint-pin.sh
-          scripts/tools/actionlint-pin.sh ensure
-          actionlint -version
 
       - name: Validate project
         run: |

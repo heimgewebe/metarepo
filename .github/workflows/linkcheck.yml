@@ -33,7 +33,10 @@ jobs:
       - name: Install system dependencies for lychee
         run: sudo apt-get update && sudo apt-get install -y jq
       - name: Install lychee
-        run: ./scripts/tools/lychee-install.sh
+        run: |
+          chmod +x scripts/tools/lychee-install.sh
+          ./scripts/tools/lychee-install.sh ensure
+          echo "${PWD}/tools/bin" >> "$GITHUB_PATH"
       - name: Cache lychee URL state
         uses: actions/cache@v4 # v4 (major tag)
         with:
