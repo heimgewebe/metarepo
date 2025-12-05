@@ -37,6 +37,8 @@ jobs:
           chmod +x scripts/tools/lychee-install.sh
           ./scripts/tools/lychee-install.sh ensure
           echo "${PWD}/tools/bin" >> "$GITHUB_PATH"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Cache lychee URL state
         uses: actions/cache@v4 # v4 (major tag)
         with:
