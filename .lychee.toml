@@ -21,8 +21,4 @@ exclude = [
 # Optional: Domains lassen sich hier ausschließen, falls einzelne Ziele drosseln oder 429 liefern.
 # exclude = ["https://raw.githubusercontent.com/heimgewebe/.*/large-assets/.*"]
 
-[[inputs]]
-path = "README.md"
-
-[[inputs]]
-path = "docs"
+inputs = ["README.md", "docs"]
