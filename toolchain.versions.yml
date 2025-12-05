@@ -1,7 +1,7 @@
 # Managed per docs/adrs/003-ci-reusables-pinning.md
 # This file is required for CI validation (hashFiles) and tool pinning.
 rust: "1.83.0"
-python: "3.11.11"
+python: "3.11.14"
 uv: "0.4.20"
 yq: "v4.49.2"
 just: "1.43.0"
