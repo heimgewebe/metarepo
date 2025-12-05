@@ -1,12 +1,12 @@
 # Managed per docs/adrs/003-ci-reusables-pinning.md
 # This file is required for CI validation (hashFiles) and tool pinning.
-rust: "stable"       # oder z. B. "1.81.0"
-python: "3.12"
+rust: "1.74.1"
+python: "3.11.14"
 uv: "0.4.20"
 yq: "v4.49.2"
-just: "v1.43.0"
-actionlint: "v1.7.9"
-sccache: "v0.12.0"
+just: "1.15.0"
+sccache: "0.7.0"
+actionlint: "1.6.14"
 lychee: "v0.15.1"
 shfmt: "v3.8.0"
 shellcheck: "v0.9.0"
