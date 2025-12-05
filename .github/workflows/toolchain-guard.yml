@@ -25,6 +25,7 @@ jobs:
 
           echo "Querying release assets for $YQ_VERSION..."
           if ! curl --fail --max-time 60 --connect-timeout 10 --retry 3 -fsSL \
+              -H "Authorization: Bearer ${{ github.token }}" \
               "https://api.github.com/repos/mikefarah/yq/releases/tags/${YQ_VERSION}" -o "$RELEASE_JSON"; then
             echo "Fehler: konnte Release metadata nicht laden" >&2
             rm -f "$RELEASE_JSON"

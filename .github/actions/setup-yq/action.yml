@@ -1,5 +1,10 @@
 name: 'Setup yq'
 description: 'Install yq using version from toolchain.versions.yml and verify checksum'
+inputs:
+  github-token:
+    description: 'GitHub token for API authentication (to avoid rate limits)'
+    required: false
+    default: ''
 runs:
   using: 'composite'
   steps:
@@ -56,6 +61,8 @@ runs:
 
     - name: Ensure yq is available
       shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
       run: |
         set -euo pipefail
         # Add tools/bin to PATH (subsequent steps in this action and caller workflow)
