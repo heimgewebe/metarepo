@@ -10,6 +10,7 @@ Welcome to the Heimgewebe Metarepo documentation!
 - [System Overview](system-overview.md): Complete system description
 - [Heimgewebe Gesamt](heimgewebe-gesamt.md): Narrative overview (German)
 - [Konzept Kern](konzept-kern.md): Core concepts - Governance, Sync, Drift (German)
+- [Nutzung](nutzung.md): Usage & Daily Operations (German)
 - [Overview](overview.md): Quick overview
 
 ### Fleet Management

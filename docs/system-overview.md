@@ -11,7 +11,7 @@
 | [`hausKI`](https://github.com/heimgewebe/hausKI) | KI-Orchestrator, State | [`docs/`](https://github.com/heimgewebe/hausKI/tree/main/docs) |
 | [`semantAH`](https://github.com/heimgewebe/semantAH) | Semantik, Graph, Insights | [`docs/`](https://github.com/heimgewebe/semantAH/tree/main/docs) |
 | `chronik` | Ingest, Persistenz, Audit | – |
-| [`leitstand`](https://github.com/heimgewebe/leitstand) | UI/Dashboard | (geplant) |
+| `leitstand` | UI/Dashboard | (geplant) |
 | [`aussensensor`](https://github.com/heimgewebe/aussensensor) | Außen-Feeds | [`docs/`](https://github.com/heimgewebe/aussensensor/tree/main/docs) |
 | [`heimlern`](https://github.com/heimgewebe/heimlern) | Policies, Lernen | [`docs/`](https://github.com/heimgewebe/heimlern/tree/main/docs) |
 
