@@ -30,12 +30,12 @@ Es gibt drei Klassen:
 - aussensensor — Event-Ingest aus der Außenwelt
 - chronik — Event-Persistenz, Audit-Log
 - tools — universelle Skripte & Hilfsprogramme
+- heimgeist — Meta-Agent für Beobachtung / Orchestrierung
+- plexer — Routing/Orchestrierungs-Schicht zwischen Agents
 
 ## Related
 
 - weltgewebe — Dokumentation / Public Web / externe Signale (nicht Fleet)
-- heimgeist — Meta-Agent für Beobachtung / Orchestrierung (nicht Fleet)
-- plexer — Routing/Orchestrierungs-Schicht zwischen Agents (nicht Fleet)
 
 ## Private
 
