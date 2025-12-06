@@ -1,36 +1,43 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.heimgewebe.org/contracts/insights.daily.schema.json",
-  "title": "semantAH insights (daily)",
-  "x-producers": ["semantAH"],
-  "x-consumers": ["hausKI", "chronik"],
+  "$id": "https://heimgewebe/contracts/insights.daily.schema.json",
+  "title": "Daily Insights",
+  "description": "Tagesbezogene semantische Einsichten aus dem Vault (semantAH).",
   "type": "object",
-  "required": ["ts", "topics"],
+  "additionalProperties": false,
+  "required": ["ts", "topics", "questions", "deltas"],
   "properties": {
-    "ts": { "type": "string", "format": "date" },
+    "ts": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "description": "Kalenderdatum im Format YYYY-MM-DD."
+    },
     "topics": {
       "type": "array",
+      "description": "Liste gewichteter Themen für den Tag.",
       "items": {
         "type": "array",
         "minItems": 2,
         "maxItems": 2,
         "prefixItems": [
-          { "type": "string" },
-          { "type": "number", "minimum": 0, "maximum": 1 }
+          { "type": "string", "description": "Themenbezeichnung." },
+          { "type": "number", "description": "Gewichtung oder Frequenz." }
         ],
         "items": false
       }
     },
-    "questions": { "type": "array", "items": { "type": "string" } },
+    "questions": {
+      "type": "array",
+      "description": "Fragen oder Denkangebote, die aus den Daten abgeleitet wurden.",
+      "items": {
+        "type": "string"
+      }
+    },
     "deltas": {
       "type": "array",
+      "description": "Beschreibungen relevanter Veränderungen gegenüber früheren Zuständen.",
       "items": {
-        "type": "object",
-        "required": ["topic", "trend"],
-        "properties": {
-          "topic": { "type": "string" },
-          "trend": { "type": "string", "enum": ["+1", "0", "-1"] }
-        }
+        "type": "string"
       }
     }
   }
