@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heimgewebe/contracts/fleet.health.schema.json",
+  "title": "Fleet Health Snapshot",
+  "description": "Aggregierter Gesundheitszustand der Heimgewebe-Fleet aus WGX-Metriken.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["timestamp", "repoCount", "status"],
+  "properties": {
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Zeitpunkt, zu dem der Snapshot erstellt wurde."
+    },
+    "repoCount": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Anzahl der in diesem Snapshot berücksichtigten Repositories."
+    },
+    "status": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ok", "warn", "fail"],
+      "properties": {
+        "ok":   { "type": "integer", "minimum": 0 },
+        "warn": { "type": "integer", "minimum": 0 },
+        "fail": { "type": "integer", "minimum": 0 }
+      },
+      "description": "Zustandsverteilung der Fleet nach Statusklassen."
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Optionale Zusatzinformationen (z. B. Quelle, Label, Version)."
+    }
+  }
+}
