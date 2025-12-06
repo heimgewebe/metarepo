@@ -56,7 +56,7 @@ fail() {
 }
 
 need() {
-  command -v "$1" >/dev/null 2>&1 || fail "benötigtes Programm fehlt: $1"
+  command -v "$1" > /dev/null 2>&1 || fail "benötigtes Programm fehlt: $1"
 }
 
 need diff
@@ -81,7 +81,6 @@ CONTRACT_TARGETS["contracts/aussen.event.schema.json"]="
 # CONTRACT_TARGETS["contracts/heimlern.policy.snapshot.schema.json"]="
 #   heimlern:contracts/heimlern.policy.snapshot.schema.json
 # "
-
 
 sync_one_target() {
   local src_rel="$1"
@@ -108,7 +107,7 @@ sync_one_target() {
       printf '[contracts-sync] DRIFT: %s fehlt in %s\n' "$rel_path" "$repo" >&2
       return 1
     fi
-    if ! diff -q "$src" "$dst" >/dev/null 2>&1; then
+    if ! diff -q "$src" "$dst" > /dev/null 2>&1; then
       printf '[contracts-sync] DRIFT: %s unterscheidet sich in %s\n' "$rel_path" "$repo" >&2
       return 1
     fi
@@ -126,7 +125,7 @@ main() {
   for src_rel in "${!CONTRACT_TARGETS[@]}"; do
     # Shell-Word-Splitting bewusst, da die Value-Liste whitespace-separiert ist.
     # shellcheck disable=SC2206
-    local targets=( ${CONTRACT_TARGETS[$src_rel]} )
+    local targets=(${CONTRACT_TARGETS[$src_rel]})
 
     for spec in "${targets[@]}"; do
       if ! sync_one_target "$src_rel" "$spec"; then
