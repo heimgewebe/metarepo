@@ -48,6 +48,7 @@
         "properties": {
           "id": {
             "type": "string",
+            "pattern": "^[a-zA-Z0-9._-]+$",
             "description": "Name des Repos oder Dienstes, z. B. 'chronik' oder 'hausKI'."
           },
           "state": {
