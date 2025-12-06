@@ -1,31 +1,24 @@
+static:
+  include:
+    - name: weltgewebe
+      url: "https://github.com/heimgewebe/weltgewebe"
+      status: related
+  # private Repos:
+  # - vault-gewebe (nie Fleet)
+
 repos:
-  - name: heimgewebe/metarepo
-    default_branch: main
-  - name: heimgewebe/wgx
-    default_branch: main
-  - name: heimgewebe/hausKI
-    default_branch: main
-  - name: heimgewebe/hausKi-audio
-    default_branch: main
-  - name: heimgewebe/heimlern
-    default_branch: main
-  - name: heimgewebe/semantAH
-    default_branch: main
-  - name: heimgewebe/aussensensor
-    default_branch: main
-  - name: heimgewebe/chronik
-    default_branch: main
-  - name: heimgewebe/contracts
-    default_branch: main
-  - name: heimgewebe/mitschreiber
-    default_branch: main
-  - name: heimgewebe/weltgewebe
-    default_branch: main
-  - name: heimgewebe/sichter
-    default_branch: main
-  - name: heimgewebe/tools
-    default_branch: main
-  - name: heimgewebe/heimgeist
-    default_branch: main
-  - name: heimgewebe/plexer
-    default_branch: main
+  - name: metarepo
+  - name: wgx
+  - name: contracts
+  - name: hausKI
+  - name: hausKI-audio
+  - name: heimlern
+  - name: semantAH
+  - name: aussensensor
+  - name: chronik
+  - name: tools
+  - name: mitschreiber
+  - name: sichter
+  - name: leitstand
+  - name: heimgeist
+  - name: plexer
