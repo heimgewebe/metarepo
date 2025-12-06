@@ -1,0 +1,29 @@
+---
+name: contracts-index-guard
+
+'on':
+  pull_request:
+    paths:
+      - 'contracts/*.schema.json'
+      - 'contracts/*.yml'
+      - 'contracts/*.yaml'
+      - 'docs/contracts-index.md'
+      - 'scripts/check-contracts-index.sh'
+      - '.github/workflows/contracts-index-guard.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        shell: bash --noprofile --norc -euo pipefail {0}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check contracts index
+        run: |
+          bash ./scripts/check-contracts-index.sh
