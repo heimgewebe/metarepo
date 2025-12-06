@@ -2,35 +2,72 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://heimgewebe/contracts/fleet.health.schema.json",
   "title": "Fleet Health Snapshot",
-  "description": "Aggregierter Gesundheitszustand der Heimgewebe-Fleet aus WGX-Metriken.",
+  "description": "Aggregierter Gesundheitszustand der Heimgewebe-Fleet zu einem Zeitpunkt.",
   "type": "object",
-  "additionalProperties": false,
   "required": ["timestamp", "repoCount", "status"],
   "properties": {
     "timestamp": {
       "type": "string",
       "format": "date-time",
-      "description": "Zeitpunkt, zu dem der Snapshot erstellt wurde."
+      "description": "Zeitpunkt der Messung im ISO-8601-Format."
     },
     "repoCount": {
       "type": "integer",
       "minimum": 0,
-      "description": "Anzahl der in diesem Snapshot berücksichtigten Repositories."
+      "description": "Anzahl der in dieser Messung berücksichtigten Repositories."
     },
     "status": {
       "type": "object",
-      "additionalProperties": false,
       "required": ["ok", "warn", "fail"],
       "properties": {
-        "ok":   { "type": "integer", "minimum": 0 },
-        "warn": { "type": "integer", "minimum": 0 },
-        "fail": { "type": "integer", "minimum": 0 }
+        "ok": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Anzahl Repositories ohne Fehlzustand."
+        },
+        "warn": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Anzahl Repositories mit Warnungen (z. B. flaky Tests, langsame Pipelines)."
+        },
+        "fail": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Anzahl Repositories mit harten Fehlern (z. B. rote CI, kaputte Deployments)."
+        }
       },
+      "additionalProperties": false,
       "description": "Zustandsverteilung der Fleet nach Statusklassen."
+    },
+    "details": {
+      "type": "array",
+      "description": "Optionale Detail-Liste pro Repo oder Service.",
+      "items": {
+        "type": "object",
+        "required": ["id", "state"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9._-]+$",
+            "description": "Name des Repos oder Dienstes, z. B. 'chronik' oder 'hausKI'."
+          },
+          "state": {
+            "type": "string",
+            "enum": ["ok", "warn", "fail"],
+            "description": "Zustand dieses Eintrags."
+          },
+          "note": {
+            "type": "string",
+            "description": "Freitext, z. B. Fehlerursache oder Hinweis."
+          }
+        },
+        "additionalProperties": false
+      }
     },
     "metadata": {
       "type": "object",
-      "description": "Optionale Zusatzinformationen (z. B. Quelle, Label, Version)."
+      "description": "Optionale Zusatzinformationen (z. B. Git-Hash, Cluster, Auslöser)."
     }
-  }
+  },
+  "additionalProperties": false
 }
