@@ -28,6 +28,10 @@ Dies ist **nicht die gesamte Organisation**, sondern nur die operative Fleet.
 | Repo              | Rolle                      | Fleet  |
 |-------------------|----------------------------|--------|
 | weltgewebe        | Web/Doku/Externe Signale   | no     |
+| heimgeist         | Meta-Agent / Beobachtung   | no     |
+| plexer            | Agent-Routing / Orchestr.  | no     |
+
+Weitere Details zu Related-Repos: siehe `overview.md`.
 
 ## Private
 | vault-gewebe      | Privater Obsidian-Vault (nie Fleet) | no |
