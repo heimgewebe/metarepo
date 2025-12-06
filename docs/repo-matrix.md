@@ -21,6 +21,8 @@ Dies ist **nicht die gesamte Organisation**, sondern nur die operative Fleet.
 | mitschreiber      | Dialog-/Schreibschicht               | yes    |
 | sichter           | Review-Agent / Semantic Checks       | yes    |
 | leitstand         | Dashboard / UI                       | yes    |
+| heimgeist         | Meta-Agent / Beobachtung             | yes    |
+| plexer            | Agent-Routing / Orchestrierung       | yes    |
 
 
 ## Related (nicht Fleet)
@@ -28,8 +30,6 @@ Dies ist **nicht die gesamte Organisation**, sondern nur die operative Fleet.
 | Repo              | Rolle                      | Fleet  |
 |-------------------|----------------------------|--------|
 | weltgewebe        | Web/Doku/Externe Signale   | no     |
-| heimgeist         | Meta-Agent / Beobachtung   | no     |
-| plexer            | Agent-Routing / Orchestr.  | no     |
 
 Weitere Details zu Related-Repos: siehe `overview.md`.
 
