@@ -1,6 +1,8 @@
 # Contracts-Index des Heimgewebes
 
-Dieses Dokument bündelt die wichtigsten Daten-Contracts des Heimgewebes und verknüpft sie mit den jeweiligen Repositories.
+Dieses Dokument listet die wichtigsten und derzeit aktiv genutzten Daten-Contracts des Heimgewebes und verknüpft sie mit den jeweiligen Repositories.
+
+**Hinweis:** Dies ist ein kuratierter Einstiegspunkt, der keinen Anspruch auf Vollständigkeit erhebt, sondern die systemweit relevanten Contracts hervorhebt.
 
 Ziel:
 
@@ -26,6 +28,8 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
   - Zweck: standardisierte Außen-Events, bevor sie in die interne Event-Landschaft aufgenommen werden.
 - `audio.events.schema.json`
   - Zweck: Audio-bezogene Ereignisse (z. B. Aufnahmen, Transkriptionen, TTS).
+- `intent_event.schema.json`
+  - Zweck: Intent-Events aus Audio/Text für chronik/hausKI (Intent-Erkennung mit Confidence).
 
 ### 1.2 Fleet & Metriken
 
@@ -183,7 +187,7 @@ Zweck:
 ## 4. Neuen Contract anlegen – Minimalvorlage
 
 Für neue JSON-Schemas im Heimgewebe sollte sich an folgendem Muster orientiert werden
-(vereinfacht, tatsächliche Konventionen siehe `contracts/SCHEMA_CONVENTIONS.md` im contracts-Repo):
+(vereinfacht, **tatsächliche Konventionen siehe `contracts/SCHEMA_CONVENTIONS.md` im contracts-Repo**):
 
 ```json
 {
@@ -217,7 +221,19 @@ Grundsätze:
 
 ---
 
-## 5. Nutzung für KI & Tools
+## 5. Pflege dieses Dokuments
+
+Dieses Dokument wird kuratiert gepflegt, um systemweit relevante Contracts sichtbar zu halten:
+
+- **Zentrale metarepo-Contracts:** Wenn neue Dateien unter `contracts/*.schema.json` angelegt, umbenannt oder gelöscht werden, sollte dieses Dokument in derselben PR aktualisiert werden.
+- **Repo-spezifische Contracts:** Änderungen an Contracts in anderen Repos sollten hier referenziert werden, falls sie systemweit relevant sind (z. B. Events, Policy-Strukturen, Weltgewebe-Domänenmodelle).
+- **Qualitätssicherung:** Ein automatischer Guard-Check (siehe `.github/workflows/contracts-index-guard.yml`) prüft, dass alle zentralen `contracts/*.schema.json`-Dateien im Index vorkommen.
+
+Weitere Hinweise zur Contracts-Pflege finden sich in `CONTRIBUTING.md`.
+
+---
+
+## 6. Nutzung für KI & Tools
 
 Für KIs und Tools kann dieses Dokument als Einstiegsindex dienen:
 

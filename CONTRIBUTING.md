@@ -32,6 +32,13 @@ Willkommen! Dieses Repo ist der Kanon für alle heimgewebe-Flotten. Damit Änder
 - **Review-Kontext:** Notiere Besonderheiten im Abschnitt „Review-Notizen“ (z. B. welche Sub-Repos ein Follow-up benötigen).
 - **Reconciliation:** Wenn du Templates aus Sub-Repos übernimmst, referenziere die Quelle (`<repo>@<sha>`).
 
+## Contracts pflegen
+Wenn du Änderungen an Daten-Contracts vornimmst:
+
+- **Zentrale metarepo-Contracts:** Wenn neue Dateien unter `contracts/*.schema.json` angelegt, umbenannt oder gelöscht werden, aktualisiere `docs/contracts-index.md` in derselben PR.
+- **Repo-spezifische Contracts:** Falls ein Contract in einem anderen Repo systemweit relevant ist (Events, Policy, Weltgewebe-Domain etc.), ergänze einen Eintrag in `docs/contracts-index.md`.
+- **CI-Check:** Ein automatischer Guard prüft, dass alle zentralen `contracts/*.schema.json`-Dateien im Index referenziert sind.
+
 ## Nach dem Merge
 - Führe bei Bedarf `./scripts/sync-templates.sh --push-to <repo>` aus, um die aktualisierten Templates zu verteilen.
 - Aktualisiere Downstream-Issues/Docs, falls deine Änderung Koordination benötigt.
