@@ -1,0 +1,96 @@
+# Maschinenlesbare Übersicht, welche Repos welche zentralen Heimgewebe-Contracts konsumieren.
+#
+# Grundprinzip:
+# - Alle hier referenzierten Schemas liegen kanonisch im metarepo unter ./contracts/.
+# - Consumer-Repos dürfen diese Schemas:
+#   - nur referenzieren (mode: reference-only), oder
+#   - 1:1 spiegeln (mode: mirror) mit CI-Driftcheck.
+#
+# Diese Datei ist bewusst einfach gehalten, damit sie später von Tools
+# (z. B. wgx oder heimgeist) ausgewertet werden kann.
+
+event_backbone:
+  aussen.event:
+    schema: contracts/aussen.event.schema.json
+    consumers:
+      - repo: aussensensor
+        files:
+          - contracts/aussen.event.schema.json
+        mode: mirror
+      - repo: chronik
+        files: []
+        mode: reference-only
+
+  event.line:
+    schema: contracts/event.line.schema.json
+    consumers:
+      - repo: chronik
+        files: []
+        mode: reference-only
+      # Weitere Repos bei Bedarf ergänzen
+
+fixtures:
+  chronik-fixtures:
+    schema: contracts/chronik-fixtures.schema.json
+    consumers:
+      - repo: chronik
+        files: []
+        mode: reference-only
+
+metrics:
+  fleet.health:
+    schema: contracts/fleet.health.schema.json
+    consumers:
+      - repo: wgx
+        files: []
+        mode: reference-only
+      - repo: leitstand
+        files: []
+        mode: reference-only
+
+  insights.daily:
+    schema: contracts/insights.daily.schema.json
+    consumers:
+      - repo: semantAH
+        files: []
+        mode: reference-only
+
+os_context:
+  state:
+    schema: contracts/os.context.state.schema.json
+    consumers:
+      - repo: mitschreiber
+        files: []
+        mode: reference-only
+
+  text.embed:
+    schema: contracts/os.context.text.embed.schema.json
+    consumers:
+      - repo: semantAH
+        files: []
+        mode: reference-only
+
+policy:
+  decision:
+    schema: contracts/policy.decision.schema.json
+    consumers:
+      - repo: heimlern
+        files: []
+        mode: reference-only
+      - repo: hausKI
+        files: []
+        mode: reference-only
+
+  feedback:
+    schema: contracts/policy.feedback.schema.json
+    consumers:
+      - repo: heimlern
+        files: []
+        mode: reference-only
+
+  snapshot:
+    schema: contracts/policy.snapshot.schema.json
+    consumers:
+      - repo: heimlern
+        files: []
+        mode: reference-only
