@@ -1,211 +1,346 @@
-# Heimgewebe als Organismus
+# Heimgewebe – Organismusübersicht
 
-Dieses Dokument beschreibt Heimgewebe als technischen Organismus:
+Heimgewebe besteht aus spezialisierten Repositories, die zusammen einen verteilten, ereignis- und wissensbasierten Organismus bilden.
+Jede Komponente ist mit einem der drei Labels markiert:
 
-- welche Repos welche „Organe“ darstellen,
-- welche Muster dort gut gelöst sind,
-- was andere Repos davon explizit übernehmen sollen.
-
-Ziel: Cross-Pollination sichtbar machen, statt jedes Repo isoliert zu betrachten.
-
----
-
-## 1. Organismus-Übersicht
-
-Kernachsen:
-
-- **Control-Plane:** `metarepo`, `contracts`, `wgx`
-- **Gedächtnis & Sinn:** `chronik`, `semantAH`, `vault-gewebe`
-- **Entscheidung:** `hausKI`, `heimlern`
-- **Peripherie & UI:** `aussensensor`, `leitstand`, `tools`, Satelliten (z. B. `sichter`, `mitschreiber`)
-
-Merksatz:
-
-> Code lebt in vielen Repos, aber **der Organismus** ist eins.
+- **(IST)** heute im Code erkennbar
+- **(ZIEL)** intendierte Weiterentwicklung
+- **(POLICY)** verbindliche Architekturregel
 
 ---
 
-## 2. Muster pro Repo – und was die anderen davon lernen sollen
+## 0. Makrostruktur des Organismus
 
-### 2.1 metarepo – Contracts, CI, ADRs
+### 0.1 Parallele Achsen
 
-**Leitmuster:**
-- JSON-Schemas unter `contracts/*.schema.json` als zentrale Verträge.
-- Reusable Workflows für Fleet-weit einheitliche Checks.
-- ADRs als explizite Architekturentscheidungen.
+- **Ereignisachse**
+  (IST) Events aus Außenwelt, OS-Kontext, Fleet, Audio, CI werden erzeugt und in `chronik` persistiert.
 
-**Empfohlene Übernahmen für alle Repos:**
-- Sich auf Contracts im metarepo beziehen (statt eigene Schemas zu erfinden).
-- Für neue Formate zuerst Contract im metarepo definieren.
-- Änderungen an Datenstrukturen immer mit ADR oder kurzem Decision-Log verknüpfen.
+- **Wissensachse**
+  (IST) `semantAH` erzeugt rekonstruierbare Insights, Einbettungen, Graphstrukturen.
 
----
+- **Entscheidungsachse**
+  (IST) `hausKI` trifft Entscheidungen basierend auf Insights, Events und weiteren Kanälen.
 
-### 2.2 contracts – gemeinsame Sprache
+- **Fleet-/Metrikachse**
+  (IST) `wgx` erzeugt Metriken und Statuspunkte (`fleet.health`, `metrics.snapshot`).
 
-**Leitmuster:**
-- Kanonische Schemas für z. B.:
-  - `event.line`
-  - `fleet.health`
-  - `insights.daily`
-- Fokus auf minimale, aber stabile Strukturen.
+- **OS-Kontextachse**
+  (IST) `mitschreiber` sammelt Desktop-/App-Kontext in einem WAL und generiert daraus `os.context.*` Events.
 
-**Empfohlene Übernahmen:**
-- `chronik` schreibt Events strikt im Format `event.line`.
-- `semantAH` produziert `insights.daily` exakt nach Contract.
-- `leitstand` konsumiert `fleet.health` und `insights.daily` ausschließlich über die Contracts.
-- Neue Repos definieren lieber kleine Sub-Contracts als freies JSON.
+(POLICY) Keine dieser Achsen ist „fundamental“. Das System entsteht aus ihrer Wechselwirkung.
 
 ---
 
-### 2.3 wgx – Fleet-CLI und Profile
+## 1. Kommunikations- und Integrationsachsen
 
-**Leitmuster:**
-- `.wgx/profile.yml` als deklaratives Profil pro Repo.
-- Einheitliche Kommandos (`wgx guard`, `wgx smoke`, `wgx metrics`).
-- Klare Trennung:
-  - „Was will das Repo?“ → Profile
-  - „Wie wird es ausgeführt?“ → wgx-Implementierung.
+### 1.1 Achse A – Code & Contracts
 
-**Empfohlene Übernahmen:**
-- Jedes Fleet-Repo besitzt ein `.wgx/profile.yml`.
-- CI-Workflows rufen wgx-Kommandos auf, statt eigene Shell-Orgien zu bauen.
-- Repos beschreiben ihr Selbstbild (Wichtigkeit, Checks, Metriken) im Profile statt in zig YAML-Varianten.
+- (IST) Interne JSON-Schemas für Organismus-Contracts
+  (z. B. `event.line`, `insights.daily`, `fleet.health`) liegen im Metarepo
+  unter `contracts/*.schema.json`.
+- (IST) Externe API-Contracts (z. B. `aussen/v1`, `heimlern/v1`) liegen
+  im `contracts`-Repo als Protobuf + JSON-Mirror.
+- (IST) Rust-Crates, Python-Module und Skripte nutzen diese Contracts
+  explizit (z. B. hausKI, heimlern, aussensensor).
+- (POLICY) „Contracts first“: Neue Formate werden zuerst als Schema
+  beschrieben, erst dann im Code verwendet.
 
----
+### 1.2 Achse B – Events (Fakten)
 
-### 2.4 chronik – Event-Gedächtnis
+- (IST) `chronik` führt einen append-only JSONL-Eventstore
+  (`event.line`).
+- (IST) Mehrere Repos schreiben Events, u. a. `aussensensor`, `heimlern`,
+  hausKI-Entscheidungen und CI-/Fleet-Signale.
+- (IST) `plexer` kann Events entgegennehmen und an Konsumenten
+  wie `heimgeist` weiterreichen.
+- (POLICY) Events beschreiben Fakten („ist passiert“), nicht Intentionen.
+- (POLICY) Wichtige Zustandsänderungen sollten als Events sichtbar werden,
+  statt als stiller Seiteneffekt zu verschwinden.
 
-**Leitmuster:**
-- Append-only Event-Store (JSONL) mit klaren Pfaden.
-- Trennung von:
-  - Ingest (schreibende Systeme)
-  - Query/Lesen (auswertende Systeme).
+### 1.3 Achse C – Commands (Intentionen)
 
-**Empfohlene Übernahmen:**
-- Alle Repos, die „etwas Wichtiges“ tun, können optional Events in `chronik` schreiben.
-- Statt Logs nur in CI-Logs zu verlieren → wichtige Zustandswechsel als `event.line` in `chronik`.
-- hausKI-Entscheidungen, Lern-Updates aus `heimlern` und WGX-Metriken sollten Events hinterlassen.
+- (IST) Commands entstehen heute vor allem über GitHub-PR-Kommentare
+  (z. B. `@heimgewebe/sichter /quick`). Diese werden geparst und in
+  Eventform (z. B. `heimgewebe.command.v1`) überführt.
+- (ZIEL) Commands sollen vollständig auditierbar und replay-fähig sein
+  (z. B. über chronik und leitstand).
+- (POLICY) Commands = Intentionen („bitte tue X“),
+  Events = Fakten („X wurde getan“). Niemals mischen.
 
----
+### 1.4 Achse D – WGX als Motorik
 
-### 2.5 semantAH – Sinnschicht und Insights
-
-**Leitmuster:**
-- Rebuildbare Indizes unter `.gewebe/index/*`.
-- Tägliche Insights unter `.gewebe/insights/daily/` + `today.json`.
-- Strenge Trennung:
-  - Quelle: Vault-Dateien
-  - Ableitung: Embeddings, Topics, Fragen.
-
-**Empfohlene Übernahmen:**
-- Andere Repos dürfen Annahmen über Insights **nur** machen, wenn sie dem Contract `insights.daily` folgen.
-- hausKI nutzt Insights für Entscheidungen, anstatt selbst wild durch den Vault zu parsen.
-- leitstand verwendet semantAH als einzige Wahrheit für „Top-Themen des Tages“.
-
----
-
-### 2.6 hausKI – Entscheider mit Gedächtnis
-
-**Leitmuster:**
-- Zentrale Entscheidungslogik (Playbooks, Policies).
-- Konsum von:
-  - Events aus `chronik`
-  - Insights aus `semantAH`
-  - Health aus `fleet.health`.
-- Rückschreiben der eigenen Entscheidungen als Events.
-
-**Empfohlene Übernahmen:**
-- hausKI sollte **immer** über `chronik` und Contracts arbeiten, nicht über direkte Datei-Hacks.
-- Andere Repos delegieren komplexere „Was soll ich tun?“-Fragen an hausKI, statt überall Mikro-Logik einzubauen.
+- (IST) Mehrere Repos sind WGX-fähig (`![WGX]`-Badge, `.wgx/profile.yml`,
+  WGX-Skripte).
+- (IST) WGX-Skripte erzeugen u. a. Fleet-Metriken, die von hausKI
+  eingelesen werden.
+- (ZIEL) Alle Fleet-Repos nutzen WGX für Standardabläufe
+  (`guard`, `smoke`, `metrics`, `semantah`).
+- (POLICY) Lieber einheitliche WGX-Kommandos als Repo-spezifische
+  Shell-Inseln.
 
 ---
 
-### 2.7 heimlern – Lernen aus Feedback
-
-**Leitmuster:**
-- Bandit-/Policy-Layer, der Regeln über Erfahrungen verbessert.
-- Nutzt chronik-Events und explizites Feedback.
-
-**Empfohlene Übernahmen:**
-- hausKI und WGX verwenden heimlern als „Meta-Schicht“, wenn es um:
-  - Priorisierung
-  - Eskalationen
-  - Wiederholte Fehler geht.
-- Repos, die Entscheidungen treffen, loggen Feedback wieder als Events, damit heimlern lernen kann.
+## 2. Repositories
 
 ---
 
-### 2.8 aussensensor – kontrollierte Außenwelt
+## 2.1 metarepo – Struktur, Contracts, Policies
 
-**Leitmuster:**
-- Kuratierter Zufluss von externen Feeds.
-- Klare Grenze zwischen Außen und Innen.
+- (IST) Enthält übergeordnete Architektur-Dokumente und Cross-Repo-Richtlinien.
+- (IST) Führt interne Organismus-Contracts (`event.*`, `insights.daily`, `fleet.health`, `os.context.*`).
+- (IST) Enthält WGX-Vorlagen und Reusable Workflows.
+- (ZIEL) Vollständige Fleet-Definition (Welche Repos? Welche Profile? Welche Policies?).
+- (POLICY) Architekturänderungen beginnen hier.
 
-**Empfohlene Übernahmen:**
-- Keine Repo-übergreifenden Direktzugriffe auf externe Feeds – alles über aussensensor → chronik.
-- semantAH und hausKI nutzen externe Informationen nur, wenn sie als Events/Docs durch aussensensor gelaufen sind.
-
----
-
-### 2.9 leitstand – Dashboard und Taktgeber
-
-**Leitmuster:**
-- Täglicher Digest aus:
-  - `fleet.health`
-  - `insights.daily`
-  - `event.line` (ausgewählte Events).
-- Klarer Fokus auf:
-  - Übersicht statt Detail
-  - „Was braucht Aufmerksamkeit?“
-
-**Empfohlene Übernahmen:**
-- Neue Module, die „sichtbar“ sein wollen, liefern Daten in eines der existierenden Contracts, statt eigene Dashboards zu bauen.
-- hausKI und heimlern können Leitstand-Daten als „What’s important today?“-Startpunkt nutzen.
+**Kommunikation:** indirekt mit allen Repos via Contracts und Workflows.
 
 ---
 
-### 2.10 tools – Werkzeuggürtel
+## 2.2 contracts – externe API-Schnittstellen
 
-**Leitmuster:**
-- Merger, Generatoren, Helferskripte, die Repos für Menschen und KIs aufbereiten.
+- (IST) Beinhaltet formale API-Schemas für Außenweltkommunikation (`aussen/v1`, `heimlern/v1`, weitere Protobuf-Schnittstellen).
+- (ZIEL) Alle externen Systeme sprechen ausschließlich über hier definierte Schnittstellen.
+- (POLICY) Innen-Contracts = metarepo; externe API = contracts.
 
-**Empfohlene Übernahmen:**
-- Repos nutzen vorhandene Merger/Generatoren, statt eigene Ad-hoc-Skripte anzuhäufen.
-- Wenn ein neues Tool generisch nützlich ist → nach `tools` ziehen.
-
----
-
-## 3. Cross-Pollination-Regeln (Fleet-weit)
-
-1. **Contracts first.**
-   Neue Datenformate entstehen zuerst im `contracts`-Ordner des metarepo.
-
-2. **Events statt stummer Seiteneffekte.**
-   Wichtige Aktionen erzeugen `event.line` in `chronik`.
-
-3. **WGX statt Einzel-Workflows.**
-   CI und lokale Commands gehen über `wgx` und `.wgx/profile.yml`.
-
-4. **semantAH statt Vault-Scraping.**
-   Für Bedeutungsfragen sind Insights und Indexe zuständig, nicht ad-hoc-Suchen.
-
-5. **Leitstand als gemeinsames Display.**
-   Sichtbarkeit geht über leitstand, nicht über Repo-spezifische Dashboards.
-
-6. **heimlern als Meta-Schicht.**
-   Langfristige Anpassung (z. B. Priorisierung, Eskalation) wird über heimlern betrachtet.
+**Kommunikation:** außen nach innen; genutzt von hausKI, aussensensor, heimlern.
 
 ---
 
-## 4. Wie neue Repos sich einordnen sollen
+## 2.3 wgx – Fleet-Motorik & Metrikschicht
 
-Neue Repos beantworten früh:
+- (IST) WGX-CLI, Guard-/Smoke-Workflows, metrics-Tools, semantAH-Integrationen.
+- (IST) Generiert `fleet.health` und `metrics.snapshot`.
+- (ZIEL) Einheitliche Standard-Kommandos und gleiche CI-Mechanik für die gesamte Fleet.
+- (POLICY) Neue Repos erhalten ein `.wgx/profile.yml`.
 
-1. Welche Contracts nutze ich? Welche brauche ich neu?
-2. Welche Events schreibe ich nach chronik?
-3. Welche WGX-Kommandos sind für mich verbindlich?
-4. Welche Einsichten kann semantAH aus meinen Daten ziehen?
-5. Was soll langfristig im Leitstand sichtbar sein?
+**Kommunikation:** liest/steuert die Fleet; liefert Metriken an leitstand, hausKI, heimgeist, chronik.
 
-Dieses Dokument ist der Referenzpunkt für diese Fragen.
+---
+
+## 2.4 chronik – Event-Store
+
+- (IST) Append-only Eventlog (`event.line`).
+- (IST) Ingest aus aussensensor, hausKI, heimlern, heimgeist, CI, WGX, mitschreiber.
+- (ZIEL) Vollständiges Replay, Querying, Langzeitarchiv.
+- (POLICY) Zustandsrelevante Änderungen erzeugen Events statt stiller Seiteneffekte.
+
+**Kommunikation:** zentrale Vergangenheitsachse.
+
+---
+
+## 2.5 aussensensor – Außenwelt-Ingest
+
+- (IST) Liest definierte Feeds/Quellen und erzeugt `aussen.event.*`.
+- (ZIEL) einzige standardisierte Außen-Ingest-Schicht.
+- (POLICY) andere Repos holen Außeninformationen nicht direkt, sondern via aussensensor/chronik.
+
+**Kommunikation:** Außenwelt → aussensensor → chronik → semantAH/hausKI/heimlern/heimgeist.
+
+---
+
+## 2.6 semantAH – Wissens-/Insight-Schicht
+
+- (IST) Erzeugt `insights.daily`, Einbettungen, Graphstrukturen; konsolidiert Vault, Events, OS-Kontext.
+- (IST) zentrales Wissenssubsystem: Rekonstruktion, Verdichtung, Bedeutung.
+- (ZIEL) vollständiger semantischer Graph mit Query-API.
+- (POLICY) semantische Verarbeitung erfolgt hier, nicht verteilt.
+
+**Kommunikation:** konsumiert chronik, os.context.* und liefert Insights an hausKI, heimgeist, leitstand.
+
+---
+
+## 2.7 hausKI – Entscheidungs- und Orchestrierungskern
+
+- (IST) Rust-basierter Entscheidungsagent, konsumiert Events, Insights, Metriken.
+- (IST) zentrale Instanz zur Erzeugung von Handlungen, Reaktionen, Audio-Befehlen, Pattern-Analysen.
+- (ZIEL) Multi-Agent-Orchestrator; Integrationszentrum für plexer, semantAH, heimlern, hausKI-audio.
+- (POLICY) Entscheidungen sind beobachtbar, reproduzierbar, kontraktbasiert.
+
+**Kommunikation:** semantAH ↔ hausKI ↔ heimlern ↔ heimgeist ↔ leitstand ↔ chronik.
+
+---
+
+## 2.8 hausKI-audio – Audio-Event-Schicht
+
+- (IST) verarbeitet Audio-Kommandos von hausKI; erzeugt `audio.event.*`.
+- (ZIEL) geschlossener Regelkreis: hausKI → audio → chronik → semantAH/heimgeist.
+- (POLICY) Audio bleibt gekapselt und moduliert, kein Spezialpfad in anderen Repos.
+
+**Kommunikation:** hausKI ↔ hausKI-audio ↔ chronik.
+
+---
+
+## 2.9 heimlern – Mustererkennung & Policy-Adaption
+
+- (IST) Rust-Library, die wiederkehrende Muster in chronik/Insights erkennt.
+- (IST) kann Patterns und Feedback zurück in den Organismus geben.
+- (ZIEL) permanente Policy-Autoadaption; systemisches Lernen.
+- (POLICY) Muster werden sichtbar gemacht (Events, Feedback), nicht still implementiert.
+
+**Kommunikation:** chronik ↔ heimlern ↔ hausKI ↔ heimgeist.
+
+---
+
+## 2.10 leitstand – UI & Visualisierung
+
+- (IST) Dashboard für Events, Insights, Fleet-Status.
+- (IST) Oberflächensicht auf den Zustand des Organismus.
+- (ZIEL) zentrale Sicht für Menschen und Agenten.
+- (POLICY) keine parallelen Dashboards für Organismuszustand in anderen Repos.
+
+**Kommunikation:** konsumiert semantAH, chronik, fleet.health.
+
+---
+
+## 2.11 heimgeist – Meta-Agent, Koordination & Systemreflexion
+
+- (IST) Meta-Agent, der Events, Metriken, Insights beobachtet und bewertet.
+- (IST) erkennt Drift, Fehlstellen, Prioritäten.
+- (ZIEL) orchestriert Agenten-Aktivität, kann Playbooks auslösen, WGX-Checks modulieren.
+- (POLICY) Meta-Reflexion liegt hier, nicht verteilt.
+
+**Kommunikation:** semantAH ↔ heimgeist ↔ hausKI ↔ sichter ↔ leitstand.
+
+---
+
+## 2.12 sichter – Review-/Analyse-Agent
+
+- (IST) PR-Analysen, Codebewertungen, Qualitätssicherung, ausgelöst via CI oder PR-Kommandos.
+- (IST) generiert Kommentare, potenziell Events/Metriken.
+- (ZIEL) tiefe Integration in Insights, heimgeist, hausKI.
+- (POLICY) Ergebnisse sollen maschinenlesbar zurückfließen.
+
+**Kommunikation:** GitHub ↔ sichter ↔ heimgeist/hausKI ↔ chronik.
+
+---
+
+## 2.13 mitschreiber – OS-Kontext & Intent-Sampler
+
+- (IST) lokaler Prozess, der OS-/App-/Fensterkontext in einer WAL sammelt.
+- (IST) erzeugt `os.context.*` Events (Text, Fenster, Apps, Embedding-Material).
+- (ZIEL) OS-Kontext als vollwertige Achse für semantische Rekonstruktion.
+- (POLICY) OS-Kontext wird ausschließlich über mitschreiber erhoben.
+
+**Kommunikation:** OS → mitschreiber → chronik → semantAH → hausKI/heimgeist.
+
+---
+
+## 2.14 plexer – Event-Router zwischen Agenten
+
+- (IST) minimaler HTTP-basierter Event-Router.
+- (IST) leitet Fakten-Events an mehrere Konsumenten weiter.
+- (ZIEL) Multi-Agent-Bus mit Filterung, Priorisierung, Fan-out/Fan-in.
+- (POLICY) Faktenstrom = plexer; Intentionen = getrennte Kanäle.
+
+**Kommunikation:** Agenten ↔ plexer ↔ weitere Agenten.
+
+---
+
+## 2.15 tools – Hilfssystem für KI-Sichtbarkeit
+
+- (IST) enthält Merger, Extraktoren, Snapshot-Generatoren.
+- (IST) erzeugt KI-freundliche, mehrstufige Repräsentationen der Repos.
+- (ZIEL) vollständige, wählbare Detailstufen (dev, max) für den gesamten Fleet-Bestand.
+- (POLICY) Tools erzeugen keine eigenen Wahrheiten; sie spiegeln die Repos.
+
+**Kommunikation:** liest alle Repos → erzeugt Artefakte für KI/Agenten.
+
+---
+
+## 2.16 weltgewebe & vault-gewebe – angrenzende Systeme
+
+- (IST) weltgewebe = Öffentlichkeits- und Dokumentationsoberfläche, nicht Fleet-pflichtig.
+- (IST) vault-gewebe = privater Obsidian-Vault, dient als Inhaltseinspeisung für semantAH.
+- (POLICY) beide bleiben bewusst außerhalb der Fleet.
+
+---
+
+## 3. Querregeln
+
+1. **Contracts first**
+   Neue Formate werden zuerst als Contract beschrieben.
+
+2. **Events statt Seiteneffekte**
+   Zustandsveränderungen müssen sichtbar sein.
+
+3. **Zentrale Semantik**
+   Wissensbildung erfolgt in semantAH.
+
+4. **WGX als Fleet-Standard**
+   Einheitliche Kommandos, Profile, Checks.
+
+5. **Leitstand-Sichtbarkeit**
+   Relevante Systemdaten sollen sichtbar werden.
+
+6. **Meta-Reflexion**
+   heimgeist/heimlern bilden die Anpassungsschicht des Systems.
+
+---
+
+## 4. Essenz
+
+Der Organismus besteht aus mehreren parallel arbeitenden Achsen.
+Bedeutung entsteht in semantAH, Entscheidungen in hausKI, Reflexion in heimgeist, Kontext in mitschreiber, Sichtbarkeit in leitstand, Persistenz in chronik, Fleet-Steuerung in wgx.
+
+Die Kraft des Systems entsteht aus ihrer Interaktion, nicht aus einer einzelnen Komponente.
+
+---
+
+## 5. Repo×Achsen-Matrix
+
+**Legende**
+
+- **P** = produziert
+- **C** = konsumiert
+- **P/C** = produziert und konsumiert
+- **T** = Templates / Definition, kein Laufzeit-Flow
+- **I** = indirekt (über andere Komponenten)
+- **–** = keine nennenswerte Rolle auf dieser Achse
+
+```markdown
+| Repo           | A: Code & Contracts | B: Events (Fakten) | C: Commands (Intention) | D: WGX (Motorik) | OS-Kontext | Kommentar                                                                 |
+|----------------|---------------------|---------------------|--------------------------|------------------|-----------|---------------------------------------------------------------------------|
+| metarepo       | T                   | T                   | T                        | T                | –         | Definiert interne Contracts, Policies, WGX-Templates                      |
+| contracts      | T                   | –                   | –                        | –                | –         | Definiert externe API-Schemas (aussen/v1, heimlern/v1, …)                |
+| wgx            | C                   | P/C (Metrik-Events) | P (indirekt)             | Kern             | –         | Steuert Fleet-Kommandos, erzeugt Metriken/Fleet-Health                    |
+| chronik        | C                   | P/C                 | I                        | I                | C         | Zentraler Event-Store, nimmt viele Linien auf                             |
+| aussensensor   | C                   | P                   | –                        | I                | –         | Wandelt externe Feeds in aussen.event.* und schreibt nach chronik        |
+| semantAH       | C                   | C                   | I                        | I                | C         | Baut Insights/Graph aus Events, Vault, OS-Kontext                         |
+| hausKI         | C                   | C                   | P/C                      | C                | C         | Orchestrator, liest alles Relevante, erzeugt Entscheidungen/Events        |
+| hausKI-audio   | C                   | P                   | I                        | I                | –         | Audio-spezifische Events und Steuerung                                    |
+| heimlern       | C                   | C                   | I                        | I                | C         | Muster-/Policy-Schicht auf Events, Insights und Kontext                   |
+| leitstand      | C                   | C                   | I                        | I                | I         | Visualisiert Events, Insights, Fleet-Health                               |
+| heimgeist      | C                   | C                   | I                        | I                | C         | Meta-Agent, konsumiert v. a. Events, Insights, Kontext                    |
+| sichter        | C                   | P/I                 | C/P (PR-Kommandos)       | I                | –         | Review-Agent, getriggert über CI/PR; kann Events/Metriken erzeugen        |
+| mitschreiber   | C                   | P (os.context.*)    | –                        | –                | Kern      | OS-/App-/Fenster-Kontext → WAL → os.context-Events                        |
+| plexer         | C                   | P/C (Routing)       | –                        | I                | –         | Event-Router zwischen Agenten, Faktenstrom                                |
+| tools          | C                   | P/I                 | –                        | I                | –         | Merger/Snapshots; erzeugen Artefakte, teils Event- oder Metrik-Ausgaben   |
+| weltgewebe     | –                   | –                   | –                        | –                | –         | Nachbarsystem (Web/Doku), nicht Fleet                                     |
+| vault-gewebe   | –                   | –                   | –                        | –                | –         | Privater Vault, Quelle für semantAH, nicht selbst auf Achsen verortet    |
+```
+
+**Mini-Erläuterungen pro Achse**
+
+- **Achse A – Code & Contracts**
+  Starke Knoten: `metarepo`, `contracts`, `hausKI`, `heimlern`, `aussensensor`, `semantAH`, `wgx`.
+  Sprach- und Strukturmacht liegt beim Metarepo (innen) und beim Contracts-Repo (außen).
+
+- **Achse B – Events (Fakten)**
+  Stark produzierend: `aussensensor`, `hausKI-audio`, `mitschreiber`, `wgx`, `sichter`, `heimgeist` (perspektivisch).
+  Stark konsumierend: `chronik`, `semantAH`, `heimlern`, `hausKI`, `leitstand`, `heimgeist`.
+
+- **Achse C – Commands (Intentionen)**
+  Ursprung: vor allem GitHub (PR-Kommentare), hausKI-Tools und CI.
+  Primär betroffen: `sichter`, `hausKI`, `wgx`, perspektivisch stärker `heimlern`/`heimgeist`.
+  Wichtig: `plexer` bleibt explizit *nicht* Command-Bus.
+
+- **Achse D – WGX (Motorik)**
+  Zentrum: `wgx`.
+  WGX-fähig: alle Fleet-Repos mittelfristig; heute schon einige.
+  Sichtbar über: `fleet.health`, Metrik-Events, leitstand-Panels.
+
+- **OS-Kontext**
+  Zentrum: `mitschreiber`.
+  Nutznießer: `semantAH`, `heimlern`, `hausKI`, `heimgeist`.
+  `chronik` spielt als Sekundärspeicher mit, aber nicht als Initiator.
