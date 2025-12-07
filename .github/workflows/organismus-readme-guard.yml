@@ -1,0 +1,52 @@
+name: organismus-readme-guard
+
+on:
+  pull_request:
+    paths:
+      - "README.md"
+      - "docs/heimgewebe-organismus.md"
+      - "docs/heimgewebe-zielbild.md"
+      - ".github/workflows/organismus-readme-guard.yml"
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - "README.md"
+      - "docs/heimgewebe-organismus.md"
+      - "docs/heimgewebe-zielbild.md"
+      - ".github/workflows/organismus-readme-guard.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  check-readme-organismus-block:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ensure README links to Heimgewebe-Organismus
+        run: |
+          set -euo pipefail
+
+          if [[ ! -f "README.md" ]]; then
+            echo "::warning file=README.md::README.md nicht gefunden – Organismus-Hinweis kann nicht geprüft werden."
+            exit 0
+          fi
+
+          if ! grep -qi "heimgewebe-organismus.md" README.md; then
+            echo "::error file=README.md::README.md verweist nicht auf docs/heimgewebe-organismus.md."
+            echo "Füge den Organismus-Kontextblock aus docs/organismus-kontextblock.md in das README ein."
+            exit 1
+          fi
+
+          if ! grep -qi "heimgewebe-zielbild.md" README.md; then
+            echo "::error file=README.md::README.md verweist nicht auf docs/heimgewebe-zielbild.md."
+            echo "Füge den Organismus-Kontextblock aus docs/organismus-kontextblock.md in das README ein."
+            exit 1
+          fi
+
+          echo "Organismus-Verweise im README vorhanden."
