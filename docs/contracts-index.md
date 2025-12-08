@@ -46,6 +46,8 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
   - Zweck: tägliche, verdichtete Insights mit `topics`, `source`, `metadata`.
 - `knowledge.graph.schema.json`
   - Zweck: generisches Wissensgraph-Schema (Knoten, Kanten, Beziehungen).
+- `knowledge.observatory.schema.json`
+  - Zweck: Snapshot des semantischen Observatoriums mit aktiven Themenräumen, Quellen, Signalen und Leitfragen.
 
 ### 1.4 Policy-Kreislauf
 
@@ -80,6 +82,13 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
 
 - `review.policy.yml`
   - Zweck: Richtlinien für Reviews (z. B. Sichter, heimgeist), dient als semantische Grundlage für automatisierte Bewertung.
+
+### 1.8 Planung & Szenarien
+
+- `project.scenario.schema.json`
+  - Zweck: Beschreibung alternativer Pfade für ein Thema oder Projekt (konservativ, ambitioniert, experimentell) mit Annahmen, Risiken und vorgeschlagenen Aktionen.
+- `consumers.yaml`
+  - Zweck: Maschinenlesbare Übersicht, welche Repos welche zentralen Heimgewebe-Contracts konsumieren (Modus: reference-only oder mirror) – quer über alle Contract-Kategorien hinweg.
 
 ---
 
