@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heimgewebe.metarepo/contracts/project.scenario.schema.json",
+  "title": "ProjectScenario",
+  "description": "Beschreibung alternativer Pfade für ein Thema oder Projekt (konservativ, ambitioniert, experimentell …).",
+  "type": "object",
+  "properties": {
+    "scenario_id": {
+      "type": "string",
+      "description": "Stabile ID des Szenarios (z. B. UUID)."
+    },
+    "anchor_ref": {
+      "type": "string",
+      "description": "Referenz auf den verankerten Kontext (z. B. topic_id aus dem Observatorium oder eine Projekt-ID)."
+    },
+    "label": {
+      "type": "string",
+      "description": "Kurzlabel des Szenarios (z. B. konservativ, ambitioniert, experimentell).",
+      "examples": [
+        "konservativ",
+        "ambitioniert",
+        "experimentell"
+      ]
+    },
+    "title": {
+      "type": "string",
+      "description": "Kurzname des Szenarios."
+    },
+    "description": {
+      "type": "string",
+      "description": "Freitextbeschreibung des Szenarios."
+    },
+    "assumptions": {
+      "type": "array",
+      "description": "Zentrale Annahmen, auf denen das Szenario basiert.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "risks": {
+      "type": "array",
+      "description": "Risiken oder mögliche Nebenwirkungen dieses Szenarios.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "risk_id": {
+            "type": "string",
+            "description": "Optionale ID zur Referenzierung des Risikos."
+          },
+          "description": {
+            "type": "string",
+            "description": "Beschreibung des Risikos."
+          },
+          "likelihood": {
+            "type": "number",
+            "description": "Geschätzte Eintrittswahrscheinlichkeit (0–1)."
+          },
+          "impact": {
+            "type": "number",
+            "description": "Geschätzte Auswirkung (z. B. 0–1 oder 1–5)."
+          }
+        },
+        "required": ["description"],
+        "additionalProperties": false
+      }
+    },
+    "suggested_actions": {
+      "type": "array",
+      "description": "Konkrete Handlungsschritte, die zu diesem Szenario passen.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "horizon": {
+      "type": "string",
+      "description": "Zeitlicher Horizont des Szenarios (z. B. kurz, mittel, lang) oder freier Text."
+    },
+    "metrics": {
+      "type": "array",
+      "description": "Optionale Kennzahlen, an denen der Fortschritt oder Erfolg des Szenarios gemessen werden kann.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "metric_id": {
+            "type": "string",
+            "description": "ID oder Name der Metrik."
+          },
+          "description": {
+            "type": "string",
+            "description": "Beschreibung der Metrik."
+          },
+          "target": {
+            "description": "Optionaler Zielwert (Skalierung bleibt dem Produzenten überlassen)."
+          }
+        },
+        "required": ["metric_id"],
+        "additionalProperties": false
+      }
+    },
+    "meta": {
+      "type": "object",
+      "description": "Freies Feld für zusätzliche Annotationen (z. B. Zuordnung zu Policies, Repos, Rollen).",
+      "additionalProperties": true
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Zeitpunkt der Erstellung."
+    },
+    "created_by": {
+      "type": "string",
+      "description": "Erzeugende Komponente oder Akteur (z. B. heimgeist)."
+    }
+  },
+  "required": [
+    "scenario_id",
+    "anchor_ref",
+    "label",
+    "title",
+    "description"
+  ],
+  "additionalProperties": false
+}
