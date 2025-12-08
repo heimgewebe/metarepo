@@ -88,7 +88,7 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
 - `project.scenario.schema.json`
   - Zweck: Beschreibung alternativer Pfade für ein Thema oder Projekt (konservativ, ambitioniert, experimentell) mit Annahmen, Risiken und vorgeschlagenen Aktionen.
 - `consumers.yaml`
-  - Zweck: Maschinenlesbare Übersicht, welche Repos welche zentralen Heimgewebe-Contracts konsumieren (Modus: reference-only oder mirror).
+  - Zweck: Maschinenlesbare Übersicht, welche Repos welche zentralen Heimgewebe-Contracts konsumieren (Modus: reference-only oder mirror) – quer über alle Contract-Kategorien hinweg.
 
 ---
 
