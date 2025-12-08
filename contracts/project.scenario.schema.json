@@ -1,7 +1,9 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://heimgewebe.metarepo/contracts/project.scenario.schema.json",
+  "$id": "https://schemas.heimgewebe.org/contracts/project.scenario.schema.json",
   "title": "ProjectScenario",
+  "x-producers": ["heimgeist", "hausKI"],
+  "x-consumers": ["chronik", "leitstand"],
   "description": "Beschreibung alternativer Pfade für ein Thema oder Projekt (konservativ, ambitioniert, experimentell …).",
   "type": "object",
   "properties": {
