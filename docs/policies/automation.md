@@ -50,6 +50,6 @@ Details zu Parametern & Rollout-Prozessen stehen in [docs/policies/ci-reusables.
 
 ## Weiterführende Links
 
-- [Fleet-Operations](./fleet.md)
-- [Templates](./templates.md)
-- [Contract-Versionierung](./contract-versioning.md)
+- [Fleet-Operations](../fleet/fleet.md)
+- [Templates](../templates.md)
+- [Contract-Versionierung](../contracts/contract-versioning.md)

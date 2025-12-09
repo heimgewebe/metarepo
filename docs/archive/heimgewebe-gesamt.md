@@ -1,6 +1,6 @@
 # Heimgewebe — Überblick (Ideales Gesamtsystem)
 
-> Kurzfassung siehe [`docs/overview.md`](./overview.md); dort sind Rollen, Datenflüsse und Auth-Anker zusammengefasst.
+> Kurzfassung siehe [`docs/archive/overview.md`](./overview.md); dort sind Rollen, Datenflüsse und Auth-Anker zusammengefasst.
 
 > **Fleet-Abgrenzung:** Core-Repos der Fleet sind `wgx, hausKI, hausKI-audio, metarepo, heimlern, aussensensor, chronik, semantAH`.
 > `vault-gewebe` (inkl. privat) ist persönlicher Wissensspeicher und **nicht** Teil der Fleet.
@@ -155,8 +155,8 @@ Ein klar getrenntes, lokal-erstes System:
 
 ## Siehe auch
 
-- [Architecture](./architecture.md) – Systemarchitektur im Detail
-- [Vision](./vision.md) – Leitlinien und Roadmap
+- [Architecture](../system/architecture.md) – Systemarchitektur im Detail
+- [Vision](../vision/vision.md) – Leitlinien und Roadmap
 - [System Overview](./system-overview.md) – Kurzübersicht
-- [Repo Matrix](./repo-matrix.md) – Repository-Rollen und Status
+- [Repo Matrix](../repo-matrix.md) – Repository-Rollen und Status
 - [Contracts](./contracts.md) – Schema-Übersicht
