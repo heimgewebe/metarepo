@@ -21,4 +21,4 @@ This document describes links to resources related to actionlint and GitHub Acti
 
 ---
 
-[Checks](checks.md) | [Installation](install.md) | [Usage](usage.md) | [Configuration](config.md) | [Go API](api.md)
+[Checks](policies/checks.md) | [Installation](runbooks/install.md) | [Usage](runbooks/usage.md) | [Configuration](config.md) | [Go API](api.md)

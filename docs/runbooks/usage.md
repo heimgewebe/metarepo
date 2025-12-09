@@ -230,7 +230,7 @@ Or simply download the executable and run it in one step:
 The download script allows to specify the version of actionlint and the download directory. Try to give `--help` argument
 to the script for more usage details.
 
-If you want to enable [shellcheck integration](checks.md#check-shellcheck-integ), install `shellcheck` command. Note that
+If you want to enable [shellcheck integration](../policies/checks.md#check-shellcheck-integ), install `shellcheck` command. Note that
 shellcheck is [pre-installed on Ubuntu worker][preinstall-ubuntu].
 
 If you want to [annotate errors][ga-annotate-error] from actionlint on GitHub, consider using
@@ -301,7 +301,7 @@ docker run --rm -v /path/to/workflows:/workflows rhysd/actionlint:latest -color 
 
 ## Using actionlint from Go program
 
-Go APIs are available. See [the Go API document](api.md) for more details.
+Go APIs are available. See [the Go API document](../api.md) for more details.
 
 
 <a id="tools-integ"></a>
@@ -449,7 +449,7 @@ You can also see actionlint issues inline in VS Code via the [Trunk VS Code exte
 
 ---
 
-[Checks](checks.md) | [Installation](install.md) | [Configuration](config.md) | [Go API](api.md) | [References](reference.md)
+[Checks](../policies/checks.md) | [Installation](./install.md) | [Configuration](../config.md) | [Go API](../api.md) | [References](../reference.md)
 
 [reviewdog-actionlint]: https://github.com/reviewdog/action-actionlint
 [reviewdog]: https://github.com/reviewdog/reviewdog
