@@ -1,3 +1,4 @@
+---
 workflow_id: sample-workflow
 orchestration: sequential
 agents:

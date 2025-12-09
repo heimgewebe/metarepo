@@ -1,12 +1,13 @@
+---
 name: wgx-guard
 
 permissions:
   contents: read
 
-on:
+"on":
   pull_request:
   push:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 jobs:

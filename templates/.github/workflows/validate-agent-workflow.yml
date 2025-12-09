@@ -1,6 +1,7 @@
+---
 name: validate-agent-workflows
 
-on:
+"on":
   push:
     paths:
       - ".agent/**/*.yml"
@@ -15,10 +16,10 @@ jobs:
     timeout-minutes: 12
     steps:
       - name: Checkout
-        uses: actions/checkout@8ade135a242bde00fd19c0e54fb3760beea110ee # v4.1.0
+        uses: actions/checkout@8ade135a242bde00fd19c0e54fb3760beea110ee  # v4.1.0
 
       - name: Setup Node
-        uses: actions/setup-node@5e221d4786ffb21088b21dfc9c80efb16b52cd3b # v4.0.2
+        uses: actions/setup-node@5e221d4786ffb21088b21dfc9c80efb16b52cd3b  # v4.0.2
 
       - name: Install tools
         run: |
@@ -29,7 +30,8 @@ jobs:
       - name: Validate manifests (.agent/*.yml/.yaml)
         shell: bash
         env:
-          SCHEMA_URL: https://raw.githubusercontent.com/heimgewebe/metarepo/contracts-v1/contracts/agent.workflow.schema.json
+          SCHEMA_URL: >-
+            https://raw.githubusercontent.com/heimgewebe/metarepo/contracts-v1/contracts/agent.workflow.schema.json
         run: |
           set -euo pipefail
           shopt -s nullglob

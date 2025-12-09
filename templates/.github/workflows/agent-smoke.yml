@@ -1,5 +1,6 @@
+---
 name: agent-smoke
-on:
+"on":
   workflow_dispatch:
   push:
     paths:
@@ -9,7 +10,7 @@ jobs:
   smoke:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@8ade135a242bde00fd19c0e54fb3760beea110ee # v4.1.0
+      - uses: actions/checkout@8ade135a242bde00fd19c0e54fb3760beea110ee  # v4.1.0
       - name: Prepare demo layout
         run: |
           mkdir -p agents scripts/agents
