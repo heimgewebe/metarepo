@@ -1,6 +1,7 @@
+---
 name: wgx-smoke
 
-on:
+"on":
   workflow_dispatch:
   push:
     paths:

@@ -1,3 +1,4 @@
+---
 name: Org assets
 
 permissions:
@@ -7,9 +8,9 @@ defaults:
   run:
     shell: bash --noprofile --norc -euo pipefail {0}
 
-on:
+"on":
   push:
-    branches: [ main ]
+    branches: [main]
     paths:
       - repos.yml
       - scripts/generate_org_assets.py

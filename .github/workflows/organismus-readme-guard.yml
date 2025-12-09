@@ -1,6 +1,7 @@
+---
 name: organismus-readme-guard
 
-on:
+"on":
   pull_request:
     paths:
       - "README.md"
