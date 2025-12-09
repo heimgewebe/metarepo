@@ -12,7 +12,7 @@ Die Schemas im Ordner [`contracts/`](../../contracts) werden über Fleet-Tags ve
 ## Tagging & Nutzung
 - Stabile Schemas werden nach Review auf einen Release-Branch (`chore/fleet-contracts-v1`) gehoben und anschließend als Tag `contracts-v1` veröffentlicht.
 - Downstream-Workflows pinnen strikt auf `@contracts-v1`, um Breaking-Changes zu vermeiden.
-- Der Reusable-Workflow [`reusable-validate-jsonl.yml`](../.github/workflows/reusable-validate-jsonl.yml) ist Teil des Tags und validiert JSONL-Feeds gegen die Schemas.
+- Der Reusable-Workflow [`reusable-validate-jsonl.yml`](../../.github/workflows/reusable-validate-jsonl.yml) ist Teil des Tags und validiert JSONL-Feeds gegen die Schemas.
 
 ### Beispiele (Pinning)
 ```yaml
