@@ -135,7 +135,7 @@ jobs:
 
       - name: Validate Fixtures
         env:
-          FIXTURES_GLOB: ${{ vars.FIXTURES_GLOB != '' && vars.FIXTURES_GLOB || 'fixtures/**/*.jsonl' }}
+          FIXTURES_GLOB: ${{ vars.FIXTURES_GLOB || 'fixtures/**/*.jsonl' }}
         run: |
           npx --yes ajv-cli@5.0.0 validate \
             -s "json/**/*.schema.json" \
