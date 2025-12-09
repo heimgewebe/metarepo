@@ -1,3 +1,4 @@
+---
 name: 'Setup yq'
 description: 'Install yq using version from toolchain.versions.yml and verify checksum'
 inputs:

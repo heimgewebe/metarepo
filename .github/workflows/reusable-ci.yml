@@ -1,3 +1,4 @@
+---
 name: reusable-ci
 
 permissions:
@@ -7,7 +8,7 @@ defaults:
   run:
     shell: bash --noprofile --norc -euo pipefail {0}
 
-on:
+"on":
   workflow_call:
     inputs:
       run_lint:
