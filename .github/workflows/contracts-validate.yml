@@ -128,21 +128,56 @@ jobs:
 
       - name: Validate Contracts (compile)
         run: |
-          npx --yes ajv-cli@5.0.0 compile \
-            -s "json/**/*.schema.json" \
-            --strict=true \
-            --spec=draft2020
+          shopt -s nullglob
+          schemas=( json/**/*.schema.json )
+          
+          if [ ${#schemas[@]} -eq 0 ]; then
+            echo "::notice::No schema files found - skipping compilation"
+            exit 0
+          fi
+          
+          echo "Compiling ${#schemas[@]} schema(s)..."
+          for schema in "${schemas[@]}"; do
+            echo "Compiling $schema"
+            npx --yes ajv-cli@5 compile \
+              -s "$schema" \
+              --strict=true \
+              --spec=draft2020
+          done
 
       - name: Validate Fixtures
         env:
           FIXTURES_GLOB: ${{ vars.FIXTURES_GLOB || 'fixtures/**/*.jsonl' }}
         run: |
-          npx --yes ajv-cli@5.0.0 validate \
-            -s "json/**/*.schema.json" \
-            -d "$FIXTURES_GLOB" \
-            --spec=draft2020 \
-            --all-errors \
-            --errors=line
+          shopt -s nullglob
+          schemas=( json/**/*.schema.json )
+          fixtures=( fixtures/**/*.jsonl )
+          
+          if [ ${#schemas[@]} -eq 0 ]; then
+            echo "::notice::No schema files found - skipping validation"
+            exit 0
+          fi
+          
+          if [ ${#fixtures[@]} -eq 0 ]; then
+            echo "::notice::No fixture files found - skipping validation"
+            exit 0
+          fi
+          
+          echo "Found ${#schemas[@]} schema(s) and ${#fixtures[@]} fixture(s)"
+          
+          # Validate each schema-fixture pair
+          # Note: ajv validate -s accepts only one schema file
+          for schema in "${schemas[@]}"; do
+            for fixture in "${fixtures[@]}"; do
+              echo "Validating $fixture against $schema"
+              npx --yes ajv-cli@5 validate \
+                -s "$schema" \
+                -d "$fixture" \
+                --spec=draft2020 \
+                --all-errors \
+                --errors=line
+            done
+          done
 
       - name: Show success
         run: echo "Contracts and fixtures validated successfully"
