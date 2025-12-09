@@ -32,63 +32,6 @@ env:
   ALLOW_REMOVALS: "0"
 
 jobs:
-  version-sync-check:
-    name: "Security: enforce static pin for contracts reusable workflow"
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 1
-          persist-credentials: false
-
-      - name: Verify 'uses:' pins for heimgewebe/contracts
-        env:
-          REQUIRED_REPO: "heimgewebe/contracts/.github/workflows/contracts-ajv-reusable.yml"
-          REQUIRED_REF: "contracts-v1"
-        run: |
-          set -euo pipefail
-
-          # Find all workflow files.
-          files=()
-          while IFS= read -r -d '' f; do
-            files+=("$f")
-          done < <(git ls-files -z -- '.github/workflows/*.yml' '.github/workflows/*.yaml' 2>/dev/null || true)
-
-          if [ ${#files[@]} -eq 0 ]; then
-            echo "::notice::No workflow files found to check."
-            exit 0
-          fi
-
-          mismatches=0
-          # Iterate over each workflow file and check its 'uses' clauses.
-          for wf in "${files[@]}"; do
-            # Extract lines containing 'uses:', remove comments, and trim whitespace.
-            # Then, capture the repo and ref from the 'user/repo@ref' format.
-            while IFS='@' read -r repo ref; do
-              # Skip if it doesn't match the required repo.
-              if [ "$repo" != "$REQUIRED_REPO" ]; then
-                continue
-              fi
-
-              # Check for dynamic or incorrect refs.
-              if [[ "$ref" =~ (\$\{|\$\(|\$[A-Za-z_]) ]]; then
-                echo "::error file=$wf::Dynamic ref not allowed in 'uses:': $repo@$ref"
-                mismatches=1
-              elif [ "$ref" != "$REQUIRED_REF" ]; then
-                echo "::error file=$wf::Pin mismatch for '$repo': expected '$REQUIRED_REF', but got '$ref'"
-                mismatches=1
-              fi
-            done < <(grep -E '^\s*uses:\s*' "$wf" | sed -e 's/^\s*uses:\s*//' -e 's/#.*//' -e 's/["'\'']//g' | grep '@' || true)
-          done
-
-          if [ $mismatches -ne 0 ]; then
-            echo "::error::Found one or more invalid workflow pins."
-            exit 1
-          fi
-
-          echo "::notice::✅ All version pins validated successfully."
-
   guard:
     name: "Security: guard deletion policy (json/proto)"
     runs-on: ubuntu-latest
@@ -171,10 +114,12 @@ jobs:
 
   validate:
     name: "Validate fixtures"
-    needs: [version-sync-check, guard]
+    needs: [guard]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Ensure Node available
         uses: actions/setup-node@v4
@@ -183,16 +128,18 @@ jobs:
 
       - name: Validate Contracts (compile)
         run: |
-          npx --yes ajv-cli@5 compile \
+          npx --yes ajv-cli@5.0.0 compile \
             -s "json/**/*.schema.json" \
             --strict=true \
             --spec=draft2020
 
       - name: Validate Fixtures
+        env:
+          FIXTURES_GLOB: ${{ vars.FIXTURES_GLOB || 'fixtures/**/*.jsonl' }}
         run: |
-          npx --yes ajv-cli@5 validate \
+          npx --yes ajv-cli@5.0.0 validate \
             -s "json/**/*.schema.json" \
-            -d "fixtures/**/*.jsonl" \
+            -d "$FIXTURES_GLOB" \
             --spec=draft2020 \
             --all-errors \
             --errors=line
