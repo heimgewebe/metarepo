@@ -72,18 +72,18 @@ scripts/wgx-doctor --repo <repo>  # Drift-Report generieren
 ## Dokumentation
 
 ### Kerndokumentation
-- [**Architecture**](docs/architecture.md) – Systemübersicht und Schichten
-- [**Vision**](docs/vision.md) – Leitlinien und Roadmap
-- [**Contracts**](docs/contracts.md) – Schema-Versionierung und Validierung
-- [**Fleet Management**](docs/fleet.md) – Template-Sync und Push-Workflows
-- [**WGX Konzept**](docs/wgx-konzept.md) – Fleet-Motor und Kommandos
+- [**Architecture**](docs/system/architecture.md) – Systemübersicht und Schichten
+- [**Vision**](docs/vision/vision.md) – Leitlinien und Roadmap
+- [**Contracts**](docs/contracts/contracts-index.md) – Schema-Versionierung und Validierung
+- [**Fleet Management**](docs/fleet/fleet.md) – Template-Sync und Push-Workflows
+- [**WGX Konzept**](docs/fleet/wgx-konzept.md) – Fleet-Motor und Kommandos
 - [**AGENTS.md**](AGENTS.md) – Leitfaden für KI-Agenten
 
 ### Entwicklung & Betrieb
-- [**Troubleshooting**](docs/troubleshooting.md) – Häufige Probleme und Lösungen
+- [**Troubleshooting**](docs/runbooks/troubleshooting.md) – Häufige Probleme und Lösungen
 - [**ADRs**](docs/adrs/README.md) – Architecture Decision Records
-- [**Runbooks**](docs/runbooks.md) – Betriebsanleitungen
-- [**Environment**](docs/environment.md) – Entwicklungsumgebung einrichten
+- [**Runbooks**](docs/runbooks/runbooks.md) – Betriebsanleitungen
+- [**Environment**](docs/fleet/environment.md) – Entwicklungsumgebung einrichten
 
 Vollständige Dokumentation: [`docs/`](docs/) · [Vollständiger Index](docs/README.md)
 

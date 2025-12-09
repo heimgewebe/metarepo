@@ -13,4 +13,4 @@ Kuratierte Verbesserungen, weniger heimliche Abweichungen.
 ## Alternativen
 Hartes Überschreiben (verliert lokale Verbesserungen).
 ## Links
-- docs/templates.md, docs/fleet.md
+- docs/templates.md, docs/fleet/fleet.md
