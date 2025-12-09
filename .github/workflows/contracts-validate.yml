@@ -170,9 +170,32 @@ jobs:
           echo "::notice::✅ Guard passed"
 
   validate:
-    name: "Validate fixtures via reusable workflow"
+    name: "Validate fixtures"
     needs: [version-sync-check, guard]
-    uses: heimgewebe/contracts/.github/workflows/contracts-ajv-reusable.yml@contracts-v1
-    secrets: inherit
-    with:
-      fixtures_glob: ${{ vars.FIXTURES_GLOB || 'fixtures/**/*.jsonl' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ensure Node available
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Validate Contracts (compile)
+        run: |
+          npx --yes ajv-cli@5 compile \
+            -s "json/**/*.schema.json" \
+            --strict=true \
+            --spec=draft2020
+
+      - name: Validate Fixtures
+        run: |
+          npx --yes ajv-cli@5 validate \
+            -s "json/**/*.schema.json" \
+            -d "fixtures/**/*.jsonl" \
+            --spec=draft2020 \
+            --all-errors \
+            --errors=line
+
+      - name: Show success
+        run: echo "Contracts and fixtures validated successfully"
