@@ -135,7 +135,7 @@ def _is_nan(value: Any) -> bool:
 
 def _looks_like_columnar_mapping(data: Mapping[str, Any]) -> bool:
     sequence_values = [value for value in data.values() if _is_sequence_like(value)]
-    return len(sequence_values) > 1 and len(sequence_values) == len(data)
+    return 0 < len(sequence_values) == len(data)
 
 
 def _is_sequence_like(value: Any) -> bool:

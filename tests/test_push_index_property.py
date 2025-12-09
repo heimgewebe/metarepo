@@ -219,6 +219,18 @@ def test_columnar_mapping_is_coerced_to_rows() -> None:
     ]
 
 
+def test_columnar_mapping_with_single_column_expands_rows() -> None:
+    columnar = {
+        "doc_id": ["a", "b", "c"],
+    }
+
+    batches = list(to_batches(columnar, default_namespace="ns-default"))
+
+    assert [batch["doc_id"] for batch in batches] == ["a", "b", "c"]
+    assert all(batch["namespace"] == "ns-default" for batch in batches)
+    assert all(len(batch["chunks"]) == 1 for batch in batches)
+
+
 @pytest.mark.parametrize(
     "value",
     [None, math.nan],
