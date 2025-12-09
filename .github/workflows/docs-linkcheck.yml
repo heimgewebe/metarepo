@@ -1,3 +1,4 @@
+---
 name: docs-linkcheck
 permissions:
   contents: read
@@ -10,7 +11,7 @@ concurrency:
   group: docs-linkcheck-${{ github.ref }}
   cancel-in-progress: true
 
-on:
+"on":
   schedule:
     - cron: "0 3 * * *"
   workflow_dispatch:

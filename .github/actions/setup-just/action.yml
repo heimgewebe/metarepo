@@ -1,3 +1,4 @@
+---
 name: 'Setup just'
 description: 'Install just using version from toolchain.versions.yml (fallback to safe defaults)'
 runs:

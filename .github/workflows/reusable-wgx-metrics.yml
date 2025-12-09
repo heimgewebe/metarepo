@@ -1,5 +1,6 @@
+---
 name: reusable-wgx-metrics
-on:
+"on":
   workflow_call:
     inputs:
       out:

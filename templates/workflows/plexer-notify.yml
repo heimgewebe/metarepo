@@ -1,6 +1,7 @@
+---
 name: Notify Plexer
 
-on:
+"on":
   workflow_call:
     inputs:
       event_type:

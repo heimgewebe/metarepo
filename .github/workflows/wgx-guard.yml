@@ -1,12 +1,13 @@
+---
 name: wgx-guard
 
 permissions:
   contents: read
 
-on:
+"on":
   pull_request:
   push:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -14,4 +15,4 @@ jobs:
     # metarepo wird selbst wie ein Fleet-Repo behandelt und nutzt
     # die kanonische Guard-Definition aus heimgewebe/wgx.
     # Gepinnt auf Commit SHA für Sicherheit und Reproduzierbarkeit.
-    uses: heimgewebe/wgx/.github/workflows/reusable-wgx-guard.yml@52a12ff97c402d1aa718d534a84b0225e7718c82
+    uses: heimgewebe/wgx/.github/workflows/wgx-guard.yml@52a12ff97c402d1aa718d534a84b0225e7718c82

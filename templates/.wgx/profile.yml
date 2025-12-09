@@ -1,3 +1,4 @@
+---
 version: 1
 # Hinweis: Repo-spezifische Overlays optional unter .wgx/profile.overlay.yml
 project: metarepo

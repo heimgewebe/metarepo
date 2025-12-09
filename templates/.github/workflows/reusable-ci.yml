@@ -1,5 +1,6 @@
+---
 name: reusable-ci
-on:
+"on":
   workflow_call:
     inputs:
       run_lint:
