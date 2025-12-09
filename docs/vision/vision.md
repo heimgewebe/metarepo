@@ -85,7 +85,7 @@ transparent, nachvollziehbar und stets erklärbar.
 
 ## Diagramm
 
-Eine visuelle Übersicht befindet sich in [heimgewebe-architektur.mmd](./heimgewebe-architektur.mmd):
+Eine visuelle Übersicht befindet sich in [heimgewebe-architektur.mmd](../system/heimgewebe-architektur.mmd):
 
 %%{init: {'theme':'neutral'}}%%
 graph TD
@@ -121,7 +121,7 @@ graph TD
 
 ## Datenfluss (Contracts)
 
-Siehe [heimgewebe-dataflow.mmd](./heimgewebe-dataflow.mmd).
+Siehe [heimgewebe-dataflow.mmd](../system/heimgewebe-dataflow.mmd).
 Die wichtigsten Artefakte & Verträge:
 - **semantAH → hausKI/chronik**: `insights/today.json`
   Schema: `contracts/insights.schema.json`
