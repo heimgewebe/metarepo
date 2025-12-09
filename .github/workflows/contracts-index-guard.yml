@@ -23,7 +23,7 @@ jobs:
       run:
         shell: bash --noprofile --norc -euo pipefail {0}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Check contracts index
         run: |
           bash ./scripts/check-contracts-index.sh
