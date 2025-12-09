@@ -28,7 +28,7 @@ Weitere Ziele (z. B. `just fleet ...`) sind in der `Justfile` kommentiert besc
 - `./scripts/wgx doctor --repo <name>` bzw. `--all` – erstellt Drift-Berichte und legt sie unter
   [`reports/`](../reports) ab.
 
-Weitere Hintergründe liefert [docs/wgx-konzept.md](./wgx-konzept.md).
+Weitere Hintergründe liefert [docs/fleet/wgx-konzept.md](../fleet/wgx-konzept.md).
 
 ## GitHub Workflows
 
@@ -37,10 +37,10 @@ Wesentliche wiederverwendbare Workflows liegen unter `.github/workflows/` und we
 
 - `reusable-validate-jsonl.yml` – JSONL-Validierung gegen ein Schema (`ajv`).
 - `wgx-metrics.yml` – Validierung & optionaler Upload von Metrics-Snapshots.
-- `org-assets.yml` – baut [Org-Index](./org-index.md) und [Org-Graph](./org-graph.mmd) und prüft Drift.
+- `org-assets.yml` – baut [Org-Index](../archive/org-index.md) und [Org-Graph](../archive/org-graph.mmd) und prüft Drift.
 
 Sub-Repos binden diese Workflows via `uses: heimgewebe/metarepo/.github/workflows/...@<tag>` ein.
-Details zu Parametern & Rollout-Prozessen stehen in [docs/ci-reusables.md](./ci-reusables.md).
+Details zu Parametern & Rollout-Prozessen stehen in [docs/policies/ci-reusables.md](./ci-reusables.md).
 
 ## Automatisierungs-Governance
 

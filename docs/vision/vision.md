@@ -138,15 +138,15 @@ Die wichtigsten Artefakte & Verträge:
 ---
 ## Canvas-Visualisierungen
 Für eine visuelle Darstellung siehe:
-- [Heimgewebe Architektur (Canvas)](./canvas/heimgewebe-architektur.canvas)
-- [Heimgewebe Datenfluss (Canvas)](./canvas/heimgewebe-dataflow.canvas)
+- [Heimgewebe Architektur (Canvas)](../canvas/heimgewebe-architektur.canvas)
+- [Heimgewebe Datenfluss (Canvas)](../canvas/heimgewebe-dataflow.canvas)
 
 Diese Canvas-Dateien sind in **Obsidian direkt darstellbar** (Datei → Öffnen mit Canvas).
 
 ## Siehe auch
 
-- [Architecture](./architecture.md) – Detaillierte Architekturübersicht
-- [Vision Documents](./vision/README.md) – Detaillierte Visionsdokumente
-- [Heimgewebe Gesamt](./heimgewebe-gesamt.md) – Narrative Gesamtübersicht
-- [Contracts](./contracts.md) – Schema-Details
-- [ADRs](./adrs/README.md) – Architekturentscheidungen
+- [Architecture](../system/architecture.md) – Detaillierte Architekturübersicht
+- [Vision Documents](./README.md) – Detaillierte Visionsdokumente
+- [Heimgewebe Gesamt](../archive/heimgewebe-gesamt.md) – Narrative Gesamtübersicht
+- [Contracts](../contracts/contracts-index.md) – Schema-Details
+- [ADRs](../adrs/README.md) – Architekturentscheidungen

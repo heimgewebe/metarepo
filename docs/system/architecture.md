@@ -29,8 +29,8 @@ bestehenden Diagramme sowie Detaildokumente.
 - **semantAH** – erzeugt Insights & Graph-Artefakte für Berichte.
 - **hausKI-audio** – liefert Audio-/Telemetrie-Events.
 
-Ausführliche Rollenbeschreibungen findest du in der [Systemübersicht](./system-overview.md) und in der
-[Repo-Matrix](./repo-matrix.md).
+Ausführliche Rollenbeschreibungen findest du in der [Systemübersicht](../archive/system-overview.md) und in der
+[Repo-Matrix](../repo-matrix.md).
 
 ## Datenflüsse
 
@@ -41,26 +41,26 @@ aussensensor → chronik → heimlern → hausKI → leitstand
 ```
 
 Weitere Flüsse (Metrics, Insights, Audio) sind im [Heimgewebe-Datenfluss](./heimgewebe-dataflow.mmd)
-und unter [Events & Contracts](./contracts/index.md) aufgeführt.
+und unter [Events & Contracts](../contracts/contracts-index.md) aufgeführt.
 
 ## Diagramme
 
-- Mermaid: [`docs/heimgewebe-architektur.mmd`](./heimgewebe-architektur.mmd)
-- Mermaid: [`docs/heimgewebe-dataflow.mmd`](./heimgewebe-dataflow.mmd)
-- Canvas: [`docs/canvas/heimgewebe-architektur.canvas`](./canvas/heimgewebe-architektur.canvas)
-- Canvas: [`docs/canvas/heimgewebe-dataflow.canvas`](./canvas/heimgewebe-dataflow.canvas)
+- Mermaid: [`docs/system/heimgewebe-architektur.mmd`](./heimgewebe-architektur.mmd)
+- Mermaid: [`docs/system/heimgewebe-dataflow.mmd`](./heimgewebe-dataflow.mmd)
+- Canvas: [`docs/canvas/heimgewebe-architektur.canvas`](../canvas/heimgewebe-architektur.canvas)
+- Canvas: [`docs/canvas/heimgewebe-dataflow.canvas`](../canvas/heimgewebe-dataflow.canvas)
 
 ## Verträge & Versionierung
 
-- Überblick in [Events & Contracts](./contracts/index.md)
-- Details & Rollout-Prozess in [Contract-Versionierung](./contract-versioning.md)
-- JSON-Schemas unter [`contracts/`](../contracts) (Tag `contracts-vN`)
+- Überblick in [Events & Contracts](../contracts/contracts-index.md)
+- Details & Rollout-Prozess in [Contract-Versionierung](../contracts/contract-versioning.md)
+- JSON-Schemas unter [`contracts/`](../../contracts) (Tag `contracts-vN`)
 
 ## Weiterführende Architekturthemen
 
-- [Heimgewebe – Überblick](./heimgewebe-gesamt.md) – narrative Gesamtsicht
-- [Vision](./vision.md) – Leitlinien & Zukunftsbild
-- [Kernkonzepte](./konzept-kern.md) – Governance, Sync, Drift
-- [System Overview](./system-overview.md) – Kurzübersicht der Komponenten
-- [ADRs](./adrs/README.md) – Architekturentscheidungen
-- [Repo Matrix](./repo-matrix.md) – Repository-Rollen im Detail
+- [Heimgewebe – Überblick](../archive/heimgewebe-gesamt.md) – narrative Gesamtsicht
+- [Vision](../vision/vision.md) – Leitlinien & Zukunftsbild
+- [Kernkonzepte](../konzept-kern.md) – Governance, Sync, Drift
+- [System Overview](../archive/system-overview.md) – Kurzübersicht der Komponenten
+- [ADRs](../adrs/README.md) – Architekturentscheidungen
+- [Repo Matrix](../repo-matrix.md) – Repository-Rollen im Detail
