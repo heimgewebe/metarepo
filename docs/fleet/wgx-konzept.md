@@ -36,6 +36,6 @@ Kurz: wgx ist der **Bordcomputer**, der die Flotte bedient – nicht das Gehirn 
 ## Siehe auch
 
 - [Fleet Management](./fleet.md) – Template-Synchronisation und Fleet-Operationen
-- [Templates](./templates.md) – Template-Verteilung und Drift-Kontrolle
-- [Heimgewebe Gesamt](./heimgewebe-gesamt.md) – Narrative Gesamtübersicht
-- [Architecture](./architecture.md) – Systemarchitektur und Komponenten
+- [Templates](../templates.md) – Template-Verteilung und Drift-Kontrolle
+- [Heimgewebe Gesamt](../archive/heimgewebe-gesamt.md) – Narrative Gesamtübersicht
+- [Architecture](../system/architecture.md) – Systemarchitektur und Komponenten

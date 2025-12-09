@@ -24,7 +24,7 @@ Weitere Tools (z. B. `wgx`, `uv`) werden in den jeweiligen Repos erklärt.
 | `GITHUB_OWNER` / `WGX_OWNER` | Überschreibt den Owner für `wgx`-Kommandos | [`scripts/wgx`](../scripts/wgx) |
 
 Weitere Variablen entnimmst du den Sub-Repo-Dokumentationen (siehe
-[Systemübersicht](./system-overview.md)).
+[Systemübersicht](../archive/system-overview.md)).
 
 ## Umgang mit Secrets
 
@@ -39,12 +39,10 @@ Weitere Variablen entnimmst du den Sub-Repo-Dokumentationen (siehe
 
 - Fehlende Variablen führen zu Abbrüchen mit hilfreichen Fehlermeldungen (z. B. im
   [E2E-Skript](../scripts/e2e/run_aussen_to_heimlern.sh)).
-- `wgx` meldet fehlende Authentisierung, wenn `GH_TOKEN` nicht gesetzt ist; siehe
-  [Troubleshooting](./troubleshooting.md).
+- `wgx` meldet fehlende Authentisierung, wenn `GH_TOKEN` nicht gesetzt ist.
 - Bei mehreren Accounts empfiehlt sich ein dediziertes `.env` pro Umgebung.
 
 ## Weiterführende Links
 
-- [E2E-Dokumentation](./e2e.md)
-- [Use-Cases](./use-cases.md)
-- [Troubleshooting & FAQ](./troubleshooting.md)
+- E2E-Dokumentation (siehe `scripts/e2e/`)
+- Weitere Use-Cases und Troubleshooting-Hinweise in Vorbereitung
