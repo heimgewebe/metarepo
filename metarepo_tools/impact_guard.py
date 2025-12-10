@@ -160,7 +160,8 @@ def build_mermaid(
             scope = info.get("scope", "")
             subtitle = ""
             if domain or scope:
-                subtitle = f"<br/>{domain}:{scope}".strip(":")
+                subtitle_text = f"{domain}:{scope}".strip(":")
+                subtitle = f"<br/>{subtitle_text}" if subtitle_text else ""
             label = f"{repo}{subtitle}"
             lines.append(f'{node_id}["{label}"]')
             seen_nodes.add(node_id)
