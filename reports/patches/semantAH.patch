@@ -1,0 +1,162 @@
+diff --git a/.github/workflows/pr-heimgewebe-commands.yml b/.github/workflows/pr-heimgewebe-commands.yml
+index 0d06620..9edf3a4 100644
+--- a/.github/workflows/pr-heimgewebe-commands.yml
++++ b/.github/workflows/pr-heimgewebe-commands.yml
+@@ -14,7 +14,4 @@ jobs:
+   dispatch:
+     if: github.event.issue.pull_request != null
+     uses: heimgewebe/metarepo/.github/workflows/heimgewebe-command-dispatch.yml@main
+-    secrets:
+-      HEIMGEWEBE_APP_ID: ${{ secrets.HEIMGEWEBE_APP_ID }}
+-      HEIMGEWEBE_APP_PRIVATE_KEY: ${{ secrets.HEIMGEWEBE_APP_PRIVATE_KEY }}
+-      HEIMGEWEBE_AUTOBOT_TOKEN: ${{ secrets.HEIMGEWEBE_AUTOBOT_TOKEN }}
++    secrets: inherit
+diff --git a/.github/workflows/validate-knowledge-graph.yml b/.github/workflows/validate-knowledge-graph.yml
+index 1a0c4b8..d6f130c 100644
+--- a/.github/workflows/validate-knowledge-graph.yml
++++ b/.github/workflows/validate-knowledge-graph.yml
+@@ -1,36 +1,52 @@
++---
+ name: validate-knowledge-graph
+-permissions:
+-  contents: read
+-on:
+-  workflow_dispatch:
+-  pull_request:
+-    paths:
+-      - "knowledge.graph.json"
+-      - "docs/**/knowledge.graph.json"
++
++"on":
+   push:
+     paths:
+       - "knowledge.graph.json"
+       - "docs/**/knowledge.graph.json"
++      - ".github/workflows/validate-knowledge-graph.yml"
++  pull_request:
++  workflow_dispatch:
++
+ jobs:
+   validate:
+     runs-on: ubuntu-latest
++    timeout-minutes: 10
+     steps:
+-      - uses: actions/checkout@v4
+-      - uses: actions/setup-node@v4
+-      - run: npm i -g ajv-cli@5
+-      - run: |
++      - name: Checkout
++        uses: actions/checkout@8ade135a242bde00fd19c0e54fb3760beea110ee  # v4.1.0
++
++      - name: Setup Node
++        uses: actions/setup-node@5e221d4786ffb21088b21dfc9c80efb16b52cd3b  # v4.0.2
++
++      - name: Install ajv-cli
++        run: npm i -g ajv-cli@5.0.0
++
++      - name: Validate knowledge.graph.json
++        shell: bash
++        env:
++          SCHEMA_URL: >-
++            https://raw.githubusercontent.com/heimgewebe/metarepo/contracts-v1/contracts/knowledge.graph.schema.json
++        run: |
+           set -euo pipefail
+-          curl -fsSL https://raw.githubusercontent.com/heimgewebe/metarepo/contracts-v1/contracts/knowledge.graph.schema.json -o /tmp/schema.json
+           shopt -s nullglob
+-          files=()
+-          if [[ -f knowledge.graph.json ]]; then
+-            files+=("knowledge.graph.json")
+-          fi
+-          while IFS= read -r -d '' f; do files+=("$f"); done < <(find docs -type f -name 'knowledge.graph.json' -print0 || true)
+-          if (( ${#files[@]} == 0 )); then
+-            echo "::notice::Keine knowledge.graph.json gefunden – skip."
++          declare -a FILES=(
++            knowledge.graph.json
++          )
++          # zusätzliche Standardpfade
++          while IFS= read -r -d '' f; do
++            FILES+=("$f")
++          done < <(find docs -type f -name 'knowledge.graph.json' -print0 2>/dev/null || true)
++          if (( ${#FILES[@]} == 0 )); then
++            echo "::notice::Keine knowledge.graph.json gefunden – übersprungen."
+             exit 0
+           fi
+-          for f in "${files[@]}"; do
+-            echo "→ $f"; ajv validate --spec=draft2020 -s /tmp/schema.json -d "$f"
++          echo "Prüfe ${#FILES[@]} Datei(en)…"
++          curl -fsSL "$SCHEMA_URL" -o /tmp/schema.json
++          for f in "${FILES[@]}"; do
++            echo "→ $f"
++            ajv validate --spec=draft2020 --strict=true --validate-formats=true -s /tmp/schema.json -d "$f"
+           done
++          echo "OK."
+diff --git a/contracts/insights.schema.json b/contracts/insights.schema.json
+index 03fd9ae..a582380 100644
+--- a/contracts/insights.schema.json
++++ b/contracts/insights.schema.json
+@@ -1,46 +1,26 @@
+ {
+   "$schema": "https://json-schema.org/draft/2020-12/schema",
+-  "title": "Daily Insights",
++  "$id": "https://schemas.heimgewebe.org/contracts/insights.schema.json",
++  "title": "Heimgewebe Review Insight",
++  "x-producers": ["semantAH"],
++  "x-consumers": ["hausKI", "chronik"],
+   "type": "object",
+   "additionalProperties": false,
+-  "required": ["generated_at", "source", "items"],
++  "required": ["type","repo","source","file","score","verdict","ingested_at"],
+   "properties": {
+-    "generated_at": {
+-      "type": "string",
+-      "format": "date-time"
+-    },
+-    "source": {
+-      "type": "string",
+-      "minLength": 1
+-    },
+-    "items": {
+-      "type": "array",
+-      "items": {
+-        "type": "object",
+-        "additionalProperties": false,
+-        "required": ["title", "summary", "url", "tags"],
+-        "properties": {
+-          "title": {
+-            "type": "string",
+-            "minLength": 1
+-          },
+-          "summary": {
+-            "type": "string",
+-            "minLength": 1
+-          },
+-          "url": {
+-            "type": "string",
+-            "format": "uri"
+-          },
+-          "tags": {
+-            "type": "array",
+-            "items": {
+-              "type": "string",
+-              "minLength": 1
+-            }
+-          }
+-        }
+-      }
+-    }
++    "id":            { "type":"string", "description":"stable hash/id (optional)" },
++    "type":          { "type":"string", "const": "review.insight" },
++    "repo":          { "type":"string", "minLength": 1 },
++    "source":        { "type":"string", "enum": ["hauski","ci","manual"] },
++    "file":          { "type":"string" },
++    "score":         { "type":"integer", "minimum": 0, "maximum": 100 },
++    "verdict":       { "type":"string" },
++    "pr":            { "type":"string" },
++    "tags":          { "type":"array", "items": { "type":"string" } },
++    "ingested_at":   { "type":"string", "format": "date-time" },
++    "schema_version":{ "type":"string" },
++    "source_version":{ "type":"string" },
++    "runner_host":   { "type":"string" },
++    "bucket":        { "type":"string", "enum": ["info","warn","fail"] }
+   }
+ }
