@@ -1,0 +1,227 @@
+---
+name: Apply Fleet Patches
+
+on:
+  workflow_dispatch:
+    inputs:
+      repos:
+        description: 'Comma-separated list of repos to apply patches to (or "all")'
+        required: true
+        default: 'all'
+        type: string
+      dry_run:
+        description: 'Dry run mode (no actual pushes)'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  apply-patches:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        repo:
+          - heimlern
+          - semantAH
+          - wgx
+          - hausKI
+          - weltgewebe
+          - chronik
+          - aussensensor
+          - tools
+          - heimgeist
+          - plexer
+          - contracts
+          - mitschreiber
+          - sichter
+          - hauski-audio
+
+    steps:
+      - name: Checkout metarepo
+        uses: actions/checkout@v4
+
+      - name: Check if patch exists
+        id: check-patch
+        run: |
+          PATCH_FILE="reports/patches/${{ matrix.repo }}.patch"
+          if [[ ! -f "$PATCH_FILE" ]]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "Patch file not found for ${{ matrix.repo }}"
+            exit 0
+          fi
+          if [[ ! -s "$PATCH_FILE" ]]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "Patch file is empty for ${{ matrix.repo }}"
+            exit 0
+          fi
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+
+      - name: Filter repos based on input
+        id: filter
+        if: steps.check-patch.outputs.skip != 'true'
+        run: |
+          REPOS_INPUT="${{ github.event.inputs.repos }}"
+          CURRENT_REPO="${{ matrix.repo }}"
+          
+          if [[ "$REPOS_INPUT" == "all" ]]; then
+            echo "apply=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          
+          IFS=',' read -ra REPOS_ARRAY <<< "$REPOS_INPUT"
+          for repo in "${REPOS_ARRAY[@]}"; do
+            repo=$(echo "$repo" | xargs) # trim whitespace
+            if [[ "$repo" == "$CURRENT_REPO" ]]; then
+              echo "apply=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          done
+          
+          echo "apply=false" >> "$GITHUB_OUTPUT"
+          echo "Skipping $CURRENT_REPO (not in input list)"
+
+      - name: Generate GitHub App Token
+        id: app-token
+        if: steps.filter.outputs.apply == 'true' && steps.check-patch.outputs.skip != 'true'
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.HEIMGEWEBE_APP_ID }}
+          private-key: ${{ secrets.HEIMGEWEBE_APP_PRIVATE_KEY }}
+          owner: heimgewebe
+          repositories: ${{ matrix.repo }}
+
+      - name: Clone target repository
+        if: steps.filter.outputs.apply == 'true' && steps.check-patch.outputs.skip != 'true'
+        run: |
+          git clone "https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/heimgewebe/${{ matrix.repo }}.git" "/tmp/${{ matrix.repo }}"
+
+      - name: Apply patch
+        if: steps.filter.outputs.apply == 'true' && steps.check-patch.outputs.skip != 'true'
+        run: |
+          cd "/tmp/${{ matrix.repo }}"
+          
+          git config user.email "codex-bot@heimgewebe.org"
+          git config user.name "Codex Bot"
+          
+          BRANCH_NAME="chore/reconcile-from-metarepo"
+          git checkout -b "$BRANCH_NAME" || git checkout "$BRANCH_NAME"
+          
+          PATCH_FILE="${GITHUB_WORKSPACE}/reports/patches/${{ matrix.repo }}.patch"
+          
+          echo "Applying patch from $PATCH_FILE..."
+          if git apply --check "$PATCH_FILE" 2>&1; then
+            git apply "$PATCH_FILE"
+          else
+            echo "Attempting 3-way merge..."
+            git apply --3way "$PATCH_FILE"
+          fi
+          
+          if git diff --quiet && git diff --cached --quiet; then
+            echo "No changes after applying patch"
+            echo "SKIP_COMMIT=true" >> "$GITHUB_ENV"
+            exit 0
+          fi
+          
+          git add -A
+          
+          git commit -m "chore(fleet): reconcile templates and contracts from metarepo
+
+Applied reconciliation patch from heimgewebe/metarepo.
+This synchronizes:
+- CI workflow templates
+- Contract schemas
+- WGX profiles
+- Documentation structure
+
+Source: metarepo/reports/patches/${{ matrix.repo }}.patch
+Generated: $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
+
+      - name: Push changes
+        if: steps.filter.outputs.apply == 'true' && steps.check-patch.outputs.skip != 'true' && env.SKIP_COMMIT != 'true' && github.event.inputs.dry_run != 'true'
+        run: |
+          cd "/tmp/${{ matrix.repo }}"
+          BRANCH_NAME="chore/reconcile-from-metarepo"
+          git push -u origin "$BRANCH_NAME" || {
+            echo "Branch might already exist, force pushing..."
+            git push -f origin "$BRANCH_NAME"
+          }
+
+      - name: Create Pull Request
+        if: steps.filter.outputs.apply == 'true' && steps.check-patch.outputs.skip != 'true' && env.SKIP_COMMIT != 'true' && github.event.inputs.dry_run != 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ steps.app-token.outputs.token }}
+          script: |
+            const repo = '${{ matrix.repo }}';
+            const branch = 'chore/reconcile-from-metarepo';
+            
+            try {
+              // Check if PR already exists
+              const { data: prs } = await github.rest.pulls.list({
+                owner: 'heimgewebe',
+                repo: repo,
+                head: `heimgewebe:${branch}`,
+                state: 'open'
+              });
+              
+              if (prs.length > 0) {
+                core.info(`PR already exists: ${prs[0].html_url}`);
+                return;
+              }
+              
+              // Create PR
+              const { data: pr } = await github.rest.pulls.create({
+                owner: 'heimgewebe',
+                repo: repo,
+                title: 'chore(fleet): reconcile templates and contracts from metarepo',
+                head: branch,
+                base: 'main',
+                body: `## Fleet Reconciliation
+
+This PR applies the reconciliation patch from \`heimgewebe/metarepo\`.
+
+### Changes include:
+- ✅ CI workflow template updates
+- ✅ Contract schema synchronization  
+- ✅ WGX profile corrections
+- ✅ Documentation structure alignment
+
+### Source
+- Patch: \`metarepo/reports/patches/${repo}.patch\`
+- Workflow: \`metarepo/.github/workflows/apply-fleet-patches.yml\`
+- Generated: ${new Date().toISOString()}
+
+### Review Notes
+Please review the changes carefully. These are automated reconciliation updates based on the canonical templates in metarepo.
+
+/cc @alexdermohr`
+              });
+              
+              core.info(`PR created: ${pr.html_url}`);
+              
+            } catch (error) {
+              core.setFailed(`Failed to create PR: ${error.message}`);
+            }
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Patch Application Summary for ${{ matrix.repo }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [[ "${{ steps.check-patch.outputs.skip }}" == "true" ]]; then
+            echo "⏭️ Skipped (no patch or empty patch)" >> $GITHUB_STEP_SUMMARY
+          elif [[ "${{ steps.filter.outputs.apply }}" != "true" ]]; then
+            echo "⏭️ Skipped (not in requested repos)" >> $GITHUB_STEP_SUMMARY
+          elif [[ "${{ env.SKIP_COMMIT }}" == "true" ]]; then
+            echo "⏭️ Skipped (no changes after applying patch)" >> $GITHUB_STEP_SUMMARY
+          elif [[ "${{ github.event.inputs.dry_run }}" == "true" ]]; then
+            echo "✅ Dry run completed successfully" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ Patch applied and PR created" >> $GITHUB_STEP_SUMMARY
+          fi
