@@ -1,7 +1,7 @@
 Installation
 ============
 
-This document describes how to install [actionlint](../docs).
+This document describes how to install [actionlint](..).
 
 ## Windows
 
@@ -185,7 +185,7 @@ go install github.com/rhysd/actionlint/cmd/actionlint@main
 
 ---
 
-[Checks](checks.md) | [Usage](usage.md) | [Configuration](config.md) | [Go API](api.md) | [References](reference.md)
+[Checks](../policies/checks.md) | [Usage](./usage.md) | [Configuration](../config.md) | [Go API](../api.md) | [References](../reference.md)
 
 [formula]: https://formulae.brew.sh/formula/actionlint
 [homebrew]: https://brew.sh/

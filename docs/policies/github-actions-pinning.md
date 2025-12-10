@@ -1,55 +1,20 @@
-# GitHub Actions Pinning-Policy
+# GitHub Actions Pinning Policy
 
-Unsere Workflows balancieren Lieferkettensicherheit mit operativer Zuverlässigkeit.
-Dieses Dokument fasst die Richtlinien zusammen, die wir nach den jüngsten
-Änderungen in den Workflow-Templates anwenden.
+To ensure security, stability, and reproducibility of our CI/CD pipelines, we enforce strict version pinning for all GitHub Actions.
 
-## 1 · Core-Actions (First-Party)
+## Policy
 
-- Für `actions/checkout`, `actions/setup-python` und `actions/cache` nutzen wir die
-  **stabilen Major-Tags** (`@v4`, `@v5`).
-- GitHub pflegt diese Major-Tags semantisch, ohne sie rückwirkend auf inkompatible
-  Commits zu verschieben.
-- Major-Tags können auf neue Minor- oder Patch-Releases zeigen, garantieren aber laut
-  SemVer der Action, dass keine Breaking Changes eingeführt werden.
-- Dieser Ansatz vermeidet 404-Fehler, die durch das Aufräumen alter Commit-SHAs
-  entstanden sind, und bleibt im Rahmen der GitHub-Empfehlungen.
+1.  **Pin by Tag or Commit SHA**: All `uses:` directives in workflow files must reference a specific version tag (e.g., `@v2`, `@v1.2.3`) or a full commit SHA.
+2.  **No `@main` or `@master`**: References to mutable branch names like `@main` or `@master` are prohibited. This prevents upstream changes from breaking our builds unexpectedly or introducing malicious code.
 
-| Action                     | Empfohlener Pin | Begründung              |
-|----------------------------|-----------------|-------------------------|
-| `actions/checkout`         | `@v4`           | stabiler Major-Tag      |
-| `actions/setup-python`     | `@v5`           | stabiler Major-Tag      |
-| `actions/cache`            | `@v4`           | stabiler Major-Tag      |
+## Verification
 
-## 2 · Drittanbieter-Actions
+This policy is enforced by the `check-action-refs` job in our CI pipeline, which scans all workflow files for prohibited references.
 
-- Drittanbieter-Actions pinnen wir weiterhin auf **veröffentlichte Release-Tags**
-  (z. B. `lycheeverse/lychee-action@v2.0.2` oder `astral-sh/setup-uv@v3`).
-- Release-Tags minimieren die Wahrscheinlichkeit von Force-Pushes und behalten
-  Versionsinformationen für Supply-Chain-Audits.
-- Sollte ein Release zurückgezogen werden, erlauben wir eine kurzfristige
-  Umstellung auf einen funktionierenden Patch-Tag oder die letzte Major-Version,
-  dokumentieren den Workaround aber im PR oder Issue.
+## Exceptions
 
-## 3 · Ausnahmen & Audits
+There is currently one authorized exception to this policy:
 
-- Falls ein Core-Action-Major-Tag regressiv wird, dokumentieren wir die Abweichung
-  im betroffenen Workflow und erstellen ein Issue.
-- Für Sicherheitsspitzen (Audit, Incident Response) können Commits temporär auf
-  exakte SHAs gepinnt werden. Danach stellen wir auf die Standard-Policy zurück.
-- Abhängigkeiten von Dependabot: Für Actions lassen wir Major-Tag-Updates zu,
-  blockieren aber direkte SHA-Replacements. Dadurch bleiben Auto-PRs nachvollziehbar.
-- Wir nutzen keine `groups`-Konfiguration für `github-actions`, weil GitHub sie nicht
-  unterstützt; so bleiben Updates pro Action getrennt und gut reviewbar.
-
-## 4 · Umsetzung in Repos
-
-- Das Metarepo dient als Kanon. Die Template-Workflows unter `.github/workflows/`
-  reflektieren diese Policy bereits.
-- Downstream-Repositories übernehmen die Einstellungen via `scripts/sync-templates.sh`.
-  Bei individuellen Abweichungen muss die zuständige Fleet-Owner:in die Entscheidung
-  dokumentieren.
-
----
-
-**Stand:** 2024-11-22
+-   **Workflow**: `heimgewebe/metarepo/.github/workflows/heimgewebe-command-dispatch.yml@main`
+-   **Usage**: Used in `pr-heimgewebe-commands.yml`.
+-   **Reason**: This workflow is part of the internal metarepo dispatch mechanism. Using `@main` ensures that the dispatch logic is always up-to-date with the latest implementation in the metarepo, avoiding the need to manually update tags across all repositories when the dispatch logic changes. Since this is an internal reference within the same trusted organization, the security risk is mitigated.

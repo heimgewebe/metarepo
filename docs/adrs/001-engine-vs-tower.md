@@ -13,4 +13,4 @@ Kein Dokument-Drift, eine Quelle der Wahrheit, klarer Update-Pfad.
 ## Alternativen
 Doppelte Doku/Checks im Tower (führt zu Drift).
 ## Links
-- docs/fleet.md, docs/ci-reusables.md, docs/wgx-stub.md
+- docs/fleet/fleet.md, docs/policies/ci-reusables.md, docs/wgx-stub.md

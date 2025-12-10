@@ -43,8 +43,8 @@ Setze immer `--dry-run`, wenn du neue Muster ausprobierst.
 
 ## Siehe auch
 
-- [Fleet Management](./fleet.md) – Fleet-Operationen und Zyklus
-- [WGX Konzept](./wgx-konzept.md) – Fleet-Motor und Kommandos
+- [Fleet Management](./fleet/fleet.md) – Fleet-Operationen und Zyklus
+- [WGX Konzept](./fleet/wgx-konzept.md) – Fleet-Motor und Kommandos
 - [Konzept Kern](./konzept-kern.md) – Synchronisationsprozess im Detail
 - [ADR-002: Distribution & Drift-Regeln](./adrs/002-distribution-drift.md) – Architekturentscheidung
 - [Push to Fleet](./fleet/push-to-fleet.md) – Deployment-Prozeduren

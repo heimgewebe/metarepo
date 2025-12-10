@@ -1,6 +1,6 @@
 # Contracts: Versionierung & Deprecations
 
-Die Schemas im Ordner [`contracts/`](../contracts) werden über Fleet-Tags verteilt, damit Producer- und Consumer-Repos synchron bleiben. Dieser Leitfaden fasst die laufende Praxis aus [`docs/contracts.md`](./contracts.md) zusammen.
+Die Schemas im Ordner [`contracts/`](../../contracts) werden über Fleet-Tags verteilt, damit Producer- und Consumer-Repos synchron bleiben. Dieser Leitfaden fasst die laufende Praxis aus [`docs/archive/contracts.md`](../archive/contracts.md) zusammen.
 
 ## Release-Kanäle
 
@@ -12,7 +12,7 @@ Die Schemas im Ordner [`contracts/`](../contracts) werden über Fleet-Tags verte
 ## Tagging & Nutzung
 - Stabile Schemas werden nach Review auf einen Release-Branch (`chore/fleet-contracts-v1`) gehoben und anschließend als Tag `contracts-v1` veröffentlicht.
 - Downstream-Workflows pinnen strikt auf `@contracts-v1`, um Breaking-Changes zu vermeiden.
-- Der Reusable-Workflow [`reusable-validate-jsonl.yml`](../.github/workflows/reusable-validate-jsonl.yml) ist Teil des Tags und validiert JSONL-Feeds gegen die Schemas.
+- Der Reusable-Workflow [`reusable-validate-jsonl.yml`](../../.github/workflows/reusable-validate-jsonl.yml) ist Teil des Tags und validiert JSONL-Feeds gegen die Schemas.
 
 ### Beispiele (Pinning)
 ```yaml
@@ -29,4 +29,4 @@ with:
 ## Pflegezyklus
 - Vor jedem Fleet-Sync `just wgx plan` → prüfen, welche Repos Contracts konsumieren.
 - `just fleet open-prs contracts-v1` stößt im ganzen Verbund Update-PRs an, sobald ein neuer Tag veröffentlicht ist.
-- Rollout-Reihenfolge siehe [`docs/contracts.md`](./contracts.md#rollout-checkliste) (Producer → Consumer → Policies).
+- Rollout-Reihenfolge siehe [`docs/archive/contracts.md`](../archive/contracts.md#rollout-checkliste) (Producer → Consumer → Policies).

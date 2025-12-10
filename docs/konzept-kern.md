@@ -53,7 +53,7 @@ repos:
 ## Siehe auch
 
 - [Templates](./templates.md) – Template-Verteilung und Drift-Kontrolle
-- [Fleet Management](./fleet.md) – Fleet-Operationen im Überblick
-- [WGX Konzept](./wgx-konzept.md) – Fleet-Motor und Kommandos
-- [Architecture](./architecture.md) – Systemarchitektur
+- [Fleet Management](./fleet/fleet.md) – Fleet-Operationen im Überblick
+- [WGX Konzept](./fleet/wgx-konzept.md) – Fleet-Motor und Kommandos
+- [Architecture](./system/architecture.md) – Systemarchitektur
 - [ADR-002: Distribution & Drift-Regeln](./adrs/002-distribution-drift.md) – Architekturentscheidung

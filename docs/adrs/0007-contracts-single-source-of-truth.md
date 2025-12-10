@@ -133,7 +133,7 @@ genutzt werden – aber es bestimmt nicht mehr den fachlichen Stand der Contract
 - Einbindung von Drift-Checks in Domain-Repos:
   „Falls lokale Contract-Datei != Quelle → CI schlägt fehl.“
 - Dokumentation anpassen:
-  - `docs/contracts.md` im metarepo,
+  - `docs/contracts/contracts-index.md` im metarepo,
   - Hinweise in den READMEs von Domain-Repos (wo erfolgt die Pflege?).
 
 **4.3 Langfristig**

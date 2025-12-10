@@ -59,7 +59,7 @@ repository.
 
 ---
 
-[Checks](checks.md) | [Installation](install.md) | [Usage](usage.md) | [Configuration](config.md) | [References](reference.md)
+[Checks](policies/checks.md) | [Installation](runbooks/install.md) | [Usage](runbooks/usage.md) | [Configuration](config.md) | [References](reference.md)
 
 [api-badge]: https://pkg.go.dev/badge/github.com/rhysd/actionlint.svg
 [apidoc]: https://pkg.go.dev/github.com/rhysd/actionlint
