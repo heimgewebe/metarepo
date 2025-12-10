@@ -139,7 +139,7 @@ This synchronizes:
 - Documentation structure
 
 Source: metarepo/reports/patches/${{ matrix.repo }}.patch
-Generated: $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
+Workflow Run: ${{ github.run_id }}"
 
       - name: Push changes
         if: steps.filter.outputs.apply == 'true' && steps.check-patch.outputs.skip != 'true' && env.SKIP_COMMIT != 'true' && github.event.inputs.dry_run != 'true'
@@ -147,7 +147,7 @@ Generated: $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
           cd "/tmp/${{ matrix.repo }}"
           BRANCH_NAME="chore/reconcile-from-metarepo"
           # Try normal push first
-          if ! git push -u origin "$BRANCH_NAME" 2>&1; then
+          if ! git push -u origin "$BRANCH_NAME"; then
             echo "Branch might already exist, attempting force-with-lease..."
             git push --force-with-lease origin "$BRANCH_NAME"
           fi

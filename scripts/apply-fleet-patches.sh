@@ -72,7 +72,7 @@ apply_patch_to_repo() {
   else
     red "✗ Patch check failed for $repo_name"
     echo "Attempting to apply with 3-way merge..."
-    if git apply --3way "$(pwd)/../../$patch_file" 2>&1; then
+    if git apply --3way "$abs_patch_file" 2>&1; then
       green "✓ Patch applied with 3-way merge"
     else
       red "✗ Failed to apply patch to $repo_name"
