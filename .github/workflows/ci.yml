@@ -241,7 +241,7 @@ jobs:
           echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
 
       - name: Aggregate requirements and install with uv
-        if: ${{ hashFiles('**/requirements*.txt') != '' }}
+        if: ${{ hashFiles('**/requirements*.txt') != '' && env.AGENT_MODE == '' }}
         env:
           UV_PROJECT_ENVIRONMENT: ${{ env.UV_PROJECT_ENVIRONMENT }}
         run: |
@@ -271,6 +271,11 @@ jobs:
           # requirements may include loose constraints that intentionally layer
           # on top of the project's locked dependencies.
           uv pip install -r "${TMP_REQUIREMENTS}"
+      
+      - name: Skip requirements (Agent-Mode)
+        if: ${{ hashFiles('**/requirements*.txt') != '' && env.AGENT_MODE != '' }}
+        run: |
+          echo "Agent-Mode: skipping uv pip install, assuming dependencies pre-installed"
 
       - name: Sync pyproject environment with uv
         if: ${{ hashFiles('**/pyproject.toml') != '' }}

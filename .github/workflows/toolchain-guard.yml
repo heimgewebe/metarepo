@@ -9,7 +9,20 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
+      
+      - name: Check yq availability (Agent-Mode)
+        if: ${{ env.AGENT_MODE != '' }}
+        run: |
+          echo "Agent-Mode: skipping yq download, checking if pre-installed"
+          if command -v yq >/dev/null 2>&1; then
+            echo "yq found: $(yq --version)"
+          else
+            echo "::error::yq not available in Agent-Mode. Please pre-install it."
+            exit 1
+          fi
+      
       - name: Install yq (robust)
+        if: ${{ env.AGENT_MODE == '' }}
         run: |
           set -euo pipefail
           YQ_VERSION="v4.49.2"

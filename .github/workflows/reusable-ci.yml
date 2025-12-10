@@ -34,9 +34,15 @@ jobs:
         uses: extractions/setup-just@2fa60cc7d6fb3586e4cbace17c1169c8d2bd0f5c # extractions/setup-just@v2 (pinned)
 
       - name: Install Dependencies (optional)
+        if: ${{ env.AGENT_MODE == '' }}
         run: |
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           if [ -f package.json ]; then npm ci; fi
+      
+      - name: Check Dependencies (Agent-Mode)
+        if: ${{ env.AGENT_MODE != '' }}
+        run: |
+          echo "Agent-Mode: skipping dynamic installs (pip/npm), assuming dependencies pre-installed"
 
       - name: Skip Justfile-dependent steps when missing Justfile
         if: ${{ hashFiles('Justfile') == '' }}

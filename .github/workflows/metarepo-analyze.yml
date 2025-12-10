@@ -37,9 +37,16 @@ jobs:
           cache: 'pip'
 
       - name: Install dependencies
+        if: ${{ env.AGENT_MODE == '' }}
         run: |
           python -m pip install --upgrade --disable-pip-version-check pip
           python -m pip install --upgrade --disable-pip-version-check networkx PyYAML
+      
+      - name: Check dependencies (Agent-Mode)
+        if: ${{ env.AGENT_MODE != '' }}
+        run: |
+          echo "Agent-Mode: skipping pip install, assuming dependencies pre-installed"
+          python -c "import networkx, yaml" || { echo "::error::networkx/PyYAML not available in Agent-Mode"; exit 1; }
 
       - name: Build dependency graph
         if: ${{ hashFiles('repos.yml') != '' }}
