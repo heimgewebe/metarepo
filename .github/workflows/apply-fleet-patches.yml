@@ -146,10 +146,11 @@ Generated: $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
         run: |
           cd "/tmp/${{ matrix.repo }}"
           BRANCH_NAME="chore/reconcile-from-metarepo"
-          git push -u origin "$BRANCH_NAME" || {
-            echo "Branch might already exist, force pushing..."
-            git push -f origin "$BRANCH_NAME"
-          }
+          # Try normal push first
+          if ! git push -u origin "$BRANCH_NAME" 2>&1; then
+            echo "Branch might already exist, attempting force-with-lease..."
+            git push --force-with-lease origin "$BRANCH_NAME"
+          fi
 
       - name: Create Pull Request
         if: steps.filter.outputs.apply == 'true' && steps.check-patch.outputs.skip != 'true' && env.SKIP_COMMIT != 'true' && github.event.inputs.dry_run != 'true'

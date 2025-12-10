@@ -47,6 +47,10 @@ apply_patch_to_repo() {
   
   cd "$repo_dir"
   
+  # Store absolute path to patch before changing directories
+  local abs_patch_file
+  abs_patch_file="$(cd "$(dirname "$patch_file")" && pwd)/$(basename "$patch_file")"
+  
   # Configure git
   git config user.email "codex-bot@heimgewebe.org"
   git config user.name "Codex Bot"
@@ -61,9 +65,9 @@ apply_patch_to_repo() {
   }
   
   # Apply the patch
-  echo "Applying patch from $patch_file..."
-  if git apply --check "$(pwd)/../../$patch_file" 2>&1; then
-    git apply "$(pwd)/../../$patch_file"
+  echo "Applying patch from $abs_patch_file..."
+  if git apply --check "$abs_patch_file" 2>&1; then
+    git apply "$abs_patch_file"
     green "✓ Patch applied successfully"
   else
     red "✗ Patch check failed for $repo_name"
@@ -85,8 +89,9 @@ apply_patch_to_repo() {
   # Stage all changes
   git add -A
   
-  # Commit changes
-  git commit -m "chore(fleet): reconcile templates and contracts from metarepo
+  # Commit changes with multiline message
+  local commit_msg
+  commit_msg="chore(fleet): reconcile templates and contracts from metarepo
 
 Applied reconciliation patch from heimgewebe/metarepo.
 This synchronizes:
@@ -96,6 +101,8 @@ This synchronizes:
 - Documentation structure
 
 Source: metarepo/reports/patches/${repo_name}.patch"
+  
+  git commit -m "$commit_msg"
   
   green "✓ Changes committed to $BRANCH_NAME"
   

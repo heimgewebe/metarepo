@@ -87,7 +87,7 @@ Most patches include one or more of the following:
 
 ### 2. Contract Schema Updates
 
-- Renamed files to match canonical naming conventions:
+- Renamed files to match canonical naming conventions (where applicable, e.g., in heimlern):
   - `aussen_event.schema.json` → `aussen.event.schema.json`
   - `policy_feedback.schema.json` → `policy.feedback.schema.json`
   - `policy_snapshot.schema.json` → `policy.snapshot.schema.json`
@@ -177,6 +177,10 @@ The workflow requires:
 - `HEIMGEWEBE_APP_PRIVATE_KEY` secret
 
 These should be configured in the metarepo repository settings under Secrets and variables → Actions.
+
+**GitHub App Permissions**: The App should have minimal required permissions:
+- Repository: Contents (read & write) and Pull Requests (read & write)
+- Access limited to the specific fleet repositories
 
 ## Regenerating Patches
 
