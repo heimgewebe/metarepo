@@ -9,6 +9,18 @@ runs:
       run: |
         set -euo pipefail
 
+        # Agent-Mode: skip all dynamic installations
+        if [[ "${AGENT_MODE:-}" != "" ]]; then
+          echo "Agent-Mode: skipping dynamic just installation"
+          if command -v just >/dev/null 2>&1; then
+            echo "just already available: $(just --version)"
+            exit 0
+          else
+            echo "::error::just not available in Agent-Mode. Please pre-install or vendor it."
+            exit 1
+          fi
+        fi
+
         # Recommend pinning in toolchain.versions.yml: just: "v0.11.0"
         # Uses JUST_VERSION env var if set (e.g. by previous step reading toolchain),
         # otherwise defaults to v0.11.0.

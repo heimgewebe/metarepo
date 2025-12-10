@@ -9,10 +9,23 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
+      
+      - name: Check yq availability (Agent-Mode)
+        if: ${{ env.AGENT_MODE != '' }}
+        run: |
+          echo "Agent-Mode: skipping yq download, checking if pre-installed"
+          if command -v yq >/dev/null 2>&1; then
+            echo "yq found: $(yq --version)"
+          else
+            echo "::error::yq not available in Agent-Mode. Please pre-install it."
+            exit 1
+          fi
+      
       - name: Install yq (robust)
+        if: ${{ env.AGENT_MODE == '' }}
         run: |
           set -euo pipefail
-          YQ_VERSION="v4.49.2"
+          YQ_VERSION="v4.44.1"
           YQ_ARCH="linux_amd64"
           BIN_DIR="${GITHUB_WORKSPACE}/tools/bin"
           mkdir -p "$BIN_DIR"
@@ -82,6 +95,7 @@ jobs:
           SHA_CANDIDATES=(
             "checksums"
             "checksums.txt"
+            "checksums_sha256.txt"
             "SHA256SUMS.txt"
             "sha256sum.txt"
             "sha256sums.txt"

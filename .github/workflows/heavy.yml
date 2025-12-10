@@ -25,13 +25,18 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Query /ask endpoint (optional)
-        if: ${{ env.ASK_ENDPOINT_URL != '' }}
+        if: ${{ env.ASK_ENDPOINT_URL != '' && env.AGENT_MODE == '' }}
         run: |
           set -euo pipefail
           curl --fail --show-error --location \
                --retry 3 --retry-connrefused --retry-delay 2 \
                --max-time 15 "$ASK_ENDPOINT_URL" -o ask.txt
           jq -e '.hits | length >= 1' ask.txt
+      
+      - name: Skip /ask endpoint (Agent-Mode)
+        if: ${{ env.ASK_ENDPOINT_URL != '' && env.AGENT_MODE != '' }}
+        run: |
+          echo "Agent-Mode: skipping external curl to ASK_ENDPOINT_URL"
 
       - name: Upload /ask response artifact
         if: ${{ hashFiles('ask.txt') != '' }}
@@ -42,12 +47,17 @@ jobs:
           if-no-files-found: ignore
 
       - name: Fetch metrics snapshot (optional)
-        if: ${{ env.METRICS_SNAPSHOT_URL != '' }}
+        if: ${{ env.METRICS_SNAPSHOT_URL != '' && env.AGENT_MODE == '' }}
         run: |
           set -euo pipefail
           curl --fail --show-error --location \
                --retry 3 --retry-connrefused --retry-delay 2 \
                --max-time 15 "$METRICS_SNAPSHOT_URL" -o metrics.txt
+      
+      - name: Skip metrics snapshot (Agent-Mode)
+        if: ${{ env.METRICS_SNAPSHOT_URL != '' && env.AGENT_MODE != '' }}
+        run: |
+          echo "Agent-Mode: skipping external curl to METRICS_SNAPSHOT_URL"
 
       - name: Inspect /ask latency histogram
         if: ${{ hashFiles('metrics.txt') != '' }}

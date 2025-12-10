@@ -28,21 +28,40 @@ jobs:
       - name: Snapshot metrics
         run: bash scripts/wgx-metrics-snapshot.sh --json
       - name: Fetch AJV schema (local file)
+        if: ${{ env.AGENT_MODE == '' }}
         run: |
           mkdir -p .ci
           curl -fsSL "$METRICS_SCHEMA_URL" -o .ci/metrics.schema.json
+      
+      - name: Use local schema (Agent-Mode)
+        if: ${{ env.AGENT_MODE != '' }}
+        run: |
+          echo "Agent-Mode: attempting to use local schema instead of curl"
+          mkdir -p .ci
+          # Try to use a local copy of the schema if available
+          if [ -f contracts/metrics.snapshot.schema.json ]; then
+            cp contracts/metrics.snapshot.schema.json .ci/metrics.schema.json
+          else
+            echo "::error::No local metrics schema found for Agent-Mode"
+            exit 1
+          fi
 
       - name: Validate metrics contract
         run: npx --yes ajv-cli@5 validate -s .ci/metrics.schema.json -d metrics.json
 
       - name: Optional POST to hausKI
-        if: ${{ env.HAUSKI_POST_URL && env.HAUSKI_POST_URL != '' }}
+        if: ${{ env.HAUSKI_POST_URL && env.HAUSKI_POST_URL != '' && env.AGENT_MODE == '' }}
         run: |
           curl --fail --silent --show-error --retry 3 --retry-delay 2 \
             -H 'Content-Type: application/json' \
             --data @metrics.json \
             "$HAUSKI_POST_URL"
         continue-on-error: true
+      
+      - name: Skip POST to hausKI (Agent-Mode)
+        if: ${{ env.HAUSKI_POST_URL && env.HAUSKI_POST_URL != '' && env.AGENT_MODE != '' }}
+        run: |
+          echo "Agent-Mode: skipping external POST to hausKI"
 
       - name: Upload metrics.json artifact
         uses: actions/upload-artifact@v5

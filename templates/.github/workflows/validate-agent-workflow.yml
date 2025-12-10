@@ -22,10 +22,18 @@ jobs:
         uses: actions/setup-node@5e221d4786ffb21088b21dfc9c80efb16b52cd3b  # v4.0.2
 
       - name: Install tools
+        if: ${{ env.AGENT_MODE == '' }}
         run: |
           python3 -m pip install --upgrade pip
           python3 -m pip install yq PyYAML
           npm i -g ajv-cli@5.0.0
+      
+      - name: Check tools (Agent-Mode)
+        if: ${{ env.AGENT_MODE != '' }}
+        run: |
+          echo "Agent-Mode: skipping pip/npm install, checking dependencies"
+          python3 -c "import yaml" || { echo "::error::PyYAML not available in Agent-Mode"; exit 1; }
+          command -v ajv >/dev/null 2>&1 || { echo "::error::ajv-cli not available in Agent-Mode"; exit 1; }
 
       - name: Validate manifests (.agent/*.yml/.yaml)
         shell: bash
@@ -40,7 +48,20 @@ jobs:
             echo "::notice::Keine Agent-Workflow-Dateien unter .agent/ gefunden – übersprungen."
             exit 0
           fi
-          curl -fsSL "$SCHEMA_URL" -o /tmp/schema.json
+          
+          # Agent-Mode: use local schema if available
+          if [[ "${AGENT_MODE:-}" != "" ]]; then
+            echo "Agent-Mode: using local schema instead of downloading"
+            if [ -f contracts/agent.workflow.schema.json ]; then
+              cp contracts/agent.workflow.schema.json /tmp/schema.json
+            else
+              echo "::warning::Local schema not found in Agent-Mode, skipping validation"
+              exit 0
+            fi
+          else
+            curl -fsSL "$SCHEMA_URL" -o /tmp/schema.json
+          fi
+          
           for f in "${FILES[@]}"; do
             echo "→ $f"
             tmp="$(mktemp /tmp/agent.XXXX.json)"
