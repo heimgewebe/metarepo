@@ -19,7 +19,6 @@ MAX_WARNINGS="${MAX_AGENT_MODE_WARNINGS:-50}"
 
 echo "Agent-Mode: scanning repository at: ${ROOT_DIR}"
 
-fail=0
 warnings=0
 
 check_pattern() {
@@ -41,7 +40,7 @@ check_pattern() {
   # Use unique temporary file to avoid race conditions
   local tmpfile
   tmpfile="$(mktemp)"
-  trap "rm -f '${tmpfile}'" RETURN
+  trap 'rm -f "${tmpfile}"' RETURN
 
   if grep -RIn "${exclude_args[@]}" "${pattern}" "${ROOT_DIR}" >"${tmpfile}" 2>/dev/null; then
     echo "::warning::Agent-Mode: found pattern '${pattern}' in ${context}"

@@ -25,7 +25,7 @@ jobs:
         if: ${{ env.AGENT_MODE == '' }}
         run: |
           set -euo pipefail
-          YQ_VERSION="v4.49.2"
+          YQ_VERSION="v4.44.1"
           YQ_ARCH="linux_amd64"
           BIN_DIR="${GITHUB_WORKSPACE}/tools/bin"
           mkdir -p "$BIN_DIR"
@@ -95,6 +95,7 @@ jobs:
           SHA_CANDIDATES=(
             "checksums"
             "checksums.txt"
+            "checksums_sha256.txt"
             "SHA256SUMS.txt"
             "sha256sum.txt"
             "sha256sums.txt"
