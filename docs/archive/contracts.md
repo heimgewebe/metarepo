@@ -1,6 +1,6 @@
 # Contracts – Heimgewebe
 
-> **Wahrheit:** `metarepo/contracts/*.schema.json` · **Policy:** [Contracts-First](./leitlinien.md#contracts-first)
+> **Wahrheit:** `metarepo/contracts/*.schema.json` · **Policy:** [Contracts-First](../leitlinien.md#contracts-first)
 
 Hier ist die Übersicht der zentralen Datenverträge (Schemas), die die Kommunikation zwischen den Heimgewebe-Komponenten regeln.
 
@@ -41,13 +41,13 @@ Hier ist die Übersicht der zentralen Datenverträge (Schemas), die die Kommunik
 
 ## Siehe auch
 
-- [Contract Versioning](./contract-versioning.md) – Rollout-Prozess für Schema-Änderungen
-- [Contracts Overview](./contracts/index.md) – Contract-Index mit Details
-- [ADR-0001: Contracts v1 & JSONL append-only](./adrs/0001-contracts-v1-jsonl.md) – Architekturentscheidung
-- [Knowledge Contracts](./knowledge-contracts.md) – Spezielle Wissensverträge
-- [Architecture](./architecture.md) – Systemarchitektur
+- [Contract Versioning](../contracts/contract-versioning.md) – Rollout-Prozess für Schema-Änderungen
+- [Contracts Overview](../contracts/contracts-index.md) – Contract-Index mit Details
+- [ADR-0001: Contracts v1 & JSONL append-only](../adrs/0001-contracts-v1-jsonl.md) – Architekturentscheidung
+- [Knowledge Contracts](../knowledge-contracts.md) – Spezielle Wissensverträge
+- [Architecture](../system/architecture.md) – Systemarchitektur
 
-[Zurück zur Übersicht](./README.md)
+[Zurück zur Übersicht](../README.md)
 
 ## Tool-Schemas
 

@@ -85,7 +85,7 @@ transparent, nachvollziehbar und stets erklärbar.
 
 ## Diagramm
 
-Eine visuelle Übersicht befindet sich in [heimgewebe-architektur.mmd](./heimgewebe-architektur.mmd):
+Eine visuelle Übersicht befindet sich in [heimgewebe-architektur.mmd](../system/heimgewebe-architektur.mmd):
 
 %%{init: {'theme':'neutral'}}%%
 graph TD
@@ -121,7 +121,7 @@ graph TD
 
 ## Datenfluss (Contracts)
 
-Siehe [heimgewebe-dataflow.mmd](./heimgewebe-dataflow.mmd).
+Siehe [heimgewebe-dataflow.mmd](../system/heimgewebe-dataflow.mmd).
 Die wichtigsten Artefakte & Verträge:
 - **semantAH → hausKI/chronik**: `insights/today.json`
   Schema: `contracts/insights.schema.json`
@@ -138,15 +138,15 @@ Die wichtigsten Artefakte & Verträge:
 ---
 ## Canvas-Visualisierungen
 Für eine visuelle Darstellung siehe:
-- [Heimgewebe Architektur (Canvas)](./canvas/heimgewebe-architektur.canvas)
-- [Heimgewebe Datenfluss (Canvas)](./canvas/heimgewebe-dataflow.canvas)
+- [Heimgewebe Architektur (Canvas)](../canvas/heimgewebe-architektur.canvas)
+- [Heimgewebe Datenfluss (Canvas)](../canvas/heimgewebe-dataflow.canvas)
 
 Diese Canvas-Dateien sind in **Obsidian direkt darstellbar** (Datei → Öffnen mit Canvas).
 
 ## Siehe auch
 
-- [Architecture](./architecture.md) – Detaillierte Architekturübersicht
-- [Vision Documents](./vision/README.md) – Detaillierte Visionsdokumente
-- [Heimgewebe Gesamt](./heimgewebe-gesamt.md) – Narrative Gesamtübersicht
-- [Contracts](./contracts.md) – Schema-Details
-- [ADRs](./adrs/README.md) – Architekturentscheidungen
+- [Architecture](../system/architecture.md) – Detaillierte Architekturübersicht
+- [Vision Documents](./README.md) – Detaillierte Visionsdokumente
+- [Heimgewebe Gesamt](../archive/heimgewebe-gesamt.md) – Narrative Gesamtübersicht
+- [Contracts](../contracts/contracts-index.md) – Schema-Details
+- [ADRs](../adrs/README.md) – Architekturentscheidungen

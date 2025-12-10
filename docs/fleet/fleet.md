@@ -36,7 +36,7 @@ Die kanonische WGX-Dokumentation bleibt im [WGX-Repository](https://github.com/h
 ## Siehe auch
 
 - [WGX Konzept](./wgx-konzept.md) – Fleet-Motor Konzept und Kommandos
-- [Templates](./templates.md) – Template-Verteilung im Detail
-- [Push to Fleet](./fleet/push-to-fleet.md) – Detaillierte Fleet-Deployment-Prozesse
-- [Repo Matrix](./repo-matrix.md) – Repository-Rollen und Status
-- [ADR-0002: Fleet-Rollout via reusable GitHub Actions](./adrs/0002-reusable-actions-rollout.md) – Entscheidungsgrundlage
+- [Templates](../templates.md) – Template-Verteilung im Detail
+- [Push to Fleet](./push-to-fleet.md) – Detaillierte Fleet-Deployment-Prozesse
+- [Repo Matrix](../repo-matrix.md) – Repository-Rollen und Status
+- [ADR-0002: Fleet-Rollout via reusable GitHub Actions](../adrs/0002-reusable-actions-rollout.md) – Entscheidungsgrundlage

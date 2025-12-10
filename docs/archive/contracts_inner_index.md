@@ -14,5 +14,5 @@
 | [`contracts/audio.events.schema.json`](../../contracts/audio.events.schema.json) | Audio-/Telemetrie-Events | `hauski-audio` | `hausKI`, `chronik` |
 
 ---
-- **Kontext `mitschreiber`:** [Details zu `os.context.*`](./mitschreiber.md)
-- **Kontext `sichter`:** [Details zu `review.*` und `feedback.*`](./sichter.md)
+- **Kontext `mitschreiber`:** [Details zu `os.context.*`](../contracts/mitschreiber.md)
+- **Kontext `sichter`:** [Details zu `review.*` und `feedback.*`](../contracts/sichter.md)

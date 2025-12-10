@@ -70,7 +70,7 @@ vim .github/actionlint.yaml
 
 ---
 
-[Checks](checks.md) | [Installation](install.md) | [Usage](usage.md) | [Go API](api.md) | [References](reference.md)
+[Checks](policies/checks.md) | [Installation](runbooks/install.md) | [Usage](runbooks/usage.md) | [Go API](api.md) | [References](reference.md)
 
 [Super-Linter]: https://github.com/super-linter/super-linter
 [pat]: https://pkg.go.dev/path#Match
