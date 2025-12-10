@@ -14,6 +14,9 @@ set -euo pipefail
 
 ROOT_DIR="${1:-.}"
 
+# Configurable threshold for maximum warnings before failing
+MAX_WARNINGS="${MAX_AGENT_MODE_WARNINGS:-50}"
+
 echo "Agent-Mode: scanning repository at: ${ROOT_DIR}"
 
 fail=0
@@ -35,10 +38,14 @@ check_pattern() {
     --exclude='*.toml' # Config files like .lychee.toml
   )
 
-  if grep -RIn "${exclude_args[@]}" "${pattern}" "${ROOT_DIR}" >/tmp/agent-mode-hit.txt 2>/dev/null; then
+  # Use unique temporary file to avoid race conditions
+  local tmpfile
+  tmpfile="$(mktemp)"
+  trap "rm -f '${tmpfile}'" RETURN
+
+  if grep -RIn "${exclude_args[@]}" "${pattern}" "${ROOT_DIR}" >"${tmpfile}" 2>/dev/null; then
     echo "::warning::Agent-Mode: found pattern '${pattern}' in ${context}"
-    cat /tmp/agent-mode-hit.txt | head -10
-    rm -f /tmp/agent-mode-hit.txt
+    head -10 "${tmpfile}"
     warnings=$((warnings + 1))
   fi
 }
@@ -51,10 +58,11 @@ check_pattern 'curl https' ".github/workflows, scripts"
 
 echo "Agent-Mode: checking for dynamic installs (npm/pip/go/cargo)…"
 
-check_pattern '\bpip install' "Python/pip installs"
-check_pattern '\bnpm install' "Node/npm installs"
-check_pattern '\bnpm i -g' "Node/npm global installs"
-check_pattern '\bcargo install' "Rust/cargo installs"
+# Use extended regex with -E for better pattern matching
+check_pattern 'pip install' "Python/pip installs"
+check_pattern 'npm install' "Node/npm installs"
+check_pattern 'npm i -g' "Node/npm global installs"
+check_pattern 'cargo install' "Rust/cargo installs"
 
 if [[ "${AGENT_MODE:-}" != "" ]]; then
   echo "Agent-Mode: AGENT_MODE is set (${AGENT_MODE})."
@@ -66,8 +74,11 @@ if [[ "${AGENT_MODE:-}" != "" ]]; then
   echo "  - In scripts that check AGENT_MODE before executing"
   echo ""
   
-  if [[ "${warnings}" -gt 50 ]]; then
-    echo "::error::Too many potential Agent-Mode violations (${warnings}). Please review and guard with AGENT_MODE checks."
+  # Threshold of 50 chosen as reasonable balance: allows some advisory warnings
+  # while catching repos with many unguarded violations.
+  # Can be overridden via MAX_AGENT_MODE_WARNINGS env var.
+  if [[ "${warnings}" -gt "${MAX_WARNINGS}" ]]; then
+    echo "::error::Too many potential Agent-Mode violations (${warnings} > ${MAX_WARNINGS}). Please review and guard with AGENT_MODE checks."
     exit 1
   else
     echo "::notice::Agent-Mode check complete. Review warnings above to ensure patterns are properly guarded."

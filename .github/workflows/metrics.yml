@@ -39,9 +39,7 @@ jobs:
           echo "Agent-Mode: attempting to use local schema instead of curl"
           mkdir -p .ci
           # Try to use a local copy of the schema if available
-          if [ -f contracts/wgx/metrics.json ]; then
-            cp contracts/wgx/metrics.json .ci/metrics.schema.json
-          elif [ -f contracts/metrics.snapshot.schema.json ]; then
+          if [ -f contracts/metrics.snapshot.schema.json ]; then
             cp contracts/metrics.snapshot.schema.json .ci/metrics.schema.json
           else
             echo "::error::No local metrics schema found for Agent-Mode"
