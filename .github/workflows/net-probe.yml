@@ -22,7 +22,7 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     timeout-minutes: 7
-    if: ${{ env.AGENT_MODE == '' }}
+    if: ${{ vars.AGENT_MODE == '' }}
     steps:
       - uses: actions/checkout@v6 # v4 (major tag)
 
