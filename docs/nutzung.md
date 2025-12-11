@@ -60,6 +60,21 @@ Kurzfassung für Dummies:
 
 ---
 
+### 1.3 Alle Repos lokal klonen
+
+Nutze das Helper-Skript, um die komplette Fleet aus `repos.yml` auf einmal zu
+holen (inklusive Owner-Fallback aus `github.owner`):
+
+```bash
+python scripts/clone_repos.py --dest heimgewebe-repos
+```
+
+- Optional: `--owner <ORG>` überschreibt den GitHub-Owner aus der Config.
+- Optional: `--update` aktualisiert bestehende Clones per `git fetch`/`git pull`.
+- Subset klonen: Repository-Namen als Argumente anhängen, z. B.
+  `python scripts/clone_repos.py hausKI semantAH`.
+
+
 ## 2. Feature-Übersicht nach Repo (mit Links)
 
 > Hinweis: Die GitHub-Links nehmen `heimgewebe` als Organisation an.
