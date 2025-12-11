@@ -2,7 +2,7 @@
 
 ## 1. Ausgangslage
 
-- Heimgewebe-Zielbild ist definiert (`docs/heimgewebe-zielbild.md`).
+- Heimgewebe-Zielbild ist definiert (`docs/system/heimgewebe-zielbild.md`).
 - Organe und Achsen sind beschrieben (Events, Semantik, Commands, WGX, OS-Kontext).
 - Es fehlen zentrale Capabilities:
   - Semantisches Observatorium
