@@ -158,7 +158,7 @@ lint:
     files=(); \
     while IFS= read -r -d '' file; do \
       files+=("$file"); \
-    done < <(git ls-files -z -- '*.sh' '*.bash' 'scripts/wgx' 'wgx/wgx' || true); \
+    done < <(git ls-files -z -- '*.sh' '*.bash' 'scripts/wgx' 'wgx/wgx' ':!:completions/*' || true); \
     if [ "${#files[@]}" -eq 0 ]; then echo "keine Shell-Dateien"; exit 0; fi; \
     printf '%s\0' "${files[@]}" | xargs -0 bash -n; \
     scripts/tools/shfmt-pin.sh ensure; \
