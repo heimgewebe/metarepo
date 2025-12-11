@@ -31,7 +31,10 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup Just
-        uses: extractions/setup-just@2fa60cc7d6fb3586e4cbace17c1169c8d2bd0f5c # extractions/setup-just@v2 (pinned)
+        run: |
+          chmod +x scripts/tools/just-pin.sh
+          scripts/tools/just-pin.sh ensure
+          echo "${PWD}/tools/bin" >> "$GITHUB_PATH"
 
       - name: Install Dependencies (optional)
         if: ${{ env.AGENT_MODE == '' }}
