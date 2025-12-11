@@ -32,7 +32,7 @@ check_pattern() {
     --exclude='*.md'
     --exclude='agent-mode-check.sh'
     --exclude='agent-mode.md'
-    --exclude='*.1'  # man pages
+    --exclude='*.1'    # man pages
     --exclude='*.json' # JSON schema files
     --exclude='*.toml' # Config files like .lychee.toml
   )
@@ -42,7 +42,7 @@ check_pattern() {
   tmpfile="$(mktemp)"
   trap 'rm -f "${tmpfile}"' RETURN
 
-  if grep -RIn "${exclude_args[@]}" "${pattern}" "${ROOT_DIR}" >"${tmpfile}" 2>/dev/null; then
+  if grep -RIn "${exclude_args[@]}" "${pattern}" "${ROOT_DIR}" > "${tmpfile}" 2> /dev/null; then
     echo "::warning::Agent-Mode: found pattern '${pattern}' in ${context}"
     head -10 "${tmpfile}"
     warnings=$((warnings + 1))
@@ -72,7 +72,7 @@ if [[ "${AGENT_MODE:-}" != "" ]]; then
   echo "  - In error messages or documentation"
   echo "  - In scripts that check AGENT_MODE before executing"
   echo ""
-  
+
   # Threshold of 50 chosen as reasonable balance: allows some advisory warnings
   # while catching repos with many unguarded violations.
   # Can be overridden via MAX_AGENT_MODE_WARNINGS env var.
