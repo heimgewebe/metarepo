@@ -36,7 +36,8 @@ version_ok() {
   local v_to_check="$1"
   local req_version_raw="$2"
   # shfmt --version output: "v3.8.0"
-  [[ "${v_to_check}" == "${req_version_raw}" ]]
+  # Compare with 'v' prefix since that's what shfmt returns
+  [[ "${v_to_check}" == "v${req_version_raw}" ]]
 }
 
 compute_target() {
@@ -65,8 +66,10 @@ download_tool() {
 
   local target
   target="$(compute_target)"
-  local filename="shfmt_${req_version_raw}_${target}"
-  local url="https://github.com/mvdan/sh/releases/download/${req_version_raw}/${filename}"
+  # mvdan/sh releases require 'v' prefix in both tag and filename
+  local version_tag="v${req_version_raw}"
+  local filename="shfmt_v${req_version_raw}_${target}"
+  local url="https://github.com/mvdan/sh/releases/download/${version_tag}/${filename}"
 
   ensure_dir
   local tmp_bin
