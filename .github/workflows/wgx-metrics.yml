@@ -37,9 +37,17 @@ jobs:
       - name: Install tooling
         run: |
           set -euo pipefail
-          sudo apt-get update
-          sudo apt-get install -y jq curl || true
-          npm i -g ajv-cli@5
+          
+          # Agent-Mode: skip installs
+          if [[ "${AGENT_MODE:-}" != "" ]]; then
+            echo "Agent-Mode: skipping apt-get and npm installs"
+            command -v jq >/dev/null 2>&1 || { echo "::error::jq not available in Agent-Mode"; exit 1; }
+            command -v ajv >/dev/null 2>&1 || { echo "::error::ajv-cli not available in Agent-Mode"; exit 1; }
+          else
+            sudo apt-get update
+            sudo apt-get install -y jq curl || true
+            npm i -g ajv-cli@5
+          fi
 
       - name: Run wgx metrics snapshot
         env:
@@ -68,16 +76,34 @@ jobs:
           SCHEMA_TAG: ${{ inputs.schema_ref }}
         run: |
           set -euo pipefail
-          SCHEMA_URL="https://raw.githubusercontent.com/heimgewebe/metarepo/${SCHEMA_TAG}/contracts/metrics.snapshot.schema.json"
-          echo "Fetching schema from $SCHEMA_URL"
-          curl -fsSL "$SCHEMA_URL" -o metrics.schema.json
+          
+          # Agent-Mode: use local schema
+          if [[ "${AGENT_MODE:-}" != "" ]]; then
+            echo "Agent-Mode: using local schema instead of downloading"
+            if [ -f contracts/metrics.snapshot.schema.json ]; then
+              cp contracts/metrics.snapshot.schema.json metrics.schema.json
+            else
+              echo "::warning::Local metrics schema not found in Agent-Mode, skipping validation"
+              exit 0
+            fi
+          else
+            SCHEMA_URL="https://raw.githubusercontent.com/heimgewebe/metarepo/${SCHEMA_TAG}/contracts/metrics.snapshot.schema.json"
+            echo "Fetching schema from $SCHEMA_URL"
+            curl -fsSL "$SCHEMA_URL" -o metrics.schema.json
+          fi
+          
           ajv validate -s metrics.schema.json -d metrics.json
 
       - name: Optional POST to ingest endpoint
-        if: ${{ inputs.post_url != '' }}
+        if: ${{ inputs.post_url != '' && env.AGENT_MODE == '' }}
         env:
           POST_URL: ${{ inputs.post_url }}
         run: |
           set -euo pipefail
           echo "POSTing metrics snapshot to $POST_URL"
           curl -fsS --data-binary @metrics.json "$POST_URL"
+      
+      - name: Skip POST to ingest (Agent-Mode)
+        if: ${{ inputs.post_url != '' && env.AGENT_MODE != '' }}
+        run: |
+          echo "Agent-Mode: skipping external POST to ingest endpoint"

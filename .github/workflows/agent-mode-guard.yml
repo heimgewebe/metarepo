@@ -1,0 +1,54 @@
+name: agent-mode-guard
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  agent-mode-guard:
+    runs-on: ubuntu-latest
+
+    env:
+      # Schalter für strikten Agent-Mode: in diesem Job immer aktiv
+      AGENT_MODE: "1"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Show environment
+        run: |
+          echo "Running in Agent-Mode guard job"
+          echo "AGENT_MODE=${AGENT_MODE}"
+
+      - name: Run Agent-Mode static check
+        run: |
+          if [ ! -x scripts/agent-mode-check.sh ]; then
+            echo "::error::scripts/agent-mode-check.sh not found or not executable"
+            exit 1
+          fi
+
+          ./scripts/agent-mode-check.sh .
+
+      - name: Summary
+        if: success()
+        run: |
+          echo "Agent-Mode guard passed."
+          echo "This repository is compatible with a no-network Agent execution path."
+
+      - name: Note on limitations
+        if: success()
+        run: |
+          cat <<'EOF'
+          Hinweis:
+          Der Agent-Mode-Guard prüft nur einfache Muster (curl, wget, api.github.com,
+          raw.githubusercontent.com, npm/pip/go/cargo install).
+
+          Er ist absichtlich konservativ, aber nicht perfekt. Er ersetzt keine
+          vollständige Sicherheits- oder Architekturprüfung, hilft aber dabei,
+          den Copilot Coding Agent in einer Firewall-Umgebung stabil zu betreiben.
+          EOF

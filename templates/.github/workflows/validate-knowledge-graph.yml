@@ -22,7 +22,14 @@ jobs:
         uses: actions/setup-node@5e221d4786ffb21088b21dfc9c80efb16b52cd3b  # v4.0.2
 
       - name: Install ajv-cli
+        if: ${{ env.AGENT_MODE == '' }}
         run: npm i -g ajv-cli@5.0.0
+      
+      - name: Check ajv-cli (Agent-Mode)
+        if: ${{ env.AGENT_MODE != '' }}
+        run: |
+          echo "Agent-Mode: skipping npm install, checking ajv-cli"
+          command -v ajv >/dev/null 2>&1 || { echo "::error::ajv-cli not available in Agent-Mode"; exit 1; }
 
       - name: Validate knowledge.graph.json
         shell: bash
@@ -44,7 +51,20 @@ jobs:
             exit 0
           fi
           echo "Prüfe ${#FILES[@]} Datei(en)…"
-          curl -fsSL "$SCHEMA_URL" -o /tmp/schema.json
+          
+          # Agent-Mode: use local schema if available
+          if [[ "${AGENT_MODE:-}" != "" ]]; then
+            echo "Agent-Mode: using local schema instead of downloading"
+            if [ -f contracts/knowledge.graph.schema.json ]; then
+              cp contracts/knowledge.graph.schema.json /tmp/schema.json
+            else
+              echo "::warning::Local schema not found in Agent-Mode, skipping validation"
+              exit 0
+            fi
+          else
+            curl -fsSL "$SCHEMA_URL" -o /tmp/schema.json
+          fi
+          
           for f in "${FILES[@]}"; do
             echo "→ $f"
             ajv validate --spec=draft2020 --strict=true --validate-formats=true -s /tmp/schema.json -d "$f"

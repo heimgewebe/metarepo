@@ -205,6 +205,23 @@ cmd_ensure() {
   # Prioritize local bin
   export PATH="${BIN_DIR}:${PATH}"
 
+  # Agent-Mode: only verify that just is available, do not download
+  if [[ "${AGENT_MODE:-}" != "" ]]; then
+    log "Agent-Mode: skipping dynamic just installation"
+    if just_bin="$(resolved_just)"; then
+      if v="$("${just_bin}" --version 2> /dev/null | cut -d' ' -f2)"; then
+        if version_ok "${v}" "${req_version_raw}"; then
+          log "OK: just ${v} verfügbar (Agent-Mode)."
+          return 0
+        else
+          log "WARN: Gefundenes just hat falsche Version: ${v} (erwartet: ${req_version_raw})"
+          die "just version mismatch in Agent-Mode. Expected: ${req_version_raw}, Found: ${v}"
+        fi
+      fi
+    fi
+    die "just not available in Agent-Mode. Please pre-install just ${req_version_raw} or vendor it."
+  fi
+
   if just_bin="$(resolved_just)"; then
     if v="$("${just_bin}" --version 2> /dev/null | cut -d' ' -f2)"; then
       if version_ok "${v}" "${req_version_raw}"; then

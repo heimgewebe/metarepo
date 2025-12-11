@@ -66,7 +66,8 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github-token }}
       run: |
         set -euo pipefail
-        # Add tools/bin to PATH (subsequent steps in this action and caller workflow)
+        # Add tools/bin to PATH for this step AND subsequent steps
+        # $GITHUB_PATH takes effect in NEXT step, so we also export locally
         echo "$PWD/tools/bin" >> "$GITHUB_PATH"
         export PATH="$PWD/tools/bin:$PATH"
 
@@ -78,17 +79,24 @@ runs:
         # Pinned Version erzwingen (Download + Verifikation)
         scripts/tools/yq-pin.sh ensure
 
-        # Final verification
-        if ! command -v yq >/dev/null; then
-          echo "yq installation failed: command not found after install attempt." >&2
+        # Re-export PATH to ensure tools/bin is prioritized after yq-pin.sh runs
+        export PATH="$PWD/tools/bin:$PATH"
+
+        # Final verification - check both in PATH and at explicit location
+        if [[ -x "$PWD/tools/bin/yq" ]]; then
+          YQ_BIN="$PWD/tools/bin/yq"
+        elif command -v yq >/dev/null; then
+          YQ_BIN="$(command -v yq)"
+        else
+          echo "yq installation failed: binary not found at $PWD/tools/bin/yq and not in PATH" >&2
           exit 1
         fi
 
-        YQ_VERSION_OUTPUT="$(yq --version)"
+        YQ_VERSION_OUTPUT="$("${YQ_BIN}" --version)"
         echo "${YQ_VERSION_OUTPUT}"
         if ! echo "${YQ_VERSION_OUTPUT}" | grep -q "version v${YQ_VER_TRIM}"; then
           echo "yq version check failed. Expected v${YQ_VER_TRIM}, got: ${YQ_VERSION_OUTPUT}" >&2
           exit 1
         fi
 
-        echo "✅ yq ${YQ_VER_TRIM} verified OK"
+        echo "✅ yq ${YQ_VER_TRIM} verified OK at ${YQ_BIN}"

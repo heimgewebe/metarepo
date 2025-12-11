@@ -55,8 +55,15 @@ jobs:
           python-version: ${{ steps.toolchain.outputs.python_version }}
           cache: 'pip'
       - name: Install dependencies
+        if: ${{ env.AGENT_MODE == '' }}
         run: |
           python -m pip install --upgrade pip
           pip install pyyaml
+      
+      - name: Check dependencies (Agent-Mode)
+        if: ${{ env.AGENT_MODE != '' }}
+        run: |
+          echo "Agent-Mode: skipping pip install, assuming PyYAML pre-installed"
+          python -c "import yaml" || { echo "::error::PyYAML not available in Agent-Mode"; exit 1; }
       - name: Run local validation script
         run: ./scripts/ci/validate-local.sh

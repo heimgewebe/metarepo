@@ -54,10 +54,15 @@ fi
 
 echo "-> Using package manager: ${PKG_MANAGER}"
 
-if [ "${PKG_MANAGER}" = "pnpm" ]; then
-  pnpm install
+# Agent-Mode: skip installation
+if [[ "${AGENT_MODE:-}" != "" ]]; then
+  echo "Agent-Mode: skipping ${PKG_MANAGER} install"
 else
-  npm install
+  if [ "${PKG_MANAGER}" = "pnpm" ]; then
+    pnpm install
+  else
+    npm install
+  fi
 fi
 
 NODE_BIN="${NODE_BIN:-node}"
