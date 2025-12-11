@@ -11,6 +11,20 @@ _just() {
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD - 1]}"
     words=("${COMP_WORDS[@]}")
+
+    local idx=$COMP_CWORD
+    while [[ $idx -gt 0 ]]; do
+      if [[ "${COMP_WORDS[idx - 1]}" == ":" ]]; then
+        cur="${COMP_WORDS[idx - 1]}$cur"
+        idx=$((idx - 1))
+      elif [[ $idx -lt $COMP_CWORD ]]; then
+        cur="${COMP_WORDS[idx - 1]}$cur"
+        idx=$((idx - 1))
+        break
+      else
+        break
+      fi
+    done
   fi
 
   cmd=""
@@ -47,6 +61,15 @@ _just() {
           mapfile -t COMPREPLY < <(compgen -W "${recipes}" -- "${cur}")
           if type __ltrim_colon_completions &> /dev/null; then
             __ltrim_colon_completions "$cur"
+          elif [[ "$cur" == *:* ]]; then
+            local col_prefix="${cur%${COMP_WORDS[COMP_CWORD]}}"
+            local i
+            for i in "${!COMPREPLY[@]}"; do
+              local val="${COMPREPLY[$i]}"
+              if [[ "$val" == "$col_prefix"* ]]; then
+                COMPREPLY[$i]="${val#$col_prefix}"
+              fi
+            done
           fi
           return 0
         fi

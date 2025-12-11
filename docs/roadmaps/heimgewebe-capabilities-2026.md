@@ -1,7 +1,7 @@
 # Heimgewebe – Capability-Plan 2026 (Observatorium, Intent, Metabrain)
 
 > Status: Plan / Orientierung
-> Bezugsdoku: `docs/heimgewebe-zielbild.md`, `docs/organismus/heimgewebe-organismus.md` (falls vorhanden)
+> Bezugsdoku: `docs/system/heimgewebe-zielbild.md`, `docs/system/heimgewebe-organismus.md` (falls vorhanden)
 
 Dieses Dokument beschreibt einen schlanken, aber verbindlichen Plan,
 welche **Fähigkeiten** Heimgewebe in den nächsten Ausbaustufen grob
@@ -30,7 +30,7 @@ Alle Capabilities bauen auf existierenden Organen auf:
 
 ## 1. Ausgangslage
 
-Das Zielbild des Heimgewebes ist in `docs/heimgewebe-zielbild.md` definiert:
+Das Zielbild des Heimgewebes ist in `docs/system/heimgewebe-zielbild.md` definiert:
 
 - Events machen Fakten sichtbar.
 - SemantAH erzeugt Bedeutung.
