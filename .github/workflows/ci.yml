@@ -99,6 +99,8 @@ jobs:
 
       - name: Read toolchain versions
         run: |
+          # Add tools/bin to PATH for this step (GITHUB_PATH only affects next step)
+          export PATH="${{ github.workspace }}/tools/bin:$PATH"
           echo "${{ github.workspace }}/tools/bin" >> "$GITHUB_PATH"
           test -f toolchain.versions.yml || { echo "toolchain.versions.yml not found"; exit 1; }
           RUST=$(yq -r '.rust' toolchain.versions.yml)
