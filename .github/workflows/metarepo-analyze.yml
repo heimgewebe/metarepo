@@ -87,14 +87,14 @@ jobs:
 
       - name: Publish summary
         run: |
-          echo '  ## Dependency graph' >> "$GITHUB_STEP_SUMMARY"
+          echo '## Dependency graph' >> "$GITHUB_STEP_SUMMARY"
           if [[-f reports/graphs/deps_graph.json]]; then
             python -m scripts.graph.generate_summary >> "$GITHUB_STEP_SUMMARY"
           else
             echo '_deps_graph.json not found_' >> "$GITHUB_STEP_SUMMARY"
           fi
           echo >> "$GITHUB_STEP_SUMMARY"
-          echo '  ## Schema impact overview' >> "$GITHUB_STEP_SUMMARY"
+          echo '## Schema impact overview' >> "$GITHUB_STEP_SUMMARY"
           if [[-f reports/graphs/schema-impact.txt]]; then
             cat reports/graphs/schema-impact.txt >> "$GITHUB_STEP_SUMMARY"
           else

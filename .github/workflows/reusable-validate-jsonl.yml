@@ -130,7 +130,7 @@ jobs:
             for item in "${_raw_items[@]}"; do
               # compgen -G expandiert Globs. Falls kein Match: exit-code != 0 -> daher "|| true".
               mapfile -t matches < <(compgen -G "$item" || true)
-              if (( ${  #matches[@]} == 0 )); then
+              if (( ${#matches[@]} == 0 )); then
                 echo "::notice title=validate-jsonl::Kein Treffer für Pattern: ${item}"
                 continue
               fi
@@ -149,7 +149,7 @@ jobs:
             fi
           fi
 
-          if (( ${  #FILES[@]} == 0 )); then
+          if (( ${#FILES[@]} == 0 )); then
             if [["$FAIL_ON_EMPTY" == "true"]]; then
               echo "::error title=validate-jsonl::Keine Dateien gefunden (leere Inputs oder keine Glob-Treffer)"
               exit 1
@@ -191,7 +191,7 @@ jobs:
           fi
 
           rm -f "$fail_file"
-          echo "OK: $overall_lines Zeilen geprüft in ${  #FILES[@]} Datei(en)."
+          echo "OK: $overall_lines Zeilen geprüft in ${#FILES[@]} Datei(en)."
 
       - name: Upload failing samples (if any)
         if: failure()

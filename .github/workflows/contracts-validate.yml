@@ -103,7 +103,7 @@ jobs:
             esac
           done < <(git diff --name-status --diff-filter=DR "${base}...HEAD")
 
-          if (( ${  #blocked[@]} )); then
+          if (( ${#blocked[@]} )); then
             echo "::group::❌ Protected file deletions blocked"
             printf '  • %s\n' "${blocked[@]}" | sort -u
             echo "::endgroup::"
@@ -132,12 +132,12 @@ jobs:
           shopt -s nullglob
           schemas=( json/**/*.schema.json )
 
-          if [${  #schemas[@]} -eq 0]; then
+          if [${#schemas[@]} -eq 0]; then
             echo "::notice::No schema files found - skipping compilation"
             exit 0
           fi
 
-          echo "Compiling ${  #schemas[@]} schema(s)..."
+          echo "Compiling ${#schemas[@]} schema(s)..."
           for schema in "${schemas[@]}"; do
             echo "Compiling $schema"
             npx --yes ajv-cli@5 compile \
@@ -154,17 +154,17 @@ jobs:
           schemas=( json/**/*.schema.json )
           fixtures=( fixtures/**/*.jsonl )
 
-          if [${  #schemas[@]} -eq 0]; then
+          if [${#schemas[@]} -eq 0]; then
             echo "::notice::No schema files found - skipping validation"
             exit 0
           fi
 
-          if [${  #fixtures[@]} -eq 0]; then
+          if [${#fixtures[@]} -eq 0]; then
             echo "::notice::No fixture files found - skipping validation"
             exit 0
           fi
 
-          echo "Found ${  #schemas[@]} schema(s) and ${  #fixtures[@]} fixture(s)"
+          echo "Found ${#schemas[@]} schema(s) and ${#fixtures[@]} fixture(s)"
 
           # Validate each schema-fixture pair
           # Note: ajv validate -s accepts only one schema file

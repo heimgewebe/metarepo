@@ -71,7 +71,7 @@ jobs:
               context.payload.comment?.author_association || "UNKNOWN";
 
             core.info(
-              `Heimgewebe dispatch invoked for ${repoFull.owner}/${repoFull.repo}  #${issue.number || "n/a"} by ${author || "unknown"}`
+              `Heimgewebe dispatch invoked for ${repoFull.owner}/${repoFull.repo} #${issue.number || "n/a"} by ${author || "unknown"}`
             );
             core.info(`author_association = ${assoc}, author_type = ${authorType}`);
             core.info(`Raw comment body: ${JSON.stringify(comment)}`);
