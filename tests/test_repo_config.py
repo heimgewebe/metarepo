@@ -1,5 +1,7 @@
+import io
 import textwrap
 import unittest
+from contextlib import redirect_stdout
 
 from wgx import repo_config
 
@@ -108,6 +110,31 @@ class ParseSimpleYamlTests(unittest.TestCase):
                 "list": [None, "item", ""],
             },
         )
+
+
+class CliParserTests(unittest.TestCase):
+    def test_build_parser_includes_expected_subcommands(self) -> None:
+        parser = repo_config.build_parser()
+        choices = parser._subparsers._group_actions[0].choices  # type: ignore[attr-defined]
+
+        for command in ("mode", "owner", "repos", "ordered-repos"):
+            self.assertIn(command, choices)
+
+        repos_options = {
+            option
+            for action in choices["repos"]._actions  # type: ignore[attr-defined]
+            for option in action.option_strings
+        }
+        self.assertIn("--json", repos_options)
+
+    def test_repos_json_output(self) -> None:
+        buffer = io.StringIO()
+        data = {"repos": [{"name": "alpha"}, {"name": "beta"}]}
+
+        with redirect_stdout(buffer):
+            repo_config.cmd_repos(data, ordered=False, as_json=True)
+
+        self.assertEqual(buffer.getvalue().strip(), '["alpha", "beta"]')
 
 
 if __name__ == "__main__":

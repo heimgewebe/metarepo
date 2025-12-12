@@ -345,8 +345,21 @@ def build_parser() -> argparse.ArgumentParser:
 
     sub.add_parser("mode")
     sub.add_parser("owner")
-    sub.add_parser("repos")
-    sub.add_parser("ordered-repos")
+
+    repos_parser = sub.add_parser("repos")
+    repos_parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Emit repo names as JSON instead of one per line",
+    )
+
+    ordered_repos_parser = sub.add_parser("ordered-repos")
+    ordered_repos_parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Emit ordered repo names as JSON instead of one per line",
+    )
+
     sub.add_parser("repo-rows")
 
     repo_info = sub.add_parser("repo-info")
@@ -373,9 +386,9 @@ def main() -> None:
     elif args.command == "owner":
         cmd_owner(data)
     elif args.command == "repos":
-        cmd_repos(data, ordered=False, as_json=False)
+        cmd_repos(data, ordered=False, as_json=args.json)
     elif args.command == "ordered-repos":
-        cmd_repos(data, ordered=True, as_json=False)
+        cmd_repos(data, ordered=True, as_json=args.json)
     elif args.command == "repo-rows":
         cmd_repo_rows(data)
     elif args.command == "repo-info":
