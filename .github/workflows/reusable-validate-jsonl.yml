@@ -58,7 +58,7 @@ jobs:
       - name: Install ajv-cli
         if: ${{ env.AGENT_MODE == '' }}
         run: npm i -g ajv-cli@5.0.0
-      
+
       - name: Check ajv-cli (Agent-Mode)
         if: ${{ env.AGENT_MODE != '' }}
         run: |
@@ -76,16 +76,16 @@ jobs:
           STRICT="${{ inputs.strict }}"
           VALIDATE_FORMATS_RAW="${{ inputs.validate_formats }}"
           FAIL_ON_EMPTY_RAW="${{ inputs.fail_on_empty }}"
-          if [[ -z "${VALIDATE_FORMATS_RAW}" ]]; then
+          if [[-z "${VALIDATE_FORMATS_RAW}"]]; then
             VALIDATE_FORMATS_RAW="true"
           fi
-          if [[ -z "${FAIL_ON_EMPTY_RAW}" ]]; then
+          if [[-z "${FAIL_ON_EMPTY_RAW}"]]; then
             FAIL_ON_EMPTY_RAW="false"
           fi
 
           SCHEMA="/tmp/schema.json"
-          if [[ -n "${SCHEMA_PATH_IN}" ]]; then
-            if [[ ! -f "${SCHEMA_PATH_IN}" ]]; then
+          if [[-n "${SCHEMA_PATH_IN}"]]; then
+            if [[! -f "${SCHEMA_PATH_IN}"]]; then
               echo "::error title=validate-jsonl::Schema-Datei nicht gefunden: ${SCHEMA_PATH_IN}"
               exit 1
             fi
@@ -105,12 +105,12 @@ jobs:
           # ---- AJV Argumente sicher bauen (ShellCheck SC2086 fix) -----------
           declare -a AJV_ARGS=()
           AJV_ARGS+=(--spec=draft2020)
-          if [[ "$STRICT" == "true" ]]; then
+          if [["$STRICT" == "true"]]; then
             AJV_ARGS+=(--strict=true)
           else
             AJV_ARGS+=(--strict=false)
           fi
-          if [[ "$VALIDATE_FORMATS" == "false" ]]; then
+          if [["$VALIDATE_FORMATS" == "false"]]; then
             AJV_ARGS+=(--validate-formats=false)
           else
             # Default is true, explizit setzen für Klarheit
@@ -121,7 +121,7 @@ jobs:
           declare -a FILES=()
           declare -A SEEN=()
 
-          if [[ -n "${LIST_RAW:-}" ]]; then
+          if [[-n "${LIST_RAW:-}"]]; then
             # Split an Komma und Zeilenumbrüchen; trimmen; leere Zeilen filtern.
             mapfile -t _raw_items < <(printf '%s\n' "$LIST_RAW" \
               | tr ',' '\n' \
@@ -130,13 +130,13 @@ jobs:
             for item in "${_raw_items[@]}"; do
               # compgen -G expandiert Globs. Falls kein Match: exit-code != 0 -> daher "|| true".
               mapfile -t matches < <(compgen -G "$item" || true)
-              if (( ${#matches[@]} == 0 )); then
+              if (( ${  #matches[@]} == 0 )); then
                 echo "::notice title=validate-jsonl::Kein Treffer für Pattern: ${item}"
                 continue
               fi
               for m in "${matches[@]}"; do
                 # Deduplizieren identischer Treffer (z. B. wenn ein File mehrere Patterns matcht)
-                if [[ -n "${SEEN[$m]:-}" ]]; then
+                if [[-n "${SEEN[$m]:-}"]]; then
                   continue
                 fi
                 SEEN["$m"]=1
@@ -144,13 +144,13 @@ jobs:
               done
             done
           else
-            if [[ -n "$SINGLE_FILE" ]]; then
+            if [[-n "$SINGLE_FILE"]]; then
               FILES=( "$SINGLE_FILE" )
             fi
           fi
 
-          if (( ${#FILES[@]} == 0 )); then
-            if [[ "$FAIL_ON_EMPTY" == "true" ]]; then
+          if (( ${  #FILES[@]} == 0 )); then
+            if [["$FAIL_ON_EMPTY" == "true"]]; then
               echo "::error title=validate-jsonl::Keine Dateien gefunden (leere Inputs oder keine Glob-Treffer)"
               exit 1
             fi
@@ -164,15 +164,15 @@ jobs:
           had_fail=0
 
           for FILE in "${FILES[@]}"; do
-            if [[ ! -f "$FILE" ]]; then
+            if [[! -f "$FILE"]]; then
               echo "::notice title=validate-jsonl::Datei nicht gefunden: $FILE – übersprungen."
               continue
             fi
             echo "Validiere $FILE gegen $SCHEMA_SOURCE (strict=$STRICT, formats=$VALIDATE_FORMATS)…"
             line_no=0
-            while IFS= read -r line || [[ -n "$line" ]]; do
+            while IFS= read -r line || [[-n "$line"]]; do
               line_no=$((line_no+1))
-              [[ -z "${line// }" ]] && continue
+              [[-z "${line// }"]] && continue
               # CRLF defensiv entfernen
               printf '%s\n' "$line" | tr -d '\r' > /tmp/event.json
               if ! ajv validate "${AJV_ARGS[@]}" -s "$SCHEMA" -d /tmp/event.json; then
@@ -191,7 +191,7 @@ jobs:
           fi
 
           rm -f "$fail_file"
-          echo "OK: $overall_lines Zeilen geprüft in ${#FILES[@]} Datei(en)."
+          echo "OK: $overall_lines Zeilen geprüft in ${  #FILES[@]} Datei(en)."
 
       - name: Upload failing samples (if any)
         if: failure()

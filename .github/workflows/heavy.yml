@@ -32,7 +32,7 @@ jobs:
                --retry 3 --retry-connrefused --retry-delay 2 \
                --max-time 15 "$ASK_ENDPOINT_URL" -o ask.txt
           jq -e '.hits | length >= 1' ask.txt
-      
+
       - name: Skip /ask endpoint (Agent-Mode)
         if: ${{ env.ASK_ENDPOINT_URL != '' && env.AGENT_MODE != '' }}
         run: |
@@ -53,7 +53,7 @@ jobs:
           curl --fail --show-error --location \
                --retry 3 --retry-connrefused --retry-delay 2 \
                --max-time 15 "$METRICS_SNAPSHOT_URL" -o metrics.txt
-      
+
       - name: Skip metrics snapshot (Agent-Mode)
         if: ${{ env.METRICS_SNAPSHOT_URL != '' && env.AGENT_MODE != '' }}
         run: |

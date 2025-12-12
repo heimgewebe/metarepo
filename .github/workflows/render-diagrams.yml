@@ -1,6 +1,7 @@
+---
 name: render-diagrams
 
-on:
+'on':
   workflow_dispatch:
     inputs:
       format:
@@ -38,10 +39,10 @@ jobs:
           # Sammle Standard-Quellen (ergänze bei Bedarf)
           files=()
           # explizite Blueprints
-          [[ -f docs/IDEal_Blueprint.md ]] && files+=("docs/IDEal_Blueprint.md")
+          [[-f docs/IDEal_Blueprint.md]] && files+=("docs/IDEal_Blueprint.md")
           # alle .mmd in docs/
           while IFS= read -r -d '' f; do files+=("$f"); done < <(find docs -type f -name '*.mmd' -print0)
-          if (( ${#files[@]} == 0 )); then
+          if (( ${  #files[@]} == 0 )); then
             echo "Keine Diagrammquellen gefunden – Job beendet."
             exit 0
           fi

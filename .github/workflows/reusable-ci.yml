@@ -39,9 +39,9 @@ jobs:
       - name: Install Dependencies (optional)
         if: ${{ env.AGENT_MODE == '' }}
         run: |
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          if [ -f package.json ]; then npm ci; fi
-      
+          if [-f requirements.txt]; then pip install -r requirements.txt; fi
+          if [-f package.json]; then npm ci; fi
+
       - name: Check Dependencies (Agent-Mode)
         if: ${{ env.AGENT_MODE != '' }}
         run: |

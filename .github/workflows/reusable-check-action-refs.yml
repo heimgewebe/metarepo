@@ -1,7 +1,8 @@
+---
 name: reusable-check-action-refs
 permissions:
   contents: read
-on:
+'on':
   workflow_call: {}
 jobs:
   check:

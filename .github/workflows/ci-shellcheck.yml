@@ -1,3 +1,4 @@
+---
 name: ci-shellcheck
 permissions:
   contents: read
@@ -9,7 +10,7 @@ defaults:
   run:
     shell: bash --noprofile --norc -euo pipefail {0}
 
-on:
+'on':
   push:
     paths:
       - '**/*.sh'
@@ -36,7 +37,7 @@ jobs:
 
           mapfile -t scripts < <(git ls-files '*.sh')
 
-          if [ "${#scripts[@]}" -eq 0 ]; then
+          if ["${  #scripts[@]}" -eq 0]; then
             echo "No shell scripts found."
             exit 0
           fi
