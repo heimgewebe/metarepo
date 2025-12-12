@@ -75,18 +75,18 @@ jobs:
 
               local output status http_code http_version remote_ip time_connect time_total
               local request_flags=()
-              if [["${method}" == "head"]]; then
+              if [[ "${method}" == "head" ]]; then
                 request_flags+=(--head)
               else
                 request_flags+=(-L)
               fi
 
-              if output=$(curl "${CURL_COMMON_ARGS[@]}" "${curl_flags[@]}" "${request_flags[@]}" "$url" -w '%{http_code} %{http_version} %{remote_ip} %{time_connect} %{time_total}' -o /dev/null); then
+              if output=$(curl "${CURL_COMMON_ARGS[@ ]}" "${curl_flags[@ ]}" "${request_flags[@ ]}" "$url" -w '%{http_code} %{http_version} %{remote_ip} %{time_connect} %{time_total}' -o /dev/null); then
                 IFS=' ' read -r http_code http_version remote_ip time_connect time_total <<<"${output}"
                 printf '%s (%s): HTTP/%s %s ip=%s connect=%ss total=%ss\n' "${label}" "${mode_label}" "${http_version}" "${http_code}" "${remote_ip:-n/a}" "${time_connect}" "${time_total}"
 
-                if [["${http_code}" -ge 400]]; then
-                  if [[-n "${allow_fail}"]]; then
+                if [[ "${http_code}" -ge 400 ]]; then
+                  if [[ -n "${allow_fail}" ]]; then
                     echo "${label} (${mode_label}) HTTP ${http_code} (ignored)"
                   else
                     echo "${label} (${mode_label}) HTTP ${http_code}"
@@ -95,12 +95,12 @@ jobs:
                 fi
               else
                 status=$?
-                if [["${mode}" == "-6"]]; then
+                if [[ "${mode}" == "-6" ]]; then
                   echo "${label} (${mode_label}) probe failed with curl exit ${status} (continuing)"
                   continue
                 fi
 
-                if [[-n "${allow_fail}"]]; then
+                if [[ -n "${allow_fail}" ]]; then
                   echo "${label} (${mode_label}) probe failed with curl exit ${status} (ignored)"
                 else
                   echo "${label} (${mode_label}) probe failed with curl exit ${status}"
@@ -178,18 +178,18 @@ jobs:
 
               local output status http_code http_version remote_ip time_connect time_total
               local request_flags=()
-              if [["${method}" == "head"]]; then
+              if [[ "${method}" == "head" ]]; then
                 request_flags+=(--head)
               else
                 request_flags+=(-L)
               fi
 
-              if output=$(curl "${CURL_COMMON_ARGS[@]}" "${curl_flags[@]}" "${request_flags[@]}" "$url" -w '%{http_code} %{http_version} %{remote_ip} %{time_connect} %{time_total}' -o /dev/null); then
+              if output=$(curl "${CURL_COMMON_ARGS[@ ]}" "${curl_flags[@ ]}" "${request_flags[@ ]}" "$url" -w '%{http_code} %{http_version} %{remote_ip} %{time_connect} %{time_total}' -o /dev/null); then
                 IFS=' ' read -r http_code http_version remote_ip time_connect time_total <<<"${output}"
                 printf '%s (%s): HTTP/%s %s ip=%s connect=%ss total=%ss\n' "${label}" "${mode_label}" "${http_version}" "${http_code}" "${remote_ip:-n/a}" "${time_connect}" "${time_total}"
 
-                if [["${http_code}" -ge 400]]; then
-                  if [[-n "${allow_fail}"]]; then
+                if [[ "${http_code}" -ge 400 ]]; then
+                  if [[ -n "${allow_fail}" ]]; then
                     echo "${label} (${mode_label}) HTTP ${http_code} (ignored)"
                   else
                     echo "${label} (${mode_label}) HTTP ${http_code}"
@@ -198,12 +198,12 @@ jobs:
                 fi
               else
                 status=$?
-                if [["${mode}" == "-6"]]; then
+                if [[ "${mode}" == "-6" ]]; then
                   echo "${label} (${mode_label}) probe failed with curl exit ${status} (continuing)"
                   continue
                 fi
 
-                if [[-n "${allow_fail}"]]; then
+                if [[ -n "${allow_fail}" ]]; then
                   echo "${label} (${mode_label}) probe failed with curl exit ${status} (ignored)"
                 else
                   echo "${label} (${mode_label}) probe failed with curl exit ${status}"

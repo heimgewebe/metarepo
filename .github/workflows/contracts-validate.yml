@@ -61,18 +61,18 @@ jobs:
           base=""
           base_src=""
 
-          if [[-n "${GH_PR_BASE_SHA:-}"]] && git rev-parse --verify "${GH_PR_BASE_SHA}^{commit}" &>/dev/null; then
+          if [[ -n "${GH_PR_BASE_SHA:-}" ]] && git rev-parse --verify "${GH_PR_BASE_SHA}^{commit}" &>/dev/null; then
             if mb="$(git merge-base "$GH_PR_BASE_SHA" HEAD 2>/dev/null)"; then
               base="$mb"; base_src="merge-base(pr_base,HEAD)"
             fi
           fi
 
-          if [[-z "$base" && -n "${GH_PUSH_BEFORE:-}" && ! "${GH_PUSH_BEFORE}" =~ ^0{40}$]] \
+          if [[ -z "$base" && -n "${GH_PUSH_BEFORE:-}" && ! "${GH_PUSH_BEFORE}" =~ ^0{40}$ ]] \
              && git rev-parse --verify "${GH_PUSH_BEFORE}^{commit}" &>/dev/null; then
             base="$GH_PUSH_BEFORE"; base_src="push_before"
           fi
 
-          if [[-z "$base"]]; then
+          if [[ -z "$base" ]]; then
             git fetch -q origin "${GH_DEFAULT_BRANCH}" || true
             if git rev-parse "origin/${GH_DEFAULT_BRANCH}^{commit}" &>/dev/null; then
               if mb="$(git merge-base "origin/${GH_DEFAULT_BRANCH}" HEAD 2>/dev/null)"; then
@@ -81,7 +81,7 @@ jobs:
             fi
           fi
 
-          if [[-z "$base"]]; then
+          if [[ -z "$base" ]]; then
             if is_truthy "${FAIL_ON_NO_BASE:-1}"; then
               echo "::error::Cannot determine merge-base"; exit 1
             else
@@ -96,16 +96,16 @@ jobs:
             status="${fields[0]}"
             p1="${fields[1]}"
             p2="${fields[2]:-}"
-            [["$p1" =~ ${PROTECTED_REGEX}]] || continue
+            [["$p1" =~ ${PROTECTED_REGEX} ]] || continue
             case "$status" in
               D)  blocked+=("DELETE: $p1") ;;
               R*) blocked+=("RENAME: $p1 → ${p2:-(unknown destination)}") ;;
             esac
           done < <(git diff --name-status --diff-filter=DR "${base}...HEAD")
 
-          if (( ${#blocked[@]} )); then
+          if (( ${#blocked[@ ]} )); then
             echo "::group::❌ Protected file deletions blocked"
-            printf '  • %s\n' "${blocked[@]}" | sort -u
+            printf '  • %s\n' "${blocked[@ ]}" | sort -u
             echo "::endgroup::"
             echo "::error::Guard violation"
             exit 1
@@ -132,13 +132,13 @@ jobs:
           shopt -s nullglob
           schemas=( json/**/*.schema.json )
 
-          if [${#schemas[@]} -eq 0]; then
+          if [ ${#schemas[@ ]} -eq 0 ]; then
             echo "::notice::No schema files found - skipping compilation"
             exit 0
           fi
 
-          echo "Compiling ${#schemas[@]} schema(s)..."
-          for schema in "${schemas[@]}"; do
+          echo "Compiling ${#schemas[@ ]} schema(s)..."
+          for schema in "${schemas[@ ]}"; do
             echo "Compiling $schema"
             npx --yes ajv-cli@5 compile \
               -s "$schema" \
@@ -154,22 +154,22 @@ jobs:
           schemas=( json/**/*.schema.json )
           fixtures=( fixtures/**/*.jsonl )
 
-          if [${#schemas[@]} -eq 0]; then
+          if [ ${#schemas[@ ]} -eq 0 ]; then
             echo "::notice::No schema files found - skipping validation"
             exit 0
           fi
 
-          if [${#fixtures[@]} -eq 0]; then
+          if [ ${#fixtures[@ ]} -eq 0 ]; then
             echo "::notice::No fixture files found - skipping validation"
             exit 0
           fi
 
-          echo "Found ${#schemas[@]} schema(s) and ${#fixtures[@]} fixture(s)"
+          echo "Found ${#schemas[@ ]} schema(s) and ${#fixtures[@ ]} fixture(s)"
 
           # Validate each schema-fixture pair
           # Note: ajv validate -s accepts only one schema file
-          for schema in "${schemas[@]}"; do
-            for fixture in "${fixtures[@]}"; do
+          for schema in "${schemas[@ ]}"; do
+            for fixture in "${fixtures[@ ]}"; do
               echo "Validating $fixture against $schema"
               npx --yes ajv-cli@5 validate \
                 -s "$schema" \

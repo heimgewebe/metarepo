@@ -105,7 +105,7 @@ jobs:
             // 4. Kommando
             // 5. Rest = Args
             const tolerantPattern =
-              /@heimgewebe\/([a-z0-9_.-]+)\s*(?:\/\s*)?([a-z0-9_.-]+)\b([\s\S]*)/i;
+              /@heimgewebe\/([a-z0-9_.- ]+)\s*(?:\/\s*)?([a-z0-9_.- ]+)\b([\s\S ]*)/i;
 
             const match = tolerantPattern.exec(comment);
 
@@ -120,7 +120,7 @@ jobs:
 
             // Kommentar sanitisieren (eine Zeile, max. 2048 Zeichen)
             const maxCommentLen = 2048;
-            let sanitizedComment = comment.replace(/[\r\n]+/g, " ");
+            let sanitizedComment = comment.replace(/[\r\n ]+/g, " ");
             if (sanitizedComment.length > maxCommentLen) {
               sanitizedComment = sanitizedComment.slice(0, maxCommentLen) + " …(gekürzt)";
             }
@@ -156,7 +156,7 @@ jobs:
             }
 
             // Membership check nur über author_association (kein extra API-Call)
-            const allowedRoles = ["OWNER", "MEMBER"];
+            const allowedRoles = ["OWNER", "MEMBER" ];
             if (requireOrgMembership) {
               if (!allowedRoles.includes(assoc)) {
                 await reply(

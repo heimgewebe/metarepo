@@ -233,7 +233,7 @@ jobs:
       - name: Create uv virtual environment
         if: ${{ hashFiles('**/requirements*.txt') != '' }}
         run: |
-          if [[-d .venv]]; then
+          if [[ -d .venv ]]; then
             echo "Using cached uv virtual environment"
           else
             uv venv .venv
@@ -256,14 +256,14 @@ jobs:
                   echo
                   echo "# --- file: ${req} ---"
                   # Kommentare/Leerzeilen entfernen, damit keine leeren Einträge entstehen
-                  sed -e 's/^[[:space:]]*#.*$//' -e '/^[[:space:]]*$/d' "$req"
+                  sed -e 's/^[[:space: ]]*#.*$//' -e '/^[[:space: ]]*$/d' "$req"
                 done
           } > "${TMP_REQUIREMENTS}"
           echo "Resolved aggregate requirements at: ${TMP_REQUIREMENTS}"
           # Debug-Preview (erste 50 Zeilen)
           head -n 50 "${TMP_REQUIREMENTS}" || true
           # Fail-fast, wenn leer
-          if [[! -s "${TMP_REQUIREMENTS}"]]; then
+          if [[ ! -s "${TMP_REQUIREMENTS}" ]]; then
             echo "No requirements to install (aggregate is empty)" >&2
             exit 1
           fi
@@ -388,38 +388,38 @@ jobs:
         run: |
           set -euo pipefail
 
-          if [-f apps/web/package.json]; then
+          if [ -f apps/web/package.json ]; then
             echo "has_package_json=true" >>"$GITHUB_OUTPUT"
           else
             echo "has_package_json=false" >>"$GITHUB_OUTPUT"
           fi
 
-          if [-f apps/web/package-lock.json]; then
+          if [ -f apps/web/package-lock.json ]; then
             has_lockfile=true
           else
             has_lockfile=false
           fi
 
-          if compgen -G 'apps/web/svelte.config.*' >/dev/null || [-f apps/web/tsconfig.json]; then
+          if compgen -G 'apps/web/svelte.config.*' >/dev/null || [-f apps/web/tsconfig.json ]; then
             has_config=true
           else
             has_config=false
           fi
 
-          if ["$has_lockfile" = true] && ["$has_config" = true]; then
+          if [ "$has_lockfile" = true ] && ["$has_config" = true ]; then
             echo "enabled=true" >>"$GITHUB_OUTPUT"
             echo "missing=" >>"$GITHUB_OUTPUT"
           else
             missing_parts=()
-            if ["$has_lockfile" != true]; then
+            if [ "$has_lockfile" != true ]; then
               missing_parts+=("package-lock.json")
             fi
-            if ["$has_config" != true]; then
+            if [ "$has_config" != true ]; then
               missing_parts+=("Svelte/TS config")
             fi
 
-            if ["${#missing_parts[@]}" -gt 0]; then
-              missing_joined=$(IFS=', '; echo "${missing_parts[*]}")
+            if [ "${#missing_parts[@ ]}" -gt 0 ]; then
+              missing_joined=$(IFS=', '; echo "${missing_parts[* ]}")
             else
               missing_joined=""
             fi
@@ -479,7 +479,7 @@ jobs:
           set -euo pipefail
           npm run lint
           npm run check:ci
-          if [-f ../../ci/scripts/assert-web-budget.mjs]; then
+          if [ -f ../../ci/scripts/assert-web-budget.mjs ]; then
             node ../../ci/scripts/assert-web-budget.mjs
           else
             echo "::notice::Budget-Script fehlt – übersprungen."

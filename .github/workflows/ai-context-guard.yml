@@ -20,7 +20,7 @@ jobs:
       - uses: actions/checkout@v6
       - name: Ensure AI context exists and is non-empty
         run: |
-          if [! -s .ai-context.yml]; then
+          if [ ! -s .ai-context.yml ]; then
             echo "::error file=.ai-context.yml::.ai-context.yml is missing or empty"
             exit 1
           fi

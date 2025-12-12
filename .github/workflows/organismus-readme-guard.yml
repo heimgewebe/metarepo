@@ -33,7 +33,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          if [[! -f "README.md"]]; then
+          if [[ ! -f "README.md" ]]; then
             echo "::warning file=README.md::README.md nicht gefunden – Organismus-Hinweis kann nicht geprüft werden."
             exit 0
           fi

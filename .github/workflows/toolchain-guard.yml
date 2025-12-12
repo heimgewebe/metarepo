@@ -47,8 +47,8 @@ jobs:
           fi
 
           ASSET_URLS="$({
-            grep -oE '"browser_download_url":\s*"[^\"]+"' "$RELEASE_JSON" \
-              | sed -E 's/.*"([^"]+)".*/\1/'
+            grep -oE '"browser_download_url":\s*"[^\" ]+"' "$RELEASE_JSON" \
+              | sed -E 's/.*"([^" ]+)".*/\1/'
           } || true)"
 
           # Try deterministic candidate asset names first (prefer plain binary for simplicity)
@@ -64,7 +64,7 @@ jobs:
           )
 
           BIN_URL=""
-          for name in "${BIN_CANDIDATES[@]}"; do
+          for name in "${BIN_CANDIDATES[@ ]}"; do
             candidate="https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${name}"
             if curl -L --head --silent --fail --max-time 10 "$candidate" >/dev/null 2>&1; then
               BIN_URL="$candidate"
@@ -73,7 +73,7 @@ jobs:
           done
 
           # Fallback to scanning release JSON assets (existing behavior)
-          if [[-z "$BIN_URL"]]; then
+          if [[ -z "$BIN_URL" ]]; then
             BIN_URL="$({
               printf '%s\n' "$ASSET_URLS" \
                 | grep -Ei "yq.*(${YQ_ARCH}|linux.*amd64|amd64|x86_64|linux|yq_linux)" \
@@ -81,7 +81,7 @@ jobs:
             } || true)"
           fi
 
-          if [[-z "$BIN_URL"]]; then
+          if [[ -z "$BIN_URL" ]]; then
             echo "Fehler: konnte keine passende yq-Binary-URL in Release-Assets finden" >&2
             echo "Release asset list (debug):" >&2
             printf '%s\n' "$ASSET_URLS" >&2
@@ -104,12 +104,12 @@ jobs:
             "yq_${YQ_VERSION}_SHA256SUMS.txt"
           )
 
-          for s in "${SHA_CANDIDATES[@]}"; do
+          for s in "${SHA_CANDIDATES[@ ]}"; do
             sha_candidate="https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${s}"
             TMP_SHA_TMP="${TMP_SHA}.tmp"
             rm -f "$TMP_SHA_TMP"
             if curl --fail --max-time 60 --connect-timeout 10 --retry 2 -fsSL "$sha_candidate" -o "$TMP_SHA_TMP"; then
-              if [[-s "$TMP_SHA_TMP"]]; then
+              if [[ -s "$TMP_SHA_TMP" ]]; then
                 mv "$TMP_SHA_TMP" "$TMP_SHA"
                 break
               fi
@@ -118,16 +118,16 @@ jobs:
           done
 
           # Fallback: try to find a checksum asset URL inside the release JSON (existing behavior)
-          if [[! -s "$TMP_SHA"]]; then
+          if [[ ! -s "$TMP_SHA" ]]; then
             SHA_URL="$({
               printf '%s\n' "$ASSET_URLS" \
                 | grep -Ei 'checksums.*\.txt$|checksums$|sha256|sha256sum|SHA256' \
                 | head -n1
             } || true)"
-            if [[-n "$SHA_URL"]]; then
+            if [[ -n "$SHA_URL" ]]; then
               echo "Download checksum from: $SHA_URL"
               if curl --fail --max-time 120 --connect-timeout 10 --retry 3 -fsSL "$SHA_URL" -o "$TMP_SHA"; then
-                [[-s "$TMP_SHA"]] || { rm -f "$TMP_SHA"; }
+                [[-s "$TMP_SHA" ]] || { rm -f "$TMP_SHA"; }
               else
                 rm -f "$TMP_SHA"
               fi
@@ -136,7 +136,7 @@ jobs:
 
           rm -f "$RELEASE_JSON"
 
-          if [[! -s "$TMP_SHA"]]; then
+          if [[ ! -s "$TMP_SHA" ]]; then
             echo "Fehler: keine Checksums-Datei gefunden oder leer; Abbruch statt unsicherer Installation" >&2
             echo "Debug: available release assets:" >&2
             printf '%s\n' "$ASSET_URLS" >&2
@@ -169,22 +169,22 @@ jobs:
           fi
 
           # Second try: extract SHA-256 from the line for our asset (field 19 in yq's format)
-          if [[-z "$EXPECTED_SHA"]]; then
-            LINE="$(grep -E "^${ASSET_NAME}[[:space:]]" "$TMP_SHA" || true)"
-            if [[-n "$LINE"]]; then
+          if [[ -z "$EXPECTED_SHA" ]]; then
+            LINE="$(grep -E "^${ASSET_NAME}[[:space: ]]" "$TMP_SHA" || true)"
+            if [[ -n "$LINE" ]]; then
               # Split by double-space and get field 19 (SHA-256)
               EXPECTED_SHA="$(echo "$LINE" | awk -F'  ' '{print $19}' | grep -oE '^[0-9a-fA-F]{64}$' || true)"
             fi
           fi
 
           # Third try: fallback to matching any 64-char hex that equals our actual SHA
-          if [[-z "$EXPECTED_SHA"]]; then
+          if [[ -z "$EXPECTED_SHA" ]]; then
             if grep -iF "$ASSET_NAME" "$TMP_SHA" | grep -oE '[0-9a-fA-F]{64}' | grep -qF "$ACTUAL_SHA" 2>/dev/null; then
               EXPECTED_SHA="$ACTUAL_SHA"
             fi
           fi
 
-          if [[-n "$EXPECTED_SHA" && "$EXPECTED_SHA" == "$ACTUAL_SHA"]]; then
+          if [[ -n "$EXPECTED_SHA" && "$EXPECTED_SHA" == "$ACTUAL_SHA" ]]; then
             echo "SHA256-Prüfsumme erfolgreich verifiziert: $ACTUAL_SHA"
           else
             echo "SHA256-Prüfsumme stimmt nicht überein!" >&2
@@ -196,16 +196,16 @@ jobs:
           fi
 
           # Handle tarball extraction if needed
-          if [["$BIN_URL" == *.tar.gz]]; then
+          if [[ "$BIN_URL" == *.tar.gz ]]; then
             echo "Extracting yq from tarball..."
             TMP_EXTRACT="$(mktemp -d)"
             tar -xzf "$TMP_BIN" -C "$TMP_EXTRACT"
             # Find the yq binary in the extracted contents
             YQ_BIN="$(find "$TMP_EXTRACT" \( -type f -name 'yq' -o -type f -name 'yq_*' \) | grep -v '\.1$' | head -n1)"
-            if [[-z "$YQ_BIN"]]; then
+            if [[ -z "$YQ_BIN" ]]; then
               YQ_BIN="$(find "$TMP_EXTRACT" -type f -executable | head -n1)"
             fi
-            if [[-z "$YQ_BIN"]]; then
+            if [[ -z "$YQ_BIN" ]]; then
               echo "Fehler: konnte yq-Binary in tarball nicht finden" >&2
               ls -laR "$TMP_EXTRACT" >&2
               rm -rf "$TMP_EXTRACT"

@@ -50,7 +50,7 @@ jobs:
         if: ${{ env.AGENT_MODE == '' }}
         run: |
           python -m pip install --upgrade pip
-          if [-f pyproject.toml] || [-f setup.py]; then
+          if [ -f pyproject.toml ] || [-f setup.py ]; then
             python -m pip install .
           else
             python -m pip install pyyaml || true
@@ -66,7 +66,7 @@ jobs:
         run: |
           # ShellCheck SC2046 Fix: Read files into an array to prevent word splitting.
           cmd_base=()
-          if [-f pyproject.toml] || [-f setup.py]; then
+          if [ -f pyproject.toml ] || [-f setup.py ]; then
             cmd_base=("python" "-m" "metarepo_tools.impact_guard")
           else
             cmd_base=("python" "metarepo_tools/impact_guard.py")
@@ -76,20 +76,20 @@ jobs:
 
           # Filter out empty strings from the array.
           args=()
-          for f in "${changed_files[@]}"; do
-            if [[-n "$f"]]; then
+          for f in "${changed_files[@ ]}"; do
+            if [[ -n "$f" ]]; then
               args+=("$f")
             fi
           done
 
           # Always run the script, passing file arguments only if they exist.
-          "${cmd_base[@]}" \
+          "${cmd_base[@ ]}" \
             --contracts-dir contracts \
             --manifest repos.yml \
             --graph-out reports/impact/impact-graph.mmd \
             --report-out reports/impact/impact-report.md \
             --json-out reports/impact/impact-report.json \
-            "${args[@]}"
+            "${args[@ ]}"
 
       - name: Publish summary
         run: cat reports/impact/impact-report.md >> "$GITHUB_STEP_SUMMARY"

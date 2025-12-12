@@ -28,7 +28,7 @@ jobs:
 
       - name: Run ADR lint script
         run: |
-          if [-x tools/adr-lint.sh]; then
+          if [ -x tools/adr-lint.sh ]; then
             tools/adr-lint.sh
           else
             echo "::error::tools/adr-lint.sh not found or not executable."

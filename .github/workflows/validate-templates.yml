@@ -46,7 +46,7 @@ jobs:
           if not python_version:
             raise SystemExit("Python version not found in toolchain.versions.yml")
 
-          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as fh:
+          with open(os.environ["GITHUB_OUTPUT" ], "a", encoding="utf-8") as fh:
             fh.write(f"python_version={python_version}\n")
           PY
       - name: Set up Python

@@ -39,7 +39,7 @@ jobs:
           set -euo pipefail
 
           # Agent-Mode: skip installs
-          if [["${AGENT_MODE:-}" != ""]]; then
+          if [[ "${AGENT_MODE:-}" != "" ]]; then
             echo "Agent-Mode: skipping apt-get and npm installs"
             command -v jq >/dev/null 2>&1 || { echo "::error::jq not available in Agent-Mode"; exit 1; }
             command -v ajv >/dev/null 2>&1 || { echo "::error::ajv-cli not available in Agent-Mode"; exit 1; }
@@ -54,14 +54,14 @@ jobs:
           OUTPUT_PATH: metrics.json
         run: |
           set -euo pipefail
-          if [-x scripts/wgx-metrics-snapshot.sh]; then
+          if [ -x scripts/wgx-metrics-snapshot.sh ]; then
             bash scripts/wgx-metrics-snapshot.sh > "$OUTPUT_PATH"
           elif command -v just >/dev/null 2>&1; then
             if just --list > /tmp/just-list 2>&1 && grep -q "wgx metrics snapshot" /tmp/just-list; then
               just wgx metrics snapshot --json > "$OUTPUT_PATH"
             fi
           fi
-          if [! -s "$OUTPUT_PATH"]; then
+          if [ ! -s "$OUTPUT_PATH" ]; then
             if command -v wgx >/dev/null 2>&1; then
               wgx metrics snapshot --json > "$OUTPUT_PATH"
             else
@@ -78,9 +78,9 @@ jobs:
           set -euo pipefail
 
           # Agent-Mode: use local schema
-          if [["${AGENT_MODE:-}" != ""]]; then
+          if [[ "${AGENT_MODE:-}" != "" ]]; then
             echo "Agent-Mode: using local schema instead of downloading"
-            if [-f contracts/metrics.snapshot.schema.json]; then
+            if [ -f contracts/metrics.snapshot.schema.json ]; then
               cp contracts/metrics.snapshot.schema.json metrics.schema.json
             else
               echo "::warning::Local metrics schema not found in Agent-Mode, skipping validation"
