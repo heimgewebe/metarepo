@@ -43,7 +43,7 @@ jobs:
             local allow_fail=""
             local method="head"
 
-            while ((($#))); do
+            while (($#)); do
               case "$1" in
                 allow-fail)
                   allow_fail="yes"
@@ -145,7 +145,7 @@ jobs:
             local method="head"
             local allow_fail=""
 
-            while ((($#))); do
+            while (($#)); do
               case "$1" in
                 allow-fail)
                   allow_fail="yes"
