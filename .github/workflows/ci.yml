@@ -256,7 +256,7 @@ jobs:
                   echo
                   echo "# --- file: ${req} ---"
                   # Kommentare/Leerzeilen entfernen, damit keine leeren Einträge entstehen
-                  sed -e 's/^[[:space: ]]*#.*$//' -e '/^[[:space: ]]*$/d' "$req"
+                  sed -e 's/^[[:space:]]*#.*$//' -e '/^[[:space:]]*$/d' "$req"
                 done
           } > "${TMP_REQUIREMENTS}"
           echo "Resolved aggregate requirements at: ${TMP_REQUIREMENTS}"

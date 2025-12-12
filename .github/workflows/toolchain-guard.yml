@@ -170,10 +170,10 @@ jobs:
 
           # Second try: extract SHA-256 from the line for our asset (field 19 in yq's format)
           if [[ -z "$EXPECTED_SHA" ]]; then
-            LINE="$(grep -E "^${ASSET_NAME}[[:space: ]]" "$TMP_SHA" || true)"
+            LINE="$(grep -E "^${ASSET_NAME}[[:space:]]" "$TMP_SHA" || true)"
             if [[ -n "$LINE" ]]; then
-              # Split by double-space and get field 19 (SHA-256)
-              EXPECTED_SHA="$(echo "$LINE" | awk -F'  ' '{print $19}' | grep -oE '^[0-9a-fA-F]{64}$' || true)"
+              # Extract the SHA-256 hash (first field)
+              EXPECTED_SHA="$(echo "$LINE" | awk '{print $1}' | grep -oE '^[0-9a-fA-F]{64}$' || true)"
             fi
           fi
 

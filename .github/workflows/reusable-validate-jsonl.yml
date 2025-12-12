@@ -125,7 +125,7 @@ jobs:
             # Split an Komma und Zeilenumbrüchen; trimmen; leere Zeilen filtern.
             mapfile -t _raw_items < <(printf '%s\n' "$LIST_RAW" \
               | tr ',' '\n' \
-              | sed 's/^[[:space: ]]\+//;s/[[:space: ]]\+$//' \
+              | sed 's/^[[:space:]]\+//;s/[[:space:]]\+$//' \
               | awk 'NF')
             for item in "${_raw_items[@]}"; do
               # compgen -G expandiert Globs. Falls kein Match: exit-code != 0 -> daher "|| true".
