@@ -127,14 +127,14 @@ jobs:
               | tr ',' '\n' \
               | sed 's/^[[:space: ]]\+//;s/[[:space: ]]\+$//' \
               | awk 'NF')
-            for item in "${_raw_items[@ ]}"; do
+            for item in "${_raw_items[@]}"; do
               # compgen -G expandiert Globs. Falls kein Match: exit-code != 0 -> daher "|| true".
               mapfile -t matches < <(compgen -G "$item" || true)
-              if (( ${#matches[@ ]} == 0 )); then
+              if (( ${#matches[@]} == 0 )); then
                 echo "::notice title=validate-jsonl::Kein Treffer für Pattern: ${item}"
                 continue
               fi
-              for m in "${matches[@ ]}"; do
+              for m in "${matches[@]}"; do
                 # Deduplizieren identischer Treffer (z. B. wenn ein File mehrere Patterns matcht)
                 if [[ -n "${SEEN[$m ]:-}" ]]; then
                   continue
@@ -149,7 +149,7 @@ jobs:
             fi
           fi
 
-          if (( ${#FILES[@ ]} == 0 )); then
+          if (( ${#FILES[@]} == 0 )); then
             if [[ "$FAIL_ON_EMPTY" == "true" ]]; then
               echo "::error title=validate-jsonl::Keine Dateien gefunden (leere Inputs oder keine Glob-Treffer)"
               exit 1
@@ -163,7 +163,7 @@ jobs:
           fail_file="$(mktemp /tmp/jsonl-violations.XXXX.txt)"
           had_fail=0
 
-          for FILE in "${FILES[@ ]}"; do
+          for FILE in "${FILES[@]}"; do
             if [[ ! -f "$FILE" ]]; then
               echo "::notice title=validate-jsonl::Datei nicht gefunden: $FILE – übersprungen."
               continue
@@ -175,7 +175,7 @@ jobs:
               [[-z "${line// }" ]] && continue
               # CRLF defensiv entfernen
               printf '%s\n' "$line" | tr -d '\r' > /tmp/event.json
-              if ! ajv validate "${AJV_ARGS[@ ]}" -s "$SCHEMA" -d /tmp/event.json; then
+              if ! ajv validate "${AJV_ARGS[@]}" -s "$SCHEMA" -d /tmp/event.json; then
                 echo "::error file=$FILE,line=$line_no::Schema-Verstoß in Zeile $line_no"
                 cat /tmp/event.json >> "$fail_file"; echo "" >> "$fail_file"
                 had_fail=1
@@ -191,7 +191,7 @@ jobs:
           fi
 
           rm -f "$fail_file"
-          echo "OK: $overall_lines Zeilen geprüft in ${#FILES[@ ]} Datei(en)."
+          echo "OK: $overall_lines Zeilen geprüft in ${#FILES[@]} Datei(en)."
 
       - name: Upload failing samples (if any)
         if: failure()

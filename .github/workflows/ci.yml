@@ -418,8 +418,8 @@ jobs:
               missing_parts+=("Svelte/TS config")
             fi
 
-            if [ "${#missing_parts[@ ]}" -gt 0 ]; then
-              missing_joined=$(IFS=', '; echo "${missing_parts[* ]}")
+            if [ "${#missing_parts[@]}" -gt 0 ]; then
+              missing_joined=$(IFS=', '; echo "${missing_parts[*]}")
             else
               missing_joined=""
             fi

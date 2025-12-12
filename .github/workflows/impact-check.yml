@@ -76,20 +76,20 @@ jobs:
 
           # Filter out empty strings from the array.
           args=()
-          for f in "${changed_files[@ ]}"; do
+          for f in "${changed_files[@]}"; do
             if [[ -n "$f" ]]; then
               args+=("$f")
             fi
           done
 
           # Always run the script, passing file arguments only if they exist.
-          "${cmd_base[@ ]}" \
+          "${cmd_base[@]}" \
             --contracts-dir contracts \
             --manifest repos.yml \
             --graph-out reports/impact/impact-graph.mmd \
             --report-out reports/impact/impact-report.md \
             --json-out reports/impact/impact-report.json \
-            "${args[@ ]}"
+            "${args[@]}"
 
       - name: Publish summary
         run: cat reports/impact/impact-report.md >> "$GITHUB_STEP_SUMMARY"

@@ -81,7 +81,7 @@ jobs:
                 request_flags+=(-L)
               fi
 
-              if output=$(curl "${CURL_COMMON_ARGS[@ ]}" "${curl_flags[@ ]}" "${request_flags[@ ]}" "$url" -w '%{http_code} %{http_version} %{remote_ip} %{time_connect} %{time_total}' -o /dev/null); then
+              if output=$(curl "${CURL_COMMON_ARGS[@]}" "${curl_flags[@]}" "${request_flags[@]}" "$url" -w '%{http_code} %{http_version} %{remote_ip} %{time_connect} %{time_total}' -o /dev/null); then
                 IFS=' ' read -r http_code http_version remote_ip time_connect time_total <<<"${output}"
                 printf '%s (%s): HTTP/%s %s ip=%s connect=%ss total=%ss\n' "${label}" "${mode_label}" "${http_version}" "${http_code}" "${remote_ip:-n/a}" "${time_connect}" "${time_total}"
 
@@ -184,7 +184,7 @@ jobs:
                 request_flags+=(-L)
               fi
 
-              if output=$(curl "${CURL_COMMON_ARGS[@ ]}" "${curl_flags[@ ]}" "${request_flags[@ ]}" "$url" -w '%{http_code} %{http_version} %{remote_ip} %{time_connect} %{time_total}' -o /dev/null); then
+              if output=$(curl "${CURL_COMMON_ARGS[@]}" "${curl_flags[@]}" "${request_flags[@]}" "$url" -w '%{http_code} %{http_version} %{remote_ip} %{time_connect} %{time_total}' -o /dev/null); then
                 IFS=' ' read -r http_code http_version remote_ip time_connect time_total <<<"${output}"
                 printf '%s (%s): HTTP/%s %s ip=%s connect=%ss total=%ss\n' "${label}" "${mode_label}" "${http_version}" "${http_code}" "${remote_ip:-n/a}" "${time_connect}" "${time_total}"
 

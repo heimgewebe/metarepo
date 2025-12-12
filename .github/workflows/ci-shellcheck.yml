@@ -37,9 +37,9 @@ jobs:
 
           mapfile -t scripts < <(git ls-files '*.sh')
 
-          if [ "${#scripts[@ ]}" -eq 0 ]; then
+          if [ "${#scripts[@]}" -eq 0 ]; then
             echo "No shell scripts found."
             exit 0
           fi
 
-          shellcheck --format=gcc "${scripts[@ ]}"
+          shellcheck --format=gcc "${scripts[@]}"

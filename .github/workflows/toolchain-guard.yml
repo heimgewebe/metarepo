@@ -64,7 +64,7 @@ jobs:
           )
 
           BIN_URL=""
-          for name in "${BIN_CANDIDATES[@ ]}"; do
+          for name in "${BIN_CANDIDATES[@]}"; do
             candidate="https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${name}"
             if curl -L --head --silent --fail --max-time 10 "$candidate" >/dev/null 2>&1; then
               BIN_URL="$candidate"
@@ -104,7 +104,7 @@ jobs:
             "yq_${YQ_VERSION}_SHA256SUMS.txt"
           )
 
-          for s in "${SHA_CANDIDATES[@ ]}"; do
+          for s in "${SHA_CANDIDATES[@]}"; do
             sha_candidate="https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${s}"
             TMP_SHA_TMP="${TMP_SHA}.tmp"
             rm -f "$TMP_SHA_TMP"
