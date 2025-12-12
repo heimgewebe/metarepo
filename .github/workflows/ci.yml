@@ -400,13 +400,13 @@ jobs:
             has_lockfile=false
           fi
 
-          if compgen -G 'apps/web/svelte.config.*' >/dev/null || [-f apps/web/tsconfig.json ]; then
+          if compgen -G 'apps/web/svelte.config.*' >/dev/null || [ -f apps/web/tsconfig.json ]; then
             has_config=true
           else
             has_config=false
           fi
 
-          if [ "$has_lockfile" = true ] && ["$has_config" = true ]; then
+          if [ "$has_lockfile" = true ] && [ "$has_config" = true ]; then
             echo "enabled=true" >>"$GITHUB_OUTPUT"
             echo "missing=" >>"$GITHUB_OUTPUT"
           else
