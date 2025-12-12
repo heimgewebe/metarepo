@@ -39,7 +39,7 @@ jobs:
           # Sammle Standard-Quellen (ergänze bei Bedarf)
           files=()
           # explizite Blueprints
-          [[-f docs/IDEal_Blueprint.md ]] && files+=("docs/IDEal_Blueprint.md")
+          [[ -f docs/IDEal_Blueprint.md ]] && files+=("docs/IDEal_Blueprint.md")
           # alle .mmd in docs/
           while IFS= read -r -d '' f; do files+=("$f"); done < <(find docs -type f -name '*.mmd' -print0)
           if (( ${#files[@]} == 0 )); then

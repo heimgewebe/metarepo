@@ -170,9 +170,9 @@ jobs:
             fi
             echo "Validiere $FILE gegen $SCHEMA_SOURCE (strict=$STRICT, formats=$VALIDATE_FORMATS)…"
             line_no=0
-            while IFS= read -r line || [[-n "$line" ]]; do
+            while IFS= read -r line || [[ -n "$line" ]]; do
               line_no=$((line_no+1))
-              [[-z "${line// }" ]] && continue
+              [[ -z "${line// }" ]] && continue
               # CRLF defensiv entfernen
               printf '%s\n' "$line" | tr -d '\r' > /tmp/event.json
               if ! ajv validate "${AJV_ARGS[@]}" -s "$SCHEMA" -d /tmp/event.json; then

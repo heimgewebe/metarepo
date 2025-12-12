@@ -127,7 +127,7 @@ jobs:
             if [[ -n "$SHA_URL" ]]; then
               echo "Download checksum from: $SHA_URL"
               if curl --fail --max-time 120 --connect-timeout 10 --retry 3 -fsSL "$SHA_URL" -o "$TMP_SHA"; then
-                [[-s "$TMP_SHA" ]] || { rm -f "$TMP_SHA"; }
+                [[ -s "$TMP_SHA" ]] || { rm -f "$TMP_SHA"; }
               else
                 rm -f "$TMP_SHA"
               fi
