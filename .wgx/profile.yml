@@ -4,9 +4,9 @@ class: meta
 tasks:
   smoke: |
     echo "Running workflow validation..."
-    python3 <<'EOF'
+    python3 -c '
     import glob, yaml, sys, pathlib
-    files = list(glob.glob('.github/workflows/*.yml'))
+    files = list(glob.glob(".github/workflows/*.yml"))
     if not files:
         print("No workflows found, skipping.")
         sys.exit(0)
@@ -20,7 +20,7 @@ tasks:
             print(f"FAIL {f}: {e}")
             sys.exit(1)
     print("All workflows valid.")
-    EOF
+    '
 
   guard: |
     echo "Running meta-guard checks..."
