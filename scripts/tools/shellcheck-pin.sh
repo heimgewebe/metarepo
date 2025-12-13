@@ -54,7 +54,7 @@ compute_target() {
       # ShellCheck provides darwin.aarch64 binaries starting from v0.10.0
       # For v0.9.0 and earlier, use x86_64 which runs via Rosetta 2 on ARM64 Macs
       if [[ "$os" == "darwin" ]]; then
-        arch="aarch64"
+        arch="x86_64"
       else
         arch="aarch64"
       fi
