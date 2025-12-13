@@ -4,7 +4,7 @@ class: meta
 tasks:
   smoke: |
     echo "Running workflow validation..."
-    python3 <<'PYSCRIPT'
+    python3 - <<EOF
     import glob, yaml, sys, pathlib
     files = list(glob.glob(".github/workflows/*.yml"))
     if not files:
