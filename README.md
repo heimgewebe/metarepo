@@ -31,7 +31,7 @@ Das **metarepo** ist die Quelle der Wahrheit für:
 Die Fleet umfasst folgende Core-Repos:
 - **weltgewebe** – Externe Events und Signale
 - **hausKI** – KI-Orchestrator (Rust, GPU, Offline)
-- **hauski-audio** – Audio-Pipeline und Telemetrie
+- **hausKI-audio** – Audio-Pipeline und Telemetrie
 - **semantAH** – Wissensextraktion und Embeddings
 - **wgx** – Flottenmotor für Sync, Doctor, Metrics
 - **chronik** – Event-Ingest und Persistenz

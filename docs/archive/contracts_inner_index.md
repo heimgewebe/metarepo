@@ -11,7 +11,7 @@
 | [`contracts/policy.feedback.schema.json`](../../contracts/policy.feedback.schema.json) | Feedback auf eine Entscheidung (Reward, Notizen) | `leitstand` (UI), Operator:innen | `heimlern` |
 | [`contracts/metrics.snapshot.schema.json`](../../contracts/metrics.snapshot.schema.json) | Systemmetriken aus `wgx` | `wgx` | `hausKI`, `chronik` |
 | [`contracts/insights.schema.json`](../../contracts/insights.schema.json) | Wissens-Exports | `semantAH` | `hausKI`, `chronik` |
-| [`contracts/audio.events.schema.json`](../../contracts/audio.events.schema.json) | Audio-/Telemetrie-Events | `hauski-audio` | `hausKI`, `chronik` |
+| [`contracts/audio.events.schema.json`](../../contracts/audio.events.schema.json) | Audio-/Telemetrie-Events | `hausKI-audio` | `hausKI`, `chronik` |
 
 ---
 - **Kontext `mitschreiber`:** [Details zu `os.context.*`](../contracts/mitschreiber.md)

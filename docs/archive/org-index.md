@@ -9,7 +9,7 @@ Quelle: [`repos.yml`](../../repos.yml).
 | [aussensensor](https://github.com/heimgewebe/aussensensor) | main | aussen | events | – | – |
 | [chronik](https://github.com/heimgewebe/chronik) | main | chronik | ingest | – | – |
 | [hausKI](https://github.com/heimgewebe/hausKI) | main | assistant | policy | ✅ | – |
-| [hauski-audio](https://github.com/heimgewebe/hauski-audio) | main | audio | events | – | hausKI |
+| [hausKI-audio](https://github.com/heimgewebe/hausKI-audio) | main | audio | events | – | hausKI |
 | [heimlern](https://github.com/heimgewebe/heimlern) | main | policy | library | – | – |
 | [semantAH](https://github.com/heimgewebe/semantAH) | main | insights | export | – | – |
 | [tools](https://github.com/heimgewebe/tools) | main | tooling | shared | – | – |
