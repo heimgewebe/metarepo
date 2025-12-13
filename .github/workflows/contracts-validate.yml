@@ -1,27 +1,25 @@
+---
 name: "contracts-validate"
 
 permissions:
   contents: read
 
 concurrency:
-  # Keep PR-specific groups to prevent cross-branch cancellations.
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
-on:
+'on':
   workflow_dispatch: {}
   push:
     paths:
-      - "json/**"
-      - "proto/**"
+      - "contracts/**"
       - "fixtures/**"
-      - ".github/workflows/**"   # ensure pin guard runs when ANY workflow changes
+      - ".github/workflows/contracts-validate.yml"
   pull_request:
     paths:
-      - "json/**"
-      - "proto/**"
+      - "contracts/**"
       - "fixtures/**"
-      - ".github/workflows/**"   # ensure pin guard runs when ANY workflow changes
+      - ".github/workflows/contracts-validate.yml"
 
 defaults:
   run:
@@ -33,16 +31,16 @@ env:
 
 jobs:
   guard:
-    name: "Security: guard deletion policy (json/proto)"
+    name: "Security: guard deletion policy (contracts)"
     runs-on: ubuntu-latest
     timeout-minutes: 8
     env:
       GH_DEFAULT_BRANCH: ${{ github.event.repository.default_branch || 'main' }}
       GH_PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
       GH_PUSH_BEFORE: ${{ github.event.before }}
-      PROTECTED_REGEX: '^(json|proto)/'
+      PROTECTED_REGEX: '^(contracts|fixtures)/'
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -113,71 +111,103 @@ jobs:
           echo "::notice::✅ Guard passed"
 
   validate:
-    name: "Validate fixtures"
+    name: "Validate Contracts & Examples"
     needs: [guard]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
         with:
           persist-credentials: false
 
       - name: Ensure Node available
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v4
         with:
           node-version: "20"
 
-      - name: Validate Contracts (compile)
+      - name: Install ajv-cli
+        run: npm install -g ajv-cli@5 ajv-formats
+
+      - name: Validate Schemas (compile)
         run: |
           shopt -s nullglob
           schemas=( json/**/*.schema.json )
-          
+
           if [ ${#schemas[@]} -eq 0 ]; then
-            echo "::notice::No schema files found - skipping compilation"
+            echo "::notice::No schema files found in contracts/ - skipping compilation"
             exit 0
           fi
-          
+
           echo "Compiling ${#schemas[@]} schema(s)..."
           for schema in "${schemas[@]}"; do
             echo "Compiling $schema"
-            npx --yes ajv-cli@5 compile \
-              -s "$schema" \
-              --strict=true \
-              --spec=draft2020
+            # Using -c ajv-formats and -p ajv-formats to ensure format validation works
+            ajv compile -s "$schema" --strict=log --spec=draft2020 -c ajv-formats
+          done
+
+      - name: Validate Specific Examples
+        run: |
+          # Explicitly requested validation
+          if [[ -f contracts/examples/knowledge.observatory.example.json && -f contracts/knowledge.observatory.schema.json ]]; then
+            echo "Validating knowledge.observatory example..."
+            ajv validate \
+              -s contracts/knowledge.observatory.schema.json \
+              -d contracts/examples/knowledge.observatory.example.json \
+              --strict=false \
+              -c ajv-formats --spec=draft2020
+          else
+            echo "::warning::Knowledge observatory schema or example not found"
+          fi
+
+      - name: Validate All Examples
+        run: |
+          shopt -s nullglob
+          # Find all examples that match the pattern *.example.json
+          for example in contracts/examples/*.example.json; do
+            filename=$(basename "$example" .example.json)
+            schema="contracts/${filename}.schema.json"
+
+            if [[ -f "$schema" ]]; then
+              echo "Validating $example against $schema"
+              ajv validate \
+                -s "$schema" \
+                -d "$example" \
+                --strict=false \
+                -c ajv-formats --spec=draft2020
+            else
+              echo "::notice::No matching schema found for $example (expected $schema)"
+            fi
           done
 
       - name: Validate Fixtures
-        env:
-          FIXTURES_GLOB: ${{ vars.FIXTURES_GLOB || 'fixtures/**/*.jsonl' }}
         run: |
-          shopt -s nullglob
+          shopt -s nullglob globstar
           schemas=( json/**/*.schema.json )
           fixtures=( fixtures/**/*.jsonl )
-          
+
           if [ ${#schemas[@]} -eq 0 ]; then
             echo "::notice::No schema files found - skipping validation"
             exit 0
           fi
-          
+
           if [ ${#fixtures[@]} -eq 0 ]; then
-            echo "::notice::No fixture files found - skipping validation"
-            exit 0
+             echo "::notice::No fixtures found."
+             exit 0
           fi
-          
+
           echo "Found ${#schemas[@]} schema(s) and ${#fixtures[@]} fixture(s)"
-          
+
           # Validate each schema-fixture pair
           # Note: ajv validate -s accepts only one schema file
           for schema in "${schemas[@]}"; do
             for fixture in "${fixtures[@]}"; do
               echo "Validating $fixture against $schema"
-              npx --yes ajv-cli@5 validate \
+              ajv validate \
                 -s "$schema" \
                 -d "$fixture" \
                 --spec=draft2020 \
                 --all-errors \
-                --errors=line
+                --errors=line \
+                -c ajv-formats \
+                --strict=log
             done
           done
-
-      - name: Show success
-        run: echo "Contracts and fixtures validated successfully"

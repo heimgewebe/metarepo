@@ -1,3 +1,4 @@
+---
 name: ci-shellcheck
 permissions:
   contents: read
@@ -9,7 +10,7 @@ defaults:
   run:
     shell: bash --noprofile --norc -euo pipefail {0}
 
-on:
+'on':
   push:
     paths:
       - '**/*.sh'
