@@ -5,22 +5,22 @@ tasks:
   smoke: |
     echo "Running workflow validation..."
     python3 <<'PYSCRIPT'
-import glob, yaml, sys, pathlib
-files = list(glob.glob(".github/workflows/*.yml"))
-if not files:
-    print("No workflows found, skipping.")
-    sys.exit(0)
-for f in files:
-    try:
-        data = yaml.safe_load(pathlib.Path(f).read_text(encoding="utf-8"))
-        if not isinstance(data, dict):
-            raise TypeError("workflow root must be a mapping")
-        print(f"OK   {f}")
-    except Exception as e:
-        print(f"FAIL {f}: {e}")
-        sys.exit(1)
-print("All workflows valid.")
-PYSCRIPT
+    import glob, yaml, sys, pathlib
+    files = list(glob.glob(".github/workflows/*.yml"))
+    if not files:
+        print("No workflows found, skipping.")
+        sys.exit(0)
+    for f in files:
+        try:
+            data = yaml.safe_load(pathlib.Path(f).read_text(encoding="utf-8"))
+            if not isinstance(data, dict):
+                raise TypeError("workflow root must be a mapping")
+            print(f"OK   {f}")
+        except Exception as e:
+            print(f"FAIL {f}: {e}")
+            sys.exit(1)
+    print("All workflows valid.")
+    PYSCRIPT
 
   guard: |
     echo "Running meta-guard checks..."
