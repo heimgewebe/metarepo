@@ -1,7 +1,8 @@
+---
 name: agents (template)
 permissions:
   contents: read
-on:
+'on':
   push:
     paths:
       - "templates/agent-kit/**"
@@ -23,13 +24,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v6 # v4 (major tag)
+      - uses: actions/checkout@v6  # v4 (major tag)
       - name: Setup Python
-        uses: actions/setup-python@v6 # v5 (major tag)
+        uses: actions/setup-python@v6  # v5 (major tag)
         with:
           python-version: "3.11"
       - name: Cache uv
-        uses: actions/cache@v5 # v4 (major tag)
+        uses: actions/cache@v5  # v4 (major tag)
         with:
           path: |
             ~/.cache/uv

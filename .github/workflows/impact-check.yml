@@ -1,6 +1,7 @@
+---
 name: impact-guard
 
-on:
+'on':
   pull_request:
     paths:
       - "contracts/*.schema.json"
@@ -54,7 +55,7 @@ jobs:
           else
             python -m pip install pyyaml || true
           fi
-      
+
       - name: Check dependencies (Agent-Mode)
         if: ${{ env.AGENT_MODE != '' }}
         run: |

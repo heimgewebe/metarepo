@@ -1,9 +1,10 @@
+---
 name: "📊 Metrics Snapshot & Validation"
 permissions:
   contents: read          # Repo lesen, um Skripte auszuführen
   actions: write          # notwendig für upload-artifact
   checks: write
-on:
+'on':
   workflow_dispatch:
   schedule:
     - cron: "0 * * * *"
@@ -32,7 +33,7 @@ jobs:
         run: |
           mkdir -p .ci
           curl -fsSL "$METRICS_SCHEMA_URL" -o .ci/metrics.schema.json
-      
+
       - name: Use local schema (Agent-Mode)
         if: ${{ env.AGENT_MODE != '' }}
         run: |
@@ -57,7 +58,7 @@ jobs:
             --data @metrics.json \
             "$HAUSKI_POST_URL"
         continue-on-error: true
-      
+
       - name: Skip POST to hausKI (Agent-Mode)
         if: ${{ env.HAUSKI_POST_URL && env.HAUSKI_POST_URL != '' && env.AGENT_MODE != '' }}
         run: |
