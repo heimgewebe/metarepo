@@ -52,4 +52,5 @@ tasks:
       echo "No metrics script for metarepo, skipping."
     fi
 
-  snapshot: ""
+  snapshot: |
+    # kein Snapshot-Befehl definiert
