@@ -2,7 +2,7 @@
 ai_context_version: 1.0
 
 project:
-  name: hauski-audio
+  name: hausKI-audio
   summary: Audio capture, VAD/ASR pipeline, and event emission.
   role: audio_to_text_events
   primary_language: mixed
@@ -36,7 +36,7 @@ architecture:
 
 conventions:
   branching: "main, feature/*"
-  commit_prefix: "hauski-audio"
+  commit_prefix: "hausKI-audio"
   ci_platform: github_actions
 
 documentation:
