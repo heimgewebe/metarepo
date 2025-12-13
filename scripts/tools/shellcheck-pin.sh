@@ -51,7 +51,8 @@ compute_target() {
   case "$(uname -m)" in
     x86_64) arch="x86_64" ;;
     aarch64 | arm64)
-      # ShellCheck v0.10.0+ provides native darwin.aarch64 binaries
+      # ShellCheck provides darwin.aarch64 binaries starting from v0.10.0
+      # For v0.9.0 and earlier, use x86_64 which runs via Rosetta 2 on ARM64 Macs
       if [[ "$os" == "darwin" ]]; then
         arch="aarch64"
       else
