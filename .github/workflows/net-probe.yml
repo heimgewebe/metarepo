@@ -1,7 +1,8 @@
+---
 name: net-probe
 permissions:
   contents: read
-on:
+'on':
   push:
     paths:
       - '.github/workflows/net-probe.yml'
@@ -24,7 +25,7 @@ jobs:
     timeout-minutes: 7
     if: ${{ vars.AGENT_MODE == '' }}
     steps:
-      - uses: actions/checkout@v6 # v4 (major tag)
+      - uses: actions/checkout@v6  # v4 (major tag)
 
       - name: Check outbound HTTPS access (GitHub, PyPI, crates.io)
         run: |

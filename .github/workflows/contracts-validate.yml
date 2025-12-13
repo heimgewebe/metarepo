@@ -1,3 +1,4 @@
+---
 name: "contracts-validate"
 
 permissions:
@@ -7,7 +8,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
-on:
+'on':
   workflow_dispatch: {}
   push:
     paths:
@@ -128,14 +129,14 @@ jobs:
 
       - name: Validate Schemas (compile)
         run: |
-          shopt -s nullglob globstar
-          schemas=( contracts/**/*.schema.json )
-          
+          shopt -s nullglob
+          schemas=( json/**/*.schema.json )
+
           if [ ${#schemas[@]} -eq 0 ]; then
             echo "::notice::No schema files found in contracts/ - skipping compilation"
             exit 0
           fi
-          
+
           echo "Compiling ${#schemas[@]} schema(s)..."
           for schema in "${schemas[@]}"; do
             echo "Compiling $schema"
@@ -181,17 +182,23 @@ jobs:
         run: |
           shopt -s nullglob globstar
           fixtures=( fixtures/**/*.jsonl )
-          
+
+          if [ ${#schemas[@]} -eq 0 ]; then
+            echo "::notice::No schema files found - skipping validation"
+            exit 0
+          fi
+
           if [ ${#fixtures[@]} -eq 0 ]; then
              echo "::notice::No fixtures found."
              exit 0
           fi
-          
-          for fixture in "${fixtures[@]}"; do
-            base="$(basename "${fixture}" .jsonl)"
-            schema="contracts/${base}.schema.json"
 
-            if [[ -f "${schema}" ]]; then
+          echo "Found ${#schemas[@]} schema(s) and ${#fixtures[@]} fixture(s)"
+
+          # Validate each schema-fixture pair
+          # Note: ajv validate -s accepts only one schema file
+          for schema in "${schemas[@]}"; do
+            for fixture in "${fixtures[@]}"; do
               echo "Validating $fixture against $schema"
               ajv validate \
                 -s "$schema" \

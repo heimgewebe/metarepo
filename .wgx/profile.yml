@@ -6,12 +6,10 @@ tasks:
     echo "Running workflow validation..."
     python3 - <<EOF
     import glob, yaml, sys, pathlib
-
-    files = list(glob.glob('.github/workflows/*.yml'))
+    files = list(glob.glob(".github/workflows/*.yml"))
     if not files:
         print("No workflows found, skipping.")
         sys.exit(0)
-
     for f in files:
         try:
             data = yaml.safe_load(pathlib.Path(f).read_text(encoding="utf-8"))
@@ -21,9 +19,8 @@ tasks:
         except Exception as e:
             print(f"FAIL {f}: {e}")
             sys.exit(1)
-
     print("All workflows valid.")
-    EOF
+    PYSCRIPT
 
   guard: |
     echo "Running meta-guard checks..."
@@ -52,4 +49,5 @@ tasks:
       echo "No metrics script for metarepo, skipping."
     fi
 
-  snapshot: ""
+  snapshot: |
+    # no snapshot command defined

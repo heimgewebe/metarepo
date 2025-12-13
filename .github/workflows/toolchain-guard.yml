@@ -1,7 +1,8 @@
+---
 name: toolchain-guard
 permissions:
   contents: read
-on:
+'on':
   push:
 jobs:
   guard:
@@ -9,7 +10,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
-      
+
       - name: Check yq availability (Agent-Mode)
         if: ${{ env.AGENT_MODE != '' }}
         run: |
@@ -20,7 +21,7 @@ jobs:
             echo "::error::yq not available in Agent-Mode. Please pre-install it."
             exit 1
           fi
-      
+
       - name: Install yq (robust)
         if: ${{ env.AGENT_MODE == '' }}
         run: |
@@ -46,8 +47,8 @@ jobs:
           fi
 
           ASSET_URLS="$({
-            grep -oE '"browser_download_url":\s*"[^\"]+"' "$RELEASE_JSON" \
-              | sed -E 's/.*"([^"]+)".*/\1/'
+            grep -oE '"browser_download_url":\s*"[^\" ]+"' "$RELEASE_JSON" \
+              | sed -E 's/.*"([^" ]+)".*/\1/'
           } || true)"
 
           # Try deterministic candidate asset names first (prefer plain binary for simplicity)
@@ -171,8 +172,8 @@ jobs:
           if [[ -z "$EXPECTED_SHA" ]]; then
             LINE="$(grep -E "^${ASSET_NAME}[[:space:]]" "$TMP_SHA" || true)"
             if [[ -n "$LINE" ]]; then
-              # Split by double-space and get field 19 (SHA-256)
-              EXPECTED_SHA="$(echo "$LINE" | awk -F'  ' '{print $19}' | grep -oE '^[0-9a-fA-F]{64}$' || true)"
+              # Extract the SHA-256 hash (first field)
+              EXPECTED_SHA="$(echo "$LINE" | awk '{print $1}' | grep -oE '^[0-9a-fA-F]{64}$' || true)"
             fi
           fi
 

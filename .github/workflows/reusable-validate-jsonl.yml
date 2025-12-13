@@ -58,7 +58,7 @@ jobs:
       - name: Install ajv-cli
         if: ${{ env.AGENT_MODE == '' }}
         run: npm i -g ajv-cli@5.0.0
-      
+
       - name: Check ajv-cli (Agent-Mode)
         if: ${{ env.AGENT_MODE != '' }}
         run: |
@@ -136,10 +136,10 @@ jobs:
               fi
               for m in "${matches[@]}"; do
                 # Deduplizieren identischer Treffer (z. B. wenn ein File mehrere Patterns matcht)
-                if [[ -n "${SEEN[$m]:-}" ]]; then
+                if [[ -n "${SEEN[$m ]:-}" ]]; then
                   continue
                 fi
-                SEEN["$m"]=1
+                SEEN["$m" ]=1
                 FILES+=("$m")
               done
             done
