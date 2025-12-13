@@ -1,0 +1,31 @@
+{
+  "observatory_id": "obs-2024-10-27-001",
+  "generated_at": "2024-10-27T10:00:00Z",
+  "source": "semantAH",
+  "topics": [
+    {
+      "topic_id": "topic-logistics-optimization",
+      "title": "Logistics Optimization",
+      "sources": [
+        {
+          "source_type": "event",
+          "ref": "evt-log-001"
+        },
+        {
+          "source_type": "repo_file",
+          "ref": "docs/logistics.md"
+        }
+      ]
+    },
+    {
+      "topic_id": "topic-ai-ethics",
+      "title": "AI Ethics",
+      "sources": [
+        {
+          "source_type": "vault_note",
+          "ref": "notes/ethics/ai_guidelines.md"
+        }
+      ]
+    }
+  ]
+}
