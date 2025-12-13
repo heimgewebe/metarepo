@@ -37,7 +37,7 @@ jobs:
       - name: Install tooling
         run: |
           set -euo pipefail
-          
+
           # Agent-Mode: skip installs
           if [[ "${AGENT_MODE:-}" != "" ]]; then
             echo "Agent-Mode: skipping apt-get and npm installs"
@@ -76,7 +76,7 @@ jobs:
           SCHEMA_TAG: ${{ inputs.schema_ref }}
         run: |
           set -euo pipefail
-          
+
           # Agent-Mode: use local schema
           if [[ "${AGENT_MODE:-}" != "" ]]; then
             echo "Agent-Mode: using local schema instead of downloading"
@@ -91,7 +91,7 @@ jobs:
             echo "Fetching schema from $SCHEMA_URL"
             curl -fsSL "$SCHEMA_URL" -o metrics.schema.json
           fi
-          
+
           ajv validate -s metrics.schema.json -d metrics.json
 
       - name: Optional POST to ingest endpoint
@@ -102,7 +102,7 @@ jobs:
           set -euo pipefail
           echo "POSTing metrics snapshot to $POST_URL"
           curl -fsS --data-binary @metrics.json "$POST_URL"
-      
+
       - name: Skip POST to ingest (Agent-Mode)
         if: ${{ inputs.post_url != '' && env.AGENT_MODE != '' }}
         run: |

@@ -1,9 +1,10 @@
+---
 name: agent-mode-guard
 
-on:
+'on':
   workflow_dispatch:
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 permissions:
   contents: read

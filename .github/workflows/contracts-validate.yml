@@ -1,3 +1,4 @@
+---
 name: "contracts-validate"
 
 permissions:
@@ -8,7 +9,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
-on:
+'on':
   workflow_dispatch: {}
   push:
     paths:
@@ -130,12 +131,12 @@ jobs:
         run: |
           shopt -s nullglob
           schemas=( json/**/*.schema.json )
-          
+
           if [ ${#schemas[@]} -eq 0 ]; then
             echo "::notice::No schema files found - skipping compilation"
             exit 0
           fi
-          
+
           echo "Compiling ${#schemas[@]} schema(s)..."
           for schema in "${schemas[@]}"; do
             echo "Compiling $schema"
@@ -152,19 +153,19 @@ jobs:
           shopt -s nullglob
           schemas=( json/**/*.schema.json )
           fixtures=( fixtures/**/*.jsonl )
-          
+
           if [ ${#schemas[@]} -eq 0 ]; then
             echo "::notice::No schema files found - skipping validation"
             exit 0
           fi
-          
+
           if [ ${#fixtures[@]} -eq 0 ]; then
             echo "::notice::No fixture files found - skipping validation"
             exit 0
           fi
-          
+
           echo "Found ${#schemas[@]} schema(s) and ${#fixtures[@]} fixture(s)"
-          
+
           # Validate each schema-fixture pair
           # Note: ajv validate -s accepts only one schema file
           for schema in "${schemas[@]}"; do
