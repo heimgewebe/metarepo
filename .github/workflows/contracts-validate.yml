@@ -181,6 +181,7 @@ jobs:
       - name: Validate Fixtures
         run: |
           shopt -s nullglob globstar
+          schemas=( json/**/*.schema.json )
           fixtures=( fixtures/**/*.jsonl )
 
           if [ ${#schemas[@]} -eq 0 ]; then
@@ -208,5 +209,5 @@ jobs:
                 --errors=line \
                 -c ajv-formats \
                 --strict=log
-            fi
+            done
           done
