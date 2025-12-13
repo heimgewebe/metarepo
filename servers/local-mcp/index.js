@@ -25,7 +25,7 @@ server.tool(
   "wgx",
   { args: z.string() },
   async ({ args }) => {
-    const out = execSync(`./wgx ${args}`, { encoding: "utf8" });
+    const out = execSync(`scripts/wgx ${args}`, { encoding: "utf8" });
     return { output: out };
   }
 );
@@ -35,7 +35,7 @@ server.tool(
   "wgx_guard",
   { args: z.string().optional() },
   async ({ args = "" }) => {
-    const out = execSync(`./wgx guard ${args}`, { encoding: "utf8" });
+    const out = execSync(`scripts/wgx guard ${args}`, { encoding: "utf8" });
     return { output: out };
   }
 );
@@ -45,7 +45,7 @@ server.tool(
   "wgx_smoke",
   { args: z.string().optional() },
   async ({ args = "" }) => {
-    const out = execSync(`./wgx smoke ${args}`, { encoding: "utf8" });
+    const out = execSync(`scripts/wgx smoke ${args}`, { encoding: "utf8" });
     return { output: out };
   }
 );
@@ -70,4 +70,4 @@ server.tool(
   }
 );
 
-server.start(new StdioServerTransport());
+await server.connect(new StdioServerTransport());
