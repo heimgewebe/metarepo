@@ -1,0 +1,17 @@
+{
+  "intent_id": "intent-12345",
+  "generated_at": "2023-10-27T10:00:00Z",
+  "intent_type": "coding",
+  "confidence": 0.72,
+  "signals": [
+    {
+      "kind": "app_window",
+      "ref": "VSCode"
+    },
+    {
+      "kind": "path",
+      "ref": "heimgewebe/metarepo/.github/workflows/ci.yml"
+    }
+  ],
+  "source": "hausKI-intent-resolver"
+}

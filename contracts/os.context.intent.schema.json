@@ -1,116 +1,55 @@
 {
- "$schema": "https://json-schema.org/draft/2020-12/schema",
- "$id": "https://schemas.heimgewebe.org/os.context.intent.schema.json",
- "title": "OS Context Intent",
- "description": "Intent-Ereignis aus dem lokalen Kontext (mitschreiber) zur semantischen Weiterverarbeitung (semantAH/hausKI/chronik). JSONL: 1 Objekt/Zeile.",
- "type": "object",
- "additionalProperties": false,
- "properties": {
- "id": {
- "type": "string",
- "description": "Stabile, optionale ID (z.B. Hash über actor+goal+ts)."
- },
- "ts": {
- "type": "string",
- "format": "date-time",
- "description": "ISO-8601 Zeitstempel (UTC empfohlen)."
- },
- "actor": {
- "type": "string",
- "minLength": 1,
- "description": "Auslöser (user:)"
- },
- "goal": {
- "type": "string",
- "minLength": 1,
- "maxLength": 500,
- "description": "Absicht in Kurzform (z.B. \"build docs\", \"refactor pattern\", \"analyze repo\")."
- },
- "scope": {
- "type": "object",
- "description": "Geltungsbereich/Scope der Absicht.",
- "additionalProperties": false,
- "properties": {
- "repo": { "type": "string", "description": "Pfad oder Git-URL." },
- "branch": { "type": "string" },
- "path": { "type": "string", "description": "Datei/Verzeichnis im Fokus." },
- "selection": {
- "type": "object",
- "additionalProperties": false,
- "properties": {
- "start_line": { "type": "integer", "minimum": 0 },
- "end_line": { "type": "integer", "minimum": 0 }
- }
- },
- "workspace": { "type": "string" }
- }
- },
- "constraints": {
- "type": "object",
- "description": "Nebenbedingungen (z.B. Zeitbudget, Offline-Zwang, Strenge).",
- "additionalProperties": true
- },
- "context": {
- "type": "object",
- "description": "Momentaufnahme des OS/Editor-Kontexts.",
- "additionalProperties": false,
- "properties": {
- "os": {
- "type": "object",
- "additionalProperties": true,
- "properties": {
- "distro": { "type": "string" },
- "hostname": { "type": "string" }
- }
- },
- "app": {
- "type": "object",
- "additionalProperties": true,
- "properties": {
- "name": { "type": "string" },
- "version": { "type": "string" }
- }
- },
- "window": {
- "type": "object",
- "additionalProperties": true,
- "properties": {
- "title": { "type": "string" }
- }
- },
- "clipboard": {
- "type": "object",
- "additionalProperties": true,
- "properties": {
- "has_text": { "type": "boolean" }
- }
- },
- "text": {
- "type": "object",
- "additionalProperties": false,
- "properties": {
- "lang": { "type": "string", "minLength": 2, "maxLength": 12 },
- "content": { "type": "string", "maxLength": 20000 }
- }
- },
- "embeddings": {
- "type": "object",
- "description": "Optional: vorab berechnete Text/State-Embeddings.",
- "additionalProperties": true
- }
- }
- },
- "tags": {
- "type": "array",
- "items": { "type": "string", "maxLength": 64, "pattern": "^[^\\s].*$" },
- "uniqueItems": true,
- "maxItems": 64
- },
- "meta": {
- "type": "object",
- "description": "Transport-/Adapter-Metadaten (z.B. mitschreiber Version).",
- "additionalProperties": true
- }
- },
- "required": ["actor", "goal"]
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heimgewebe/contracts/os.context.intent.schema.json",
+  "title": "OS Context Intent (Light)",
+  "type": "object",
+  "properties": {
+    "intent_id": {
+      "type": "string"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "intent_type": {
+      "type": "string",
+      "enum": [
+        "coding",
+        "writing",
+        "research",
+        "repo_browsing",
+        "ci_triage",
+        "unknown"
+      ]
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "signals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "kind": { "type": "string" },
+          "ref": { "type": "string" },
+          "weight": { "type": "number" }
+        },
+        "required": ["kind", "ref"]
+      }
+    },
+    "source": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "intent_id",
+    "generated_at",
+    "intent_type",
+    "confidence",
+    "signals",
+    "source"
+  ],
+  "additionalProperties": false
 }

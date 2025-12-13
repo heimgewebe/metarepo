@@ -21,6 +21,26 @@ else
     echo "::endgroup::"
   done
 fi
+
+# Validate examples
+examples=(contracts/examples/*.example.json)
+if ((${#examples[@]} == 0)); then
+  echo "::notice::No examples found under contracts/examples/"
+else
+  for example in "${examples[@]}"; do
+    filename=$(basename "$example" .example.json)
+    schema="contracts/${filename}.schema.json"
+
+    echo "::group::Validate Example ${example}"
+    if [[ -f "$schema" ]]; then
+      npx --yes -p ajv-cli@5 -p ajv-formats ajv validate -s "$schema" -d "$example" --strict=false -c ajv-formats --spec=draft2020
+    else
+      echo "::notice::No matching schema found for $example (expected $schema)"
+    fi
+    echo "::endgroup::"
+  done
+fi
+
 # Fixtures check: use nullglob/globstar from above
 fixtures=(fixtures/**/*.jsonl)
 if ((${#fixtures[@]} > 0)); then
