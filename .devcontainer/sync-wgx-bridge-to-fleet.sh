@@ -8,7 +8,7 @@ TEMPLATE=".devcontainer/_setup-wgx-bridge.template.sh"
 PATCHER=".devcontainer/_wgx-bridge-patch-devcontainer-json.py"
 
 usage() {
-  cat <<'USAGE'
+  cat << 'USAGE'
 Usage:
   .devcontainer/sync-wgx-bridge-to-fleet.sh <repo-dir> [<repo-dir>...]
 
