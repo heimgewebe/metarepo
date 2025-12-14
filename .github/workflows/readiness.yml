@@ -1,0 +1,48 @@
+name: readiness
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'docs/repo-matrix.md'
+      - 'scripts/fleet/generate_readiness.py'
+      - '.github/workflows/readiness.yml'
+      - 'fleet/repos.txt'
+  pull_request:
+    paths:
+      - 'docs/repo-matrix.md'
+      - 'scripts/fleet/generate_readiness.py'
+      - '.github/workflows/readiness.yml'
+      - 'fleet/repos.txt'
+  workflow_dispatch: {}
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Generate readiness report (matrix as source of truth)
+        env:
+          # In CI we usually only have THIS repo checked out, so org_root won't contain siblings.
+          # That's fine: the report will mark missing_repo=true for others.
+          HG_ROOT: ${{ github.workspace }}/..
+        run: |
+          python scripts/fleet/generate_readiness.py \
+            --matrix docs/repo-matrix.md \
+            --out-json reports/heimgewebe-readiness.json \
+            --write-repos-txt fleet/repos.txt
+
+      - name: Upload readiness report
+        uses: actions/upload-artifact@v4
+        with:
+          name: heimgewebe-readiness
+          path: |
+            reports/heimgewebe-readiness.json
+            fleet/repos.txt

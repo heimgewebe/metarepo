@@ -1,0 +1,30 @@
+name: fleet-drift-check
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'docs/repo-matrix.md'
+      - 'fleet/repos.txt'
+      - 'scripts/fleet/check_fleet_list.py'
+      - '.github/workflows/fleet-drift-check.yml'
+  pull_request:
+    paths:
+      - 'docs/repo-matrix.md'
+      - 'fleet/repos.txt'
+      - 'scripts/fleet/check_fleet_list.py'
+      - '.github/workflows/fleet-drift-check.yml'
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Check fleet list matches repo-matrix
+        run: |
+          python scripts/fleet/check_fleet_list.py --matrix docs/repo-matrix.md --fleet fleet/repos.txt

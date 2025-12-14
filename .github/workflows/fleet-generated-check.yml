@@ -1,0 +1,30 @@
+name: fleet-generated-check
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'docs/repo-matrix.md'
+      - 'fleet/repos.txt'
+      - 'scripts/fleet/verify_generated_repos_txt.py'
+      - '.github/workflows/fleet-generated-check.yml'
+  pull_request:
+    paths:
+      - 'docs/repo-matrix.md'
+      - 'fleet/repos.txt'
+      - 'scripts/fleet/verify_generated_repos_txt.py'
+      - '.github/workflows/fleet-generated-check.yml'
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Verify fleet/repos.txt is generated exactly
+        run: |
+          python scripts/fleet/verify_generated_repos_txt.py --matrix docs/repo-matrix.md --fleet fleet/repos.txt

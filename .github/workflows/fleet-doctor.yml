@@ -1,0 +1,43 @@
+name: fleet-doctor
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'scripts/fleet/doctor.py'
+      - 'scripts/fleet/generate_readiness.py'
+      - 'docs/repo-matrix.md'
+      - 'fleet/repos.txt'
+      - 'reports/heimgewebe-readiness.json'
+      - '.github/workflows/fleet-doctor.yml'
+  pull_request:
+    paths:
+      - 'scripts/fleet/doctor.py'
+      - 'scripts/fleet/generate_readiness.py'
+      - 'docs/repo-matrix.md'
+      - 'fleet/repos.txt'
+      - 'reports/heimgewebe-readiness.json'
+      - '.github/workflows/fleet-doctor.yml'
+  workflow_dispatch: {}
+
+jobs:
+  doctor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Generate readiness report (CI)
+        env:
+          HG_ROOT: ${{ github.workspace }}/..
+        run: |
+          python scripts/fleet/generate_readiness.py \
+            --matrix docs/repo-matrix.md \
+            --out-json reports/heimgewebe-readiness.json \
+            --write-repos-txt fleet/repos.txt
+      - name: Run hg-doctor (CI mode)
+        run: |
+          python scripts/fleet/doctor.py --report reports/heimgewebe-readiness.json --ci
