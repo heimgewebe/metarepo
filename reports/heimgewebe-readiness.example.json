@@ -1,0 +1,25 @@
+{
+  "generated_at": "2025-12-13T23:59:59Z",
+  "defaults": {
+    "profile": "dev",
+    "render": "combined",
+    "split_part_mb": 25,
+    "max_file_bytes": 0,
+    "features": {
+      "health": true,
+      "augment_sidecar": true,
+      "organism_index": true,
+      "fleet_panorama": true,
+      "json_sidecar": true,
+      "ai_heatmap": true
+    }
+  },
+  "repos": [
+    {
+      "name": "leitstand",
+      "has_wgx_profile": false,
+      "has_ci": true,
+      "has_contracts_marker": false
+    }
+  ]
+}

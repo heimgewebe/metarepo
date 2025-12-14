@@ -199,3 +199,16 @@ Heimgewebe bewertet grob seine eigenen Maßnahmen / Policies:
 - Fehlende Idee: Heimgewebe hat noch keinen inneren Sinnkreislauf.
 - Lösung: Vier Capabilities, die auf bestehende Organe aufsetzen.
 - Dokumentation: Ein gemeinsamer Capability-Plan statt verstreuter Einzeldokus.
+
+## Planned vs Implemented (machine-checkable)
+
+- **Liste der geplanten Defaults**:
+  - `profile`: `dev`
+  - `render`: `combined`
+  - `split_part_mb`: 25
+  - `max_file_bytes`: 0
+  - `features`: `Extras` (health, augment_sidecar, organism_index, fleet_panorama, json_sidecar, ai_heatmap)
+- **Definition, was als „implemented“ gilt (Beweisquellen)**:
+  - `.wgx/profile.yml` vorhanden
+  - CI minimal vorhanden (`.github/workflows/*.yml`)
+  - Contracts vorhanden oder marker „none by design“
