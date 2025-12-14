@@ -28,7 +28,7 @@ bridge_from_workspace() {
 main() {
   ensure_local_bin_on_path
 
-  if command -v wgx >/dev/null 2>&1; then
+  if command -v wgx > /dev/null 2>&1; then
     echo "WGX already available: $(command -v wgx)"
     exit 0
   fi
