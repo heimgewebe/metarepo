@@ -10,7 +10,12 @@
     "action": { "type": "string" },
     "score": { "type": "number" },
     "why": { "type": "string" },
-    "context": { "type": "object" }
+    "context": { "type": "object" },
+    "preimage_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Optional: Referenz auf einen Erkenntnis-Vorlauf (decision.preimage), z. B. Preimage-ID oder chronik-Ref. Siehe ADR-0022."
+    }
   },
   "additionalProperties": false
 }
