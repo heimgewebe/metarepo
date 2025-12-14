@@ -1,4 +1,6 @@
 name: fleet-doctor
+permissions:
+  contents: read
 
 on:
   push:
