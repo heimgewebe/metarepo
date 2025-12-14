@@ -40,6 +40,12 @@ jobs:
             --matrix docs/repo-matrix.md \
             --out-json reports/heimgewebe-readiness.json \
             --write-repos-txt fleet/repos.txt
+      - name: Display readiness report
+        run: |
+          echo "=== Readiness Report ==="
+          cat reports/heimgewebe-readiness.json
+          echo ""
       - name: Run hg-doctor (CI mode)
         run: |
+          set -x
           python scripts/fleet/doctor.py --report reports/heimgewebe-readiness.json --ci
