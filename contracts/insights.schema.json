@@ -4,6 +4,10 @@
   "title": "Heimgewebe Review Insight",
   "x-producers": ["semantAH"],
   "x-consumers": ["hausKI", "chronik"],
+  "x-related-adrs": ["docs/adrs/0022-erkenntnis-vorlauf-negationsspur.md"],
+  "x-todo": [
+    "Introduce a first-class negation/contrast insight type (insight.negation) and relations (thesis ⟂ antithesis) per ADR-0022. Keep it optional and threshold-driven."
+  ],
   "type": "object",
   "additionalProperties": false,
   "required": ["type","repo","source","file","score","verdict","ingested_at"],

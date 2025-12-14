@@ -68,6 +68,16 @@ Eigenschaften:
 - Negationen sind keine Blockaden, sondern alternative Deutungsräume.
 - Negationen werden nicht „aufgelöst“, sondern mitgeführt.
 
+---
+
+## 2.3 Beziehung zum Knowledge Observatory
+
+Das **Knowledge Observatory** (z. B. `knowledge.observatory`) ist ein breiter, periodischer Snapshot über semantische Lage, Signale und Drift.
+
+`decision.preimage` ist **kein Ersatz**, sondern ein **entscheidungsnaher Ausschnitt** daraus: minimal, referenzierbar, direkt an eine konkrete Entscheidung gekoppelt.
+
+Damit bleiben Observatorium und Entscheidungsvorlauf getrennt: *Beobachtung* (breit) vs. *Entscheidungsakt* (eng).
+
 Negationen können entstehen durch:
 
 - semantAH (automatische Gegenthese)
