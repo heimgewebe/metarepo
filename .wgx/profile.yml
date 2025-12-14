@@ -25,6 +25,16 @@ tasks:
   guard: |
     echo "Running meta-guard checks..."
 
+    # decision.preimage visibility guard (warn-only)
+    # - checks for policy.decision JSON objects missing preimage_ref
+    # - does NOT fail the build (yet)
+    if [ -x "wgx/guards/decision-preimage.bash" ]; then
+      echo "Running decision-preimage guard (warn-only)..."
+      ./wgx/guards/decision-preimage.bash || true
+    else
+      echo "decision-preimage guard not found; skipping."
+    fi
+
     if command -v shellcheck >/dev/null 2>&1; then
       echo "Running shellcheck on wgx/**/*.bash..."
       # bewusst fokussiert auf WGX-Bash-Module; bei Bedarf erweiterbar
