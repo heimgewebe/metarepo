@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.0",
+  "kind": "decision.preimage",
+  "id": "01JFM2V3Z7QY8F8M2GZ2ZVQK9A",
+  "ts": "2025-12-14T08:30:00Z",
+  "producer": "hausKI",
+  "decision": {
+    "decision_id": "01JFM2V3Z7QY8F8M2GZ2ZVQK9B",
+    "decision_type": "policy.update",
+    "scope": "heimlern",
+    "explain": "Wir ändern die Policy-Schwellenwerte, weil die letzten 7 Tage systematisch zu aggressiv gefiltert wurde."
+  },
+  "inputs": {
+    "events": [
+      "chronik:event.line:01JFM2RZ2Y0W0K9K5QJQK2WZ3X",
+      "chronik:event.line:01JFM2S1H0J2C4J9N7Y2W0A1BC"
+    ],
+    "insights": [
+      "semantAH:insights.daily:2025-12-13",
+      "semantAH:node:policy_drift_cluster_3"
+    ],
+    "negations": [
+      "semantAH:negation:alt_explanation_data_bias"
+    ],
+    "notes": "Konflikt: Nutzerfeedback widerspricht Telemetrie. Wir priorisieren Nutzerfeedback, markieren aber Datenlücke."
+  },
+  "alternatives": [
+    {
+      "alt_id": "A",
+      "label": "Nichts ändern",
+      "summary": "Policy bleibt unverändert, wir beobachten weiter.",
+      "score": 0.2,
+      "rejected_reason": "Zu viele false positives in der letzten Woche."
+    },
+    {
+      "alt_id": "B",
+      "label": "Schwellenwert anheben",
+      "summary": "Erhöht Toleranz gegenüber unsicheren Signalen, reduziert false positives.",
+      "score": 0.8
+    }
+  ],
+  "uncertainties": [
+    {
+      "topic": "Ursache der false positives",
+      "kind": "data_gap",
+      "cause": "Es fehlen repräsentative Samples aus dem iPad-Workflow; Logs sind unvollständig.",
+      "confidence": 0.55,
+      "impact": "high"
+    }
+  ],
+  "weights": {
+    "user_feedback_weight": 0.7,
+    "telemetry_weight": 0.3
+  },
+  "open_questions": [
+    "Sind die fehlenden Samples ein systematischer Bias oder ein einmaliger Ausfall?",
+    "Soll eine automatische Negationserzeugung erst ab Konfliktstufe 2 aktiviert werden?"
+  ],
+  "meta": {
+    "trace_id": "trace-9f2c3a1b",
+    "model": "unknown"
+  }
+}

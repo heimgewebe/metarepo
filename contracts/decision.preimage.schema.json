@@ -1,0 +1,182 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.heimgewebe.org/contracts/decision.preimage.schema.json",
+  "title": "decision.preimage",
+  "description": "Expliziter Erkenntnis-Vorlauf vor einer wirksamen Entscheidung. Dient Auditierbarkeit, Lernfähigkeit und Sichtbarkeit von Unsicherheit/Alternativen.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "description": "Version dieses Payload-Formats (nicht des JSON-Schema Drafts).",
+      "examples": ["1.0"]
+    },
+    "kind": {
+      "type": "string",
+      "const": "decision.preimage",
+      "description": "Konstante Kennung für diesen Event-Typ."
+    },
+    "id": {
+      "type": "string",
+      "minLength": 8,
+      "description": "Stabile ID dieses Preimage (z. B. ULID/UUID)."
+    },
+    "ts": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Zeitstempel ISO-8601 (UTC empfohlen)."
+    },
+    "producer": {
+      "type": "string",
+      "description": "Erzeugende Instanz (typisch: hausKI).",
+      "examples": ["hausKI"]
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Metadaten zur folgenden Entscheidung, auf die dieses Preimage vorbereitet.",
+      "properties": {
+        "decision_id": {
+          "type": "string",
+          "minLength": 8,
+          "description": "ID der Entscheidung, die dieses Preimage referenzieren soll (z. B. policy.decision.id)."
+        },
+        "decision_type": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Freier, aber konsistenter Typ/Name der Entscheidung (z. B. 'ingest.stream', 'policy.update')."
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Entscheidungs-Scope (Repo/Achse/Subsystem).",
+          "examples": ["hausKI", "semantAH", "heimlern", "chronik"]
+        },
+        "explain": {
+          "type": "string",
+          "description": "Kurze Begründung/Absicht in einem Satz (für Menschen lesbar).",
+          "maxLength": 2000
+        }
+      },
+      "required": ["decision_id", "decision_type", "scope"]
+    },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Relevante Eingänge (Events/Insights/sonstige Referenzen), aus denen der Vorlauf gespeist wurde.",
+      "properties": {
+        "events": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Referenzen auf Events (z. B. chronik IDs, URLs, Pfade)."
+        },
+        "insights": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Referenzen auf Insights/Reports/Graph-Knoten."
+        },
+        "negations": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Referenzen auf Negations-/Kontrastsignale (wenn vorhanden)."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Freitext für Kontext, der (noch) nicht strukturiert ist.",
+          "maxLength": 5000
+        }
+      },
+      "required": ["events", "insights"]
+    },
+    "alternatives": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Erkannte Alternativen (mindestens eine).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "alt_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Lokale Alternative-ID (kurz)."
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "summary": {
+            "type": "string",
+            "description": "Kurzbeschreibung der Alternative.",
+            "maxLength": 3000
+          },
+          "score": {
+            "type": "number",
+            "description": "Optionales Scoring (höher = besser, Konvention muss pro scope konsistent sein)."
+          },
+          "rejected_reason": {
+            "type": "string",
+            "description": "Warum diese Alternative verworfen wurde (falls verworfen).",
+            "maxLength": 3000
+          }
+        },
+        "required": ["alt_id", "label"]
+      }
+    },
+    "uncertainties": {
+      "type": "array",
+      "description": "Explizite Unsicherheiten inkl. Ursachenanalyse.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "topic": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Worauf bezieht sich die Unsicherheit?"
+          },
+          "kind": {
+            "type": "string",
+            "enum": ["data_gap", "ambiguity", "model_assumption", "conflict", "unknown_unknown"],
+            "description": "Kategorie der Unsicherheit."
+          },
+          "cause": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Ursachenbeschreibung (kurz, konkret).",
+            "maxLength": 3000
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Optional: subjektive Konfidenz (0..1)."
+          },
+          "impact": {
+            "type": "string",
+            "enum": ["low", "medium", "high"],
+            "description": "Optional: erwarteter Einfluss auf die Entscheidung."
+          }
+        },
+        "required": ["topic", "kind", "cause"]
+      }
+    },
+    "weights": {
+      "type": "object",
+      "description": "Gewichtungen/Heuristiken, die (explizit oder implizit) zur Auswahl geführt haben.",
+      "additionalProperties": true
+    },
+    "open_questions": {
+      "type": "array",
+      "description": "Offene Fragen, die nicht aufgelöst wurden, aber später wichtig sein können.",
+      "items": { "type": "string", "minLength": 1, "maxLength": 500 }
+    },
+    "meta": {
+      "type": "object",
+      "description": "Transport-/Debug-Metadaten (z. B. model, prompt_hash, trace ids).",
+      "additionalProperties": true
+    }
+  },
+  "required": ["schema_version", "kind", "id", "ts", "producer", "decision", "inputs", "alternatives"]
+}
