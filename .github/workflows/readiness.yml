@@ -1,4 +1,6 @@
 name: readiness
+permissions:
+  contents: read
 
 on:
   push:
