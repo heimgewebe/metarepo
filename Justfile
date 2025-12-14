@@ -21,6 +21,8 @@ help:
     @printf "  just validate      # Lokale Checks (Linting, Format, yq)\n"
     @printf "  just smoke         # Schneller Fleet-Integrationslauf\n"
     @printf "  just log-sync      # Report-Vorlage unter reports/sync-logs/\n"
+    @printf "  just fleet         # Fleet Readiness & Repos List generieren\n"
+    @printf "  just doctor        # Fleet Diagnose (Health Check)\n"
     @printf "\nWeitere Ziele: just --list\n"
 
 # --- Aliase -------------------------------------------------------------------
@@ -67,9 +69,6 @@ up:
 run target="smoke":
     just _wgx run {{target}}
 
-doctor:
-    just _wgx doctor
-
 wgx_validate:
     just _wgx validate
 
@@ -89,6 +88,33 @@ sync:
 
 log-sync *args:
     scripts/create-sync-log.py {{args}}
+
+# --- Fleet Utilities (New) -----------------------------------------------------
+
+# Generate fleet readiness report and derived fleet/repos.txt
+fleet:
+    @echo "→ Generating Heimgewebe fleet readiness and repos list"
+    @python scripts/fleet/generate_readiness.py \
+        --matrix docs/repo-matrix.md \
+        --out-json reports/heimgewebe-readiness.json \
+        --write-repos-txt fleet/repos.txt
+    @echo "✓ Done. See:"
+    @echo "  - reports/heimgewebe-readiness.json"
+    @echo "  - fleet/repos.txt"
+
+# Verify that fleet/repos.txt matches generated output exactly
+fleet-check:
+    @python scripts/fleet/verify_generated_repos_txt.py \
+        --matrix docs/repo-matrix.md \
+        --fleet fleet/repos.txt
+
+# Diagnose current fleet readiness from reports/heimgewebe-readiness.json
+doctor:
+    @python scripts/fleet/doctor.py --report reports/heimgewebe-readiness.json --generate-if-missing
+
+# Doctor in CI mode: returns nonzero on WARN/CRITICAL
+doctor-ci:
+    @python scripts/fleet/doctor.py --report reports/heimgewebe-readiness.json --generate-if-missing --ci
 
 # --- Fleet Push (Wave-1: agent-kit + contracts) --------------------------------
 # Voraussetzungen:
