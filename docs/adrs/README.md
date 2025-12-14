@@ -13,6 +13,7 @@ Kurzer Index der akzeptierten Entscheidungen:
 - [CI-Reusables & Pinning-Policy](./003-ci-reusables-pinning.md)
 - [.wgx/profile.yml v1 – Minimal-Schema](./004-wgx-profile-v1.md)
 - [Evidence-Packs & Link-Health](./005-evidence-linkhealth.md)
+- [ADR-0022: Erkenntnis-Vorlauf & Negationsspur als Systemprinzip](./0022-erkenntnis-vorlauf-negationsspur.md) — Proposed (2025-12-14)
 - [ADR-Template](./000-template.md)
 
 ## CI-Linting für ADRs
