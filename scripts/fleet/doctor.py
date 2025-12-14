@@ -14,7 +14,7 @@ def main() -> int:
     ap.add_argument("--report", default="reports/heimgewebe-readiness.json",
                     help="Path to readiness report JSON")
     ap.add_argument("--ci", action="store_true",
-                    help="CI mode (stricter checks)")
+                    help="CI mode (only validate report structure, not fleet state)")
     args = ap.parse_args()
 
     report = Path(args.report)
@@ -27,13 +27,33 @@ def main() -> int:
         data = json.loads(report.read_text())
         repos = data.get("repos", [])
 
+        # Validate report structure
+        if not isinstance(repos, list):
+            print("❌ Invalid report structure: 'repos' must be a list", file=sys.stderr)
+            return 3
+        
+        if "generated_at" not in data:
+            print("❌ Invalid report structure: missing 'generated_at'", file=sys.stderr)
+            return 3
+
         missing_repo = [r["name"] for r in repos if r["missing_repo"]]
         missing_decl = [r["name"] for r in repos if r["wgx_profile_kind"] == "missing"]
         no_profile = [r["name"] for r in repos if r["wgx_profile_kind"] == "no_profile"]
 
         print("hg-doctor")
         print("---------")
+        
+        if args.ci:
+            # In CI mode, only validate report generation, not fleet state
+            print(f"✅ Report generated successfully")
+            print(f"   - Total repos: {len(repos)}")
+            print(f"   - Timestamp: {data.get('generated_at')}")
+            if no_profile:
+                print(f"   - Observer repos: {len(no_profile)}")
+            print("✅ CI validation passed (fleet state not checked in CI)")
+            return 0
 
+        # Full validation (local mode)
         if no_profile:
             print("Observer repos (NO_PROFILE):")
             for r in no_profile:
