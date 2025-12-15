@@ -18,10 +18,12 @@ jobs:
     steps:
       - name: Collect failure context
         run: |
-          echo "repo=${{ github.repository }}" >> context.txt
-          echo "run_id=${{ github.event.workflow_run.id }}" >> context.txt
-          echo "workflow=${{ github.event.workflow_run.name }}" >> context.txt
-          echo "conclusion=failure" >> context.txt
+          {
+            echo "repo=${{ github.repository }}"
+            echo "run_id=${{ github.event.workflow_run.id }}"
+            echo "workflow=${{ github.event.workflow_run.name }}"
+            echo "conclusion=failure"
+          } >> context.txt
 
       - name: Call Jules API (analysis only)
         env:
