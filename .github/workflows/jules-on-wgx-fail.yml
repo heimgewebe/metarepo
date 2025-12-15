@@ -1,4 +1,6 @@
 name: jules-analysis-on-wgx-fail
+permissions:
+  contents: read
 
 on:
   workflow_run:
