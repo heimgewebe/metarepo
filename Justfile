@@ -51,7 +51,7 @@ org-graph:
     uv run scripts/generate_org_assets.py --repos-file repos.yml --graph docs/org-graph.mmd
 
 linkcheck:
-    docker run --rm -v $PWD:/work ghcr.io/lycheeverse/lychee:v0.14.3 \
+    docker run --rm -v $PWD:/work ghcr.io/lycheeverse/lychee:v0.15.1 \
       --config /work/.lychee.toml
 
 # --- Tasks --------------------------------------------------------------------
@@ -110,11 +110,13 @@ fleet-check:
 
 # Diagnose current fleet readiness from reports/heimgewebe-readiness.json
 doctor:
-    @python scripts/fleet/doctor.py --report reports/heimgewebe-readiness.json --generate-if-missing
+    @[ -f reports/heimgewebe-readiness.json ] || just fleet
+    @python scripts/fleet/doctor.py --report reports/heimgewebe-readiness.json
 
 # Doctor in CI mode: returns nonzero on WARN/CRITICAL
 doctor-ci:
-    @python scripts/fleet/doctor.py --report reports/heimgewebe-readiness.json --generate-if-missing --ci
+    @[ -f reports/heimgewebe-readiness.json ] || just fleet
+    @python scripts/fleet/doctor.py --report reports/heimgewebe-readiness.json --ci
 
 # --- Fleet Push (Wave-1: agent-kit + contracts) --------------------------------
 # Voraussetzungen:
