@@ -22,7 +22,7 @@ sind dort verankert.
 Das **metarepo** ist die Quelle der Wahrheit für:
 
 - **Templates** – Gemeinsame Workflows, Justfiles, Docs und WGX-Profile unter `templates/`
-- **Contracts** – JSON-Schemas und OpenAPI-Specs unter `contracts/`
+- **Contracts** – JSON-Schemas und OpenAPI-Specs unter `contracts/` (siehe [Routing](docs/contracts-routing.md))
 - **Reusable Workflows** – Wiederverwendbare CI-Pipelines unter `.github/workflows/reusable-*.yml`
 - **Fleet-Management** – Zentrale Konfiguration aller Heimgewebe-Repos in `repos.yml`
 
