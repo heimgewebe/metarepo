@@ -65,7 +65,7 @@ jobs:
           echo "Agent-Mode: skipping external POST to hausKI"
 
       - name: Upload metrics.json artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: metrics-snapshot
           path: metrics.json

@@ -17,7 +17,7 @@ jobs:
       - name: Generate readiness
         run: python scripts/fleet/generate_readiness.py
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: heimgewebe-readiness
           path: reports/heimgewebe-readiness.json
