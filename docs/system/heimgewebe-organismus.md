@@ -40,7 +40,7 @@ Jede Komponente ist mit einem der drei Labels markiert:
   (z. B. `event.line`, `insights.daily`, `fleet.health`) liegen im Metarepo
   unter `contracts/*.schema.json`.
 - (IST) Externe API-Contracts (z. B. `aussen/v1`, `heimlern/v1`) werden
-  im `contract-spiegel`-Repo als Protobuf + JSON-Mirror bereitgestellt.
+  im `contracts-mirror`-Repo als Protobuf + JSON-Mirror bereitgestellt.
 - (IST) Rust-Crates, Python-Module und Skripte nutzen diese Contracts
   explizit (z. B. hausKI, heimlern, aussensensor).
 - (POLICY) „Contracts first“: Neue Formate werden zuerst als Schema
@@ -97,11 +97,11 @@ Jede Komponente ist mit einem der drei Labels markiert:
 
 ---
 
-## 2.2 contract-spiegel – externe API-Schnittstellen
+## 2.2 contracts-mirror – externe API-Schnittstellen
 
 - (IST) Spiegelt formale API-Schemas für Außenweltkommunikation (`aussen/v1`, `heimlern/v1`, weitere Protobuf-Schnittstellen).
 - (ZIEL) Alle externen Systeme sprechen ausschließlich über hier gespiegelte Schnittstellen.
-- (POLICY) Innen-Contracts = metarepo; externe API = contract-spiegel (als Spiegel).
+- (POLICY) Innen-Contracts = metarepo; externe API = contracts-mirror (als Spiegel).
 
 **Kommunikation:** außen nach innen; genutzt von hausKI, aussensensor, heimlern.
 
@@ -302,7 +302,7 @@ Die Kraft des Systems entsteht aus ihrer Interaktion, nicht aus einer einzelnen 
 | Repo           | A: Code & Contracts | B: Events (Fakten) | C: Commands (Intention) | D: WGX (Motorik) | OS-Kontext | Kommentar                                                                 |
 |----------------|---------------------|---------------------|--------------------------|------------------|-----------|---------------------------------------------------------------------------|
 | metarepo       | T                   | T                   | T                        | T                | –         | Definiert interne Contracts, Policies, WGX-Templates                      |
-| contract-spiegel | T                 | –                   | –                        | –                | –         | Spiegelt externe API-Schemas (aussen/v1, heimlern/v1, …)                 |
+| contracts-mirror | T                 | –                   | –                        | –                | –         | Spiegelt externe API-Schemas (aussen/v1, heimlern/v1, …)                 |
 | wgx            | C                   | P/C (Metrik-Events) | P (indirekt)             | Kern             | –         | Steuert Fleet-Kommandos, erzeugt Metriken/Fleet-Health                    |
 | chronik        | C                   | P/C                 | I                        | I                | C         | Zentraler Event-Store, nimmt viele Linien auf                             |
 | aussensensor   | C                   | P                   | –                        | I                | –         | Wandelt externe Feeds in aussen.event.* und schreibt nach chronik        |
@@ -323,8 +323,8 @@ Die Kraft des Systems entsteht aus ihrer Interaktion, nicht aus einer einzelnen 
 **Mini-Erläuterungen pro Achse**
 
 - **Achse A – Code & Contracts**
-  Starke Knoten: `metarepo`, `contract-spiegel`, `hausKI`, `heimlern`, `aussensensor`, `semantAH`, `wgx`.
-  Sprach- und Strukturmacht liegt beim Metarepo. `contract-spiegel` dient als Validierungsanker.
+  Starke Knoten: `metarepo`, `contracts-mirror`, `hausKI`, `heimlern`, `aussensensor`, `semantAH`, `wgx`.
+  Sprach- und Strukturmacht liegt beim Metarepo. `contracts-mirror` dient als Validierungsanker.
 
 - **Achse B – Events (Fakten)**
   Stark produzierend: `aussensensor`, `hausKI-audio`, `mitschreiber`, `wgx`, `sichter`, `heimgeist` (perspektivisch).

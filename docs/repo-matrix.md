@@ -10,7 +10,7 @@ Dies ist **nicht die gesamte Organisation**, sondern nur die operative Fleet.
 |-------------------|-------------------------------------|--------|
 | metarepo          | Control-Plane, Templates, Contracts | yes    |
 | wgx               | Fleet-CLI / Motorik                  | yes    |
-| contract-spiegel  | Schema-Definitionen für Events/Tools | yes    |
+| contracts-mirror  | Schema-Definitionen für Events/Tools | yes    |
 | hausKI            | KI-Orchestrator (Rust)               | yes    |
 | hausKI-audio      | Audio-Schicht                        | yes    |
 | heimlern          | Lern-/Policy-Schicht                 | yes    |

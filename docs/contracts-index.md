@@ -96,7 +96,7 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
 
 ## 2. Contracts-Repo (offizielle APIs)
 
-Repository: **heimgewebe/contract-spiegel**
+Repository: **heimgewebe/contracts-mirror**
 
 ### 2.1 Protobuf-APIs
 
@@ -198,7 +198,7 @@ Zweck:
 ## 4. Neuen Contract anlegen – Minimalvorlage
 
 Für neue JSON-Schemas im Heimgewebe sollte sich an folgendem Muster orientiert werden
-(vereinfacht, **tatsächliche Konventionen siehe `contracts/SCHEMA_CONVENTIONS.md` im contract-spiegel-Repo**):
+(vereinfacht, **tatsächliche Konventionen siehe `contracts/SCHEMA_CONVENTIONS.md` im contracts-mirror-Repo**):
 
 ```json
 {

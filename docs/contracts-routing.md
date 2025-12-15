@@ -4,6 +4,6 @@
 - **JSON Schemas**: `metarepo/contracts/`
 
 ## Mirrors & Validation
-- **Repo**: `contract-spiegel/`
+- **Repo**: `contracts-mirror/`
   Dieses Repository dient ausschließlich als Spiegel und Validierungsumgebung.
   Es ist **nicht** normativ.

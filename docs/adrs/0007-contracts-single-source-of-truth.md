@@ -10,7 +10,7 @@ Betroffene Repos:
 - heimgewebe/heimlern
 - heimgewebe/hausKI
 - heimgewebe/sichter
-- heimgewebe/contract-spiegel (als Werkzeug- bzw. Spiegel-Repo)
+- heimgewebe/contracts-mirror (als Werkzeug- bzw. Spiegel-Repo)
 
 ---
 
@@ -26,7 +26,7 @@ Heimgewebe nutzt in mehreren Repos JSON-Schemas und andere Contracts, zum Beispi
 Historisch sind Contracts an mehreren Stellen gleichzeitig aufgetaucht:
 
 - im `metarepo` unter `contracts/`,
-- im separaten Repo `heimgewebe/contract-spiegel` (ehemals `contracts`),
+- im separaten Repo `heimgewebe/contracts-mirror` (ehemals `contracts`),
 - als Kopien in Domain-Repos (z. B. `aussensensor/contracts/`, `chronik/docs/`).
 
 Das führt zu typischen Drift-Risiken:
@@ -63,9 +63,9 @@ Diese Realität soll jetzt formalisiert werden.
    Jede fachliche Änderung an einem Contract muss über einen PR im `metarepo`
    erfolgen und von dort aus synchronisiert werden.
 
-**2.2 Rolle des `heimgewebe/contract-spiegel` Repos**
+**2.2 Rolle des `heimgewebe/contracts-mirror` Repos**
 
-4. Das Repo `heimgewebe/contract-spiegel` verliert die Rolle einer eigenständigen fachlichen Quelle.
+4. Das Repo `heimgewebe/contracts-mirror` verliert die Rolle einer eigenständigen fachlichen Quelle.
    Es wird künftig:
    - entweder als reines Tooling-/Mirror-Repo genutzt (z. B. Ajv-CLI, Prototypen),
    - oder langfristig archiviert.
@@ -138,7 +138,7 @@ genutzt werden – aber es bestimmt nicht mehr den fachlichen Stand der Contract
 
 **4.3 Langfristig**
 
-- Optionales „Downgrade“ von `heimgewebe/contract-spiegel` zu:
+- Optionales „Downgrade“ von `heimgewebe/contracts-mirror` zu:
   - Mirror-Repo (nur automatisiert befüllt),
   - oder Archiv-Repo (read-only).
 
@@ -170,7 +170,7 @@ genutzt werden – aber es bestimmt nicht mehr den fachlichen Stand der Contract
 4. Nach und nach:
    - Domain-Repos umstellen,
    - CI-Checks ergänzen,
-   - `heimgewebe/contract-spiegel`-Repo in Doku neu verorten.
+   - `heimgewebe/contracts-mirror`-Repo in Doku neu verorten.
 
 ---
 
