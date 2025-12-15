@@ -16,7 +16,7 @@ graph: deps
 	$(ORG_GENERATOR) --graph docs/org-graph.mmd
 
 linkcheck:
-	docker run --rm -v $$(pwd):/work ghcr.io/lycheeverse/lychee:v0.14.3 --config /work/.lychee.toml
+	docker run --rm -v $$(pwd):/work ghcr.io/lycheeverse/lychee:v0.15.1 --config /work/.lychee.toml
 
 fleet:
 	@echo "→ Generating Heimgewebe fleet readiness and repos list"
@@ -32,7 +32,9 @@ fleet-check:
 		--fleet fleet/repos.txt
 
 doctor:
-	@python scripts/fleet/doctor.py --report reports/heimgewebe-readiness.json --generate-if-missing
+	@[ -f reports/heimgewebe-readiness.json ] || $(MAKE) fleet
+	@python scripts/fleet/doctor.py --report reports/heimgewebe-readiness.json
 
 doctor-ci:
-	@python scripts/fleet/doctor.py --report reports/heimgewebe-readiness.json --generate-if-missing --ci
+	@[ -f reports/heimgewebe-readiness.json ] || $(MAKE) fleet
+	@python scripts/fleet/doctor.py --report reports/heimgewebe-readiness.json --ci
