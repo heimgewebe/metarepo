@@ -188,14 +188,6 @@ download_yq() {
           else
             log "WARN: Berechneter Hash ${my_sum} nicht in Checksum-Zeile gefunden."
           fi
-        elif command -v shasum > /dev/null 2>&1; then
-          local my_sum
-          my_sum=$(shasum -a 256 "${tmp}" | awk '{print $1}')
-          if echo "${checksum_line}" | grep -q "${my_sum}"; then
-            expected_sum="${my_sum}"
-          else
-            log "WARN: Berechneter Hash ${my_sum} nicht in Checksum-Zeile gefunden."
-          fi
         elif command -v python3 > /dev/null 2>&1; then
           log "Using Python3 fallback for SHA256 checksum..."
           local my_sum

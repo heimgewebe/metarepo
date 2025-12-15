@@ -34,7 +34,7 @@ def utc_now_iso() -> str:
 
 
 def detect_org_root() -> Path:
-    env = os.environ.get("HG_ROOT") or os.environ.get("HEIMGEBEWE_ROOT") or os.environ.get("HEIMGEWEBE_ROOT")
+    env = os.environ.get("HG_ROOT") or os.environ.get("HEIMGEWEBE_ROOT")
     if env:
         return Path(env).expanduser().resolve()
     # assume: <org_root>/metarepo/scripts/fleet/generate_readiness.py
