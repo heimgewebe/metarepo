@@ -1,0 +1,51 @@
+name: jules-analysis-on-wgx-fail
+permissions:
+  contents: read
+
+on:
+  workflow_run:
+    workflows:
+      - wgx-guard
+      - wgx-smoke
+    types:
+      - completed
+
+jobs:
+  jules-analysis:
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Collect failure context
+        run: |
+          {
+            echo "repo=${{ github.repository }}"
+            echo "run_id=${{ github.event.workflow_run.id }}"
+            echo "workflow=${{ github.event.workflow_run.name }}"
+            echo "conclusion=failure"
+          } >> context.txt
+
+      - name: Call Jules API (analysis only)
+        env:
+          JULES_API_KEY: ${{ secrets.JULES_API_KEY }}
+        run: |
+          curl -s https://jules.googleapis.com/v1/agents:run \
+            -H "Authorization: Bearer $JULES_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "agent": "analysis",
+              "input": {
+                "task": "Analyze CI failure. Do NOT propose fixes. Do NOT create PRs. Return root cause hypotheses and missing info only.",
+                "context": {
+                  "repository": "'"${{ github.repository }}"'",
+                  "workflow": "'"${{ github.event.workflow_run.name }}"'",
+                  "run_id": "'"${{ github.event.workflow_run.id }}"'"
+                }
+              }
+            }' > jules-output.json
+
+      - name: Persist analysis artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: jules-analysis
+          path: jules-output.json
