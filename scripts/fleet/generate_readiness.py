@@ -117,7 +117,11 @@ def main() -> int:
 
     repos: List[RepoReadiness] = []
     for name in fleet:
-        rp = org_root / name
+        if name == "metarepo":
+            rp = metarepo_root
+        else:
+            rp = org_root / name
+
         if not rp.exists():
             repos.append(
                 RepoReadiness(
