@@ -51,7 +51,7 @@ compute_target() {
     darwin)
       case "$arch" in
         x86_64) echo "x86_64-apple-darwin" ;;
-        arm64|aarch64) echo "aarch64-apple-darwin" ;;
+        arm64 | aarch64) echo "aarch64-apple-darwin" ;;
         *) die "Arch $arch not supported for darwin" ;;
       esac
       ;;
@@ -96,7 +96,7 @@ download_tool() {
   local checksum_candidates=("SHA256SUMS" "checksums.txt" "checksums")
   local checksum_found=false
   for cand in "${checksum_candidates[@]}"; do
-    if curl -fSL --retry 3 --connect-timeout 10 "${checksum_base}/${cand}" -o "${tmp_checksum}" 2>/dev/null; then
+    if curl -fSL --retry 3 --connect-timeout 10 "${checksum_base}/${cand}" -o "${tmp_checksum}" 2> /dev/null; then
       log "Checksummen geladen: ${cand}"
       checksum_found=true
       break
