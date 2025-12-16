@@ -14,7 +14,7 @@ WGX_OWNER="${WGX_OWNER:-${GITHUB_OWNER:-}}"
 _tmp_dirs=()
 cleanup() {
   local d
-  for d in "${_tmp_dirs[@]:-}"; do [[ -n "$d" && -e "$d" ]] && rm -rf -- "$d"; done
+  for d in "${_tmp_dirs[@]}"; do [[ -n "$d" && -e "$d" ]] && rm -rf -- "$d"; done || true
 }
 trap cleanup EXIT INT TERM
 
