@@ -14,7 +14,7 @@ Dieses Verzeichnis bündelt zwei Ebenen:
 Weitere Umsetzung:
 - **Fleet-Rollout:** [`../fleet/push-to-fleet.md`](../fleet/push-to-fleet.md)
 - **Agent-Contracts:** `contracts/agent.tool.schema.json`
-- **Intent-Events:** `contracts/intent.event.schema.json`
+- **Intent-Events:** `contracts/intent_event.schema.json`
 
 ## Navigationshilfe
 - Einstieg operativ: *Executive Summary* → Just-Targets → Fleet-Push.

@@ -48,7 +48,7 @@ just fleet.push-all
 3. Kopieren:
    - `templates/agent-kit/**` → `<repo>/templates/agent-kit/**`
    - `contracts/agent.tool.schema.json` → `<repo>/contracts/agent.tool.schema.json`
-   - **wenn Repo = `chronik`**: zusätzlich `contracts/intent.event.schema.json`
+   - **wenn Repo = `chronik`**: zusätzlich `contracts/intent_event.schema.json`
 4. Commit & Push
 5. PR eröffnen (Label: `fleet/wave-1`)
 
