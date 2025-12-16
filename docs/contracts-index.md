@@ -28,7 +28,7 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
   - Zweck: standardisierte Außen-Events, bevor sie in die interne Event-Landschaft aufgenommen werden.
 - `audio.events.schema.json`
   - Zweck: Audio-bezogene Ereignisse (z. B. Aufnahmen, Transkriptionen, TTS).
-- `intent_event.schema.json`
+- `intent.event.schema.json`
   - Zweck: Intent-Events aus Audio/Text für chronik/hausKI (Intent-Erkennung mit Confidence).
 
 ### 1.2 Fleet & Metriken

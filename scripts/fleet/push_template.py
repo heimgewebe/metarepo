@@ -19,7 +19,7 @@ PR_BODY = textwrap.dedent("""\
 
   - add `templates/agent-kit/**`
   - add `contracts/agent.tool.schema.json`
-  - add `contracts/intent_event.schema.json` (chronik only)
+  - add `contracts/intent.event.schema.json` (chronik only)
   - docs: linked from metarepo
 
   Fleet wave-1 rollout. Label: `fleet/wave-1`.
@@ -131,7 +131,7 @@ def determine_copies(paths: list[str], repo_name: str) -> list[tuple[Path, Path]
             for f in src.glob("*.schema.json"):
                 if f.name == "agent.tool.schema.json":
                     copies.append((f, Path("contracts") / f.name))
-                if f.name == "intent_event.schema.json" and repo_name.endswith("/chronik"):
+                if f.name == "intent.event.schema.json" and repo_name.endswith("/chronik"):
                     copies.append((f, Path("contracts") / f.name))
         else:
             # default: mirror relative path
