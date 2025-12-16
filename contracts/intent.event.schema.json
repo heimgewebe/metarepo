@@ -1,6 +1,6 @@
 {
   "$schema":"https://json-schema.org/draft/2020-12/schema",
-  "$id":"https://schemas.heimgewebe.org/intent_event.schema.json",
+  "$id":"https://schemas.heimgewebe.org/intent.event.schema.json",
   "title":"Intent Event",
   "description":"Audio/Text → Intent-Event für chronik/hausKI.",
   "type":"object",
