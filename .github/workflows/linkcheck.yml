@@ -31,12 +31,10 @@ jobs:
     steps:
       # Für Core-Actions nutzen wir stabile Major-Tags statt SHAs, um 404-Risiken zu vermeiden.
       - uses: actions/checkout@v6  # v4 (major tag)
-      - name: Install system dependencies for lychee
-        run: sudo apt-get update && sudo apt-get install -y jq
       - name: Install lychee
         run: |
-          chmod +x scripts/tools/lychee-install.sh
-          ./scripts/tools/lychee-install.sh ensure
+          chmod +x scripts/tools/lychee-pin.sh
+          ./scripts/tools/lychee-pin.sh ensure
           echo "${PWD}/tools/bin" >> "$GITHUB_PATH"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
