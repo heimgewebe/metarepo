@@ -38,7 +38,9 @@ cmd_agent() {
         exit 2
       fi
       if [[ -z "$runfile" ]]; then
-        runfile=$(find .agents/runs -name '*.jsonl' -print0 | xargs -0 ls -1t | head -n1 || true)
+        if [[ -d ".agents/runs" ]]; then
+          runfile=$(find .agents/runs -name '*.jsonl' -print0 | xargs -0 ls -1t | head -n1 || true)
+        fi
         [[ -n "$runfile" ]] || {
           echo "Kein Run gefunden unter .agents/runs/*.jsonl"
           exit 2
