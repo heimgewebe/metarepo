@@ -44,14 +44,18 @@ require_cmd() {
 }
 
 read_pinned_version() {
-  local version
+  local version=""
   if [[ -x "${YQ_LOCAL}" ]]; then
     version=$("${YQ_LOCAL}" '.yq' "${ROOT_DIR}/toolchain.versions.yml" 2> /dev/null || true)
   elif have_cmd yq; then
     version=$(yq '.yq' "${ROOT_DIR}/toolchain.versions.yml" 2> /dev/null || true)
   fi
-  if [[ -z "${version}" ]]; then
-    version=$(grep -E '^\s*yq:' "${ROOT_DIR}/toolchain.versions.yml" | sed -E 's/^\s*yq:\s*["'\'']?([^"'\'']+)["'\'']?/\1/' | xargs)
+
+  if [[ -z "${version}" ]] || [[ "${version}" == "null" ]]; then
+    # Parse version from toolchain.versions.yml robustly:
+    version=$(grep -E '^\s*yq:' "${ROOT_DIR}/toolchain.versions.yml" |
+      sed -E 's/^\s*[^:]+:\s*//; s/#.*$//; s/^[[:space:]]*//; s/[[:space:]]*$//; s/^"//; s/"$//; s/^'\''//; s/'\''$//' |
+      tr -d '\n\r')
   fi
   if [[ -z "${version}" ]]; then
     die "Konnte gewünschte yq-Version aus toolchain.versions.yml nicht ermitteln."

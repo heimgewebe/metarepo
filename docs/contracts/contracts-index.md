@@ -51,6 +51,8 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
 
 ### 1.4 Policy-Kreislauf
 
+- `decision.preimage.schema.json`
+  - Zweck: expliziter Erkenntnis-Vorlauf vor einer wirksamen Entscheidung – dient Auditierbarkeit, Lernfähigkeit und Sichtbarkeit von Unsicherheit/Alternativen.
 - `policy.decision.schema.json`
   - Zweck: formalisierte Entscheidungen (wer/was hat entschieden, mit welcher Option).
 - `policy.feedback.schema.json`
