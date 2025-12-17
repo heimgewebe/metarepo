@@ -3,7 +3,7 @@ ai_context_version: 1.1
 
 project:
   name: contracts-mirror
-  summary: External API schemas (protobuf) + JSON mirror; source-of-truth lives outside metarepo.
+  summary: External API schemas (protobuf) + JSON mirror; used across the fleet.
   role: contracts_external_api
   primary_language: mixed
   visibility: internal
@@ -19,20 +19,15 @@ heimgewebe:
 interfaces:
   consumes: []
   produces:
-    - "aussen/v1 protobuf"
-    - "heimlern/v1 protobuf"
-    - "JSON schema mirror"
-
-contracts:
-  schemas:
-    - path: "contracts/*.schema.json"
-      note: "This is the mirror. Canonical internal contracts live in metarepo/contracts."
+    - "aussen/v1"
+    - "heimlern/v1"
+    - "contracts/*.schema.json (mirror)"
 
 boundaries:
   not_responsible_for:
-    - "Internal-only contracts (metarepo)."
+    - "Internal contract constitution (metarepo/contracts)."
   dangerous_assumptions:
-    - "Confuse 'contracts' with 'contracts-mirror'. Verify repo name."
+    - "Use old repo name 'contracts' in automation; must be 'contracts-mirror'."
 
 conventions:
   branching: "main, feature/*, hotfix/*"
