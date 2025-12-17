@@ -1,6 +1,6 @@
 metarepo
 wgx
-contracts
+contracts-mirror
 hausKI
 hausKI-audio
 heimlern
@@ -10,6 +10,6 @@ chronik
 tools
 mitschreiber
 sichter
-leitstand
 heimgeist
 plexer
+leitstand
