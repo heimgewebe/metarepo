@@ -149,6 +149,7 @@ fleet-push-all:
 # Local CI
 validate: yq_ensure lint
     scripts/ci/validate-local.sh
+    @if [ -d tests ]; then echo "Running python tests..."; uv run pytest tests/; fi
     @printf "Running actionlint...\n"
     @scripts/tools/actionlint-pin.sh ensure
     @actionlint -color || (echo "::error::actionlint failed" && exit 1)
