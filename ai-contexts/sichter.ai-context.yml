@@ -1,5 +1,5 @@
 ---
-ai_context_version: 1.0
+ai_context_version: 1.1
 
 project:
   name: sichter
@@ -8,30 +8,56 @@ project:
   primary_language: mixed
   visibility: internal
 
+heimgewebe:
+  axis: [Motorik, Contracts, Decisions]
+  fleet:
+    enabled: true
+  wgx:
+    profile_expected: true
+    guard_smoke_expected: true
+
+interfaces:
+  consumes:
+    - "repolens-agent/v1 snapshots"
+    - "policies"
+    - "validation_schemas"
+  produces:
+    - "quality findings (machine-readable)"
+
+contracts:
+  schemas:
+    - path: "contracts/*.schema.json"
+      note: "Validate against canonical contracts."
+
 dependencies:
   internal:
-    - name: contracts
+    - name: wgx
       relationship: uses
-      interface:
-        - policies
-        - validation_schemas
-    - name: heimlern
+      interface: [cli, guard]
+    - name: metarepo
       relationship: uses
-      interface:
-        - quality_scores
+      interface: [policies, contracts]
   external:
     - name: ajv-cli
 
+boundaries:
+  not_responsible_for:
+    - "Defining canonical schemas (metarepo/contracts do that)."
+    - "Mutating repos; it only reports findings."
+  dangerous_assumptions:
+    - "Treat style as policy without explicit rule."
+
 architecture:
   entrypoints:
-    - cli/*
+    - "scripts/validate-contracts.sh"
+    - ".github/workflows/validate.yml"
   key_paths:
-    - path: checks/
-      purpose: rulesets & validators
+    - path: "policies/"
+      purpose: "Define what is allowed"
   data_flow:
-    input: artifacts from repos
-    processing: policy + schema checks
-    output: approve/block
+    input: "PR diff / content"
+    processing: "validation against policies/contracts"
+    output: "Pass/Fail + Comments"
 
 conventions:
   branching: "main, feature/*"
