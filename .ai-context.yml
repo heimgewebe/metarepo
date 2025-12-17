@@ -1,6 +1,9 @@
 ---
 ai_context_version: 1.1
 
+# Repo-specific AI context.
+# Do NOT copy this file unchanged into other repos; adjust project.name/role/paths first.
+
 project:
   name: metarepo
   summary: Architecture source + internal contract constitution + templates/policies.

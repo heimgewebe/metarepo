@@ -39,8 +39,7 @@ dependencies:
     - name: vault-gewebe
       relationship: uses
       interface: [notes]
-  external:
-    - name: python
+  external: []
 
 boundaries:
   not_responsible_for:

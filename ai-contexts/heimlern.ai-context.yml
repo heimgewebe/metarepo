@@ -38,8 +38,7 @@ dependencies:
     - name: semantah
       relationship: uses
       interface: [insights_api]
-  external:
-    - name: python
+  external: []
 
 boundaries:
   not_responsible_for:

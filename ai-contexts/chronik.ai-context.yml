@@ -34,8 +34,7 @@ dependencies:
       relationship: uses
       interface:
         - schema_validation
-  external:
-    - name: postgres
+  external: []
 
 architecture:
   entrypoints:

@@ -33,8 +33,7 @@ dependencies:
     - name: chronik
       relationship: writes
       interface: [event_line_append]
-  external:
-    - name: python
+  external: []
 
 boundaries:
   not_responsible_for:

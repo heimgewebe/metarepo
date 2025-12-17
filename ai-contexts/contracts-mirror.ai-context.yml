@@ -31,7 +31,7 @@ boundaries:
 
 conventions:
   branching: "main, feature/*, hotfix/*"
-  commit_prefix: "contracts"
+  commit_prefix: "contracts-mirror"
   ci_platform: github_actions
 
 documentation:

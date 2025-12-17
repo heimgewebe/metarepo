@@ -40,9 +40,7 @@ dependencies:
       relationship: uses
       interface:
         - event_query
-  external:
-    - name: rust
-    - name: node
+  external: []
 
 boundaries:
   not_responsible_for:

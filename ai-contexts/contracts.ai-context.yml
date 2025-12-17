@@ -1,6 +1,10 @@
 ---
 ai_context_version: 1.1
 
+# COMPATIBILITY SHIM / ALIAS
+# Canonical file: ai-contexts/contracts-mirror.ai-context.yml
+# Do not update this file except to keep the alias pointing to canonical truth.
+
 project:
   name: contracts-mirror
   summary: External API schemas (protobuf) + JSON mirror; source-of-truth lives outside metarepo.
