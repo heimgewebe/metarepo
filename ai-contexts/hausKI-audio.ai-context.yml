@@ -1,38 +1,48 @@
 ---
-ai_context_version: 1.0
+ai_context_version: 1.1
 
 project:
   name: hausKI-audio
-  summary: Audio capture, VAD/ASR pipeline, and event emission.
-  role: audio_to_text_events
+  summary: Audio sidecar for hausKI; emits audio.event.* and related artifacts.
+  role: capability_audio
   primary_language: mixed
   visibility: internal
 
+heimgewebe:
+  axis: [Decisions, Events]
+  fleet:
+    enabled: true
+  wgx:
+    profile_expected: true
+    guard_smoke_expected: true
+
+interfaces:
+  consumes:
+    - "audio inputs"
+    - "hausKI intents"
+  produces:
+    - "audio.event.*"
+    - "artifacts for downstream agents"
+
+contracts:
+  schemas:
+    - path: "contracts/*.schema.json"
+      note: "Audio events must remain contract-valid."
+
 dependencies:
   internal:
-    - name: contracts
-      relationship: uses
-      interface:
-        - audio_events_schema
     - name: chronik
-      relationship: uses
-      interface:
-        - event_ingest
-  external:
-    - name: ffmpeg
-    - name: whisper.cpp
-      note: optional
+      relationship: writes
+      interface: [event_line_append]
+  external: []
+  # NOTE: 'external: []' means "not verified from metarepo context".
+  # Prefer 'unknown' over false precision; verify in repo before asserting tech stack.
 
-architecture:
-  entrypoints:
-    - cli/*
-  key_paths:
-    - path: pipeline/
-      purpose: VAD + ASR + packaging
-  data_flow:
-    input: mic/streams
-    processing: segment → transcribe → package
-    output: JSONL events
+boundaries:
+  not_responsible_for:
+    - "Canonical orchestration (hausKI does that)."
+  dangerous_assumptions:
+    - "Write events without chronik validation."
 
 conventions:
   branching: "main, feature/*"

@@ -1,38 +1,52 @@
 ---
-ai_context_version: 1.0
+ai_context_version: 1.1
 
 project:
   name: heimlern
-  summary: Learning/feedback loops over events, scoring & policies.
-  role: analytics_and_policy_feedback
-  primary_language: python
+  summary: Pattern learning + policy adaptation based on chronik events and semantAH insights.
+  role: learning_policy
+  primary_language: mixed
   visibility: internal
+
+heimgewebe:
+  axis: [Learning, Decisions]
+  fleet:
+    enabled: true
+  wgx:
+    profile_expected: true
+    guard_smoke_expected: true
+
+interfaces:
+  consumes:
+    - "event.line (chronik)"
+    - "insights.* (semantAH)"
+    - "policy.feedback"
+  produces:
+    - "policy.snapshot"
+    - "policy.feedback (derived)"
+
+contracts:
+  schemas:
+    - path: "contracts/*.schema.json"
+      note: "Policy loop must stay schema-bound; no silent drift."
 
 dependencies:
   internal:
     - name: chronik
       relationship: uses
-      interface:
-        - event_feed
-        - metrics
-    - name: contracts
+      interface: [event_query]
+    - name: semantah
       relationship: uses
-      interface:
-        - json_schema
-  external:
-    - name: pydantic
-    - name: pandas
+      interface: [insights_api]
+  external: []
+  # NOTE: 'external: []' means "not verified from metarepo context".
+  # Prefer 'unknown' over false precision; verify in repo before asserting tech stack.
 
-architecture:
-  entrypoints:
-    - src/main.py
-  key_paths:
-    - path: src/scoring/
-      purpose: quality scoring & policy checks
-  data_flow:
-    input: events/metrics from chronik
-    processing: scoring + feedback
-    output: reports, signals
+boundaries:
+  not_responsible_for:
+    - "Executing actions (wgx/hausKI)."
+  dangerous_assumptions:
+    - "Treat correlations as decisions without feedback loop."
 
 conventions:
   branching: "main, feature/*"

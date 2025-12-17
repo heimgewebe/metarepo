@@ -1,39 +1,57 @@
 ---
-ai_context_version: 1.0
+ai_context_version: 1.1
 
 project:
   name: chronik
-  summary: Event ingest and processing hub.
-  role: central_event_store
-  primary_language: rust
+  summary: Append-only event memory; stores event.line as the system backbone.
+  role: event_store
+  primary_language: mixed
   visibility: internal
+
+heimgewebe:
+  axis: [Events, Contracts]
+  fleet:
+    enabled: true
+  wgx:
+    profile_expected: true
+    guard_smoke_expected: true
+
+interfaces:
+  consumes:
+    - "event.line (validated)"
+  produces:
+    - "event queries/streams"
+    - "snapshots for semantAH/hausKI"
+
+contracts:
+  schemas:
+    - path: "contracts/*.schema.json"
+      note: "event.line is canonical backbone; be strict."
 
 dependencies:
   internal:
-    - name: contracts
+    - name: contracts-mirror
       relationship: uses
       interface:
-        - json_schema
-        - proto
-  external:
-    - name: tokio
-      version: "1.x"
-    - name: serde
-    - name: serde_json
-    - name: tracing
+        - schema_validation
+  external: []
+  # NOTE: 'external: []' means "not verified from metarepo context".
+  # Prefer 'unknown' over false precision; verify in repo before asserting tech stack.
 
 architecture:
   entrypoints:
-    - src/main.rs
+    - cmd/*
   key_paths:
-    - path: src/ingest/
-      purpose: HTTP ingest + validation
-    - path: src/pipeline/
-      purpose: event processing
-  data_flow:
-    input: HTTP POST /ingest/*
-    processing: JSON Schema validation + pipelines
-    output: storage + metrics
+    - path: docs/
+      purpose: "Data model, retention, invariants"
+
+boundaries:
+  not_responsible_for:
+    - "Generating meaning/insights (semantAH)."
+    - "Executing commands (wgx/hausKI)."
+  dangerous_assumptions:
+    - "Treat event store as mutable."
+    - "Accept events without contract validation."
 
 conventions:
   branching: "main, feature/*, hotfix/*"

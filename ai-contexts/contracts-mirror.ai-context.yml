@@ -1,0 +1,50 @@
+---
+ai_context_version: 1.1
+
+project:
+  name: contracts-mirror
+  summary: External API schemas (protobuf) + JSON mirror; used across the fleet.
+  role: contracts_external_api
+  primary_language: mixed
+  visibility: internal
+
+heimgewebe:
+  axis: [Contracts]
+  fleet:
+    enabled: true
+  wgx:
+    profile_expected: true
+    guard_smoke_expected: true
+
+interfaces:
+  consumes: []
+  produces:
+    - "aussen/v1"
+    - "heimlern/v1"
+    - "contracts/*.schema.json (mirror)"
+
+boundaries:
+  not_responsible_for:
+    - "Internal contract constitution (metarepo/contracts)."
+  dangerous_assumptions:
+    - "Use old repo name 'contracts' in automation; must be 'contracts-mirror'."
+
+conventions:
+  branching: "main, feature/*, hotfix/*"
+  commit_prefix: "contracts-mirror"
+  ci_platform: github_actions
+
+documentation:
+  adr: docs/adrs/
+  runbook: docs/runbook.md
+  api_reference:
+    - json/*
+    - proto/*
+
+ai_guidance:
+  do:
+    - never break schemas; use additive changes and/or new versions
+    - validate JSONL fixtures with AJV; keep examples minimal but complete
+    - keep file moves as renames (git mv) to preserve history
+  dont:
+    - change formats without version bump

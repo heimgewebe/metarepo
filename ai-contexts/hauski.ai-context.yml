@@ -1,37 +1,55 @@
 ---
-ai_context_version: 1.0
+ai_context_version: 1.1
 
 project:
   name: hauski
-  summary: User-facing assistant UI and orchestration hooks.
-  role: frontend_multi_agent
-  primary_language: typescript
+  summary: Orchestration core for intentions/decisions; integrates with semantAH + chronik.
+  role: decision_orchestrator
+  primary_language: mixed
   visibility: internal
+
+heimgewebe:
+  axis: [Decisions, Commands]
+  fleet:
+    enabled: true
+  wgx:
+    profile_expected: true
+    guard_smoke_expected: true
+
+interfaces:
+  consumes:
+    - "event.line (chronik)"
+    - "insights.* (semantAH)"
+    - "fleet.health (wgx)"
+  produces:
+    - "hausKI decisions"
+    - "policy.decision / policy.feedback"
+
+contracts:
+  schemas:
+    - path: "contracts/*.schema.json"
+      note: "Do not change decision/policy payload shape ad-hoc."
 
 dependencies:
   internal:
     - name: semantah
       relationship: uses
       interface:
-        - search_apis
-    - name: heimlern
+        - insights_api
+    - name: chronik
       relationship: uses
       interface:
-        - scores_feedback
-  external:
-    - name: react
-    - name: vite
+        - event_query
+  external: []
+  # NOTE: 'external: []' means "not verified from metarepo context".
+  # Prefer 'unknown' over false precision; verify in repo before asserting tech stack.
 
-architecture:
-  entrypoints:
-    - apps/web/src/main.tsx
-  key_paths:
-    - path: apps/web/src/agents/
-      purpose: agent wiring
-  data_flow:
-    input: user queries
-    processing: route → agents → backends
-    output: answers + traces
+boundaries:
+  not_responsible_for:
+    - "Outside-world ingest (aussensensor)."
+    - "Embedding/meaning generation (semantAH)."
+  dangerous_assumptions:
+    - "Treat commands as events; commands must remain separate."
 
 conventions:
   branching: "main, feature/*"

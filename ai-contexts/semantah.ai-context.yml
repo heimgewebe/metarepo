@@ -1,45 +1,54 @@
 ---
-ai_context_version: 1.0
+ai_context_version: 1.1
 
 project:
   name: semantah
-  summary: Semantic ingest/index & retrieval services.
-  role: knowledge_index_retrieval
-  primary_language: python
+  summary: Semantic observatory; turns events + vault + OS context into insights/graph/embeddings.
+  role: semantic_observatory
+  primary_language: mixed
   visibility: internal
+
+heimgewebe:
+  axis: [Semantik, Events]
+  fleet:
+    enabled: true
+  wgx:
+    profile_expected: true
+    guard_smoke_expected: true
+
+interfaces:
+  consumes:
+    - "event.line (chronik)"
+    - "os.context.* (mitschreiber)"
+    - "vault notes (vault-gewebe)"
+  produces:
+    - "insights.*"
+    - "graph nodes/edges"
+    - "insights.daily"
+
+contracts:
+  schemas:
+    - path: "contracts/*.schema.json"
+      note: "Insights outputs must remain contract-valid; schema drift breaks UI."
 
 dependencies:
   internal:
-    - name: metarepo
+    - name: chronik
       relationship: uses
-      interface:
-        - knowledge_exports
-    - name: contracts
-      relationship: uses
-      interface:
-        - knowledge_graph_schemas
+      interface: [event_query]
     - name: vault-gewebe
       relationship: uses
-      interface:
-        - document_exports
-        - embeddings_source
-  external:
-    - name: fastapi
-    - name: uvicorn
-    - name: faiss
+      interface: [notes]
+  external: []
+  # NOTE: 'external: []' means "not verified from metarepo context".
+  # Prefer 'unknown' over false precision; verify in repo before asserting tech stack.
 
-architecture:
-  entrypoints:
-    - src/main.py
-  key_paths:
-    - path: src/ingest/
-      purpose: document/code ingest
-    - path: src/search/
-      purpose: semantic search APIs
-  data_flow:
-    input: docs/code exports
-    processing: chunk → embed → index
-    output: search APIs
+boundaries:
+  not_responsible_for:
+    - "Command execution (wgx/hausKI)."
+    - "Outside-world ingest (aussensensor)."
+  dangerous_assumptions:
+    - "Treat embeddings as truth; keep provenance and uncertainty."
 
 conventions:
   branching: "main, feature/*"

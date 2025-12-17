@@ -1,49 +1,45 @@
 ---
-ai_context_version: 1.0
+ai_context_version: 1.1
 
 project:
   name: vault-gewebe
   summary: Unified personal and shared Obsidian vault for structured knowledge and notes.
-  role: knowledge_vault
+  role: knowledge_archive
   primary_language: markdown
   visibility: internal
+
+heimgewebe:
+  axis: [Semantik]
+  fleet:
+    enabled: false
+  wgx:
+    profile_expected: false
+    guard_smoke_expected: false
+
+interfaces:
+  consumes: []
+  produces:
+    - "markdown notes"
+    - "structured knowledge context"
+
+contracts:
+  schemas:
+    - path: "contracts/*.schema.json"
+      note: "Usually does not enforce runtime contracts; acts as content source."
 
 dependencies:
   internal:
     - name: semantah
-      relationship: uses
-      interface:
-        - semantic_linking
-        - search_integration
-    - name: chronik
-      relationship: uses
-      interface:
-        - ingest_events
-    - name: contracts
-      relationship: uses
-      interface:
-        - knowledge_graph_schemas
+      relationship: feeds
+      interface: [notes]
   external:
     - name: obsidian
-      note: local editor platform
-    - name: pandoc
-      note: exports to other formats
 
-architecture:
-  entrypoints:
-    - vault/
-    - vault/.obsidian/
-  key_paths:
-    - path: vault/
-      purpose: main knowledge base (markdown + canvas files)
-    - path: vault/templates/
-      purpose: content and project templates
-    - path: vault/meta/
-      purpose: metadata, indices, linkmaps
-  data_flow:
-    input: notes, interviews, transcripts, project docs
-    processing: tagging → linking → export
-    output: semantic index and sync signals
+boundaries:
+  not_responsible_for:
+    - "Fleet mechanics / CI enforcement."
+  dangerous_assumptions:
+    - "Assume vault content is consistent or canonical; it is curated but fallible."
 
 conventions:
   branching: "main, feature/*"

@@ -1,37 +1,50 @@
-ai_context_version: 1.0
+---
+ai_context_version: 1.1
+
+# Repo-specific AI context.
+# Do NOT copy this file unchanged into other repos; adjust project.name/role/paths first.
 
 project:
   name: metarepo
-  summary: Docs/templates/workflows for all repos.
-  role: standards_and_reusable_automation
+  summary: Architecture source + internal contract constitution + templates/policies.
+  role: control_plane
   primary_language: mixed
   visibility: internal
 
+heimgewebe:
+  axis: [Contracts, Motorik, Decisions]
+  fleet:
+    enabled: true
+  wgx:
+    profile_expected: true
+    guard_smoke_expected: true
+
+interfaces:
+  consumes:
+    - "fleet state (reports/findings)"
+  produces:
+    - "internal contracts (contracts/*.schema.json)"
+    - "CI templates (wgx-guard.yml, wgx-smoke.yml)"
+    - "architecture docs / ADRs"
+
+contracts:
+  schemas:
+    - path: "contracts/*.schema.json"
+      note: "Internal canonical contracts live here."
+
 dependencies:
   internal:
-    - name: contracts
-      relationship: uses
-      interface:
-        - validation_workflows
-        - fixtures
     - name: wgx
       relationship: uses
-      interface:
-        - fleet_rollout
+      interface: [reusable_workflows]
   external:
-    - name: github_actions
+    - name: markdown
 
-architecture:
-  entrypoints:
-    - docs/*
-    - .github/workflows/*
-  key_paths:
-    - path: templates/
-      purpose: repo templates
-  data_flow:
-    input: proposals
-    processing: codify → templates
-    output: standards
+boundaries:
+  not_responsible_for:
+    - "External protobuf APIs (contracts-mirror)."
+  dangerous_assumptions:
+    - "Assume docs reflect reality; verify via fleet scans."
 
 conventions:
   branching: "main, feature/*"

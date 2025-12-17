@@ -1,53 +1,23 @@
 ---
-ai_context_version: 1.0
+ai_context_version: 1.1
+
+# COMPATIBILITY SHIM / ALIAS
+# Canonical file: ai-contexts/contracts-mirror.ai-context.yml
+# Do not update this file except to keep the alias pointing to canonical truth.
 
 project:
   name: contracts
-  summary: Central contract repo providing JSON/Proto schemas and fixtures.
-  role: schema_contract_provider
+  summary: "Alias for contracts-mirror. Canonical: ai-contexts/contracts-mirror.ai-context.yml"
+  role: compatibility_alias
   primary_language: mixed
   visibility: internal
 
-dependencies:
-  internal: []
-  external:
-    - name: ajv-cli
-      version: "5.x"
-    - name: buf
-      note: for protobuf (optional)
-
-architecture:
-  entrypoints:
-    - json/
-    - proto/
-  key_paths:
-    - path: json/
-      purpose: JSON Schemas
-    - path: proto/
-      purpose: Protobuf IDL
-    - path: fixtures/
-      purpose: Golden samples for validation
-  data_flow:
-    input: change proposals via PR
-    processing: guard checks + AJV validation
-    output: pinned, versioned contracts for consumers
-
-conventions:
-  branching: "main, feature/*, hotfix/*"
-  commit_prefix: "contracts"
-  ci_platform: github_actions
-
-documentation:
-  adr: docs/adrs/
-  runbook: docs/runbook.md
-  api_reference:
-    - json/*
-    - proto/*
+boundaries:
+  not_responsible_for:
+    - "Being canonical. Use contracts-mirror.ai-context.yml."
 
 ai_guidance:
   do:
-    - never break schemas; use additive changes and/or new versions
-    - validate JSONL fixtures with AJV; keep examples minimal but complete
-    - keep file moves as renames (git mv) to preserve history
+    - "Use contracts-mirror.ai-context.yml instead."
   dont:
-    - change formats without version bump
+    - "Update this file."

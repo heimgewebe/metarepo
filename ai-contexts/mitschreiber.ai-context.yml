@@ -1,36 +1,47 @@
 ---
-ai_context_version: 1.0
+ai_context_version: 1.1
 
 project:
   name: mitschreiber
-  summary: Scripted content capture/append utilities (JSONL).
-  role: producer_structured_notes
-  primary_language: bash
+  summary: OS/app/window/text sampler; emits os.context.* into chronik.
+  role: os_context_sampler
+  primary_language: mixed
   visibility: internal
+
+heimgewebe:
+  axis: [OS-Kontext, Events]
+  fleet:
+    enabled: true
+  wgx:
+    profile_expected: true
+    guard_smoke_expected: true
+
+interfaces:
+  consumes:
+    - "local OS state (windows/apps/text)"
+  produces:
+    - "os.context.state"
+    - "os.context.text.embed (via downstream)"
+
+contracts:
+  schemas:
+    - path: "contracts/*.schema.json"
+      note: "OS context event shape must stay stable."
 
 dependencies:
   internal:
-    - name: contracts
-      relationship: uses
-      interface:
-        - jsonl_line_schema
     - name: chronik
-      relationship: uses
-      interface:
-        - http_ingest_optional
-  external:
-    - name: jq
+      relationship: writes
+      interface: [event_line_append]
+  external: []
+  # NOTE: 'external: []' means "not verified from metarepo context".
+  # Prefer 'unknown' over false precision; verify in repo before asserting tech stack.
 
-architecture:
-  entrypoints:
-    - scripts/*.sh
-  key_paths:
-    - path: lib/locking.sh
-      purpose: atomic append
-  data_flow:
-    input: user/agent inputs
-    processing: normalize → validate
-    output: append *.jsonl
+boundaries:
+  not_responsible_for:
+    - "Meaning/embeddings generation (semantAH)."
+  dangerous_assumptions:
+    - "Capture sensitive data without policy constraints."
 
 conventions:
   branching: "main, feature/*"

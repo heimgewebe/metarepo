@@ -1,5 +1,5 @@
 ---
-ai_context_version: 1.0
+ai_context_version: 1.1
 
 project:
   name: wgx
@@ -8,30 +8,58 @@ project:
   primary_language: bash
   visibility: internal
 
+heimgewebe:
+  axis: [Motorik, Commands]
+  fleet:
+    enabled: true
+  wgx:
+    profile_expected: false
+    guard_smoke_expected: false
+
+interfaces:
+  consumes:
+    - "repo trees (git)"
+    - "workflows (.github/workflows/*)"
+  produces:
+    - "guard/smoke artifacts"
+    - "fleet.health signals"
+
+contracts:
+  schemas:
+    - path: "contracts/*.schema.json"
+      note: "WGX does not define canonical contracts; it enforces/uses them."
+
 dependencies:
   internal:
-    - name: contracts
+    - name: contracts-mirror
       relationship: uses
-      interface:
-        - validation_hooks
-    - name: chronik
+      interface: [schemas, protobuf_mirror]
+    - name: metarepo
       relationship: uses
-      interface:
-        - ci_e2e_orchestration
+      interface: [templates, policies]
   external:
-    - name: jq
-    - name: curl
+    - name: bash
+      version: ">=4"
 
 architecture:
   entrypoints:
-    - wgx/cmd/*
+    - wgx
+    - cmd/*
   key_paths:
-    - path: modules/
-      purpose: subcommand implementations
-  data_flow:
-    input: developer commands
-    processing: fan-out to repos
-    output: reports/metrics
+    - path: wgx/
+      purpose: "CLI core"
+    - path: templates/
+      purpose: "Reusable workflow/templates"
+    - path: scripts/
+      purpose: "Maintenance + validators"
+
+boundaries:
+  not_responsible_for:
+    - "Being the canonical source of repo roles (metarepo is)."
+    - "Inventing schema changes; it consumes existing contracts."
+  dangerous_assumptions:
+    - "Assume a repo is Fleet-enabled without checking .wgx/profile.yml."
+    - "Assume repo naming: verify contracts-mirror vs contracts."
 
 conventions:
   branching: "main, feature/*"
