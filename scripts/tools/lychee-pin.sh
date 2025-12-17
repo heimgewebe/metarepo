@@ -19,6 +19,9 @@ ensure_dir() { mkdir -p -- "${BIN_DIR}"; }
 have_cmd() { command -v "$1" > /dev/null 2>&1; }
 
 read_pinned_version() {
+  if [[ ! -f "${ROOT_DIR}/toolchain.versions.yml" ]]; then
+    die "toolchain.versions.yml nicht gefunden: ${ROOT_DIR}/toolchain.versions.yml"
+  fi
   local version
   version=$(grep -E "^\s*${TOOLCHAIN_KEY}:" "${ROOT_DIR}/toolchain.versions.yml" |
     sed -E 's/^\s*[^:]+:\s*//; s/#.*$//; s/^[[:space:]]*//; s/[[:space:]]*$//; s/^"//; s/"$//; s/^'\''//; s/'\''$//' |

@@ -44,6 +44,10 @@ require_cmd() {
 }
 
 read_pinned_version() {
+  if [[ ! -f "${ROOT_DIR}/toolchain.versions.yml" ]]; then
+    die "toolchain.versions.yml nicht gefunden: ${ROOT_DIR}/toolchain.versions.yml"
+  fi
+
   local version
   if [[ -x "${YQ_LOCAL}" ]]; then
     version=$("${YQ_LOCAL}" '.yq' "${ROOT_DIR}/toolchain.versions.yml" 2> /dev/null || true)

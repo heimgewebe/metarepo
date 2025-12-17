@@ -24,6 +24,11 @@ read_pinned_version() {
     printf '%s' "${JUST_VERSION}"
     return 0
   fi
+
+  if [[ ! -f "${ROOT_DIR}/toolchain.versions.yml" ]]; then
+    die "toolchain.versions.yml nicht gefunden: ${ROOT_DIR}/toolchain.versions.yml"
+  fi
+
   local version
   # Parse version from toolchain.versions.yml robustly:
   # 1. Remove key prefix (up to and including ':')
