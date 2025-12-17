@@ -1,5 +1,5 @@
 ---
-ai_context_version: 1.0
+ai_context_version: 1.1
 
 project:
   name: tools
@@ -8,23 +8,41 @@ project:
   primary_language: bash
   visibility: internal
 
+heimgewebe:
+  axis: [Motorik]
+  fleet:
+    enabled: true
+  wgx:
+    profile_expected: false
+    guard_smoke_expected: false
+
+interfaces:
+  consumes: ["CI/local shell"]
+  produces: ["pinned binaries in tools/bin/*"]
+
+boundaries:
+  not_responsible_for:
+    - "Project semantics; only tooling."
+
 dependencies:
   internal: []
   external:
-    - name: curl
-    - name: bash
-      version: ">=4"
+    - name: yq
+    - name: just
+    - name: sccache
+    - name: actionlint
 
 architecture:
   entrypoints:
-    - scripts/tools/*-pin.sh
+    - "bin/*"
+    - "scripts/*-pin.sh"
   key_paths:
-    - path: scripts/tools/yq-pin.sh
-      purpose: Install/pin yq v4
+    - path: "checksums/"
+      purpose: "Integrity verification"
   data_flow:
-    input: CI & local setup
-    processing: download/pin utilities
-    output: tools/bin/*
+    input: "Tool request"
+    processing: "Download + Verify + Install"
+    output: "Executable in path"
 
 conventions:
   branching: "main, feature/*"
@@ -36,6 +54,7 @@ documentation:
 
 ai_guidance:
   do:
-    - fail fast on missing commands; provide actionable hints
+    - keep scripts idempotent
+    - verify checksums
   dont:
-    - silently skip version mismatches
+    - install unpinned versions
