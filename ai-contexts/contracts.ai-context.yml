@@ -6,54 +6,18 @@ ai_context_version: 1.1
 # Do not update this file except to keep the alias pointing to canonical truth.
 
 project:
-  name: contracts-mirror
-  summary: External API schemas (protobuf) + JSON mirror; source-of-truth lives outside metarepo.
-  role: contracts_external_api
+  name: contracts
+  summary: "Alias for contracts-mirror. Canonical: ai-contexts/contracts-mirror.ai-context.yml"
+  role: compatibility_alias
   primary_language: mixed
   visibility: internal
 
-heimgewebe:
-  axis: [Contracts]
-  fleet:
-    enabled: true
-  wgx:
-    profile_expected: true
-    guard_smoke_expected: true
-
-interfaces:
-  consumes: []
-  produces:
-    - "aussen/v1 protobuf"
-    - "heimlern/v1 protobuf"
-    - "JSON schema mirror"
-
-contracts:
-  schemas:
-    - path: "contracts/*.schema.json"
-      note: "This is the mirror. Canonical internal contracts live in metarepo/contracts."
-
 boundaries:
   not_responsible_for:
-    - "Internal-only contracts (metarepo)."
-  dangerous_assumptions:
-    - "Confuse 'contracts' with 'contracts-mirror'. Verify repo name."
-
-conventions:
-  branching: "main, feature/*, hotfix/*"
-  commit_prefix: "contracts"
-  ci_platform: github_actions
-
-documentation:
-  adr: docs/adrs/
-  runbook: docs/runbook.md
-  api_reference:
-    - json/*
-    - proto/*
+    - "Being canonical. Use contracts-mirror.ai-context.yml."
 
 ai_guidance:
   do:
-    - never break schemas; use additive changes and/or new versions
-    - validate JSONL fixtures with AJV; keep examples minimal but complete
-    - keep file moves as renames (git mv) to preserve history
+    - "Use contracts-mirror.ai-context.yml instead."
   dont:
-    - change formats without version bump
+    - "Update this file."

@@ -39,6 +39,8 @@ dependencies:
       relationship: uses
       interface: [insights_api]
   external: []
+  # NOTE: 'external: []' means "not verified from metarepo context".
+  # Prefer 'unknown' over false precision; verify in repo before asserting tech stack.
 
 boundaries:
   not_responsible_for:
