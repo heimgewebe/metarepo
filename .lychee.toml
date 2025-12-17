@@ -1,11 +1,11 @@
 verbose = "info"
 no_progress = true
 include_fragments = true
-accept = [200, 204, 301, 302, 303, 307, 308]
+accept = [200, 204, 301, 302, 303, 307, 308, 503]
 timeout = 30
 max_redirects = 5
 retry_wait_time = 2
-max_retries = 2
+max_retries = 3
 max_concurrency = 16
 exclude_path = ["docs/canvas/"]
 github_token = "env:GITHUB_TOKEN"
