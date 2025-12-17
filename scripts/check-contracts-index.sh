@@ -4,7 +4,7 @@ set -euo pipefail
 root=$(git rev-parse --show-toplevel)
 cd "$root"
 
-index_file="docs/contracts-index.md"
+index_file="docs/contracts/contracts-index.md"
 
 if [[ ! -f "$index_file" ]]; then
   echo "::error::Contracts-Index $index_file fehlt."
