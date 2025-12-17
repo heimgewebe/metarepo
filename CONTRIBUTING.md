@@ -35,8 +35,8 @@ Willkommen! Dieses Repo ist der Kanon für alle heimgewebe-Flotten. Damit Änder
 ## Contracts pflegen
 Wenn du Änderungen an Daten-Contracts vornimmst:
 
-- **Zentrale metarepo-Contracts:** Wenn neue Dateien unter `contracts/*.schema.json` angelegt, umbenannt oder gelöscht werden, aktualisiere `docs/contracts-index.md` in derselben PR.
-- **Repo-spezifische Contracts:** Falls ein Contract in einem anderen Repo systemweit relevant ist (Events, Policy, Weltgewebe-Domain etc.), ergänze einen Eintrag in `docs/contracts-index.md`.
+- **Zentrale metarepo-Contracts:** Wenn neue Dateien unter `contracts/*.schema.json` angelegt, umbenannt oder gelöscht werden, aktualisiere `docs/contracts/contracts-index.md` in derselben PR.
+- **Repo-spezifische Contracts:** Falls ein Contract in einem anderen Repo systemweit relevant ist (Events, Policy, Weltgewebe-Domain etc.), ergänze einen Eintrag in `docs/contracts/contracts-index.md`.
 - **CI-Check:** Ein automatischer Guard prüft, dass alle zentralen `contracts/*.schema.json`-Dateien im Index referenziert sind.
 
 ## Nach dem Merge
