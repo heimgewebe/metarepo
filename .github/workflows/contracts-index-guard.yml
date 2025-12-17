@@ -7,7 +7,7 @@ name: contracts-index-guard
       - 'contracts/*.schema.json'
       - 'contracts/*.yml'
       - 'contracts/*.yaml'
-      - 'docs/contracts-index.md'
+      - 'docs/contracts/contracts-index.md'
       - 'scripts/check-contracts-index.sh'
       - '.github/workflows/contracts-index-guard.yml'
   workflow_dispatch:
