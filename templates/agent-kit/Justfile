@@ -1,7 +1,7 @@
 set shell := ["bash", "--noprofile", "--norc", "-euo", "pipefail", "-c"]
 
-agents.run:
-uv run -m agents.graph
+agents_run:
+    uv run -m agents.graph
 
-agents.test:
-uv run -m pytest
+agents_test:
+    uv run -m pytest
