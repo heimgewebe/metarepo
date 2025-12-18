@@ -148,6 +148,7 @@ fleet-push-all:
 
 # Local CI
 validate: yq_ensure lint
+    just fleet-check
     scripts/ci/validate-local.sh
     @if [ -d tests ] && [ -f pyproject.toml ] && grep -q "pytest" pyproject.toml; then echo "Running python tests..."; uv run pytest tests/; fi
     @printf "Running actionlint...\n"
