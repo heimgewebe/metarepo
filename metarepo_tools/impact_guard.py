@@ -113,8 +113,18 @@ def load_manifest(manifest_path: Path) -> dict[str, dict]:
         data = yaml.safe_load(text)
     else:
         data = _load_manifest_fallback(text)
+
+    if data is None:
+        data = {}
+    if not isinstance(data, Mapping):
+        raise ValueError("Manifest must be a mapping")
     repos: dict[str, dict] = {}
-    for entry in data.get("repos", []):
+    repo_entries = data.get("repos", []) or []
+    if not isinstance(repo_entries, list):
+        repo_entries = []
+    for entry in repo_entries:
+        if not isinstance(entry, Mapping):
+            continue
         name = entry.get("name")
         if not name:
             continue
