@@ -1,7 +1,8 @@
-# ADR-0023: Epistemic Autopoiesis
-
-## Status
-Accepted
+# ADR-0023 Epistemic Autopoiesis
+![status: accepted](https://img.shields.io/badge/status-accepted-green)
+Datum: 2025-12-19
+Status: Accepted
+Owner: epistemic-team
 
 ## Kontext
 
