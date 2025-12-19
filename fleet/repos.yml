@@ -5,7 +5,7 @@ static:
       url: "https://github.com/heimgewebe/weltgewebe"
       status: related
   # private Repos:
-  # - vault-gewebe (nie Fleet)
+  # - vault-privat (nie Fleet)
 
 repos:
   - name: metarepo

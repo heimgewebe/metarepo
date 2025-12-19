@@ -30,4 +30,4 @@ Externe Werkzeuge oder Wissensspeicher. Keine Fleet-Policies erforderlich.
 |-------------------|----------------------------|-------|
 | weltgewebe        | Web/Doku/Externe Signale   | no    |
 | icf-tool          | ICF-Katalog & Browser      | no    |
-| vault-gewebe      | Privater Obsidian-Vault    | no    |
+| vault-privat      | Privater Obsidian-Vault    | no    |
