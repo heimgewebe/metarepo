@@ -6,6 +6,8 @@ on:
 jobs:
   epistemic-check:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - name: Run WGX epistemic guard
