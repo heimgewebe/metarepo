@@ -13,5 +13,6 @@ Quelle: [`repos.yml`](../repos.yml).
 | [heimlern](https://github.com/heimgewebe/heimlern) | main | policy | library | – | – |
 | [semantAH](https://github.com/heimgewebe/semantAH) | main | insights | export | – | – |
 | [tools](https://github.com/heimgewebe/tools) | main | tooling | shared | – | – |
+| [vault-gewebe](https://github.com/heimgewebe/vault-gewebe) | main | vault | content | – | – |
 | [weltgewebe](https://github.com/heimgewebe/weltgewebe) | main | aussen | events | – | – |
 | [wgx](https://github.com/heimgewebe/wgx) | main | platform | metrics | ✅ | – |
