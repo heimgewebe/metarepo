@@ -17,6 +17,8 @@ Nicht jedes Repo braucht zwingend ein `.wgx/profile.yml`. Entscheidend ist, ob e
 
 **Quelle der Wahrheit:** `.ai-context.yml` (pro Repo) – Schlüssel:
 
+Wichtig: `heimgewebe.fleet.enabled: true` allein impliziert **keine** WGX-Profilpflicht. Die Erwartung wird ausschließlich über die Felder unter `heimgewebe.wgx` gesteuert.
+
 ```yaml
 heimgewebe:
   fleet:
