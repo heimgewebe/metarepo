@@ -170,3 +170,11 @@ Durch einen **semantischen Blutkreislauf**, ein **Gehirn** (Heimgeist), ein **Im
 3. Soll Heimgewebe irgendwann selbst Features entwerfen?
 4. Soll der Organismus intern „Zweige“ erzeugen (Evolution)?
 5. Wie verhält sich Heimgewebe zu externen Systemen (GitHub, lokale KI, Cloud-Funktionen)?
+
+---
+
+## 9. Epistemische Verfassung
+
+Um diese Vision eines selbstkorrigierenden Organismus umzusetzen, hat sich das Heimgewebe eine epistemische Verfassung gegeben. Sie definiert, wie Erkenntnis, Unsicherheit und Widerspruch strukturell behandelt werden:
+
+👉 **[Epistemische Autopoiesis (Prinzipien)](../principles/epistemic-autopoiesis.md)**

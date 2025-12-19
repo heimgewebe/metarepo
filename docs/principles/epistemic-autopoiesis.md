@@ -109,3 +109,19 @@ Es definiert:
 – welche Erkenntnisformen zulässig sind
 – welche Mindeststandards gelten
 – was das System explizit **nicht tut**
+
+---
+
+## Bezug zur Vision
+
+Dieses Dokument bildet die konstitutionelle Grundlage für die Vision des Heimgewebes als autopoetischer KI-Organismus:
+
+👉 **[Heimgewebe Vision: Autopoiesis](../vision/heimgewebe-autopoiesis.md)**
+
+---
+
+## Blaupause & Vision
+
+Für die langfristige Implementierungsstrategie und die detaillierten Rollen der einzelnen Repositories (Chronik, SemantAH, HausKI, etc.) siehe:
+
+👉 **[Epistemische Autopoiesis Blaupause](../vision/heimgewebe-epistemische-autopoiesis.md)**

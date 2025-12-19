@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.heimgewebe.org/contracts/epistemic/contradiction.schema.json",
+  "title": "Epistemic Contradiction",
+  "type": "object",
+  "required": ["target", "contradiction_type", "severity", "message"],
+  "properties": {
+    "target": {
+      "type": "string",
+      "description": "The object or concept in contradiction (e.g. decision, insight, concept)"
+    },
+    "contradiction_type": {
+      "type": "string",
+      "enum": ["logical", "empirical", "operational"]
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["low", "medium", "high"]
+    },
+    "message": {
+      "type": "string",
+      "description": "Description of the contradiction"
+    },
+    "source": {
+      "type": "string",
+      "description": "Source of the contradiction (human | agent_role)"
+    },
+    "details": {
+      "type": "string"
+    }
+  }
+}
