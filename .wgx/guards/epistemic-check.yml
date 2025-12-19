@@ -1,0 +1,32 @@
+id: epistemic-check
+kind: guard
+mode: warn-only
+description: >
+  Warn-only Checks für epistemische Mindeststandards.
+
+checks:
+  - id: adr-index-has-0023
+    severity: info
+    description: ADR-0023 sollte im ADR-Index auftauchen
+    when:
+      files_changed:
+        any:
+          - "docs/adrs/0023-epistemic-autopoiesis.md"
+    expect:
+      pattern: "ADR-0023"
+      in: "docs/adrs/README.md"
+
+  - id: crosslinks-present
+    severity: info
+    description: Vision und Prinzipien sollten gegenseitig verlinkt sein
+    when:
+      files_changed:
+        any:
+          - "docs/principles/epistemic-autopoiesis.md"
+          - "docs/vision/heimgewebe-autopoiesis.md"
+    expect:
+      all_of:
+        - pattern: "docs/principles/epistemic-autopoiesis.md"
+          in: "docs/vision/heimgewebe-autopoiesis.md"
+        - pattern: "docs/vision/heimgewebe-autopoiesis.md"
+          in: "docs/principles/epistemic-autopoiesis.md"

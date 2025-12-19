@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.heimgewebe.org/contracts/epistemic/decision.quality.schema.json",
+  "title": "Decision Epistemic Quality",
+  "type": "object",
+  "required": ["decision_id", "epistemic_quality"],
+  "properties": {
+    "decision_id": {
+      "type": "string"
+    },
+    "epistemic_quality": {
+      "type": "string",
+      "enum": ["grounded", "weak"]
+    },
+    "reason": {
+      "type": "string",
+      "description": "Optional explanation for quality assessment"
+    }
+  }
+}

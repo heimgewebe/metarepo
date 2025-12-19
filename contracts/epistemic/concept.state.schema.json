@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.heimgewebe.org/contracts/epistemic/concept.state.schema.json",
+  "title": "Epistemic Concept State",
+  "description": "Tracks the state and drift of a semantic concept",
+  "type": "object",
+  "required": ["concept_id", "description", "version", "updated_at"],
+  "properties": {
+    "concept_id": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string",
+      "description": "Semantic version or hash of the concept definition"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["stable", "drifting", "contested", "ambiguous"]
+    },
+    "notes": {
+      "type": "string"
+    }
+  }
+}

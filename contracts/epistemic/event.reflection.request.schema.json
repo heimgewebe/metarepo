@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.heimgewebe.org/contracts/epistemic/event.reflection.request.schema.json",
+  "title": "Epistemic Reflection Request",
+  "description": "Request for justification due to repeated epistemic pattern violations. Payload schema intended to be embedded in event.line payload; not an event envelope.",
+  "type": "object",
+  "required": ["subject", "reason", "pattern_ref", "required_response", "severity"],
+  "properties": {
+    "subject": {
+      "type": "string",
+      "description": "The item requiring reflection (e.g. decision:deploy-x)"
+    },
+    "reason": {
+      "type": "string"
+    },
+    "pattern_ref": {
+      "type": "string",
+      "description": "Reference to the epistemic pattern that triggered this"
+    },
+    "required_response": {
+      "type": "string",
+      "enum": ["human_explanation", "agent_justification"]
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["low", "medium", "high"]
+    }
+  }
+}

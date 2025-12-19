@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.heimgewebe.org/contracts/epistemic/warning.memory.schema.json",
+  "title": "Epistemic Warning Memory",
+  "type": "object",
+  "required": ["subject", "warning_id", "count", "last_seen"],
+  "properties": {
+    "subject": {
+      "type": "string",
+      "description": "Beobachtetes Objekt (Repo, Pfad, Konzept, Agent)"
+    },
+    "warning_id": {
+      "type": "string",
+      "description": "ID der epistemischen Warnung"
+    },
+    "count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "first_seen": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "last_seen": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}
