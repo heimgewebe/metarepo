@@ -20,10 +20,18 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import sys
 from dataclasses import dataclass, asdict
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import List, Dict, Literal
+from typing import Any, List, Dict, Literal
+
+# Ensure the repository root is in the path for wgx imports
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
+
+from wgx import repo_config
 
 
 WgxProfileKind = Literal["profile", "no_profile", "missing"]
@@ -65,11 +73,26 @@ def parse_repo_matrix(path: Path) -> List[str]:
     return repos
 
 
-def wgx_profile_kind(repo: Path) -> WgxProfileKind:
+def load_repo_configs(path: Path) -> Dict[str, Dict[str, Any]]:
+    """Load repos.yml and return a dict of name -> config."""
+    if not path.exists():
+        return {}
+    data = repo_config.load_config(path)
+    repos_list = repo_config.gather_repos(data)
+    return {r["name"]: r for r in repos_list if "name" in r}
+
+
+def wgx_profile_kind(repo: Path, config: Dict[str, Any]) -> WgxProfileKind:
     if (repo / ".wgx" / "profile.yml").exists():
         return "profile"
     if (repo / ".wgx" / "NO_PROFILE").exists():
         return "no_profile"
+
+    # Check config for exception
+    wgx_config = config.get("wgx", {})
+    if wgx_config.get("profile_expected") is False:
+        return "no_profile"
+
     return "missing"
 
 
@@ -100,6 +123,7 @@ class RepoReadiness:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--matrix", default="docs/repo-matrix.md")
+    ap.add_argument("--repos-yml", default="repos.yml")
     ap.add_argument("--out-json", default="reports/heimgewebe-readiness.json")
     ap.add_argument("--write-repos-txt", default="fleet/repos.txt")
     args = ap.parse_args()
@@ -108,6 +132,7 @@ def main() -> int:
     org_root = detect_org_root()
 
     fleet = parse_repo_matrix(metarepo_root / args.matrix)
+    repo_configs = load_repo_configs(metarepo_root / args.repos_yml)
 
     # write derived repos.txt
     if args.write_repos_txt:
@@ -136,7 +161,8 @@ def main() -> int:
             )
             continue
 
-        kind = wgx_profile_kind(rp)
+        config = repo_configs.get(name, {})
+        kind = wgx_profile_kind(rp, config)
         repos.append(
             RepoReadiness(
                 name=name,

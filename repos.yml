@@ -70,6 +70,12 @@ repos:
     scope: library
     metrics:
       enable: false
-
-# exclude:
-#   - vault-gewebe
+  - name: vault-gewebe
+    url: https://github.com/heimgewebe/vault-gewebe
+    default_branch: main
+    domain: vault
+    scope: content
+    metrics:
+      enable: false
+    wgx:
+      profile_expected: false
