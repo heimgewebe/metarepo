@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.heimgewebe.org/contracts/epistemic/event.reflection.request.schema.json",
   "title": "Epistemic Reflection Request",
-  "description": "Request for justification due to repeated epistemic pattern violations",
+  "description": "Request for justification due to repeated epistemic pattern violations. Payload schema intended to be embedded in event.line payload; not an event envelope.",
   "type": "object",
   "required": ["subject", "reason", "pattern_ref", "required_response", "severity"],
   "properties": {

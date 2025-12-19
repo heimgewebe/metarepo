@@ -1,0 +1,15 @@
+name: Epistemic Guard (warn-only)
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  epistemic-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run WGX epistemic guard
+        uses: heimgewebe/wgx/.github/workflows/wgx-guard.yml@main
+        with:
+          guard: epistemic-check
+          mode: warn-only
