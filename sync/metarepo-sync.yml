@@ -1,0 +1,36 @@
+# metarepo-sync v0
+# managed-by: metarepo-sync
+
+version: 1
+source: metarepo
+
+managed_marker: "managed-by: metarepo-sync"
+
+entries:
+  - id: ci-taxonomy
+    description: "Canonical CI taxonomy and fleet policy"
+    source: docs/ci/README.md
+    targets:
+      - docs/ci/README.md
+    mode: copy
+
+  - id: wgx-guard-workflow
+    description: "Canonical WGX guard workflow"
+    source: .github/workflows/wgx-guard.yml
+    targets:
+      - .github/workflows/wgx-guard.yml
+    mode: copy
+
+  - id: wgx-smoke-workflow
+    description: "Canonical WGX smoke workflow"
+    source: .github/workflows/wgx-smoke.yml
+    targets:
+      - .github/workflows/wgx-smoke.yml
+    mode: copy
+
+  - id: wgx-profile-example
+    description: "Baseline WGX profile template (never overwrite)"
+    source: .wgx/profile.example.yml
+    targets:
+      - .wgx/profile.yml
+    mode: copy_if_missing

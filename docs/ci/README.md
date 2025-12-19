@@ -1,3 +1,4 @@
+<!-- managed-by: metarepo-sync -->
 # CI Taxonomy
 
 Dieses Dokument definiert die Klassifizierung von CI-Workflows im Heimgewebe, um Klarheit über Prioritäten und Erwartungshaltungen zu schaffen.
