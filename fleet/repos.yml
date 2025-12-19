@@ -5,6 +5,7 @@ static:
       url: "https://github.com/heimgewebe/weltgewebe"
       status: related
   # private Repos:
+  # CRITICAL: Do not uncomment or enable Fleet status. Contains private data (vault-privat). No CI artifacts allowed.
   # - vault-privat (nie Fleet)
 
 repos:
