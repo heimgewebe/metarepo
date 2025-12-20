@@ -1,25 +1,89 @@
----
-static:
-  include:
-    - name: weltgewebe
-      url: "https://github.com/heimgewebe/weltgewebe"
-      status: related
-  # private Repos:
-  # - vault-gewebe (nie Fleet)
+- repo: metarepo
+  fleet_member: true
+  role: Control-Plane, Templates, Contracts
+  wgx.profile_expected: true
 
-repos:
-  - name: metarepo
-  - name: wgx
-  - name: contracts-mirror
-  - name: hausKI
-  - name: hausKI-audio
-  - name: heimlern
-  - name: semantAH
-  - name: aussensensor
-  - name: chronik
-  - name: tools
-  - name: mitschreiber
-  - name: sichter
-  - name: leitstand
-  - name: heimgeist
-  - name: plexer
+- repo: wgx
+  fleet_member: true
+  role: Fleet-CLI / Motorik
+  wgx.profile_expected: true
+
+- repo: contracts-mirror
+  fleet_member: true
+  role: Schema-Definitionen für Events/Tools
+  wgx.profile_expected: true
+
+- repo: hausKI
+  fleet_member: true
+  role: KI-Orchestrator (Rust)
+  wgx.profile_expected: true
+
+- repo: hausKI-audio
+  fleet_member: true
+  role: Audio-Schicht
+  wgx.profile_expected: true
+
+- repo: heimlern
+  fleet_member: true
+  role: Lern-/Policy-Schicht
+  wgx.profile_expected: true
+
+- repo: semantAH
+  fleet_member: true
+  role: Embeddings / Wissensschicht
+  wgx.profile_expected: true
+
+- repo: aussensensor
+  fleet_member: true
+  role: Außenwelt-Events
+  wgx.profile_expected: true
+
+- repo: chronik
+  fleet_member: true
+  role: Persistenz/Audit
+  wgx.profile_expected: true
+
+- repo: tools
+  fleet_member: true
+  role: Skripte & Hilfsprogramme
+  wgx.profile_expected: true
+
+- repo: mitschreiber
+  fleet_member: true
+  role: Dialog-/Schreibschicht
+  wgx.profile_expected: true
+
+- repo: sichter
+  fleet_member: true
+  role: Review-Agent / Semantic Checks
+  wgx.profile_expected: true
+
+- repo: heimgeist
+  fleet_member: true
+  role: Meta-Agent / Beobachtung
+  wgx.profile_expected: true
+
+- repo: plexer
+  fleet_member: true
+  role: Agent-Routing / Orchestrierung
+  wgx.profile_expected: true
+
+- repo: leitstand
+  fleet_member: true
+  role: Observer / UI
+  wgx.profile_expected: true
+
+- repo: vault-gewebe
+  fleet_member: true
+  role: Privater Obsidian-Vault
+  wgx.profile_expected: false
+
+- repo: weltgewebe
+  fleet_member: false
+  role: Web/Doku/Externe Signale
+  wgx.profile_expected: false
+
+- repo: icf-tool
+  fleet_member: false
+  role: ICF-Katalog & Browser
+  wgx.profile_expected: false
