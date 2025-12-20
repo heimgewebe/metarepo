@@ -4,8 +4,9 @@ static:
     - name: weltgewebe
       url: "https://github.com/heimgewebe/weltgewebe"
       status: related
-  # private Repos:
-  # - vault-gewebe (nie Fleet)
+    - name: vault-privat
+      status: related
+      fleet: false
 
 repos:
   - name: metarepo
@@ -23,3 +24,5 @@ repos:
   - name: leitstand
   - name: heimgeist
   - name: plexer
+  - name: webmaschine
+  - name: vault-gewebe
