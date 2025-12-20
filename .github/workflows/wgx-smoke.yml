@@ -1,4 +1,5 @@
 ---
+# managed-by: metarepo-sync
 name: wgx-smoke
 
 permissions:

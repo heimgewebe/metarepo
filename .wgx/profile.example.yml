@@ -1,4 +1,5 @@
 ---
+# managed-by: metarepo-sync
 # Minimaler WGX-v1-Profile-Stub für CI.
 # Wird vom zentralen WGX-Runner erkannt und reicht aus,
 # damit der Guard „tracked profile found“ sagen kann.
