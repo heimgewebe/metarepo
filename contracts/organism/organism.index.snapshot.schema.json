@@ -1,0 +1,115 @@
+{
+  "$id": "https://heimgewebe.de/contracts/organism/organism.index.snapshot.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Organism Index Snapshot",
+  "description": "Snapshot of Heimgewebe organism index with axes, fleets, and interfaces per repository.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "snapshot_id",
+    "generated_at",
+    "organisms"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "organism.index.snapshot.v1"
+    },
+    "snapshot_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Opaque identifier of the snapshot run."
+    },
+    "generated_at": {
+      "$ref": "#/$defs/dateTimeString",
+      "description": "Timestamp when the snapshot was generated."
+    },
+    "source": {
+      "type": "string",
+      "description": "Tool or pipeline that produced the snapshot."
+    },
+    "version": {
+      "type": "string",
+      "description": "Optional semantic version of the snapshot format."
+    },
+    "organisms": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/organism"
+      },
+      "description": "List of organism entries grouped by axes or fleets."
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "dateTimeString": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "organism": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Name of the organism, team, or bounded context."
+        },
+        "axis": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Axes covered by the organism."
+        },
+        "fleet": {
+          "type": "string",
+          "description": "Fleet the organism belongs to."
+        },
+        "role": {
+          "type": "string",
+          "description": "Role description within the organism index."
+        },
+        "repositories": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/repository"
+          },
+          "description": "Repositories that make up the organism."
+        }
+      },
+      "additionalProperties": false
+    },
+    "repository": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Repository slug."
+        },
+        "summary": {
+          "type": "string",
+          "description": "Short description of the repository's purpose."
+        },
+        "axis": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Axes covered by the repository."
+        },
+        "role": {
+          "type": "string",
+          "description": "Role within the organism."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
