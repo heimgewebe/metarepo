@@ -1,15 +1,17 @@
 # Repos, die vom Metarepo Templates bekommen
 mode: static
 
-static:
-  include:
-    - name: contracts-mirror
-      url: https://github.com/heimgewebe/contracts-mirror
-
 github:
   owner: heimgewebe
 
 repos:
+  - name: contracts-mirror
+    url: https://github.com/heimgewebe/contracts-mirror
+    default_branch: main
+    domain: contracts
+    scope: schema
+    metrics:
+      enable: false
   - name: weltgewebe
     url: https://github.com/heimgewebe/weltgewebe
     default_branch: main
