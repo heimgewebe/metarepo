@@ -10,6 +10,7 @@ entries:
   - id: ci-taxonomy
     description: "Canonical CI taxonomy and fleet policy"
     source: docs/ci/README.md
+    tags: [fleet, ci, docs]
     targets:
       - docs/ci/README.md
     mode: copy
@@ -17,6 +18,7 @@ entries:
   - id: wgx-guard-workflow
     description: "Canonical WGX guard workflow"
     source: .github/workflows/wgx-guard.yml
+    tags: [fleet, ci, wgx]
     targets:
       - .github/workflows/wgx-guard.yml
     mode: copy
@@ -24,6 +26,7 @@ entries:
   - id: wgx-smoke-workflow
     description: "Canonical WGX smoke workflow"
     source: .github/workflows/wgx-smoke.yml
+    tags: [fleet, ci, wgx]
     targets:
       - .github/workflows/wgx-smoke.yml
     mode: copy
@@ -31,6 +34,7 @@ entries:
   - id: wgx-profile-example
     description: "Baseline WGX profile template (never overwrite)"
     source: .wgx/profile.example.yml
+    tags: [fleet, wgx, config]
     targets:
       - .wgx/profile.yml
     mode: copy_if_missing
