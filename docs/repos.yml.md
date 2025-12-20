@@ -28,7 +28,8 @@ static:
 repos:
   - name: metarepo
   - name: wgx
-  - name: contracts
+  - name: contracts-mirror
+  - name: webmaschine
   - name: hausKI
   - name: hausKI-audio
   - name: heimlern

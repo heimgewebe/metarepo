@@ -24,6 +24,7 @@ Diese Repositories bilden den Organismus und unterliegen den Fleet-Policies (CI,
 | heimgeist         | Meta-Agent / Beobachtung            | yes   |
 | plexer            | Agent-Routing / Orchestrierung      | yes   |
 | leitstand         | Observer / UI                       | yes   |
+| webmaschine       | Orientierungssystem / Tooling       | yes   |
 | vault-gewebe      | Privater Obsidian-Vault             | yes   |
 
 ## Related / Satellites (Non-Fleet)

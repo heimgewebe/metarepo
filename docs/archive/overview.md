@@ -25,9 +25,9 @@ Control-Plane, Fleet-Konfiguration, Contracts, Templates.
 
 Fleet-Motor (CLI, Profiles, Doctor).
 
-### contracts
+### contracts-mirror
 
-Externe API-Contracts für die Heimgewebe-Ökosystem-Grenze.
+Externe API-Contracts für die Heimgewebe-Ökosystem-Grenze (Mirror).
 
 Dieses Repository enthält:
 
@@ -85,6 +85,10 @@ Meta-Agent für Beobachtung / Orchestrierung.
 ### plexer
 
 Routing/Orchestrierungs-Schicht zwischen Agents.
+
+### webmaschine
+
+Orientierungssystem für KI-Agenten / lokaler Anker (Tooling).
 
 
 ## Related

@@ -31,7 +31,7 @@ wie der Organismus gedacht ist, wenn die Architektur vollständig ausgebaut ist.
   `fleet.health`, `os.context.*`) sind im Metarepo definiert und
   werden von allen Fleet-Repos eingehalten.
 - Externe API-Contracts (z. B. `aussen/v1`, `heimlern/v1`) sind im
-  `contracts`-Repo definiert (Protobuf + JSON-Mirror) und bilden
+  `contracts-mirror`-Repo definiert (Protobuf + JSON-Mirror) und bilden
   die offizielle Sprache nach außen.
 - Alle relevanten Rust-Crates, Python-Module und Skripte beziehen
   sich explizit auf diese Contracts („Contracts first“).
@@ -278,7 +278,7 @@ Komponente, sondern aus dem Zusammenspiel dieser Linien.
 | Repo           | A: Code & Contracts | B: Events (Fakten) | C: Commands (Intention) | D: WGX (Motorik) | OS-Kontext | Kommentar                                                                 |
 |----------------|---------------------|---------------------|--------------------------|------------------|-----------|---------------------------------------------------------------------------|
 | metarepo       | T                   | T                   | T                        | T                | –         | Definiert interne Contracts, Policies, WGX-Templates                      |
-| contracts      | T                   | –                   | –                        | –                | –         | Definiert externe API-Schemas (aussen/v1, heimlern/v1, …)                |
+| contracts-mirror| T                   | –                   | –                        | –                | –         | Definiert externe API-Schemas (aussen/v1, heimlern/v1, …)                |
 | wgx            | C                   | P/C (Metrik-Events) | P (indirekt)             | Kern             | –         | Steuert Fleet-Kommandos, erzeugt Metriken/Fleet-Health                    |
 | chronik        | C                   | P/C                 | I                        | I                | C         | Zentraler Event-Store, nimmt viele Linien auf                             |
 | aussensensor   | C                   | P                   | –                        | I                | –         | Wandelt externe Feeds in aussen.event.* und schreibt nach chronik        |
