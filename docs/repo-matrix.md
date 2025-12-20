@@ -2,6 +2,8 @@
 
 Diese Matrix definiert die Struktur des Heimgewebes. Sie ist die **Single Source of Truth** für Fleet-Mitgliedschaft und Rollen.
 
+> **Hinweis:** Die maschinelle Quelle für diese Daten ist `fleet/repos.yml`.
+
 ## Core-Fleet
 Diese Repositories bilden den Organismus und unterliegen den Fleet-Policies (CI, WGX-Profil, Contracts).
 
