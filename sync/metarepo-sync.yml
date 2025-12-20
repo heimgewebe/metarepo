@@ -38,11 +38,3 @@ entries:
     targets:
       - .wgx/profile.yml
     mode: copy_if_missing
-
-  - id: docs-extras-snapshots
-    description: "Documentation about snapshots and extras truth path"
-    source: docs/extras/snapshots.md
-    tags: [fleet, docs, extras]
-    targets:
-      - docs/extras/snapshots.md
-    mode: copy
