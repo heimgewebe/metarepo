@@ -1,6 +1,11 @@
 # Repos, die vom Metarepo Templates bekommen
 mode: static
 
+static:
+  include:
+    - name: contracts-mirror
+      url: https://github.com/heimgewebe/contracts-mirror
+
 github:
   owner: heimgewebe
 
@@ -49,6 +54,13 @@ repos:
     scope: shared
     metrics:
       enable: false
+  - name: webmaschine
+    url: https://github.com/heimgewebe/webmaschine
+    default_branch: main
+    domain: tooling
+    scope: agents
+    metrics:
+      enable: true
   - name: chronik
     url: https://github.com/heimgewebe/chronik
     default_branch: main
