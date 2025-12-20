@@ -8,6 +8,7 @@ Quelle: [`repos.yml`](../repos.yml).
 | --- | --- | --- | --- | --- | --- |
 | [aussensensor](https://github.com/heimgewebe/aussensensor) | main | aussen | events | – | – |
 | [chronik](https://github.com/heimgewebe/chronik) | main | chronik | ingest | – | – |
+| [contracts-mirror](https://github.com/heimgewebe/contracts-mirror) | main | contracts | schema | – | – |
 | [hausKI](https://github.com/heimgewebe/hausKI) | main | assistant | policy | ✅ | – |
 | [hausKI-audio](https://github.com/heimgewebe/hausKI-audio) | main | audio | events | – | hausKI |
 | [heimlern](https://github.com/heimgewebe/heimlern) | main | policy | library | – | – |

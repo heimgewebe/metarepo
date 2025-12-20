@@ -16,8 +16,6 @@ Beispiel:
 ```yaml
 static:
   include:
-    - name: contracts-mirror
-      url: "https://github.com/heimgewebe/contracts-mirror"
     - name: weltgewebe
       url: "https://github.com/heimgewebe/weltgewebe"
       description: "Dokumentation/extern"
@@ -30,6 +28,7 @@ static:
 repos:
   - name: metarepo
   - name: wgx
+  - name: contracts-mirror
   - name: webmaschine
   - name: hausKI
   - name: hausKI-audio
