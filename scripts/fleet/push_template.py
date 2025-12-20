@@ -92,11 +92,37 @@ def load_repos(repo_single: str | None) -> list[dict]:
         print(f"ERROR: {FLEET} not found.", file=sys.stderr)
         sys.exit(2)
     data = yaml.safe_load(FLEET.read_text(encoding="utf-8")) or {}
-    repos = data.get("repos", [])
-    if not repos:
-        print("ERROR: no repos configured in fleet/repos.yml", file=sys.stderr)
-        sys.exit(2)
-    return repos
+
+    # M2 Compatibility: Handle list (new) vs dict (old)
+    if isinstance(data, list):
+        repos = []
+        for entry in data:
+            if not isinstance(entry, dict):
+                continue
+            # Filter: Only push to fleet members
+            if not entry.get("fleet_member"):
+                continue
+
+            repo_name = entry.get("repo")
+            if not repo_name:
+                continue
+
+            # Map 'repo' -> 'name', ensure default_branch
+            repos.append({
+                "name": repo_name,
+                "default_branch": entry.get("default_branch", "main")
+            })
+        if not repos:
+            print("ERROR: no fleet members found in fleet/repos.yml", file=sys.stderr)
+            sys.exit(2)
+        return repos
+    else:
+        # Fallback for old format
+        repos = data.get("repos", [])
+        if not repos:
+            print("ERROR: no repos configured in fleet/repos.yml", file=sys.stderr)
+            sys.exit(2)
+        return repos
 
 def copy_into(src: Path, dst: Path):
     if src.is_dir():
