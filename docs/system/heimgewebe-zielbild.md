@@ -224,7 +224,14 @@ wie der Organismus gedacht ist, wenn die Architektur vollständig ausgebaut ist.
 - Weltgewebe bildet öffentliche Web-/Dokumentationsoberflächen,
   steht neben der Fleet, aber nicht in ihr.
 - Vault-Gewebe ist ein privater Obsidian-Vault, dient als
-  Inhaltsquelle für SemantAH, ist jedoch kein Fleet-Repo.
+  Inhaltsquelle für SemantAH und ist als Mitglied mit Sonderstatus
+  (privat, kein WGX-Profil) Teil des Organismus.
+
+### 3.17 Webmaschine – Lokaler Anker
+
+- Dient als lokaler Anker und Orientierungssystem für den Organismus.
+- Stellt Tooling bereit, um Navigation und Verständnis zu unterstützen,
+  und ergänzt die Tools-Schicht.
 
 ---
 
@@ -292,8 +299,9 @@ Komponente, sondern aus dem Zusammenspiel dieser Linien.
 | mitschreiber   | C                   | P (os.context.*)    | –                        | –                | Kern      | OS-/App-/Fenster-Kontext → WAL → os.context-Events                        |
 | plexer         | C                   | P/C (Routing)       | –                        | I                | –         | Event-Router zwischen Agenten, Faktenstrom                                |
 | tools          | C                   | P/I                 | –                        | I                | –         | Merger/Snapshots; erzeugen Artefakte, teils Event- oder Metrik-Ausgaben   |
+| webmaschine    | C                   | –                   | –                        | I                | –         | Lokaler Anker, Tooling                                                    |
 | weltgewebe     | –                   | –                   | –                        | –                | –         | Nachbarsystem (Web/Doku), nicht Fleet                                     |
-| vault-gewebe   | –                   | –                   | –                        | –                | –         | Privater Vault, Quelle für semantAH (Fleet-Mitglied)                     |
+| vault-gewebe   | –                   | –                   | –                        | –                | –         | Privater Vault, Quelle für semantAH (Sonderstatus: privat)               |
 ```
 
 ---
