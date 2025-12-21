@@ -48,6 +48,9 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
   - Zweck: generisches Wissensgraph-Schema (Knoten, Kanten, Beziehungen).
 - `knowledge.observatory.schema.json`
   - Zweck: Snapshot des semantischen Observatoriums mit aktiven Themenräumen, Quellen, Signalen und Leitfragen.
+  - Produzent: semantAH
+  - Konsumenten: leitstand, hausKI, heimlern
+  - Typ: Beobachtung
 
 ### 1.4 Policy-Kreislauf
 
