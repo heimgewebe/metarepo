@@ -293,7 +293,7 @@ Komponente, sondern aus dem Zusammenspiel dieser Linien.
 | plexer         | C                   | P/C (Routing)       | –                        | I                | –         | Event-Router zwischen Agenten, Faktenstrom                                |
 | tools          | C                   | P/I                 | –                        | I                | –         | Merger/Snapshots; erzeugen Artefakte, teils Event- oder Metrik-Ausgaben   |
 | weltgewebe     | –                   | –                   | –                        | –                | –         | Nachbarsystem (Web/Doku), nicht Fleet                                     |
-| vault-gewebe   | –                   | –                   | –                        | –                | –         | Privater Vault, Quelle für semantAH, nicht selbst auf Achsen verortet    |
+| vault-gewebe   | –                   | –                   | –                        | –                | –         | Privater Vault, Quelle für semantAH (Fleet-Mitglied)                     |
 ```
 
 ---

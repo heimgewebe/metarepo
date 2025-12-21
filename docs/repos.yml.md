@@ -1,5 +1,10 @@
 # repos.yml – Fleet-Konfiguration
 
+> **⚠️ SOURCE OF TRUTH NOTICE**
+> The canonical definition of the Fleet is located in `fleet/repos.yml`.
+> All lists of repositories in this documentation are derived or exemplary.
+> Do not edit repository lists manually in Markdown files.
+
 Die **Fleet** umfasst alle Repositories, die operativ über WGX und Contracts
 gesteuert werden sollen.
 
@@ -11,33 +16,9 @@ Es gibt drei Klassen:
 2. **Related**: Repos in `static.include`
 3. **Private**: niemals in der Fleet
 
-Beispiel:
+Eine aktuelle, generierte Übersicht befindet sich in:
+👉 **[docs/_generated/fleet.md](_generated/fleet.md)**
 
-```yaml
-static:
-  include:
-    - name: weltgewebe
-      url: "https://github.com/heimgewebe/weltgewebe"
-      description: "Dokumentation/extern"
-      status: "related"
-  # private Repositories:
-  # - vault-gewebe (nie Fleet)
+---
 
-
-
-repos:
-  - name: metarepo
-  - name: wgx
-  - name: contracts-mirror
-  - name: webmaschine
-  - name: hausKI
-  - name: hausKI-audio
-  - name: heimlern
-  - name: semantAH
-  - name: aussensensor
-  - name: chronik
-  - name: tools
-  - name: mitschreiber
-  - name: sichter
-  - name: leitstand
-```
+Die Definition in `fleet/repos.yml` ist maßgeblich.

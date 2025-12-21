@@ -1,5 +1,9 @@
 # ADR-0007 Contracts als Single Source of Truth
 
+> **Terminology Note:**
+> The repository referred to as `contracts` (or `heimgewebe/contracts`) in this ADR is now named `contracts-mirror`.
+> The semantic role remains unchanged: it serves as a mirror for external API definitions, while the canonical internal source remains `metarepo/contracts/`.
+
 Status: accepted
 Datum: 2025-12-05
 Betroffene Repos:

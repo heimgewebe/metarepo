@@ -10,7 +10,8 @@
 6. **Politisch-Adaptiv (heimlern)** – Policies, Bandits, Feedback/Score
 - **Interaktiv/Dialogisch (leitstand, mitschreiber, hausKI-audio)** – UI, Intent, Kontext, Audio-Events
 
-> **Nicht-Fleet:** `vault-gewebe` (privat) und `weltgewebe` (öffentlich, unabhängig) gehören nicht zur Fleet; sie werden nur referenziert.
+> **Related/Satellite:** `weltgewebe` (öffentlich, unabhängig) gehört nicht zur Fleet.
+> **Fleet:** `vault-gewebe` (privat) ist Mitglied der Fleet (Quelle für semantAH), hat aber Sonderstatus (kein WGX).
 
 Diese Seite fasst die wichtigsten Architektur-Perspektiven zusammen und verlinkt auf die
 bestehenden Diagramme sowie Detaildokumente.

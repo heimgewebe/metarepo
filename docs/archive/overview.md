@@ -1,3 +1,8 @@
+> **⚠️ ARCHIVE NOTICE**
+> This document reflects a historical system overview.
+> The canonical fleet definition is `fleet/repos.yml`.
+> Lists of repositories below may be outdated.
+
 # Heimgewebe – System Overview
 
 Die folgende Masterliste beschreibt **alle Repositories des Heimgewebes**, gegliedert nach ihrer Rolle
@@ -44,7 +49,7 @@ KI-Kern (Rust GPU/CPU).
 
 ### hausKI-audio
 
-Audio-Schicht (`depends_on: hausKI`).
+Audio-Pipeline und Telemetrie.
 
 ### heimlern
 
