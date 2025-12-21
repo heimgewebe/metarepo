@@ -45,6 +45,27 @@
             "minimum": 0,
             "maximum": 1,
             "description": "Konfidenzwert (0-1)."
+          },
+          "sources": {
+            "type": "array",
+            "description": "Quellen, aus denen der Themenraum gespeist wird.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "ref": { "type": "string" },
+                "type": { "type": "string", "enum": ["event", "repo_file", "vault_note", "url", "other"] },
+                "weight": { "type": "number", "minimum": 0, "maximum": 1 }
+              },
+              "required": ["ref", "type"],
+              "additionalProperties": true
+            }
+          },
+          "suggested_questions": {
+            "type": "array",
+            "description": "Offene Fragen, die aus diesem Themenraum hervorgehen.",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "required": ["topic", "confidence"],
@@ -56,7 +77,7 @@
       "description": "Liste von Signalen.",
       "items": {
         "type": "object",
-        "description": "Einzelsignal (Struktur flexibel aber als Objekt definiert).",
+        "description": "Einzelsignal.",
         "additionalProperties": true
       }
     },

@@ -8,11 +8,29 @@
   "topics": [
     {
       "topic": "Epistemic Drift",
-      "confidence": 0.85
+      "confidence": 0.85,
+      "sources": [
+        {
+          "type": "event",
+          "ref": "event-123",
+          "weight": 0.9
+        },
+        {
+          "type": "vault_note",
+          "ref": "Analysis/Drift.md",
+          "weight": 0.5
+        }
+      ],
+      "suggested_questions": [
+        "Is the drift accelerating?",
+        "What are the root causes?"
+      ]
     },
     {
       "topic": "System Resilience",
-      "confidence": 0.92
+      "confidence": 0.92,
+      "sources": [],
+      "suggested_questions": []
     }
   ],
   "signals": [

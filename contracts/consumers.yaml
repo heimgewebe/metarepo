@@ -60,9 +60,6 @@ knowledge:
   observatory:
     schema: contracts/knowledge.observatory.schema.json
     consumers:
-      - repo: semantAH
-        files: []
-        mode: reference-only
       - repo: leitstand
         files: []
         mode: reference-only
