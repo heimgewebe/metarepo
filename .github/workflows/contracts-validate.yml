@@ -180,6 +180,15 @@ jobs:
             fi
           done
 
+      - name: Validate Contract Examples (Hard Check)
+        run: |
+          set -euo pipefail
+          ajv validate \
+            -s contracts/knowledge.observatory.schema.json \
+            -d contracts/examples/knowledge.observatory.example.json \
+            --strict=false \
+            -c ajv-formats --spec=draft2020
+
       - name: Validate Fixtures
         run: |
           shopt -s nullglob globstar
