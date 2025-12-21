@@ -250,9 +250,9 @@ Jede Komponente ist mit einem der drei Labels markiert:
 
 ## 2.16 weltgewebe & vault-gewebe – angrenzende Systeme
 
-- (IST) weltgewebe = Öffentlichkeits- und Dokumentationsoberfläche, nicht Fleet-pflichtig.
-- (IST) vault-gewebe = privater Obsidian-Vault, dient als Inhaltseinspeisung für semantAH.
-- (POLICY) beide bleiben bewusst außerhalb der Fleet.
+- (IST) weltgewebe = Öffentlichkeits- und Dokumentationsoberfläche, Related/Satellite.
+- (IST) vault-gewebe = privater Obsidian-Vault, dient als Inhaltseinspeisung für semantAH (Fleet).
+- (POLICY) weltgewebe bleibt bewusst außerhalb der Fleet (Satellite), vault-gewebe wird integriert.
 
 ---
 
@@ -316,8 +316,9 @@ Die Kraft des Systems entsteht aus ihrer Interaktion, nicht aus einer einzelnen 
 | mitschreiber   | C                   | P (os.context.*)    | –                        | –                | Kern      | OS-/App-/Fenster-Kontext → WAL → os.context-Events                        |
 | plexer         | C                   | P/C (Routing)       | –                        | I                | –         | Event-Router zwischen Agenten, Faktenstrom                                |
 | tools          | C                   | P/I                 | –                        | I                | –         | Merger/Snapshots; erzeugen Artefakte, teils Event- oder Metrik-Ausgaben   |
+| webmaschine    | T                   | –                   | –                        | –                | –         | Lokaler Anker, Tooling                                                   |
+| vault-gewebe   | –                   | –                   | –                        | –                | –         | Privater Vault, Quelle für semantAH (Fleet-Mitglied)                     |
 | weltgewebe     | –                   | –                   | –                        | –                | –         | Nachbarsystem (Web/Doku), nicht Fleet                                     |
-| vault-gewebe   | –                   | –                   | –                        | –                | –         | Privater Vault, Quelle für semantAH, nicht selbst auf Achsen verortet    |
 ```
 
 **Mini-Erläuterungen pro Achse**

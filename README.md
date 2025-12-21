@@ -1,5 +1,10 @@
 # Metarepo – Heimgewebe Control Plane
 
+> **⚠️ SOURCE OF TRUTH NOTICE**
+> The canonical definition of the Fleet is located in `fleet/repos.yml`.
+> All lists of repositories in this documentation are derived or exemplary.
+> Do not edit repository lists manually in Markdown files.
+
 > **Zentraler Meta-Layer für die Heimgewebe-Fleet**
 > Spiegelt kanonische Templates (Workflows, Justfile, Docs, WGX-Profile) in Sub-Repos und zieht Verbesserungen zurück (dialektisches Lernen).
 
@@ -24,12 +29,14 @@ Das **metarepo** ist die Quelle der Wahrheit für:
 - **Templates** – Gemeinsame Workflows, Justfiles, Docs und WGX-Profile unter `templates/`
 - **Contracts** – JSON-Schemas und OpenAPI-Specs unter `contracts/`
 - **Reusable Workflows** – Wiederverwendbare CI-Pipelines unter `.github/workflows/reusable-*.yml`
-- **Fleet-Management** – Zentrale Konfiguration aller Heimgewebe-Repos in `repos.yml`
+- **Fleet-Management** – Zentrale Konfiguration aller Heimgewebe-Repos in `fleet/repos.yml`
 
 ### Heimgewebe-Fleet
 
-Die Fleet umfasst folgende Core-Repos:
-- **weltgewebe** – Externe Events und Signale
+Die aktuelle Fleet wird in [`docs/_generated/fleet.md`](docs/_generated/fleet.md) (automatisch generiert aus `fleet/repos.yml`) aufgeführt.
+
+Die Fleet umfasst Core-Repos wie:
+- **weltgewebe** – Externe Events und Signale (Related)
 - **hausKI** – KI-Orchestrator (Rust, GPU, Offline)
 - **hausKI-audio** – Audio-Pipeline und Telemetrie
 - **semantAH** – Wissensextraktion und Embeddings
@@ -38,6 +45,9 @@ Die Fleet umfasst folgende Core-Repos:
 - **aussensensor** – Außen-Signalgeber
 - **heimlern** – Lern- und Policy-Engine
 - **tools** – Gemeinsame Utilities
+- **contracts-mirror** – Spiegel für externe API-Contracts
+
+(Siehe `docs/_generated/fleet.md` für die vollständige, kanonische Liste.)
 
 ## Schnellstart
 
@@ -123,7 +133,8 @@ metarepo/
 ├── scripts/             # Sync-, Drift- und Fleet-Tools
 ├── docs/                # Projektdokumentation
 ├── reports/             # Sync-Logs und Drift-Reports
-├── repos.yml            # Fleet-Konfiguration
+├── fleet/               # Fleet-Definition (repos.yml)
+├── repos.yml            # (Legacy) Fleet-Konfiguration für Tooling
 └── Justfile             # Haupt-Kommandos
 ```
 
