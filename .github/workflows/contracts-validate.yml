@@ -161,9 +161,11 @@ jobs:
       - name: Validate All Examples
         run: |
           shopt -s nullglob
-          # Find all examples that match the pattern *.example.json
-          for example in contracts/examples/*.example.json; do
-            filename=$(basename "$example" .example.json)
+          # Find all examples that match the pattern *.json (including .example.json)
+          for example in contracts/examples/*.json; do
+            # Extract base name, handling .example.json or just .json
+            base=$(basename "$example" .json)
+            filename=${base%.example}
             schema="contracts/${filename}.schema.json"
 
             if [[ -f "$schema" ]]; then
