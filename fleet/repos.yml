@@ -1,123 +1,28 @@
-- repo: metarepo
-  fleet_member: true
-  role: Control-Plane, Templates, Contracts
-  policy_tier: standard
-  wgx:
-    profile_expected: true
+---
+static:
+  include:
+    - name: weltgewebe
+      url: "https://github.com/heimgewebe/weltgewebe"
+      status: related
+    - name: vault-privat
+      status: related
+      fleet: false
 
-- repo: wgx
-  fleet_member: true
-  role: Fleet-CLI / Motorik
-  policy_tier: standard
-  wgx:
-    profile_expected: true
-
-- repo: contracts-mirror
-  fleet_member: true
-  role: Schema-Definitionen für Events/Tools
-  policy_tier: standard
-  wgx:
-    profile_expected: true
-
-- repo: hausKI
-  fleet_member: true
-  role: KI-Orchestrator (Rust)
-  policy_tier: standard
-  wgx:
-    profile_expected: true
-
-- repo: hausKI-audio
-  fleet_member: true
-  role: Audio-Schicht
-  policy_tier: standard
-  wgx:
-    profile_expected: true
-
-- repo: heimlern
-  fleet_member: true
-  role: Lern-/Policy-Schicht
-  policy_tier: standard
-  wgx:
-    profile_expected: true
-
-- repo: semantAH
-  fleet_member: true
-  role: Embeddings / Wissensschicht
-  policy_tier: standard
-  wgx:
-    profile_expected: true
-
-- repo: aussensensor
-  fleet_member: true
-  role: Außenwelt-Events
-  policy_tier: standard
-  wgx:
-    profile_expected: true
-
-- repo: chronik
-  fleet_member: true
-  role: Persistenz/Audit
-  policy_tier: standard
-  wgx:
-    profile_expected: true
-
-- repo: tools
-  fleet_member: true
-  role: Skripte & Hilfsprogramme
-  policy_tier: standard
-  wgx:
-    profile_expected: true
-
-- repo: mitschreiber
-  fleet_member: true
-  role: Dialog-/Schreibschicht
-  policy_tier: standard
-  wgx:
-    profile_expected: true
-
-- repo: sichter
-  fleet_member: true
-  role: Review-Agent / Semantic Checks
-  policy_tier: standard
-  wgx:
-    profile_expected: true
-
-- repo: heimgeist
-  fleet_member: true
-  role: Meta-Agent / Beobachtung
-  policy_tier: standard
-  wgx:
-    profile_expected: true
-
-- repo: plexer
-  fleet_member: true
-  role: Agent-Routing / Orchestrierung
-  policy_tier: standard
-  wgx:
-    profile_expected: true
-
-- repo: leitstand
-  fleet_member: true
-  role: Observer / UI
-  policy_tier: standard
-  wgx:
-    profile_expected: true
-
-- repo: vault-gewebe
-  fleet_member: true
-  role: Privater Obsidian-Vault
-  policy_tier: relaxed
-  wgx:
-    profile_expected: false
-
-- repo: weltgewebe
-  fleet_member: false
-  role: Web/Doku/Externe Signale
-  wgx:
-    profile_expected: false
-
-- repo: icf-tool
-  fleet_member: false
-  role: ICF-Katalog & Browser
-  wgx:
-    profile_expected: false
+repos:
+  - name: metarepo
+  - name: wgx
+  - name: contracts-mirror
+  - name: hausKI
+  - name: hausKI-audio
+  - name: heimlern
+  - name: semantAH
+  - name: aussensensor
+  - name: chronik
+  - name: tools
+  - name: mitschreiber
+  - name: sichter
+  - name: leitstand
+  - name: heimgeist
+  - name: plexer
+  - name: webmaschine
+  - name: vault-gewebe
