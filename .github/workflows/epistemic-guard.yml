@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Run WGX epistemic guard
-        uses: heimgewebe/wgx/.github/workflows/wgx-guard.yml@52a12ff97c402d1aa718d534a84b0225e7718c82
+        uses: heimgewebe/wgx/.github/workflows/wgx-guard.yml@main
         with:
           guard: epistemic-check
           mode: warn-only
