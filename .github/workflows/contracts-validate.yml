@@ -180,14 +180,19 @@ jobs:
             fi
           done
 
-      - name: Validate Contract Examples (Hard Check)
+      - name: Validate Contract Examples (Explicit)
         run: |
           set -euo pipefail
-          ajv validate \
-            -s contracts/knowledge.observatory.schema.json \
-            -d contracts/examples/knowledge.observatory.example.json \
-            --strict=false \
-            -c ajv-formats --spec=draft2020
+          if [ -f contracts/examples/knowledge.observatory.example.json ]; then
+            ajv validate \
+              -s contracts/knowledge.observatory.schema.json \
+              -d contracts/examples/knowledge.observatory.example.json \
+              --strict=false \
+              -c ajv-formats --spec=draft2020
+          else
+            echo "::error::Missing contract example: contracts/examples/knowledge.observatory.example.json"
+            exit 1
+          fi
 
       - name: Validate Fixtures
         run: |

@@ -78,6 +78,11 @@
       "items": {
         "type": "object",
         "description": "Einzelsignal.",
+        "properties": {
+          "type": { "type": "string", "description": "Typ des Signals (z. B. anomaly, trend)." },
+          "description": { "type": "string", "description": "Textuelle Beschreibung." }
+        },
+        "required": ["type"],
         "additionalProperties": true
       }
     },
