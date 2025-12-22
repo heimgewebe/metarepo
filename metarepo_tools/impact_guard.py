@@ -6,6 +6,7 @@ import argparse
 import json
 import re
 from collections import defaultdict
+from collections.abc import Iterable as IterableABC
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Iterable, Mapping
@@ -107,6 +108,53 @@ def _load_manifest_fallback(text: str) -> dict:
     return root
 
 
+def _normalise_depends_on(
+    value: object,
+    *,
+    warnings: list[str] | None = None,
+    context: str | None = None,
+) -> list[str]:
+    context_prefix = f"{context}: " if context else ""
+    seen_warnings = set(warnings or [])
+
+    def _warn(message: str) -> None:
+        if warnings is not None:
+            full = f"{context_prefix}{message}"
+            if full not in seen_warnings:
+                seen_warnings.add(full)
+                warnings.append(full)
+
+    if value is None:
+        return []
+    if isinstance(value, str):
+        candidate = value.strip()
+        return [candidate] if candidate else []
+    if isinstance(value, Mapping):
+        _warn("depends_on mapping ignored; expected string or iterable of strings")
+        return []
+    if isinstance(value, IterableABC):
+        deps: list[str] = []
+        for item in value:
+            if item is None:
+                continue
+            if isinstance(item, str):
+                candidate = item.strip()
+                if candidate:
+                    deps.append(candidate)
+                else:
+                    _warn("depends_on entry was empty/whitespace and ignored")
+                continue
+            if isinstance(item, Mapping):
+                _warn("depends_on mapping entry ignored; expected string")
+                continue
+            _warn(f"depends_on entry of type {type(item).__name__} ignored")
+        if isinstance(value, (set, frozenset)):
+            return sorted(dict.fromkeys(deps))
+        return deps
+    _warn(f"depends_on value of type {type(value).__name__} ignored")
+    return []
+
+
 def load_manifest(manifest_path: Path) -> dict[str, dict]:
     text = manifest_path.read_text(encoding="utf-8")
     if yaml is not None:
@@ -200,10 +248,14 @@ def build_mermaid(
     return "\n".join(lines)
 
 
-def compute_dependents(manifest: Mapping[str, Mapping]) -> dict[str, list[str]]:
+def compute_dependents(
+    manifest: Mapping[str, Mapping], warnings: list[str] | None = None
+) -> dict[str, list[str]]:
     dependents: dict[str, list[str]] = defaultdict(list)
     for repo, info in manifest.items():
-        for dep in info.get("depends_on", []) or []:
+        for dep in _normalise_depends_on(
+            info.get("depends_on"), warnings=warnings, context=f"manifest.{repo}"
+        ):
             dependents[dep].append(repo)
     return dependents
 
@@ -214,7 +266,8 @@ def build_report(
     manifest: Mapping[str, Mapping],
 ) -> dict:
     changed_set = set(changed)
-    dependents = compute_dependents(manifest)
+    warnings: list[str] = []
+    dependents = compute_dependents(manifest, warnings=warnings)
 
     impacted_contracts = [contracts[c] for c in contracts if c in changed_set]
 
@@ -241,12 +294,19 @@ def build_report(
         info["roles"] = sorted(info["roles"])
         info["domain"] = meta.get("domain")
         info["scope"] = meta.get("scope")
-        info["depends_on"] = meta.get("depends_on", []) or []
+        info["depends_on"] = _normalise_depends_on(
+            meta.get("depends_on"),
+            warnings=warnings,
+            context=f"manifest.{repo}",
+        )
         info["dependents"] = dependents.get(repo, [])
+
+    warnings = list(dict.fromkeys(warnings))
 
     return {
         "changed_contracts": [c.path.as_posix() for c in impacted_contracts],
         "impacted_repos": repo_details,
+        "warnings": warnings,
     }
 
 
@@ -285,6 +345,13 @@ def write_markdown_report(
             lines.append(
                 f"| {repo} | {roles} | {domain} | {scope} | {depends_on} | {dependents} |"
             )
+        lines.append("")
+
+    warnings = summary.get("warnings") or []
+    if warnings:
+        lines.append("## Warnings")
+        for warning in warnings:
+            lines.append(f"- {warning}")
         lines.append("")
 
     if mermaid:
