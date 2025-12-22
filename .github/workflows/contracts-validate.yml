@@ -130,7 +130,7 @@ jobs:
       - name: Validate Schemas (compile)
         run: |
           shopt -s nullglob
-          schemas=( json/**/*.schema.json )
+          schemas=( contracts/**/*.schema.json )
 
           if [ ${#schemas[@]} -eq 0 ]; then
             echo "::notice::No schema files found in contracts/ - skipping compilation"
@@ -161,9 +161,11 @@ jobs:
       - name: Validate All Examples
         run: |
           shopt -s nullglob
-          # Find all examples that match the pattern *.example.json
-          for example in contracts/examples/*.example.json; do
-            filename=$(basename "$example" .example.json)
+          # Find all examples that match the pattern *.json (including .example.json)
+          for example in contracts/examples/*.json; do
+            # Extract base name, handling .example.json or just .json
+            base=$(basename "$example" .json)
+            filename=${base%.example}
             schema="contracts/${filename}.schema.json"
 
             if [[ -f "$schema" ]]; then
@@ -178,10 +180,24 @@ jobs:
             fi
           done
 
+      - name: Validate Contract Examples (Explicit)
+        run: |
+          set -euo pipefail
+          if [ -f contracts/examples/knowledge.observatory.example.json ]; then
+            ajv validate \
+              -s contracts/knowledge.observatory.schema.json \
+              -d contracts/examples/knowledge.observatory.example.json \
+              --strict=false \
+              -c ajv-formats --spec=draft2020
+          else
+            echo "::error::Missing contract example: contracts/examples/knowledge.observatory.example.json"
+            exit 1
+          fi
+
       - name: Validate Fixtures
         run: |
           shopt -s nullglob globstar
-          schemas=( json/**/*.schema.json )
+          schemas=( contracts/**/*.schema.json )
           fixtures=( fixtures/**/*.jsonl )
 
           if [ ${#schemas[@]} -eq 0 ]; then

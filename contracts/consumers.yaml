@@ -56,6 +56,20 @@ metrics:
         files: []
         mode: reference-only
 
+knowledge:
+  observatory:
+    schema: contracts/knowledge.observatory.schema.json
+    consumers:
+      - repo: leitstand
+        files: []
+        mode: reference-only
+      - repo: hausKI
+        files: []
+        mode: reference-only
+      - repo: heimlern
+        files: []
+        mode: reference-only
+
 os_context:
   state:
     schema: contracts/os.context.state.schema.json
