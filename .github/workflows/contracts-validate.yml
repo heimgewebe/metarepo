@@ -171,7 +171,7 @@ jobs:
             # Extract base name, handling .example.json or just .json
             base=$(basename "$example" .json)
             filename=${base%.example}
-            
+
             # Try to find schema in contracts/ or contracts/events/
             schema=""
             if [[ -f "contracts/${filename}.schema.json" ]]; then
