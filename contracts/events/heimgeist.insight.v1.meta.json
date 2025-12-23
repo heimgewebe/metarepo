@@ -1,0 +1,12 @@
+{
+  "contract": "heimgeist.insight.v1",
+  "schema": "contracts/events/heimgeist.insight.v1.schema.json",
+  "governance": {
+    "producers": ["heimgeist"],
+    "consumers": ["chronik", "wgx", "leitstand", "hausKI", "heimlern", "semantAH"]
+  },
+  "notes": [
+    "This file is intentionally NOT JSON-Schema. It is governance metadata.",
+    "Reason: strict schema validators may fail on unknown keywords inside *.schema.json."
+  ]
+}
