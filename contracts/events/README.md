@@ -13,7 +13,7 @@ Die gemeinsame Wahrheit für `heimgeist.insight` Events ist wie folgt definiert:
   "id": "evt-${insight.id}", // z.B. evt-uuid...
   "meta": {
     "occurred_at": "ISO8601-Timestamp",
-    "role": "heimgeist" // oder "archivist"
+    "role": "heimgeist"
   },
   "data": {
     // Payload (Typ, Summary, Details...)
