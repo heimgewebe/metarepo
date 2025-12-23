@@ -51,6 +51,11 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
   - Produzent: semantAH
   - Konsumenten: leitstand, hausKI, heimlern
   - Typ: Beobachtung
+- `contracts/events/heimgeist.insight.v1.schema.json`
+  - Zweck: Systemreflexion und Meta-Analysen durch Heimgeist (z. B. Drifts, Risiken).
+  - Produzent: heimgeist
+  - Konsumenten: chronik, leitstand
+  - Regel: Versionierung erfolgt über Dateiname (v1) und `schema_version`-Feld. Breaking Changes erfordern v2.
 
 ### 1.4 Policy-Kreislauf
 

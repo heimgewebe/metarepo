@@ -1,0 +1,16 @@
+{
+  "kind": "heimgeist.insight",
+  "version": 1,
+  "id": "evt-550e8400-e29b-41d4-a716-446655440000",
+  "meta": {
+    "occurred_at": "2023-10-27T10:00:00Z",
+    "role": "heimgeist"
+  },
+  "data": {
+    "insight_type": "drift",
+    "summary": "Mögliche Diskrepanz zwischen Zielbild und Implementation in Repository 'sichter'",
+    "details": "Die Analyse der letzten 50 Events zeigt...",
+    "context_refs": ["https://github.com/heimgewebe/sichter/pull/42"],
+    "confidence": 0.85
+  }
+}
