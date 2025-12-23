@@ -1,11 +1,11 @@
 # Heimgeist Contracts & Events
 
-## Sync-Punkt A: Mini-Spezifikation (v1)
+## Canonical Source of Truth (SSOT)
 
-**Source of Truth (SoT):** `metarepo/contracts/events/heimgeist.insight.v1.schema.json`
+Canonical source of truth for Heimgeist Insight Events lives here (`metarepo/contracts/events/heimgeist.insight.v1.schema.json`).
+All other repos must mirror or validate against this schema.
 
-Dieses Verzeichnis enthält Contracts für die Domain `heimgeist`.
-Die gemeinsame Wahrheit für `heimgeist.insight` Events ist wie folgt definiert:
+The definitive structure for `heimgeist.insight` (v1) events is:
 
 ```json
 // Wrapper-Struktur
