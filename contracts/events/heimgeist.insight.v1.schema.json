@@ -35,7 +35,7 @@
         "role": {
           "type": "string",
           "enum": ["heimgeist", "archivist"],
-          "description": "Rolle des Erzeugers"
+          "description": "Rolle des Erzeugers/Persistierers"
         },
         "schema_version": {
           "type": "string",
@@ -73,8 +73,18 @@
           "type": "number",
           "minimum": 0.0,
           "maximum": 1.0
+        },
+        "origin": {
+          "type": "object",
+          "description": "Ursprung der Erkenntnis (falls abweichend von meta.role)",
+          "properties": {
+            "role": { "type": "string" },
+            "agent_id": { "type": "string" }
+          },
+          "additionalProperties": false
         }
-      }
+      },
+      "additionalProperties": false
     }
   },
   "additionalProperties": false
