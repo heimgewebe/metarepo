@@ -51,6 +51,12 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
   - Produzent: semantAH
   - Konsumenten: leitstand, hausKI, heimlern
   - Typ: Beobachtung
+- `contracts/events/heimgeist.insight.v1.schema.json`
+  - Zweck: Systemreflexion und Meta-Analysen durch Heimgeist (z. B. Drifts, Risiken).
+  - Produzent: heimgeist
+  - Konsumenten: chronik, leitstand
+  - Governance: siehe `heimgeist.insight.v1.meta.json` (getrennt für strict-mode Compliance)
+  - Regel: Versionierung erfolgt über Dateiname (v1) und `schema_version`-Feld. Breaking Changes erfordern v2.
 
 ### 1.4 Policy-Kreislauf
 
@@ -232,6 +238,26 @@ Grundsätze:
 - **klare `title` und `description`**,
 - **`additionalProperties: false`**, außer es gibt gute Gründe für Offenheit,
 - gemeinsame Stammdaten-Felder (`id`, `created_at`, ggf. `source`, `trace_id`) möglichst wiederverwenden.
+
+### 4.1 Governance-Metadaten (*.meta.json)
+
+Für Contracts, die Produzenten/Konsumenten dokumentieren möchten, wird empfohlen, diese Informationen **außerhalb des JSON-Schemas** zu halten, um Strict-Mode-Kompatibilität zu gewährleisten. Verwende eine separate `*.meta.json`-Datei:
+
+```json
+{
+  "contract": "<name>.v<version>",
+  "schema": "contracts/<path>/<name>.schema.json",
+  "governance": {
+    "producers": ["service1"],
+    "consumers": ["service2", "service3"]
+  },
+  "notes": [
+    "This file is intentionally NOT JSON-Schema. It is governance metadata."
+  ]
+}
+```
+
+Grund: JSON-Schema-Validatoren im strict mode können bei unbekannten Keywords (z.B. `x-producers`, `x-consumers`) fehlschlagen.
 
 ---
 

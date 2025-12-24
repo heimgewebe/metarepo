@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.heimgewebe.org/contracts/events/base.event.schema.json",
+  "title": "Heimgewebe Base Event Envelope",
+  "description": "Kanonischer Basis-Contract für alle Events im Heimgewebe (Envelope).",
+  "type": "object",
+  "required": ["kind", "version", "id", "meta", "data"],
+  "properties": {
+    "kind": {
+      "type": "string",
+      "description": "Art des Events (z.B. domain.eventname)"
+    },
+    "version": {
+      "type": "integer",
+      "description": "Schema-Version (Ganzzahl)"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^evt-",
+      "description": "Eindeutige Event-ID (Prefix 'evt-')"
+    },
+    "meta": {
+      "type": "object",
+      "required": ["occurred_at", "producer"],
+      "properties": {
+        "occurred_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Zeitpunkt des Ereignisses (ISO8601)"
+        },
+        "producer": {
+          "type": "string",
+          "description": "System/Rolle, das das Event erzeugt/persistiert hat"
+        }
+      }
+    },
+    "data": {
+      "type": "object",
+      "description": "Domänenspezifische Nutzdaten"
+    }
+  }
+}

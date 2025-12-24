@@ -129,6 +129,26 @@ jobs:
 
       - name: Validate Schemas (compile)
         run: |
+          set -Eeuo pipefail
+          PS4="+(${BASH_SOURCE##*/}:${LINENO}): "
+          
+          on_fail() {
+            code=$?
+            echo "::group::FAIL DIAGNOSTICS"
+            echo "exit_code=${code}"
+            echo "pwd=$(pwd)"
+            echo "GITHUB_WORKSPACE=${GITHUB_WORKSPACE:-<not set>}"
+            echo "GITHUB_REF=${GITHUB_REF:-<not set>}"
+            echo "GITHUB_SHA=${GITHUB_SHA:-<not set>}"
+            echo "Top-level files:"
+            find . -maxdepth 1 -type f -ls 2>/dev/null | head -30 || true
+            echo "contracts/ structure:"
+            find contracts/ -type f -name "*.json" | head -20 || true
+            echo "::endgroup::"
+            exit "${code}"
+          }
+          trap on_fail ERR
+          
           shopt -s nullglob
           schemas=( contracts/**/*.schema.json )
 
@@ -140,8 +160,14 @@ jobs:
           echo "Compiling ${#schemas[@]} schema(s)..."
           for schema in "${schemas[@]}"; do
             echo "Compiling $schema"
-            # Using -c ajv-formats and -p ajv-formats to ensure format validation works
-            ajv compile -s "$schema" --strict=log --spec=draft2020 -c ajv-formats
+            # Check if schema references base.event.schema.json and include it if so
+            # shellcheck disable=SC2016
+            if grep -q '"\$ref".*base\.event\.schema\.json' "$schema" 2>/dev/null; then
+              echo "  → Schema references base.event.schema.json, including as reference"
+              ajv compile -s "$schema" -r contracts/events/base.event.schema.json --strict=log --spec=draft2020 -c ajv-formats
+            else
+              ajv compile -s "$schema" --strict=log --spec=draft2020 -c ajv-formats
+            fi
           done
 
       - name: Validate Specific Examples
@@ -160,23 +186,58 @@ jobs:
 
       - name: Validate All Examples
         run: |
+          set -Eeuo pipefail
+          PS4="+(${BASH_SOURCE##*/}:${LINENO}): "
+          
+          on_fail() {
+            code=$?
+            echo "::group::FAIL DIAGNOSTICS"
+            echo "exit_code=${code}"
+            echo "pwd=$(pwd)"
+            echo "GITHUB_WORKSPACE=${GITHUB_WORKSPACE:-<not set>}"
+            echo "contracts/examples/ contents:"
+            find contracts/examples/ -maxdepth 1 -type f -ls 2>/dev/null | head -20 || true
+            echo "::endgroup::"
+            exit "${code}"
+          }
+          trap on_fail ERR
+          
           shopt -s nullglob
           # Find all examples that match the pattern *.json (including .example.json)
           for example in contracts/examples/*.json; do
             # Extract base name, handling .example.json or just .json
             base=$(basename "$example" .json)
             filename=${base%.example}
-            schema="contracts/${filename}.schema.json"
 
-            if [[ -f "$schema" ]]; then
+            # Try to find schema in contracts/ or contracts/events/
+            schema=""
+            if [[ -f "contracts/${filename}.schema.json" ]]; then
+              schema="contracts/${filename}.schema.json"
+            elif [[ -f "contracts/events/${filename}.schema.json" ]]; then
+              schema="contracts/events/${filename}.schema.json"
+            fi
+
+            if [[ -n "$schema" ]]; then
               echo "Validating $example against $schema"
-              ajv validate \
-                -s "$schema" \
-                -d "$example" \
-                --strict=false \
-                -c ajv-formats --spec=draft2020
+              # Check if schema references base.event.schema.json
+              # shellcheck disable=SC2016
+              if grep -q '"\$ref".*base\.event\.schema\.json' "$schema" 2>/dev/null; then
+                echo "  → Schema references base.event.schema.json, including as reference"
+                ajv validate \
+                  -s "$schema" \
+                  -r contracts/events/base.event.schema.json \
+                  -d "$example" \
+                  --strict=false \
+                  -c ajv-formats --spec=draft2020
+              else
+                ajv validate \
+                  -s "$schema" \
+                  -d "$example" \
+                  --strict=false \
+                  -c ajv-formats --spec=draft2020
+              fi
             else
-              echo "::notice::No matching schema found for $example (expected $schema)"
+              echo "::notice::No matching schema found for $example (tried contracts/${filename}.schema.json and contracts/events/${filename}.schema.json)"
             fi
           done
 

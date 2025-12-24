@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.heimgewebe.org/contracts/events/heimgeist.insight.v1.schema.json",
+  "title": "Heimgeist Insight Event",
+  "description": "Ein Insight-Event von Heimgeist (Meta-Analyse, Drift, Risiko).",
+  "$comment": "Governance (producers/consumers) lives in heimgeist.insight.v1.meta.json. Schema stays strict-mode clean.",
+  "allOf": [
+    { "$ref": "./base.event.schema.json" },
+    {
+      "type": "object",
+      "properties": {
+        "kind": { "const": "heimgeist.insight" },
+        "version": { "const": 1 },
+        "meta": {
+          "type": "object",
+          "properties": {
+            "producer": {
+              "type": "string",
+              "description": "Rolle des Erzeugers/Persistierers (z.B. heimgeist, archivist)"
+            },
+            "occurred_at": { "type": "string" },
+            "schema_version": { "type": "string" },
+            "idempotency_key": { "type": "string" }
+          },
+          "required": ["producer"],
+          "additionalProperties": false
+        },
+        "data": {
+          "type": "object",
+          "required": ["insight_type", "summary", "details"],
+          "properties": {
+            "insight_type": {
+              "type": "string",
+              "enum": ["risk", "drift", "pattern", "anomaly", "meta"],
+              "description": "Kategorie"
+            },
+            "summary": { "type": "string" },
+            "details": { "type": "string" },
+            "context_refs": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 1.0
+            },
+            "origin": {
+              "type": "object",
+              "properties": {
+                "role": { "type": "string" },
+                "agent_id": { "type": "string" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    }
+  ]
+}

@@ -184,6 +184,8 @@ wie der Organismus gedacht ist, wenn die Architektur vollständig ausgebaut ist.
   WGX-Flows anstoßen.
 - Versteht Insights, Events, Fleet-Zustände und Kontext in
   ihrem Zusammenspiel.
+- Erzeugt Insight-Events (`heimgeist.insight.v1`) für Chronik,
+  um Analysen historisierbar zu machen.
 
 ### 3.12 Sichter – Review- & Analyse-Agent
 
@@ -294,7 +296,7 @@ Komponente, sondern aus dem Zusammenspiel dieser Linien.
 | hausKI-audio   | C                   | P                   | I                        | I                | –         | Audio-spezifische Events und Steuerung                                    |
 | heimlern       | C                   | C                   | I                        | I                | C         | Muster-/Policy-Schicht auf Events, Insights und Kontext                   |
 | leitstand      | C                   | C                   | I                        | I                | I         | Visualisiert Events, Insights, Fleet-Health                               |
-| heimgeist      | C                   | C                   | I                        | I                | C         | Meta-Agent, konsumiert v. a. Events, Insights, Kontext                    |
+| heimgeist      | C                   | P/C                 | I                        | I                | C         | Meta-Agent, konsumiert Events/Kontext, produziert Insights                |
 | sichter        | C                   | P/I                 | C/P (PR-Kommandos)       | I                | –         | Review-Agent, getriggert über CI/PR; kann Events/Metriken erzeugen        |
 | mitschreiber   | C                   | P (os.context.*)    | –                        | –                | Kern      | OS-/App-/Fenster-Kontext → WAL → os.context-Events                        |
 | plexer         | C                   | P/C (Routing)       | –                        | I                | –         | Event-Router zwischen Agenten, Faktenstrom                                |
