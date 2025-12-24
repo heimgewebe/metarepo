@@ -33,12 +33,32 @@ runs:
         # 2. Strip comments
         # 3. Trim whitespace
         # 4. Strip quotes
+        
+        # Debug: show the file content around yq line
+        echo "Extracting yq version from ${TOOLCHAIN_FILE}..." >&2
+        echo "File snippet:" >&2
+        grep -C 2 'yq:' "${TOOLCHAIN_FILE}" || echo "WARNING: No yq: line found" >&2
+        
+        # Try primary extraction method
         YQ_VER=$(grep -E '^\s*yq:' "${TOOLCHAIN_FILE}" | \
           sed -E 's/^\s*[^:]+:\s*//; s/#.*$//; s/^[[:space:]]*//; s/[[:space:]]*$//; s/^"//; s/"$//; s/^'\''//; s/'\''$//' | \
           tr -d '\n\r')
+        
+        # Fallback: try simpler pattern if primary failed
+        if [[ -z "${YQ_VER}" ]]; then
+          echo "Primary extraction failed, trying fallback..." >&2
+          YQ_VER=$(grep 'yq:' "${TOOLCHAIN_FILE}" | head -1 | sed 's/.*yq:[[:space:]]*["'\'']*//; s/["'\''[:space:]]*$//' | sed 's/#.*$//' | tr -d '\n\r')
+        fi
+        
+        echo "Extracted YQ_VER: '${YQ_VER}'" >&2
 
         if [[ -z "${YQ_VER}" ]]; then
            echo "Failed to extract yq version from toolchain.versions.yml" >&2
+           echo "File path: ${TOOLCHAIN_FILE}" >&2
+           echo "File exists: $(test -f "${TOOLCHAIN_FILE}" && echo yes || echo no)" >&2
+           echo "File size: $(wc -c < "${TOOLCHAIN_FILE}" 2>/dev/null || echo unknown)" >&2
+           echo "Full file content:" >&2
+           cat "${TOOLCHAIN_FILE}" >&2
            exit 1
         fi
 
