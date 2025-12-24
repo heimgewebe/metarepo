@@ -11,6 +11,10 @@
     {
       "if": { "properties": { "type": { "const": "review.insight" } } },
       "then": { "properties": { "relation": false } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "insight.negation" } } },
+      "then": { "required": ["relation"] }
     }
   ],
   "additionalProperties": false,
@@ -37,6 +41,8 @@
     "relation": {
       "type": "object",
       "description": "Relational context for insight.negation (thesis ⟂ antithesis)",
+      "required": ["thesis", "antithesis"],
+      "additionalProperties": false,
       "properties": {
         "thesis": {
           "type": "string",
