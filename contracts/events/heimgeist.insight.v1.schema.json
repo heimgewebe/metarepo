@@ -3,8 +3,7 @@
   "$id": "https://schemas.heimgewebe.org/contracts/events/heimgeist.insight.v1.schema.json",
   "title": "Heimgeist Insight Event",
   "description": "Ein Insight-Event von Heimgeist (Meta-Analyse, Drift, Risiko).",
-  "x-producers": ["heimgeist"],
-  "x-consumers": ["chronik", "leitstand"],
+  "$comment": "Governance (producers/consumers) lives in heimgeist.insight.v1.meta.json. Schema stays strict-mode clean.",
   "allOf": [
     { "$ref": "./base.event.schema.json" },
     {

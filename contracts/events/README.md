@@ -7,6 +7,14 @@ All other repos must mirror or validate against this schema.
 
 It inherits from the **Base Event Envelope** (`base.event.schema.json`).
 
+### Governance Metadata
+
+Governance information (producers, consumers) is stored separately in `*.meta.json` files to keep schemas strict-mode compliant:
+- **Schema**: `heimgeist.insight.v1.schema.json` (validation logic)
+- **Governance**: `heimgeist.insight.v1.meta.json` (producers, consumers, documentation)
+
+This separation ensures that JSON Schema validators in strict mode can process schemas without encountering unknown keywords.
+
 The definitive structure for `heimgeist.insight` (v1) events is:
 
 ```json
