@@ -12,8 +12,17 @@ runs:
     - name: Load yq version pin
       shell: bash
       run: |
-        if [[ ! -f toolchain.versions.yml ]]; then
-          echo "toolchain.versions.yml not found in $(pwd)" >&2
+        # Determine repo root - composite actions run in caller's workspace
+        # GITHUB_WORKSPACE is set by GitHub Actions and points to the checked-out repo
+        REPO_ROOT="${GITHUB_WORKSPACE:-.}"
+        TOOLCHAIN_FILE="${REPO_ROOT}/toolchain.versions.yml"
+        
+        if [[ ! -f "${TOOLCHAIN_FILE}" ]]; then
+          echo "toolchain.versions.yml not found at ${TOOLCHAIN_FILE}" >&2
+          echo "Current directory: $(pwd)" >&2
+          echo "GITHUB_WORKSPACE: ${GITHUB_WORKSPACE:-<not set>}" >&2
+          echo "Contents of repo root:" >&2
+          ls -la "${REPO_ROOT}" | head -20 >&2
           exit 1
         fi
 
@@ -24,7 +33,7 @@ runs:
         # 2. Strip comments
         # 3. Trim whitespace
         # 4. Strip quotes
-        YQ_VER=$(grep -E '^\s*yq:' toolchain.versions.yml | \
+        YQ_VER=$(grep -E '^\s*yq:' "${TOOLCHAIN_FILE}" | \
           sed -E 's/^\s*[^:]+:\s*//; s/#.*$//; s/^[[:space:]]*//; s/[[:space:]]*$//; s/^"//; s/"$//; s/^'\''//; s/'\''$//' | \
           tr -d '\n\r')
 
@@ -40,7 +49,8 @@ runs:
       uses: actions/cache@v4
       with:
         path: ~/.local/bin/yq
-        key: ${{ runner.os }}-yq-${{ hashFiles('toolchain.versions.yml') }}
+        # Use GITHUB_WORKSPACE to ensure consistent path resolution across composite action calls
+        key: ${{ runner.os }}-yq-${{ hashFiles(format('{0}/toolchain.versions.yml', github.workspace)) }}
         restore-keys: |
           ${{ runner.os }}-yq-
           yq-
@@ -51,29 +61,35 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github-token }}
       run: |
         set -euo pipefail
+        
+        # Determine repo root - composite actions might run in different contexts
+        REPO_ROOT="${GITHUB_WORKSPACE:-.}"
+        cd "${REPO_ROOT}"
+        
         # Add tools/bin to PATH for this step AND subsequent steps
         # $GITHUB_PATH takes effect in NEXT step, so we also export locally
-        echo "$PWD/tools/bin" >> "$GITHUB_PATH"
-        export PATH="$PWD/tools/bin:$PATH"
+        echo "${REPO_ROOT}/tools/bin" >> "$GITHUB_PATH"
+        export PATH="${REPO_ROOT}/tools/bin:$PATH"
 
         YQ_VER_TRIM="${YQ_VERSION#v}"
 
         # Ensure scripts are executable
-        chmod +x scripts/tools/yq-pin.sh
+        chmod +x "${REPO_ROOT}/scripts/tools/yq-pin.sh"
 
         # Pinned Version erzwingen (Download + Verifikation)
-        scripts/tools/yq-pin.sh ensure
+        # The script uses BASH_SOURCE to find ROOT_DIR, so it will work from any location
+        "${REPO_ROOT}/scripts/tools/yq-pin.sh" ensure
 
         # Re-export PATH to ensure tools/bin is prioritized after yq-pin.sh runs
-        export PATH="$PWD/tools/bin:$PATH"
+        export PATH="${REPO_ROOT}/tools/bin:$PATH"
 
         # Final verification - check both in PATH and at explicit location
-        if [[ -x "$PWD/tools/bin/yq" ]]; then
-          YQ_BIN="$PWD/tools/bin/yq"
+        if [[ -x "${REPO_ROOT}/tools/bin/yq" ]]; then
+          YQ_BIN="${REPO_ROOT}/tools/bin/yq"
         elif command -v yq >/dev/null; then
           YQ_BIN="$(command -v yq)"
         else
-          echo "yq installation failed: binary not found at $PWD/tools/bin/yq and not in PATH" >&2
+          echo "yq installation failed: binary not found at ${REPO_ROOT}/tools/bin/yq and not in PATH" >&2
           exit 1
         fi
 
