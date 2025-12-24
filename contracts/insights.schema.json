@@ -5,15 +5,12 @@
   "x-producers": ["semantAH"],
   "x-consumers": ["hausKI", "chronik"],
   "x-related-adrs": ["docs/adrs/0022-erkenntnis-vorlauf-negationsspur.md"],
-  "x-todo": [
-    "Introduce a first-class negation/contrast insight type (insight.negation) and relations (thesis ⟂ antithesis) per ADR-0022. Keep it optional and threshold-driven."
-  ],
   "type": "object",
   "additionalProperties": false,
   "required": ["type","repo","source","file","score","verdict","ingested_at"],
   "properties": {
     "id":            { "type":"string", "description":"stable hash/id (optional)" },
-    "type":          { "type":"string", "const": "review.insight" },
+    "type":          { "type":"string", "enum": ["review.insight", "insight.negation"] },
     "repo":          { "type":"string", "minLength": 1 },
     "source":        { "type":"string", "enum": ["hauski","ci","manual"] },
     "file":          { "type":"string" },
@@ -25,6 +22,21 @@
     "schema_version":{ "type":"string" },
     "source_version":{ "type":"string" },
     "runner_host":   { "type":"string" },
-    "bucket":        { "type":"string", "enum": ["info","warn","fail"] }
+    "bucket":        { "type":"string", "enum": ["info","warn","fail"] },
+    "relation": {
+      "type": "object",
+      "required": ["thesis", "antithesis"],
+      "additionalProperties": false,
+      "properties": {
+        "thesis": { "type": "string" },
+        "antithesis": { "type": "string" }
+      }
+    }
+  },
+  "if": { "properties": { "type": { "const": "review.insight" } } },
+  "then": { "properties": { "relation": false } },
+  "else": {
+    "if": { "properties": { "type": { "const": "insight.negation" } } },
+    "then": { "required": ["relation"] }
   }
 }

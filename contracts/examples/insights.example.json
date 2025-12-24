@@ -1,0 +1,13 @@
+{
+  "type": "insight.negation",
+  "repo": "heimgewebe/semantAH",
+  "source": "ci",
+  "file": "pipelines/observatory/negation.py",
+  "score": 85,
+  "verdict": "Contradiction detected between thesis and antithesis",
+  "ingested_at": "2023-10-27T10:00:00Z",
+  "relation": {
+    "thesis": "evt-123-thesis",
+    "antithesis": "evt-456-antithesis"
+  }
+}
