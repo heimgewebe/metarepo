@@ -130,7 +130,7 @@ jobs:
       - name: Validate Schemas (compile)
         run: |
           set -Eeuo pipefail
-          PS4='+(${BASH_SOURCE##*/}:${LINENO}): '
+          PS4="+(${BASH_SOURCE##*/}:${LINENO}): "
           
           on_fail() {
             code=$?
@@ -186,7 +186,7 @@ jobs:
       - name: Validate All Examples
         run: |
           set -Eeuo pipefail
-          PS4='+(${BASH_SOURCE##*/}:${LINENO}): '
+          PS4="+(${BASH_SOURCE##*/}:${LINENO}): "
           
           on_fail() {
             code=$?
