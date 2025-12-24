@@ -12,6 +12,20 @@ runs:
     - name: Load yq version pin
       shell: bash
       run: |
+        set -Eeuo pipefail
+        PS4='+(${BASH_SOURCE##*/}:${LINENO}): '
+        
+        on_fail() {
+          code=$?
+          echo "::group::FAIL DIAGNOSTICS (Load yq version)" >&2
+          echo "exit_code=${code}" >&2
+          echo "pwd=$(pwd)" >&2
+          echo "GITHUB_WORKSPACE=${GITHUB_WORKSPACE:-<not set>}" >&2
+          echo "::endgroup::" >&2
+          exit "${code}"
+        }
+        trap on_fail ERR
+        
         # Determine repo root - composite actions run in caller's workspace
         # GITHUB_WORKSPACE is set by GitHub Actions and points to the checked-out repo
         REPO_ROOT="${GITHUB_WORKSPACE:-.}"
@@ -80,7 +94,22 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
       run: |
-        set -euo pipefail
+        set -Eeuo pipefail
+        PS4='+(${BASH_SOURCE##*/}:${LINENO}): '
+        
+        on_fail() {
+          code=$?
+          echo "::group::FAIL DIAGNOSTICS (Ensure yq)" >&2
+          echo "exit_code=${code}" >&2
+          echo "pwd=$(pwd)" >&2
+          echo "GITHUB_WORKSPACE=${GITHUB_WORKSPACE:-<not set>}" >&2
+          echo "PATH=${PATH}" >&2
+          echo "tools/bin contents:" >&2
+          ls -la "${REPO_ROOT}/tools/bin" 2>/dev/null || echo "tools/bin not found" >&2
+          echo "::endgroup::" >&2
+          exit "${code}"
+        }
+        trap on_fail ERR
         
         # Determine repo root - composite actions might run in different contexts
         REPO_ROOT="${GITHUB_WORKSPACE:-.}"
