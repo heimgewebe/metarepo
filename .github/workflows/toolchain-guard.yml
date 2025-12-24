@@ -26,199 +26,65 @@ jobs:
         if: ${{ env.AGENT_MODE == '' }}
         run: |
           set -euo pipefail
-          YQ_VERSION="v4.44.1"
-          YQ_ARCH="linux_amd64"
+
+          # Use version from toolchain.versions.yml if available, otherwise fallback
+          if [[ -f toolchain.versions.yml ]]; then
+            YQ_VERSION=$(grep -E '^\s*yq:' toolchain.versions.yml | \
+              sed -E 's/^\s*[^:]+:\s*//; s/#.*$//; s/^[[:space:]]*//; s/[[:space:]]*$//; s/^"//; s/"$//; s/^'\''//; s/'\''$//' | \
+              tr -d '\n\r')
+          fi
+          YQ_VERSION="${YQ_VERSION:-v4.50.1}"
+
+          os="$(uname -s | tr '[:upper:]' '[:lower:]')"
+          arch="$(uname -m)"
+          case "$arch" in
+            x86_64|amd64) arch="amd64" ;;
+            aarch64|arm64) arch="arm64" ;;
+            *) echo "Unsupported arch: $arch" >&2; exit 1 ;;
+          esac
+
+          asset="yq_${os}_${arch}"
+          base="https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}"
+
           BIN_DIR="${GITHUB_WORKSPACE}/tools/bin"
           mkdir -p "$BIN_DIR"
-          # Add to PATH for subsequent steps in this job
           echo "$BIN_DIR" >> "$GITHUB_PATH"
 
-          TMP_BIN="$(mktemp "$BIN_DIR/yq.dl.XXXXXX")"
-          TMP_SHA="$(mktemp "$BIN_DIR/yq.sha.XXXXXX")"
-          RELEASE_JSON="$(mktemp "$BIN_DIR/release.json.XXXXXX")"
+          echo "Installing yq ${YQ_VERSION} for ${os}/${arch}..."
 
-          echo "Querying release assets for $YQ_VERSION..."
-          if ! curl --fail --max-time 60 --connect-timeout 10 --retry 3 -fsSL \
-              -H "Authorization: Bearer ${{ github.token }}" \
-              "https://api.github.com/repos/mikefarah/yq/releases/tags/${YQ_VERSION}" -o "$RELEASE_JSON"; then
-            echo "Fehler: konnte Release metadata nicht laden" >&2
-            rm -f "$RELEASE_JSON"
+          # Direct download without metadata parsing
+          curl -fsSL -o "${BIN_DIR}/yq" "${base}/${asset}"
+          curl -fsSL -o "${BIN_DIR}/checksums" "${base}/checksums"
+
+          # Extract SHA-256 hash for this specific asset
+          # yq checksums file format: filename hash1 hash2 ... hash18(sha256) ...
+          # SHA-256 is field 19 (1=filename + 18 hashes before SHA-256)
+          cd "${BIN_DIR}"
+          line=$(grep "^${asset}[[:space:]]" checksums)
+          sha256=$(echo "$line" | awk '{print $19}')
+          
+          if [[ ! "$sha256" =~ ^[0-9a-fA-F]{64}$ ]]; then
+            echo "ERROR: Could not extract valid SHA-256 hash for ${asset}" >&2
+            echo "Line: ${line}" >&2
             exit 1
           fi
 
-          ASSET_URLS="$({
-            grep -oE '"browser_download_url":\s*"[^\" ]+"' "$RELEASE_JSON" \
-              | sed -E 's/.*"([^" ]+)".*/\1/'
-          } || true)"
-
-          # Try deterministic candidate asset names first (prefer plain binary for simplicity)
-          BIN_CANDIDATES=(
-            "yq_linux_amd64"
-            "yq_linux_amd64.tar.gz"
-            "yq_linux_x86_64"
-            "yq_linux_x86_64.tar.gz"
-            "yq_linux_arm64"
-            "yq_linux_arm64.tar.gz"
-            "yq_linux_ppc64le"
-            "yq_linux_ppc64le.tar.gz"
-          )
-
-          BIN_URL=""
-          for name in "${BIN_CANDIDATES[@]}"; do
-            candidate="https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${name}"
-            if curl -L --head --silent --fail --max-time 10 "$candidate" >/dev/null 2>&1; then
-              BIN_URL="$candidate"
-              break
-            fi
-          done
-
-          # Fallback to scanning release JSON assets (existing behavior)
-          if [[ -z "$BIN_URL" ]]; then
-            BIN_URL="$({
-              printf '%s\n' "$ASSET_URLS" \
-                | grep -Ei "yq.*(${YQ_ARCH}|linux.*amd64|amd64|x86_64|linux|yq_linux)" \
-                | head -n1
-            } || true)"
-          fi
-
-          if [[ -z "$BIN_URL" ]]; then
-            echo "Fehler: konnte keine passende yq-Binary-URL in Release-Assets finden" >&2
-            echo "Release asset list (debug):" >&2
-            printf '%s\n' "$ASSET_URLS" >&2
-            rm -f "$RELEASE_JSON"
+          # Verify checksum
+          actual_sha256=$(sha256sum yq | awk '{print $1}')
+          if [[ "$sha256" != "$actual_sha256" ]]; then
+            echo "ERROR: Checksum mismatch!" >&2
+            echo "Expected: $sha256" >&2
+            echo "Actual:   $actual_sha256" >&2
             exit 1
           fi
 
-          echo "Download binary from: $BIN_URL"
-          curl --fail --max-time 120 --connect-timeout 10 --retry 3 -fsSL "$BIN_URL" -o "$TMP_BIN"
+          echo "✅ Checksum verified: $sha256"
+          chmod +x yq
+          rm checksums
 
-          # Try a list of likely checksum filenames hosted under the release /download/{tag}/
-          SHA_CANDIDATES=(
-            "checksums"
-            "checksums.txt"
-            "checksums_sha256.txt"
-            "SHA256SUMS.txt"
-            "sha256sum.txt"
-            "sha256sums.txt"
-            "sha256sums"
-            "yq_${YQ_VERSION}_SHA256SUMS.txt"
-          )
-
-          for s in "${SHA_CANDIDATES[@]}"; do
-            sha_candidate="https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${s}"
-            TMP_SHA_TMP="${TMP_SHA}.tmp"
-            rm -f "$TMP_SHA_TMP"
-            if curl --fail --max-time 60 --connect-timeout 10 --retry 2 -fsSL "$sha_candidate" -o "$TMP_SHA_TMP"; then
-              if [[ -s "$TMP_SHA_TMP" ]]; then
-                mv "$TMP_SHA_TMP" "$TMP_SHA"
-                break
-              fi
-            fi
-            rm -f "$TMP_SHA_TMP"
-          done
-
-          # Fallback: try to find a checksum asset URL inside the release JSON (existing behavior)
-          if [[ ! -s "$TMP_SHA" ]]; then
-            SHA_URL="$({
-              printf '%s\n' "$ASSET_URLS" \
-                | grep -Ei 'checksums.*\.txt$|checksums$|sha256|sha256sum|SHA256' \
-                | head -n1
-            } || true)"
-            if [[ -n "$SHA_URL" ]]; then
-              echo "Download checksum from: $SHA_URL"
-              if curl --fail --max-time 120 --connect-timeout 10 --retry 3 -fsSL "$SHA_URL" -o "$TMP_SHA"; then
-                [[ -s "$TMP_SHA" ]] || { rm -f "$TMP_SHA"; }
-              else
-                rm -f "$TMP_SHA"
-              fi
-            fi
-          fi
-
-          rm -f "$RELEASE_JSON"
-
-          if [[ ! -s "$TMP_SHA" ]]; then
-            echo "Fehler: keine Checksums-Datei gefunden oder leer; Abbruch statt unsicherer Installation" >&2
-            echo "Debug: available release assets:" >&2
-            printf '%s\n' "$ASSET_URLS" >&2
-            echo "If this release intentionally lacks checksums you can either pick a different YQ_VERSION or add a known-good checksum to the workflow." >&2
-            exit 1
-          fi
-
-          # Calculate and verify
-          if command -v sha256sum >/dev/null 2>&1; then
-            ACTUAL_SHA="$(sha256sum "$TMP_BIN" | awk '{print $1}')"
-          elif command -v shasum >/dev/null 2>&1; then
-            ACTUAL_SHA="$(shasum -a 256 "$TMP_BIN" | awk '{print $1}')"
-          else
-            echo "No sha256sum or shasum command found for checksum verification." >&2
-            exit 1
-          fi
-          ASSET_NAME="$(basename "$BIN_URL")"
-
-          # yq checksums file has multiple hash types per line, space-separated
-          # SHA-256 is at field 19 (after filename): format is "filename  hash1  hash2  ... hash18(sha256)  ..."
-          # Try to extract the SHA-256 by matching against the actual SHA or by position
-          EXPECTED_SHA=""
-
-          # First try: look for exact match of actual SHA in the checksums file (most reliable)
-          if grep -qF "$ACTUAL_SHA" "$TMP_SHA" 2>/dev/null; then
-            # Verify the line also contains our asset name
-            if grep -iF "$ASSET_NAME" "$TMP_SHA" | grep -qF "$ACTUAL_SHA" 2>/dev/null; then
-              EXPECTED_SHA="$ACTUAL_SHA"
-            fi
-          fi
-
-          # Second try: extract SHA-256 from the line for our asset (field 19 in yq's format)
-          if [[ -z "$EXPECTED_SHA" ]]; then
-            LINE="$(grep -E "^${ASSET_NAME}[[:space:]]" "$TMP_SHA" || true)"
-            if [[ -n "$LINE" ]]; then
-              # Extract the SHA-256 hash (first field)
-              EXPECTED_SHA="$(echo "$LINE" | awk '{print $1}' | grep -oE '^[0-9a-fA-F]{64}$' || true)"
-            fi
-          fi
-
-          # Third try: fallback to matching any 64-char hex that equals our actual SHA
-          if [[ -z "$EXPECTED_SHA" ]]; then
-            if grep -iF "$ASSET_NAME" "$TMP_SHA" | grep -oE '[0-9a-fA-F]{64}' | grep -qF "$ACTUAL_SHA" 2>/dev/null; then
-              EXPECTED_SHA="$ACTUAL_SHA"
-            fi
-          fi
-
-          if [[ -n "$EXPECTED_SHA" && "$EXPECTED_SHA" == "$ACTUAL_SHA" ]]; then
-            echo "SHA256-Prüfsumme erfolgreich verifiziert: $ACTUAL_SHA"
-          else
-            echo "SHA256-Prüfsumme stimmt nicht überein!" >&2
-            echo "Binary: $BIN_URL" >&2
-            echo "Gesuchter Hash: $ACTUAL_SHA" >&2
-            echo "Gefundener Hash in Checksums-Datei: ${EXPECTED_SHA:-'(kein Hash gefunden)'}" >&2
-            sed -n '1,200p' "$TMP_SHA" >&2 || true
-            exit 1
-          fi
-
-          # Handle tarball extraction if needed
-          if [[ "$BIN_URL" == *.tar.gz ]]; then
-            echo "Extracting yq from tarball..."
-            TMP_EXTRACT="$(mktemp -d)"
-            tar -xzf "$TMP_BIN" -C "$TMP_EXTRACT"
-            # Find the yq binary in the extracted contents
-            YQ_BIN="$(find "$TMP_EXTRACT" \( -type f -name 'yq' -o -type f -name 'yq_*' \) | grep -v '\.1$' | head -n1)"
-            if [[ -z "$YQ_BIN" ]]; then
-              YQ_BIN="$(find "$TMP_EXTRACT" -type f -executable | head -n1)"
-            fi
-            if [[ -z "$YQ_BIN" ]]; then
-              echo "Fehler: konnte yq-Binary in tarball nicht finden" >&2
-              ls -laR "$TMP_EXTRACT" >&2
-              rm -rf "$TMP_EXTRACT"
-              exit 1
-            fi
-            chmod +x "$YQ_BIN"
-            mv "$YQ_BIN" "$BIN_DIR/yq"
-            rm -rf "$TMP_EXTRACT" "$TMP_BIN"
-          else
-            chmod +x "$TMP_BIN"
-            mv "$TMP_BIN" "$BIN_DIR/yq"
-          fi
-          echo "yq erfolgreich installiert und verifiziert."
+          # Verify installation
+          ./yq --version
+          echo "✅ yq installed successfully"
       - name: Install just
         run: scripts/tools/just-pin.sh
       - name: Lint GitHub workflows (actionlint)
