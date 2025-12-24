@@ -5,12 +5,23 @@
   "x-producers": ["semantAH"],
   "x-consumers": ["hausKI", "chronik"],
   "x-related-adrs": ["docs/adrs/0022-erkenntnis-vorlauf-negationsspur.md"],
+  "$comment": "ADR-0022: Structural support for negation. Semantics defined in consumer repos.",
   "type": "object",
+  "allOf": [
+    {
+      "if": { "properties": { "type": { "const": "review.insight" } } },
+      "then": { "properties": { "relation": false } }
+    }
+  ],
   "additionalProperties": false,
   "required": ["type","repo","source","file","score","verdict","ingested_at"],
   "properties": {
     "id":            { "type":"string", "description":"stable hash/id (optional)" },
-    "type":          { "type":"string", "enum": ["review.insight", "insight.negation"] },
+    "type":          {
+      "type":"string",
+      "enum": ["review.insight", "insight.negation"],
+      "description": "insight.negation is a meta-insight on an existing insight. Interpretation is out of contract scope."
+    },
     "repo":          { "type":"string", "minLength": 1 },
     "source":        { "type":"string", "enum": ["hauski","ci","manual"] },
     "file":          { "type":"string" },

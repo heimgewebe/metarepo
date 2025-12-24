@@ -1,14 +1,14 @@
 {
-  "id": "neg-123",
+  "id": "neg-001",
   "type": "insight.negation",
   "repo": "heimgewebe/core",
   "source": "hauski",
   "file": "src/logic.py",
-  "score": 90,
-  "verdict": "Contradiction detected: Logic implies X but docs say Y.",
+  "score": 85,
+  "verdict": "Structural contradiction with thesis.",
   "ingested_at": "2023-12-14T12:00:00Z",
   "relation": {
-    "thesis": "insight-abc-123",
-    "antithesis": "neg-123"
+    "thesis": "insight-ref-123",
+    "antithesis": "neg-001"
   }
 }
