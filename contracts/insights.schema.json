@@ -5,15 +5,27 @@
   "x-producers": ["semantAH"],
   "x-consumers": ["hausKI", "chronik"],
   "x-related-adrs": ["docs/adrs/0022-erkenntnis-vorlauf-negationsspur.md"],
-  "x-todo": [
-    "Introduce a first-class negation/contrast insight type (insight.negation) and relations (thesis ⟂ antithesis) per ADR-0022. Keep it optional and threshold-driven."
-  ],
+  "$comment": "ADR-0022: Structural support for negation. Semantics defined in consumer repos.",
   "type": "object",
+  "allOf": [
+    {
+      "if": { "properties": { "type": { "const": "review.insight" } } },
+      "then": { "properties": { "relation": false } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "insight.negation" } } },
+      "then": { "required": ["relation"] }
+    }
+  ],
   "additionalProperties": false,
   "required": ["type","repo","source","file","score","verdict","ingested_at"],
   "properties": {
     "id":            { "type":"string", "description":"stable hash/id (optional)" },
-    "type":          { "type":"string", "const": "review.insight" },
+    "type":          {
+      "type":"string",
+      "enum": ["review.insight", "insight.negation"],
+      "description": "insight.negation is a meta-insight on an existing insight. Interpretation is out of contract scope."
+    },
     "repo":          { "type":"string", "minLength": 1 },
     "source":        { "type":"string", "enum": ["hauski","ci","manual"] },
     "file":          { "type":"string" },
@@ -25,6 +37,22 @@
     "schema_version":{ "type":"string" },
     "source_version":{ "type":"string" },
     "runner_host":   { "type":"string" },
-    "bucket":        { "type":"string", "enum": ["info","warn","fail"] }
+    "bucket":        { "type":"string", "enum": ["info","warn","fail"] },
+    "relation": {
+      "type": "object",
+      "description": "Relational context for insight.negation (thesis ⟂ antithesis)",
+      "required": ["thesis", "antithesis"],
+      "additionalProperties": false,
+      "properties": {
+        "thesis": {
+          "type": "string",
+          "description": "Reference ID to the thesis insight being negated/contrasted"
+        },
+        "antithesis": {
+          "type": "string",
+          "description": "Reference ID to the antithesis insight (if external) or self"
+        }
+      }
+    }
   }
 }

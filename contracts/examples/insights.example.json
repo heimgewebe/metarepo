@@ -1,0 +1,14 @@
+{
+  "id": "neg-001",
+  "type": "insight.negation",
+  "repo": "heimgewebe/core",
+  "source": "hauski",
+  "file": "src/logic.py",
+  "score": 85,
+  "verdict": "Structural contradiction with thesis.",
+  "ingested_at": "2023-12-14T12:00:00Z",
+  "relation": {
+    "thesis": "insight-ref-123",
+    "antithesis": "neg-001"
+  }
+}
