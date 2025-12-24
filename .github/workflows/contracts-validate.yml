@@ -141,7 +141,7 @@ jobs:
           for schema in "${schemas[@]}"; do
             echo "Compiling $schema"
             # Check if schema references base.event.schema.json and include it if so
-            if grep -q '"$ref".*base\.event\.schema\.json' "$schema" 2>/dev/null; then
+            if grep -q '"\$ref".*base\.event\.schema\.json' "$schema" 2>/dev/null; then
               echo "  → Schema references base.event.schema.json, including as reference"
               ajv compile -s "$schema" -r contracts/events/base.event.schema.json --strict=log --spec=draft2020 -c ajv-formats
             else
@@ -183,7 +183,7 @@ jobs:
             if [[ -n "$schema" ]]; then
               echo "Validating $example against $schema"
               # Check if schema references base.event.schema.json
-              if grep -q '"$ref".*base\.event\.schema\.json' "$schema" 2>/dev/null; then
+              if grep -q '"\$ref".*base\.event\.schema\.json' "$schema" 2>/dev/null; then
                 echo "  → Schema references base.event.schema.json, including as reference"
                 ajv validate \
                   -s "$schema" \
