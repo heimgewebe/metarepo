@@ -22,71 +22,11 @@ jobs:
             exit 1
           fi
 
-      - name: Install yq (robust)
+      - name: Setup yq
         if: ${{ env.AGENT_MODE == '' }}
-        run: |
-          set -euo pipefail
-
-          # Use version from toolchain.versions.yml if available, otherwise fallback
-          if [[ -f toolchain.versions.yml ]]; then
-            YQ_VERSION=$(grep -E '^\s*yq:' toolchain.versions.yml | \
-              sed -E 's/^\s*[^:]+:\s*//; s/#.*$//; s/^[[:space:]]*//; s/[[:space:]]*$//; s/^"//; s/"$//; s/^'\''//; s/'\''$//' | \
-              tr -d '\n\r')
-          fi
-          YQ_VERSION="${YQ_VERSION:-v4.50.1}"
-
-          os="$(uname -s | tr '[:upper:]' '[:lower:]')"
-          arch="$(uname -m)"
-          case "$arch" in
-            x86_64|amd64) arch="amd64" ;;
-            aarch64|arm64) arch="arm64" ;;
-            *) echo "Unsupported arch: $arch" >&2; exit 1 ;;
-          esac
-
-          asset="yq_${os}_${arch}"
-          base="https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}"
-
-          BIN_DIR="${GITHUB_WORKSPACE}/tools/bin"
-          mkdir -p "$BIN_DIR"
-          echo "$BIN_DIR" >> "$GITHUB_PATH"
-
-          echo "Installing yq ${YQ_VERSION} for ${os}/${arch}..."
-
-          # Direct download without metadata parsing
-          curl -fsSL -o "${BIN_DIR}/yq" "${base}/${asset}"
-          curl -fsSL -o "${BIN_DIR}/checksums" "${base}/checksums"
-
-          # Extract SHA-256 hash for this specific asset
-          # yq checksums file has multiple hash types per line
-          # Strategy: calculate actual hash, then verify it exists in checksums file
-          cd "${BIN_DIR}"
-          
-          # Calculate actual SHA-256 of downloaded binary
-          actual_sha256=$(sha256sum yq | awk '{print $1}')
-          
-          # Find line for our asset in checksums file
-          line=$(grep "^${asset}[[:space:]]" checksums || true)
-          
-          if [[ -z "$line" ]]; then
-            echo "ERROR: Could not find ${asset} in checksums file" >&2
-            exit 1
-          fi
-
-          # Verify that our calculated hash exists in the checksums line
-          if ! echo "$line" | grep -qF "$actual_sha256"; then
-            echo "ERROR: Checksum verification failed!" >&2
-            echo "Calculated SHA-256: $actual_sha256" >&2
-            echo "Not found in checksums line for ${asset}" >&2
-            exit 1
-          fi
-
-          echo "✅ Checksum verified: $actual_sha256"
-          chmod +x yq
-          rm checksums
-
-          # Verify installation
-          ./yq --version
-          echo "✅ yq installed successfully"
+        uses: ./.github/actions/setup-yq
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Install just
         run: scripts/tools/just-pin.sh
       - name: Lint GitHub workflows (actionlint)
