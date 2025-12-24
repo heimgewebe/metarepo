@@ -141,7 +141,7 @@ jobs:
             echo "GITHUB_REF=${GITHUB_REF:-<not set>}"
             echo "GITHUB_SHA=${GITHUB_SHA:-<not set>}"
             echo "Top-level files:"
-            ls -la | head -30 || true
+            find . -maxdepth 1 -type f -ls 2>/dev/null | head -30 || true
             echo "contracts/ structure:"
             find contracts/ -type f -name "*.json" | head -20 || true
             echo "::endgroup::"
@@ -195,7 +195,7 @@ jobs:
             echo "pwd=$(pwd)"
             echo "GITHUB_WORKSPACE=${GITHUB_WORKSPACE:-<not set>}"
             echo "contracts/examples/ contents:"
-            ls -la contracts/examples/ | head -20 || true
+            find contracts/examples/ -maxdepth 1 -type f -ls 2>/dev/null | head -20 || true
             echo "::endgroup::"
             exit "${code}"
           }
