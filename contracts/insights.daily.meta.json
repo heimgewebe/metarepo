@@ -1,0 +1,11 @@
+{
+  "contract": "insights.daily",
+  "schema": "contracts/insights.daily.schema.json",
+  "governance": {
+    "producers": ["semantAH"],
+    "consumers": ["chronik", "leitstand", "semantAH"]
+  },
+  "notes": [
+    "Artifact contract: semantAH exports a daily JSON snapshot; chronik stores it append-only; leitstand reads it."
+  ]
+}

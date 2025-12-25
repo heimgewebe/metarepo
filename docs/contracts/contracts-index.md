@@ -44,6 +44,9 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
   - Zweck: generische „Insight“-Einträge (Erkenntnisse, Beobachtungen, Analysen).
 - `insights.daily.schema.json`
   - Zweck: tägliche, verdichtete Insights mit `topics`, `source`, `metadata`.
+  - Typ: Artefakt (kein Event-Wrapper).
+  - Produzent: semantAH
+  - Konsumenten: chronik (append-only), leitstand
 - `knowledge.graph.schema.json`
   - Zweck: generisches Wissensgraph-Schema (Knoten, Kanten, Beziehungen).
 - `knowledge.observatory.schema.json`

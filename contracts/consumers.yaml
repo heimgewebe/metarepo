@@ -39,6 +39,9 @@ event_backbone:
       - repo: semantAH
         files: []
         mode: reference-only
+      - repo: leitstand
+        files: []
+        mode: reference-only
 
 fixtures:
   chronik-fixtures:
@@ -63,6 +66,12 @@ metrics:
     schema: contracts/insights.daily.schema.json
     consumers:
       - repo: semantAH
+        files: []
+        mode: reference-only
+      - repo: chronik
+        files: []
+        mode: reference-only
+      - repo: leitstand
         files: []
         mode: reference-only
 
