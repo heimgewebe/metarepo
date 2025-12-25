@@ -30,6 +30,19 @@ event_backbone:
         mode: reference-only
       # Weitere Repos bei Bedarf ergänzen
 
+  heimgeist.insight:
+    schema: contracts/events/heimgeist.insight.v1.schema.json
+    consumers:
+      - repo: chronik
+        files: []
+        mode: reference-only
+      - repo: semantAH
+        files: []
+        mode: reference-only
+      - repo: leitstand
+        files: []
+        mode: reference-only
+
 fixtures:
   chronik-fixtures:
     schema: contracts/chronik-fixtures.schema.json
@@ -49,14 +62,20 @@ metrics:
         files: []
         mode: reference-only
 
+knowledge:
   insights.daily:
     schema: contracts/insights.daily.schema.json
     consumers:
       - repo: semantAH
         files: []
         mode: reference-only
+      - repo: chronik
+        files: []
+        mode: reference-only
+      - repo: leitstand
+        files: []
+        mode: reference-only
 
-knowledge:
   observatory:
     schema: contracts/knowledge.observatory.schema.json
     consumers:

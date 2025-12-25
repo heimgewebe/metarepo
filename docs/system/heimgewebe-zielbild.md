@@ -4,6 +4,10 @@ Dieses Dokument beschreibt das angestrebte Zielbild des Heimgewebe-Organismus.
 Es verzichtet bewusst auf Ist-Zustand und Umsetzungstand und formuliert nur,
 wie der Organismus gedacht ist, wenn die Architektur vollständig ausgebaut ist.
 
+> **Klarstellung (Epistemische Rollen):**
+> *   **Chronik ist passiv:** Sie speichert Events (Fakten), agiert aber nicht selbstständig.
+> *   **Lernen ist nicht aktiv:** Heimlern beobachtet und generiert Feedback/Modelle, greift aber nicht aktiv in den operativen Fluss ein.
+
 ---
 
 ## 1. Leitprinzipien
