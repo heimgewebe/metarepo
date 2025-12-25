@@ -1,0 +1,116 @@
+---
+name: validate-observatory
+
+"on":
+  workflow_call:
+  workflow_dispatch:
+  push:
+    paths:
+      - "**/insights.daily.json"
+      - "**/knowledge.observatory.json"
+      - ".github/workflows/reusable-validate-observatory.yml"
+    branches: [main]
+  pull_request:
+    paths:
+      - "**/insights.daily.json"
+      - "**/knowledge.observatory.json"
+      - ".github/workflows/reusable-validate-observatory.yml"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@8ade135a242bde00fd19c0e54fb3760beea110ee  # v4.1.0
+
+      - name: Setup Node
+        uses: actions/setup-node@5e221d4786ffb21088b21dfc9c80efb16b52cd3b  # v4.0.2
+
+      - name: Install ajv-cli
+        if: ${{ env.AGENT_MODE == '' }}
+        run: npm i -g ajv-cli@5.0.0 ajv-formats
+
+      - name: Check ajv-cli (Agent-Mode)
+        if: ${{ env.AGENT_MODE != '' }}
+        run: |
+          echo "Agent-Mode: skipping npm install, checking ajv-cli"
+          command -v ajv >/dev/null 2>&1 || { echo "::error::ajv-cli not available in Agent-Mode"; exit 1; }
+
+      - name: Validate insights.daily.json
+        shell: bash
+        env:
+          # Use raw URL from metarepo/main
+          SCHEMA_URL: >-
+            https://raw.githubusercontent.com/heimgewebe/metarepo/main/contracts/insights.daily.schema.json
+        run: |
+          set -euo pipefail
+          shopt -s nullglob globstar
+          declare -a FILES=(
+            **/insights.daily.json
+          )
+
+          if (( ${#FILES[@]} == 0 )); then
+            echo "::notice::Keine insights.daily.json gefunden."
+          else
+            echo "Prüfe ${#FILES[@]} insights.daily.json Datei(en)…"
+
+            if [[ "${AGENT_MODE:-}" != "" ]]; then
+              if [ -f contracts/insights.daily.schema.json ]; then
+                cp contracts/insights.daily.schema.json /tmp/insights.schema.json
+              else
+                 # Fallback for consuming repos in Agent Mode?
+                 # In Agent Mode without network, we need the schema locally.
+                 # If this runs in another repo, contracts/ might not be there.
+                 # But standard Agent Mode assumes network restriction.
+                 # For now, we assume schema is present or curl works if not strict agent mode.
+                echo "::warning::Local schema not found in Agent-Mode, skipping validation"
+                exit 0
+              fi
+            else
+              curl -fsSL "$SCHEMA_URL" -o /tmp/insights.schema.json
+            fi
+
+            for f in "${FILES[@]}"; do
+              # Skip if in node_modules or .git
+              if [[ "$f" == *"node_modules"* || "$f" == *".git"* ]]; then continue; fi
+              echo "→ $f"
+              ajv validate --spec=draft2020 --strict=log -c ajv-formats -s /tmp/insights.schema.json -d "$f"
+            done
+          fi
+
+      - name: Validate knowledge.observatory.json
+        shell: bash
+        env:
+          SCHEMA_URL: >-
+            https://raw.githubusercontent.com/heimgewebe/metarepo/main/contracts/knowledge.observatory.schema.json
+        run: |
+          set -euo pipefail
+          shopt -s nullglob globstar
+          declare -a FILES=(
+            **/knowledge.observatory.json
+          )
+
+          if (( ${#FILES[@]} == 0 )); then
+            echo "::notice::Keine knowledge.observatory.json gefunden."
+          else
+            echo "Prüfe ${#FILES[@]} knowledge.observatory.json Datei(en)…"
+
+            if [[ "${AGENT_MODE:-}" != "" ]]; then
+              if [ -f contracts/knowledge.observatory.schema.json ]; then
+                cp contracts/knowledge.observatory.schema.json /tmp/observatory.schema.json
+              else
+                echo "::warning::Local schema not found in Agent-Mode, skipping validation"
+                exit 0
+              fi
+            else
+              curl -fsSL "$SCHEMA_URL" -o /tmp/observatory.schema.json
+            fi
+
+            for f in "${FILES[@]}"; do
+               # Skip if in node_modules or .git
+              if [[ "$f" == *"node_modules"* || "$f" == *".git"* ]]; then continue; fi
+              echo "→ $f"
+              ajv validate --spec=draft2020 --strict=log -c ajv-formats -s /tmp/observatory.schema.json -d "$f"
+            done
+          fi
