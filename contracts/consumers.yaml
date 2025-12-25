@@ -62,6 +62,7 @@ metrics:
         files: []
         mode: reference-only
 
+knowledge:
   insights.daily:
     schema: contracts/insights.daily.schema.json
     consumers:
@@ -75,7 +76,6 @@ metrics:
         files: []
         mode: reference-only
 
-knowledge:
   observatory:
     schema: contracts/knowledge.observatory.schema.json
     consumers:
