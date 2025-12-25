@@ -1,7 +1,5 @@
 ---
 name: validate-observatory
-permissions:
-  contents: read
 
 "on":
   workflow_call:

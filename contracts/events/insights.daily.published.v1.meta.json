@@ -9,6 +9,6 @@
   "notes": [
     "This event MUST NOT embed the insights payload itself.",
     "It exists solely to signal availability of a published artifact.",
-    "Payload size must remain small (<1KB)."
+    "Payload size must remain small (<2KB)."
   ]
 }
