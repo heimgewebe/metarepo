@@ -47,6 +47,11 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
   - Typ: Artefakt (kein Event-Wrapper).
   - Produzent: semantAH
   - Konsumenten: chronik (append-only), leitstand
+- `contracts/events/insights.daily.published.v1.schema.json`
+  - Zweck: Notification-Event, das Verfügbarkeit neuer Daily-Insights signalisiert (URL, TS).
+  - Typ: Notification (Payload < 1KB, kein Inline-Daten-Transport).
+  - Produzent: semantAH (nach Release).
+  - Konsumenten: plexer (Router), chronik, leitstand.
 - `knowledge.graph.schema.json`
   - Zweck: generisches Wissensgraph-Schema (Knoten, Kanten, Beziehungen).
 - `knowledge.observatory.schema.json`

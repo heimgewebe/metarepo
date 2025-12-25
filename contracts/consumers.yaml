@@ -76,6 +76,22 @@ knowledge:
         files: []
         mode: reference-only
 
+  insights.daily.published:
+    schema: contracts/events/insights.daily.published.v1.schema.json
+    consumers:
+      - repo: plexer
+        files: []
+        mode: notification-only
+      - repo: chronik
+        files: []
+        mode: reference-only
+      - repo: leitstand
+        files: []
+        mode: reference-only
+      - repo: hausKI
+        files: []
+        mode: reference-only
+
   observatory:
     schema: contracts/knowledge.observatory.schema.json
     consumers:

@@ -1,0 +1,14 @@
+{
+  "contract": "insights.daily.published.v1",
+  "schema": "contracts/events/insights.daily.published.v1.schema.json",
+  "governance": {
+    "producers": ["semantAH"],
+    "consumers": ["plexer", "chronik", "leitstand", "hausKI"],
+    "mode": "notification-only"
+  },
+  "notes": [
+    "This event MUST NOT embed the insights payload itself.",
+    "It exists solely to signal availability of a published artifact.",
+    "Payload size must remain small (<1KB)."
+  ]
+}
