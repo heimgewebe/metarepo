@@ -1,0 +1,9 @@
+{
+  "type": "insights.daily.published",
+  "source": "semantAH",
+  "payload": {
+    "ts": "2025-12-25",
+    "url": "https://github.com/heimgewebe/semantAH/releases/latest/download/insights.daily.json",
+    "generated_at": "2025-12-25T06:05:00Z"
+  }
+}
