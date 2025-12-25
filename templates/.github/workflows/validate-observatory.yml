@@ -1,0 +1,19 @@
+---
+name: validate-observatory
+
+"on":
+  push:
+    paths:
+      - "**/insights.daily.json"
+      - "**/knowledge.observatory.json"
+      - ".github/workflows/validate-observatory.yml"
+  pull_request:
+    paths:
+      - "**/insights.daily.json"
+      - "**/knowledge.observatory.json"
+      - ".github/workflows/validate-observatory.yml"
+  workflow_dispatch:
+
+jobs:
+  validate:
+    uses: heimgewebe/metarepo/.github/workflows/reusable-validate-observatory.yml@main
