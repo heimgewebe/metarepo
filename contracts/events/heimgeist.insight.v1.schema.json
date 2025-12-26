@@ -3,60 +3,66 @@
   "$id": "https://schemas.heimgewebe.org/contracts/events/heimgeist.insight.v1.schema.json",
   "title": "Heimgeist Insight Event",
   "description": "Ein Insight-Event von Heimgeist (Meta-Analyse, Drift, Risiko).",
-  "$comment": "Governance (producers/consumers) lives in heimgeist.insight.v1.meta.json. Schema stays strict-mode clean.",
-  "allOf": [
-    { "$ref": "./base.event.schema.json" },
-    {
+  "$comment": "Governance (producers/consumers) lives in heimgeist.insight.v1.meta.json. Schema stays strict-mode clean. Inlined base.event.schema.json to support single-file validation.",
+  "type": "object",
+  "required": ["kind", "version", "id", "meta", "data"],
+  "properties": {
+    "kind": { "const": "heimgeist.insight" },
+    "version": { "const": 1 },
+    "id": {
+      "type": "string",
+      "pattern": "^evt-",
+      "description": "Eindeutige Event-ID (Prefix 'evt-')"
+    },
+    "meta": {
       "type": "object",
+      "required": ["producer", "occurred_at"],
       "properties": {
-        "kind": { "const": "heimgeist.insight" },
-        "version": { "const": 1 },
-        "meta": {
-          "type": "object",
-          "properties": {
-            "producer": {
-              "type": "string",
-              "description": "Rolle des Erzeugers/Persistierers (z.B. heimgeist, archivist)"
-            },
-            "occurred_at": { "type": "string" },
-            "schema_version": { "type": "string" },
-            "idempotency_key": { "type": "string" }
-          },
-          "required": ["producer"],
-          "additionalProperties": false
+        "producer": {
+          "type": "string",
+          "description": "Rolle des Erzeugers/Persistierers (z.B. heimgeist, archivist)"
         },
-        "data": {
+        "occurred_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Zeitpunkt des Ereignisses (ISO8601)"
+        },
+        "schema_version": { "type": "string" },
+        "idempotency_key": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "data": {
+      "type": "object",
+      "required": ["insight_type", "summary", "details"],
+      "properties": {
+        "insight_type": {
+          "type": "string",
+          "enum": ["risk", "drift", "pattern", "anomaly", "meta"],
+          "description": "Kategorie"
+        },
+        "summary": { "type": "string" },
+        "details": { "type": "string" },
+        "context_refs": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "origin": {
           "type": "object",
-          "required": ["insight_type", "summary", "details"],
           "properties": {
-            "insight_type": {
-              "type": "string",
-              "enum": ["risk", "drift", "pattern", "anomaly", "meta"],
-              "description": "Kategorie"
-            },
-            "summary": { "type": "string" },
-            "details": { "type": "string" },
-            "context_refs": {
-              "type": "array",
-              "items": { "type": "string" }
-            },
-            "confidence": {
-              "type": "number",
-              "minimum": 0.0,
-              "maximum": 1.0
-            },
-            "origin": {
-              "type": "object",
-              "properties": {
-                "role": { "type": "string" },
-                "agent_id": { "type": "string" }
-              },
-              "additionalProperties": false
-            }
+            "role": { "type": "string" },
+            "agent_id": { "type": "string" }
           },
           "additionalProperties": false
         }
-      }
+      },
+      "additionalProperties": false
     }
-  ]
+  },
+  "additionalProperties": false
 }
