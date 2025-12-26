@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://heimgewebe/contracts/reading.self_report.v1.schema.json",
+  "$id": "https://schemas.heimgewebe.org/contracts/epistemic/reading.self_report.v1.schema.json",
   "title": "Reading Self Report",
   "description": "Epistemic self-report describing actual text contact under active reading lenses. This serves as a traceability record to detect hallucinations and epistemic gaps.",
   "type": "object",

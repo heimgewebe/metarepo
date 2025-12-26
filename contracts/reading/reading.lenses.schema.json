@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://heimgewebe/contracts/reading.lenses.v1.schema.json",
+  "$id": "https://schemas.heimgewebe.org/contracts/reading/reading.lenses.v1.schema.json",
   "title": "Reading Lenses",
   "description": "Canonical lens taxonomy for question-oriented reading focus. Lenses guide attention; they never exclude content. This is a focus overlay, not a filter.",
   "type": "object",
