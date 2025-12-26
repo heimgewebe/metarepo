@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.heimgewebe.org/contracts/epistemic/reading.self_report.v1.schema.json",
+  "title": "Reading Self Report",
+  "description": "Epistemic self-report describing actual text contact under active reading lenses. This serves as a traceability record to detect hallucinations and epistemic gaps.",
+  "type": "object",
+  "required": ["active_lenses", "text_contact", "risk_level"],
+  "properties": {
+    "active_lenses": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "List of lens IDs that were active during the reading process."
+    },
+    "text_contact": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "evidence_type"],
+        "properties": {
+          "path": { "type": "string" },
+          "evidence_type": {
+            "type": "string",
+            "enum": ["full", "snippet", "meta"],
+            "description": "The depth of contact with the file content."
+          },
+          "chars_seen": {
+            "type": "integer",
+            "description": "Number of characters actually included in the context window."
+          }
+        }
+      },
+      "description": "List of files touched, with evidence of how much was seen."
+    },
+    "claims_without_contact": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["claim", "implied_lens"],
+        "properties": {
+          "claim": { "type": "string" },
+          "implied_lens": { "type": "string" }
+        }
+      },
+      "description": "List of claims made about files or concepts where no text contact occurred."
+    },
+    "risk_level": {
+      "type": "string",
+      "enum": ["low", "medium", "high"],
+      "description": "Estimated risk of hallucination based on text contact ratio and truncation."
+    },
+    "uncertainty_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Numerical score representing epistemic uncertainty (0 = grounded, 1 = complete guess)."
+    }
+  }
+}
