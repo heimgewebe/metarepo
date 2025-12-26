@@ -3,7 +3,7 @@
   "$id": "https://schemas.heimgewebe.org/contracts/events/heimgeist.insight.v1.schema.json",
   "title": "Heimgeist Insight Event",
   "description": "Ein Insight-Event von Heimgeist (Meta-Analyse, Drift, Risiko).",
-  "$comment": "Governance (producers/consumers) lives in heimgeist.insight.v1.meta.json. Schema stays strict-mode clean. Inlined base.event.schema.json to support single-file validation.",
+  "$comment": "INLINED SNAPSHOT (DRIFT WARNING): This schema inlines properties from base.event.schema.json to ensure robust validation (avoiding relative $ref issues). Any changes to the Base Event Envelope MUST be manually synchronized here.",
   "type": "object",
   "required": ["kind", "version", "id", "meta", "data"],
   "properties": {
