@@ -33,27 +33,34 @@ else
     # Search for candidates recursively
     candidates=(contracts/**/"${filename}.schema.json")
 
-    # Deduplicate candidates
+    # Deduplicate candidates (portable, works on Bash < 4)
+    # 1. Print candidates (newline separated)
+    # 2. Sort unique
+    # 3. Read back into array
+    mapfile -t unique_candidates < <(printf '%s\n' "${candidates[@]}" | sort -u)
+
+    # Filter for existing files (sanity check)
     found=()
-    declare -A seen
-    for c in "${candidates[@]}"; do
-      if [[ -f "$c" && -z "${seen[$c]:-}" ]]; then
-        found+=("$c")
-        seen["$c"]=1
-      fi
+    for c in "${unique_candidates[@]}"; do
+      [[ -f "$c" ]] && found+=("$c")
     done
-    unset seen
 
     echo "::group::Validate Example ${example}"
     if ((${#found[@]} == 1)); then
       schema="${found[0]}"
-      # If schema references base.event.schema.json, include it as a reference for AJV
-      if grep -q '"\$ref".*base\.event\.schema\.json' "$schema" 2>/dev/null; then
-        npx --yes -p ajv-cli@5 -p ajv-formats ajv validate \
-          -s "$schema" \
-          -r contracts/events/base.event.schema.json \
-          -d "$example" \
-          --strict=false -c ajv-formats --spec=draft2020
+      # Check if schema references base.event.schema.json (broad check)
+      if grep -q "base\.event\.schema\.json" "$schema" 2>/dev/null; then
+        ref_schema="contracts/events/base.event.schema.json"
+        if [[ -f "$ref_schema" ]]; then
+           npx --yes -p ajv-cli@5 -p ajv-formats ajv validate \
+            -s "$schema" \
+            -r "$ref_schema" \
+            -d "$example" \
+            --strict=false -c ajv-formats --spec=draft2020
+        else
+            echo "::error::Schema $schema references base.event.schema.json, but it was not found at $ref_schema"
+            exit 2
+        fi
       else
         npx --yes -p ajv-cli@5 -p ajv-formats ajv validate \
           -s "$schema" -d "$example" --strict=false -c ajv-formats --spec=draft2020
@@ -78,16 +85,14 @@ if ((${#fixtures[@]} > 0)); then
     # Search for candidates recursively
     candidates=(contracts/**/"${base}.schema.json")
 
-    # Deduplicate candidates
+    # Deduplicate candidates (portable)
+    mapfile -t unique_candidates < <(printf '%s\n' "${candidates[@]}" | sort -u)
+
+    # Filter for existing files
     found=()
-    declare -A seen
-    for c in "${candidates[@]}"; do
-      if [[ -f "$c" && -z "${seen[$c]:-}" ]]; then
-        found+=("$c")
-        seen["$c"]=1
-      fi
+    for c in "${unique_candidates[@]}"; do
+      [[ -f "$c" ]] && found+=("$c")
     done
-    unset seen
 
     echo "::group::Validate ${fixture}"
     if ((${#found[@]} == 1)); then
