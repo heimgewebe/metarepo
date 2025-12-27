@@ -29,13 +29,41 @@ if ((${#examples[@]} == 0)); then
 else
   for example in "${examples[@]}"; do
     filename=$(basename "$example" .example.json)
-    schema="contracts/${filename}.schema.json"
+
+    # Search for candidates recursively
+    candidates=(contracts/**/"${filename}.schema.json")
+
+    # Deduplicate candidates
+    found=()
+    declare -A seen
+    for c in "${candidates[@]}"; do
+      if [[ -f "$c" && -z "${seen[$c]:-}" ]]; then
+        found+=("$c")
+        seen["$c"]=1
+      fi
+    done
+    unset seen
 
     echo "::group::Validate Example ${example}"
-    if [[ -f "$schema" ]]; then
-      npx --yes -p ajv-cli@5 -p ajv-formats ajv validate -s "$schema" -d "$example" --strict=false -c ajv-formats --spec=draft2020
+    if ((${#found[@]} == 1)); then
+      schema="${found[0]}"
+      # If schema references base.event.schema.json, include it as a reference for AJV
+      if grep -q '"\$ref".*base\.event\.schema\.json' "$schema" 2>/dev/null; then
+        npx --yes -p ajv-cli@5 -p ajv-formats ajv validate \
+          -s "$schema" \
+          -r contracts/events/base.event.schema.json \
+          -d "$example" \
+          --strict=false -c ajv-formats --spec=draft2020
+      else
+        npx --yes -p ajv-cli@5 -p ajv-formats ajv validate \
+          -s "$schema" -d "$example" --strict=false -c ajv-formats --spec=draft2020
+      fi
+    elif ((${#found[@]} > 1)); then
+      echo "::error::Ambiguous schema match for $example. Found multiple candidates:"
+      printf '  - %s\n' "${found[@]}"
+      exit 2
     else
-      echo "::notice::No matching schema found for $example (expected $schema)"
+      echo "::notice::No matching schema found for $example (searched contracts/**/${filename}.schema.json)"
     fi
     echo "::endgroup::"
   done
@@ -46,12 +74,31 @@ fixtures=(fixtures/**/*.jsonl)
 if ((${#fixtures[@]} > 0)); then
   for fixture in "${fixtures[@]}"; do
     base="$(basename "${fixture}" .jsonl)"
-    schema="contracts/${base}.schema.json"
+
+    # Search for candidates recursively
+    candidates=(contracts/**/"${base}.schema.json")
+
+    # Deduplicate candidates
+    found=()
+    declare -A seen
+    for c in "${candidates[@]}"; do
+      if [[ -f "$c" && -z "${seen[$c]:-}" ]]; then
+        found+=("$c")
+        seen["$c"]=1
+      fi
+    done
+    unset seen
+
     echo "::group::Validate ${fixture}"
-    if [[ -f "${schema}" ]]; then
+    if ((${#found[@]} == 1)); then
+      schema="${found[0]}"
       npx --yes -p ajv-cli@5 -p ajv-formats ajv validate -s "${schema}" -d "${fixture}" --spec=draft2020 --errors=line --all-errors -c ajv-formats --strict=log
+    elif ((${#found[@]} > 1)); then
+      echo "::error::Ambiguous schema match for ${fixture}. Found multiple candidates:"
+      printf '  - %s\n' "${found[@]}"
+      exit 2
     else
-      echo "::notice::No matching schema for ${fixture} (expected ${schema})"
+      echo "::notice::No matching schema for ${fixture} (searched contracts/**/${base}.schema.json)"
     fi
     echo "::endgroup::"
   done
