@@ -10,7 +10,12 @@ if ! command -v npm > /dev/null 2>&1; then
   exit 1
 fi
 # Prefer npx to avoid global state on shared runners
-shopt -s nullglob globstar
+shopt -s nullglob globstar || true
+# Note: globstar is Bash 4+, but we attempt to use it.
+# If running on Bash 3 (macOS), this might fail to expand recursively.
+# For strict Bash 3 compatibility, 'find' would be needed, but this script
+# primarily targets CI (Bash 4+). The logic below avoids mapfile for better portability.
+
 schemas=(contracts/**/*.schema.json)
 if ((${#schemas[@]} == 0)); then
   echo "::notice::No schemas found under contracts/"
@@ -33,11 +38,14 @@ else
     # Search for candidates recursively
     candidates=(contracts/**/"${filename}.schema.json")
 
-    # Deduplicate candidates (portable, works on Bash < 4)
+    # Deduplicate candidates (portable, works on Bash < 4 if tools present)
     # 1. Print candidates (newline separated)
     # 2. Sort unique
-    # 3. Read back into array
-    mapfile -t unique_candidates < <(printf '%s\n' "${candidates[@]}" | sort -u)
+    # 3. Read back into array using while-read loop (avoids mapfile)
+    unique_candidates=()
+    while IFS= read -r line; do
+      [[ -n "$line" ]] && unique_candidates+=("$line")
+    done < <(printf '%s\n' "${candidates[@]}" | sort -u)
 
     # Filter for existing files (sanity check)
     found=()
@@ -86,7 +94,10 @@ if ((${#fixtures[@]} > 0)); then
     candidates=(contracts/**/"${base}.schema.json")
 
     # Deduplicate candidates (portable)
-    mapfile -t unique_candidates < <(printf '%s\n' "${candidates[@]}" | sort -u)
+    unique_candidates=()
+    while IFS= read -r line; do
+       [[ -n "$line" ]] && unique_candidates+=("$line")
+    done < <(printf '%s\n' "${candidates[@]}" | sort -u)
 
     # Filter for existing files
     found=()
