@@ -10,13 +10,22 @@ if ! command -v npm > /dev/null 2>&1; then
   exit 1
 fi
 # Prefer npx to avoid global state on shared runners
-shopt -s nullglob globstar || true
-# Note: globstar is Bash 4+, but we attempt to use it.
-# If running on Bash 3 (macOS), this might fail to expand recursively.
-# For strict Bash 3 compatibility, 'find' would be needed, but this script
-# primarily targets CI (Bash 4+). The logic below avoids mapfile for better portability.
+shopt -s nullglob globstar 2>/dev/null || true
 
-schemas=(contracts/**/*.schema.json)
+# Check if globstar is actually active (Bash 4+)
+globstar_ok=0
+shopt -q globstar 2>/dev/null && globstar_ok=1
+
+if [[ "$globstar_ok" -eq 1 ]]; then
+    schemas=(contracts/**/*.schema.json)
+else
+    # Bash 3 fallback
+    schemas=()
+    while IFS= read -r s; do
+        schemas+=("$s")
+    done < <(find contracts -type f -name "*.schema.json" -print 2>/dev/null)
+fi
+
 if ((${#schemas[@]} == 0)); then
   echo "::notice::No schemas found under contracts/"
 else
@@ -36,12 +45,18 @@ else
     filename=$(basename "$example" .example.json)
 
     # Search for candidates recursively
-    candidates=(contracts/**/"${filename}.schema.json")
+    candidates=()
+    if [[ "$globstar_ok" -eq 1 ]]; then
+        # Bash 4+ recursive glob
+        candidates=(contracts/**/"${filename}.schema.json")
+    else
+        # Bash 3 fallback using find
+        while IFS= read -r c; do
+            candidates+=("$c")
+        done < <(find contracts -type f -name "${filename}.schema.json" -print 2>/dev/null)
+    fi
 
-    # Deduplicate candidates (portable, works on Bash < 4 if tools present)
-    # 1. Print candidates (newline separated)
-    # 2. Sort unique
-    # 3. Read back into array using while-read loop (avoids mapfile)
+    # Deduplicate candidates (portable)
     unique_candidates=()
     while IFS= read -r line; do
       [[ -n "$line" ]] && unique_candidates+=("$line")
@@ -91,7 +106,16 @@ if ((${#fixtures[@]} > 0)); then
     base="$(basename "${fixture}" .jsonl)"
 
     # Search for candidates recursively
-    candidates=(contracts/**/"${base}.schema.json")
+    candidates=()
+    if [[ "$globstar_ok" -eq 1 ]]; then
+        # Bash 4+ recursive glob
+        candidates=(contracts/**/"${base}.schema.json")
+    else
+        # Bash 3 fallback using find
+        while IFS= read -r c; do
+            candidates+=("$c")
+        done < <(find contracts -type f -name "${base}.schema.json" -print 2>/dev/null)
+    fi
 
     # Deduplicate candidates (portable)
     unique_candidates=()
