@@ -1,3 +1,4 @@
+---
 # Zentraler Toolchain-Pin für das Heimgewebe-Metarepo.
 #
 # Diese Datei wird von Hilfsskripten wie `scripts/tools/just-pin.sh` gelesen,
