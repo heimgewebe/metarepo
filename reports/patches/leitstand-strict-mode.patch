@@ -1,0 +1,110 @@
+diff --git a/src/lib/server/observatory.ts b/src/lib/server/observatory.ts
+new file mode 100644
+index 0000000..20fb331
+--- /dev/null
++++ b/src/lib/server/observatory.ts
+@@ -0,0 +1,44 @@
++import { env } from '$env/dynamic/private';
++import { readFileSync, existsSync } from 'node:fs';
++import path from 'node:path';
++
++// Zwingend in Production
++const STRICT_MODE = env.NODE_ENV === 'production' || env.OBSERVATORY_STRICT === '1';
++
++export function loadObservatoryData() {
++  const artifactPath = path.resolve('artifacts/knowledge.observatory.json');
++
++  // 1. Local Artifact (Priorität 1)
++  if (existsSync(artifactPath)) {
++    try {
++      const data = JSON.parse(readFileSync(artifactPath, 'utf-8'));
++      if (data && Object.keys(data).length > 0) {
++        return data;
++      }
++    } catch (e) {
++      console.error("Artifact found but invalid:", e);
++    }
++  }
++
++  // 2. Fetch (Optional runtime fallback, if implemented)
++  // ... (Code zum Fetchen, falls vorhanden)
++
++  // 3. Strict Mode Check
++  if (STRICT_MODE) {
++    console.error("STRICT MODE: No valid observatory artifact found. Failing build/start.");
++    // In Production darf kein Fallback auf Fixtures passieren.
++    // Wir werfen einen Fehler oder geben explizit NULL zurück, damit die UI "Leere" anzeigt.
++    // Ein "Fake-Objekt" ist verboten.
++    return null;
++  }
++
++  // 4. Fixture (Nur Dev)
++  console.warn("Dev Mode: Falling back to fixture.");
++  try {
++     // return import('../fixtures/knowledge.observatory.fixture.json');
++     // Oder dynamisches Laden
++     return JSON.parse(readFileSync('src/fixtures/knowledge.observatory.fixture.json', 'utf-8'));
++  } catch (e) {
++     return null;
++  }
++}
+diff --git a/src/routes/+page.server.ts b/src/routes/+page.server.ts
+new file mode 100644
+index 0000000..bb5aee4
+--- /dev/null
++++ b/src/routes/+page.server.ts
+@@ -0,0 +1,10 @@
++import { loadObservatoryData } from '$lib/server/observatory';
++
++export function load() {
++    const insights = loadObservatoryData();
++
++    // Explicitly return the structure expected by the page
++    return {
++        insights
++    };
++}
+diff --git a/src/routes/+page.svelte b/src/routes/+page.svelte
+new file mode 100644
+index 0000000..2f9c1d4
+--- /dev/null
++++ b/src/routes/+page.svelte
+@@ -0,0 +1,38 @@
++<script>
++  export let data;
++  // data.insights kommt vom Server
++</script>
++
++{#if data.insights}
++  <div class="observatory-dashboard">
++    <!-- Normale Anzeige -->
++    <h1>Daily Insights</h1>
++    <!-- ... Content ... -->
++    <pre>{JSON.stringify(data.insights, null, 2)}</pre>
++  </div>
++{:else}
++  <!-- Explizite Leere (Epistemische Ehrlichkeit) -->
++  <div class="empty-state error-border">
++    <div class="icon">⚠️</div>
++    <h2>Keine veröffentlichten Daily Insights vorhanden.</h2>
++    <p>Das System verfügt derzeit über kein gesichertes Wissen (Observatory Snapshot fehlt).</p>
++    {#if import.meta.env.PROD}
++       <small>Strict Mode: Fixtures sind deaktiviert.</small>
++    {/if}
++  </div>
++{/if}
++
++<style>
++  .error-border {
++    border: 2px solid red;
++    padding: 2rem;
++    background: #fff0f0;
++    text-align: center;
++    margin: 2rem;
++    border-radius: 8px;
++  }
++  .icon {
++    font-size: 3rem;
++    margin-bottom: 1rem;
++  }
++</style>

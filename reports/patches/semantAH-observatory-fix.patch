@@ -1,0 +1,50 @@
+diff --git a/.github/workflows/knowledge-observatory-drift.yml b/.github/workflows/knowledge-observatory-drift.yml
+index 06a8d66..592c0fa 100644
+--- a/.github/workflows/knowledge-observatory-drift.yml
++++ b/.github/workflows/knowledge-observatory-drift.yml
+@@ -32,14 +32,13 @@ jobs:
+         run: |
+           mkdir -p artifacts
+           # Download knowledge.observatory.prev.json (explicit baseline) from the stable release tag
+-          # Retry loop to handle transient API glitches
+-          for i in {1..3}; do
+-            gh release download knowledge-observatory \
+-              -p knowledge.observatory.prev.json \
+-              -D artifacts/ && break
+-            echo "Attempt $i failed. Retrying in 5s..."
+-            sleep 5
+-          done || echo "Warning: Baseline download failed after retries. Continuing in bootstrap mode."
++          gh release download knowledge-observatory \
++            --pattern "knowledge.observatory.prev.json" \
++            --dir artifacts \
++            --clobber
++
++          # Explicitly verify the artifact exists and is not empty
++          test -s artifacts/knowledge.observatory.prev.json
+
+       - name: Install dependencies
+         run: uv sync
+diff --git a/.github/workflows/publish-insights-daily.yml b/.github/workflows/publish-insights-daily.yml
+index 5a736ce..fb023b5 100644
+--- a/.github/workflows/publish-insights-daily.yml
++++ b/.github/workflows/publish-insights-daily.yml
+@@ -38,13 +38,14 @@ jobs:
+           GH_TOKEN: ${{ github.token }}
+         run: |
+           mkdir -p artifacts
+-          # Attempt to download the latest stable observatory snapshot.
+-          # We use || true to proceed even if it fails (e.g. first run),
+-          # relying on the script's fallback logic.
++          # Fetch the latest observatory snapshot. Fails if missing.
+           gh release download knowledge-observatory \
+             --pattern "knowledge.observatory.json" \
+-            --output "artifacts/knowledge.observatory.json" \
+-            --clobber || echo "::warning::Could not fetch knowledge.observatory.json (might be first run)"
++            --dir artifacts \
++            --clobber
++
++          # Explicitly verify the artifact exists and is not empty
++          test -s artifacts/knowledge.observatory.json
+
+       - name: Generate Daily Insights
+         run: |
