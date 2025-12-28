@@ -66,8 +66,18 @@ runs:
              # Install into tools/bin (standard location)
              mkdir -p "${REPO_ROOT}/tools/bin"
              echo "Downloading bootstrap yq from ${BS_URL}..." >&2
-             curl -fsSL "${BS_URL}" -o "${REPO_ROOT}/tools/bin/yq"
+             if ! curl -fsSL "${BS_URL}" -o "${REPO_ROOT}/tools/bin/yq"; then
+                  echo "::error::Failed to download yq from ${BS_URL}"
+                  exit 1
+             fi
              chmod +x "${REPO_ROOT}/tools/bin/yq"
+             
+             # Verify binary is executable after download
+             if [[ ! -x "${REPO_ROOT}/tools/bin/yq" ]]; then
+                  echo "::error::yq binary nicht ausführbar"
+                  ls -la "${REPO_ROOT}/tools/bin/yq" >&2 || echo "Binary not found" >&2
+                  exit 1
+             fi
 
              # Add to PATH for this step and subsequent steps
              echo "${REPO_ROOT}/tools/bin" >> "$GITHUB_PATH"
