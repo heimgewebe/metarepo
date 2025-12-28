@@ -66,8 +66,18 @@ runs:
              # Install into tools/bin (standard location)
              mkdir -p "${REPO_ROOT}/tools/bin"
              echo "Downloading bootstrap yq from ${BS_URL}..." >&2
-             curl -fsSL "${BS_URL}" -o "${REPO_ROOT}/tools/bin/yq"
+             if ! curl -fsSL "${BS_URL}" -o "${REPO_ROOT}/tools/bin/yq"; then
+                  echo "::error::Failed to download yq from ${BS_URL}"
+                  exit 1
+             fi
              chmod +x "${REPO_ROOT}/tools/bin/yq"
+             
+             # Verify binary is executable after download
+             if [[ ! -x "${REPO_ROOT}/tools/bin/yq" ]]; then
+                  echo "::error::yq binary nicht ausführbar"
+                  ls -la "${REPO_ROOT}/tools/bin/yq" >&2 || echo "Binary not found" >&2
+                  exit 1
+             fi
 
              # Add to PATH for this step and subsequent steps
              echo "${REPO_ROOT}/tools/bin" >> "$GITHUB_PATH"
@@ -83,7 +93,7 @@ runs:
         # ---------------------------------------------------------------------
         # PARSE VERSION
         # ---------------------------------------------------------------------
-        YQ_VER=$(yq -r '.yq' "${TOOLCHAIN_FILE}")
+        YQ_VER=$(yq eval '.yq' "${TOOLCHAIN_FILE}")
 
         # Ensure we got a valid string (not null)
         test -n "${YQ_VER}" || { echo "::error::yq version missing in toolchain.versions.yml"; exit 1; }
@@ -100,7 +110,7 @@ runs:
         # Ensure critical keys are present to prevent downstream failures
         # ---------------------------------------------------------------------
         echo "Verifying toolchain.versions.yml integrity..." >&2
-        yq -e -r '.yq, .rust, .python, .uv, .just, .sccache, .actionlint' "${TOOLCHAIN_FILE}" >/dev/null
+        yq eval -e '.yq, .rust, .python, .uv, .just, .sccache, .actionlint' "${TOOLCHAIN_FILE}" >/dev/null
 
     - name: Cache yq binary
       uses: actions/cache@v4
