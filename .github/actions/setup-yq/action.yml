@@ -100,7 +100,7 @@ runs:
         # Ensure critical keys are present to prevent downstream failures
         # ---------------------------------------------------------------------
         echo "Verifying toolchain.versions.yml integrity..." >&2
-        yq -r '.yq, .rust, .python, .uv, .just, .sccache, .actionlint' "${TOOLCHAIN_FILE}" >/dev/null
+        yq -e -r '.yq, .rust, .python, .uv, .just, .sccache, .actionlint' "${TOOLCHAIN_FILE}" >/dev/null
 
     - name: Cache yq binary
       uses: actions/cache@v4

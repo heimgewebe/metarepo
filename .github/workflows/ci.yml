@@ -97,6 +97,15 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Guard toolchain integrity
+        if: ${{ env.AGENT_MODE == '' }}
+        run: |
+          if ! command -v ajv >/dev/null 2>&1; then
+             npm install -g ajv-cli@5.0.0
+          fi
+          chmod +x scripts/guards/validate-toolchain-versions.sh
+          scripts/guards/validate-toolchain-versions.sh
+
       - name: Read toolchain versions
         run: |
           # Add tools/bin to PATH for this step (GITHUB_PATH only affects next step)

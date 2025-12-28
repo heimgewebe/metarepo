@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heimgewebe.de/contracts/tooling/toolchain.versions.schema.json",
+  "title": "Heimgewebe Toolchain Versions",
+  "description": "Defines required tool versions for the build and CI environment. Serves as the single source of truth.",
+  "type": "object",
+  "required": [
+    "yq",
+    "rust",
+    "python",
+    "uv",
+    "just",
+    "sccache",
+    "actionlint"
+  ],
+  "properties": {
+    "yq": {
+      "type": "string",
+      "description": "Version of mikefarah/yq",
+      "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "rust": {
+      "type": "string",
+      "description": "Rust toolchain version",
+      "minLength": 1
+    },
+    "python": {
+      "type": "string",
+      "description": "Python version",
+      "minLength": 1
+    },
+    "uv": {
+      "type": "string",
+      "description": "uv package manager version",
+      "minLength": 1
+    },
+    "just": {
+      "type": "string",
+      "description": "just command runner version",
+      "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "sccache": {
+      "type": "string",
+      "description": "sccache compiler cache version",
+      "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "actionlint": {
+      "type": "string",
+      "description": "actionlint version",
+      "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "lychee": {
+      "type": "string",
+      "description": "lychee link checker version (optional)",
+      "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "shfmt": {
+      "type": "string",
+      "description": "shfmt version (optional)",
+      "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "shellcheck": {
+      "type": "string",
+      "description": "shellcheck version (optional)",
+      "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+$"
+    }
+  },
+  "additionalProperties": true
+}
