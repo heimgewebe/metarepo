@@ -1,0 +1,35 @@
+---
+# Zentraler Toolchain-Pin für das Heimgewebe-Metarepo.
+#
+# Diese Datei wird von Hilfsskripten wie `scripts/tools/just-pin.sh` gelesen,
+# die die Versionen ohne yq-Abhängigkeit aus dem YAML parsen.
+#
+# Konvention:
+# - Einfacher String pro Tool
+# - Für Tools, deren Upstream-Tags mit "v" beginnen (z. B. just, yq,
+#   actionlint, sccache), hier ebenfalls mit "v" pinnen.
+#
+# Wichtig:
+# - Änderungen hier sollten im Commit-Text begründet werden
+# - CI kann diese Datei als Single Source of Truth verwenden
+#
+# Managed per docs/adrs/003-ci-reusables-pinning.md
+
+rust: "1.83.0"
+python: "3.11.9"
+uv: "0.4.20"
+
+# yq wird in den Workflows über YQ_VERSION bzw. diese Datei gepinnt und
+# per GitHub-Releases geladen.
+yq: "v4.49.2"
+
+# just-Version für scripts/tools/just-pin.sh:
+# Das Skript erwartet hier einen Tag im Format "vX.Y.Z" und leitet
+# daraus z. B. den Asset-Namen "just-X.Y.Z-<target>.tar.gz" ab.
+just: "v1.43.0"
+
+sccache: "v0.10.2"
+actionlint: "v1.7.4"
+lychee: "v0.15.1"
+shfmt: "v3.8.0"
+shellcheck: "v0.9.0"
