@@ -93,7 +93,7 @@ runs:
         # ---------------------------------------------------------------------
         # PARSE VERSION
         # ---------------------------------------------------------------------
-        YQ_VER=$(yq -r '.yq' "${TOOLCHAIN_FILE}")
+        YQ_VER=$(yq eval '.yq' "${TOOLCHAIN_FILE}")
 
         # Ensure we got a valid string (not null)
         test -n "${YQ_VER}" || { echo "::error::yq version missing in toolchain.versions.yml"; exit 1; }
@@ -110,7 +110,7 @@ runs:
         # Ensure critical keys are present to prevent downstream failures
         # ---------------------------------------------------------------------
         echo "Verifying toolchain.versions.yml integrity..." >&2
-        yq -e -r '.yq, .rust, .python, .uv, .just, .sccache, .actionlint' "${TOOLCHAIN_FILE}" >/dev/null
+        yq eval -e '.yq, .rust, .python, .uv, .just, .sccache, .actionlint' "${TOOLCHAIN_FILE}" >/dev/null
 
     - name: Cache yq binary
       uses: actions/cache@v4
