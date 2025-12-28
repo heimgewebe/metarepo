@@ -51,28 +51,24 @@ runs:
              exit 1
         fi
         
-        # Python-based extraction (robust against encoding/whitespace/comments)
-        if command -v python3 >/dev/null 2>&1; then
-             echo "Using Python3 for yq version extraction..." >&2
-             YQ_VER=$(python3 -c "import re, pathlib; t = pathlib.Path('${TOOLCHAIN_FILE}').read_text(encoding='utf-8', errors='replace'); m = re.search(r'(?m)^\s*yq\s*:\s*[\"']?([^\"'\r\n#]+)[\"']?\s*(?:#.*)?$', t); print(m.group(1).strip() if m else '')")
-        else
-             echo "Python3 not found, falling back to grep/sed..." >&2
-             YQ_VER=$(grep -E '^\s*yq:' "${TOOLCHAIN_FILE}" | \
-               sed -E 's/^\s*[^:]+:\s*//; s/#.*$//; s/^[[:space:]]*//; s/[[:space:]]*$//; s/^"//; s/"$//; s/^'\''//; s/'\''$//' | \
-               tr -d '\n\r')
-        fi
-        
-        echo "Extracted YQ_VER: '${YQ_VER}'" >&2
+        # Use yq to read yq version (bootstrap via system yq)
+        echo "Extracting yq version using system yq..." >&2
 
-        if [[ -z "${YQ_VER}" ]]; then
-           echo "Failed to extract yq version from toolchain.versions.yml" >&2
-           echo "File path: ${TOOLCHAIN_FILE}" >&2
-           echo "File exists: $(test -f "${TOOLCHAIN_FILE}" && echo yes || echo no)" >&2
-           echo "File size: $(wc -c < "${TOOLCHAIN_FILE}" 2>/dev/null || echo unknown)" >&2
-           echo "Full file content:" >&2
-           cat "${TOOLCHAIN_FILE}" >&2
+        if ! command -v yq >/dev/null 2>&1; then
+           echo "::error::yq command not found. Cannot bootstrap pinned yq version without a pre-installed yq."
            exit 1
         fi
+        
+        YQ_VER=$(yq -r '.yq' "${TOOLCHAIN_FILE}")
+
+        # Ensure we got a valid string (not null)
+        if [[ "${YQ_VER}" == "null" || -z "${YQ_VER}" ]]; then
+           echo "::error::yq version missing in toolchain.versions.yml (or parsing failed)"
+           exit 1
+        fi
+
+        echo "Resolved yq version: ${YQ_VER}" >&2
+        yq --version >&2
 
         echo "YQ_VERSION=${YQ_VER}" >> "$GITHUB_ENV"
         echo "Resolved yq version ${YQ_VER}"
