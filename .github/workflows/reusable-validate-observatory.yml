@@ -1,21 +1,34 @@
----
+# Dieser Reusable wird von wgx-guard aufgerufen; keine Duplikate in wgx.
 name: validate-observatory
 permissions:
   contents: read
 
-"on":
+on:
   workflow_call:
+    inputs:
+      STRICT:
+        description: "Enforce strict schema validation (fail on errors)"
+        required: false
+        type: boolean
+        default: false
+      FAIL_ON_EMPTY:
+        description: "Fail if no relevant files are found"
+        required: false
+        type: boolean
+        default: false
   workflow_dispatch:
   push:
     paths:
       - "**/insights.daily.json"
       - "**/knowledge.observatory.json"
+      - "**/insights.daily.published.json"
       - ".github/workflows/reusable-validate-observatory.yml"
     branches: [main]
   pull_request:
     paths:
       - "**/insights.daily.json"
       - "**/knowledge.observatory.json"
+      - "**/insights.daily.published.json"
       - ".github/workflows/reusable-validate-observatory.yml"
 
 jobs:
@@ -39,10 +52,14 @@ jobs:
           echo "Agent-Mode: skipping npm install, checking ajv-cli"
           command -v ajv >/dev/null 2>&1 || { echo "::error::ajv-cli not available in Agent-Mode"; exit 1; }
 
+      # ------------------------------------------------------------------
+      # Validate insights.daily.json
+      # ------------------------------------------------------------------
       - name: Validate insights.daily.json
         shell: bash
         env:
-          # Use raw URL from metarepo/main
+          FAIL_ON_EMPTY: ${{ inputs.FAIL_ON_EMPTY }}
+          STRICT_MODE: ${{ inputs.STRICT }}
           SCHEMA_URL: >-
             https://raw.githubusercontent.com/heimgewebe/metarepo/main/contracts/insights.daily.schema.json
         run: |
@@ -53,7 +70,12 @@ jobs:
           )
 
           if (( ${#FILES[@]} == 0 )); then
-            echo "::notice::Keine insights.daily.json gefunden."
+            if [[ "$FAIL_ON_EMPTY" == "true" ]]; then
+               echo "::error::Keine insights.daily.json gefunden, aber FAIL_ON_EMPTY=true."
+               exit 1
+            else
+               echo "::notice::Keine insights.daily.json gefunden."
+            fi
           else
             echo "Prüfe ${#FILES[@]} insights.daily.json Datei(en)…"
 
@@ -61,11 +83,6 @@ jobs:
               if [ -f contracts/insights.daily.schema.json ]; then
                 cp contracts/insights.daily.schema.json /tmp/insights.schema.json
               else
-                 # Fallback for consuming repos in Agent Mode?
-                 # In Agent Mode without network, we need the schema locally.
-                 # If this runs in another repo, contracts/ might not be there.
-                 # But standard Agent Mode assumes network restriction.
-                 # For now, we assume schema is present or curl works if not strict agent mode.
                 echo "::warning::Local schema not found in Agent-Mode, skipping validation"
                 exit 0
               fi
@@ -73,17 +90,29 @@ jobs:
               curl -fsSL "$SCHEMA_URL" -o /tmp/insights.schema.json
             fi
 
+            # Determine AJV flags
+            AJV_FLAGS="--spec=draft2020 -c ajv-formats"
+            if [[ "$STRICT_MODE" == "true" ]]; then
+               AJV_FLAGS="$AJV_FLAGS --strict=true"
+            else
+               AJV_FLAGS="$AJV_FLAGS --strict=log"
+            fi
+
             for f in "${FILES[@]}"; do
-              # Skip if in node_modules or .git
               if [[ "$f" == *"node_modules"* || "$f" == *".git"* ]]; then continue; fi
               echo "→ $f"
-              ajv validate --spec=draft2020 --strict=log -c ajv-formats -s /tmp/insights.schema.json -d "$f"
+              ajv validate $AJV_FLAGS -s /tmp/insights.schema.json -d "$f"
             done
           fi
 
+      # ------------------------------------------------------------------
+      # Validate knowledge.observatory.json
+      # ------------------------------------------------------------------
       - name: Validate knowledge.observatory.json
         shell: bash
         env:
+          FAIL_ON_EMPTY: ${{ inputs.FAIL_ON_EMPTY }}
+          STRICT_MODE: ${{ inputs.STRICT }}
           SCHEMA_URL: >-
             https://raw.githubusercontent.com/heimgewebe/metarepo/main/contracts/knowledge.observatory.schema.json
         run: |
@@ -94,7 +123,12 @@ jobs:
           )
 
           if (( ${#FILES[@]} == 0 )); then
-            echo "::notice::Keine knowledge.observatory.json gefunden."
+            if [[ "$FAIL_ON_EMPTY" == "true" ]]; then
+               echo "::error::Keine knowledge.observatory.json gefunden, aber FAIL_ON_EMPTY=true."
+               exit 1
+            else
+               echo "::notice::Keine knowledge.observatory.json gefunden."
+            fi
           else
             echo "Prüfe ${#FILES[@]} knowledge.observatory.json Datei(en)…"
 
@@ -109,10 +143,79 @@ jobs:
               curl -fsSL "$SCHEMA_URL" -o /tmp/observatory.schema.json
             fi
 
+            AJV_FLAGS="--spec=draft2020 -c ajv-formats"
+            if [[ "$STRICT_MODE" == "true" ]]; then
+               AJV_FLAGS="$AJV_FLAGS --strict=true"
+            else
+               AJV_FLAGS="$AJV_FLAGS --strict=log"
+            fi
+
             for f in "${FILES[@]}"; do
-               # Skip if in node_modules or .git
               if [[ "$f" == *"node_modules"* || "$f" == *".git"* ]]; then continue; fi
               echo "→ $f"
-              ajv validate --spec=draft2020 --strict=log -c ajv-formats -s /tmp/observatory.schema.json -d "$f"
+              ajv validate $AJV_FLAGS -s /tmp/observatory.schema.json -d "$f"
+            done
+          fi
+
+      # ------------------------------------------------------------------
+      # Validate insights.daily.published.json (Events)
+      # ------------------------------------------------------------------
+      - name: Validate insights.daily.published.json
+        shell: bash
+        env:
+          FAIL_ON_EMPTY: ${{ inputs.FAIL_ON_EMPTY }}
+          STRICT_MODE: ${{ inputs.STRICT }}
+          # Canonical URL for the event schema
+          SCHEMA_URL: >-
+            https://raw.githubusercontent.com/heimgewebe/metarepo/main/contracts/events/insights.daily.published.v1.schema.json
+        run: |
+          set -euo pipefail
+          shopt -s nullglob globstar
+          declare -a FILES=(
+            **/insights.daily.published.json
+            **/insights.daily.published.v1.json
+          )
+
+          if (( ${#FILES[@]} == 0 )); then
+            # No error here even if FAIL_ON_EMPTY is true?
+            # The prompt implies published events are crucial, but maybe not present in every run.
+            # However, if FAIL_ON_EMPTY is requested, we should probably honor it or handle it specifically.
+            # Given instructions: "Guard 2: insights.daily.published.v1 muss schema-valid sein"
+            # I will apply FAIL_ON_EMPTY logic here too if set.
+            if [[ "$FAIL_ON_EMPTY" == "true" ]]; then
+               echo "::notice::Keine insights.daily.published.json gefunden (FAIL_ON_EMPTY active)."
+               # Not strictly failing here unless we want to force publication existence?
+               # The user says: "Trigger explizit: insights.daily -> insights.daily.published.v1"
+               # If the caller sets FAIL_ON_EMPTY, they likely expect files.
+               echo "::error::Keine insights.daily.published.json gefunden."
+               exit 1
+            else
+               echo "::notice::Keine insights.daily.published.json gefunden."
+            fi
+          else
+            echo "Prüfe ${#FILES[@]} insights.daily.published.json Datei(en)…"
+
+            if [[ "${AGENT_MODE:-}" != "" ]]; then
+              if [ -f contracts/events/insights.daily.published.v1.schema.json ]; then
+                cp contracts/events/insights.daily.published.v1.schema.json /tmp/published.schema.json
+              else
+                echo "::warning::Local schema not found in Agent-Mode, skipping validation"
+                exit 0
+              fi
+            else
+              curl -fsSL "$SCHEMA_URL" -o /tmp/published.schema.json
+            fi
+
+            AJV_FLAGS="--spec=draft2020 -c ajv-formats"
+            if [[ "$STRICT_MODE" == "true" ]]; then
+               AJV_FLAGS="$AJV_FLAGS --strict=true"
+            else
+               AJV_FLAGS="$AJV_FLAGS --strict=log"
+            fi
+
+            for f in "${FILES[@]}"; do
+              if [[ "$f" == *"node_modules"* || "$f" == *".git"* ]]; then continue; fi
+              echo "→ $f"
+              ajv validate $AJV_FLAGS -s /tmp/published.schema.json -d "$f"
             done
           fi
