@@ -5,6 +5,7 @@ Kurzer Index der akzeptierten Entscheidungen:
 - [ADR-0002: Fleet-Rollout via reusable GitHub Actions](./0002-reusable-actions-rollout.md) — Accepted (2025-10-12)
 - [ADR-0021: Scope & Boundaries of Plexer in the Heimgewebe Organism](./0021-plexer-scope-and-boundaries.md) — Accepted (2025-12-01)
 - [ADR-0023: Epistemic Autopoiesis](./0023-epistemic-autopoiesis.md) — Accepted
+- [ADR-0028: Leitstand Strict Build Symmetry](./0028-leitstand-strict-build-symmetry.md) — Accepted (2025-12-28)
 
 ## Weitere ADRs & Ressourcen
 - [ADR-Governance & Format](./000-adr-governance.md)
