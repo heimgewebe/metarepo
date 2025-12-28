@@ -56,12 +56,26 @@ read_pinned_version() {
   fi
 
   if [[ -z "${version}" ]] || [[ "${version}" == "null" ]]; then
-    # Parse version from toolchain.versions.yml robustly:
-    version=$(grep -E '^\s*yq:' "${ROOT_DIR}/toolchain.versions.yml" |
-      sed -E 's/^\s*[^:]+:\s*//; s/#.*$//; s/^[[:space:]]*//; s/[[:space:]]*$//; s/^"//; s/"$//; s/^'\''//; s/'\''$//' |
-      tr -d '\n\r')
+    # Parse version from toolchain.versions.yml robustly using Python regex if available
+    # This handles CRLF, whitespace, comments, and quotes more reliably than grep/sed.
+    if command -v python3 >/dev/null 2>&1; then
+      version=$(python3 -c "import re, pathlib; t = pathlib.Path('${ROOT_DIR}/toolchain.versions.yml').read_text(encoding='utf-8', errors='replace'); m = re.search(r'(?m)^\s*yq\s*:\s*[\"']?([^\"'\r\n#]+)[\"']?\s*(?:#.*)?$', t); print(m.group(1).strip() if m else '')")
+    else
+       # Fallback to grep/sed if python3 is missing
+       version=$(grep -E '^\s*yq:' "${ROOT_DIR}/toolchain.versions.yml" |
+        sed -E 's/^\s*[^:]+:\s*//; s/#.*$//; s/^[[:space:]]*//; s/[[:space:]]*$//; s/^"//; s/"$//; s/^'\''//; s/'\''$//' |
+        tr -d '\n\r')
+    fi
   fi
+
   if [[ -z "${version}" ]]; then
+    log "ERROR: Could not extract yq version from: ${ROOT_DIR}/toolchain.versions.yml"
+    log "---- file dump (first 4000 bytes) ----"
+    if command -v python3 >/dev/null 2>&1; then
+        python3 -c "import pathlib; print(pathlib.Path('${ROOT_DIR}/toolchain.versions.yml').read_bytes()[:4000])" >&2
+    else
+        head -n 50 "${ROOT_DIR}/toolchain.versions.yml" >&2
+    fi
     die "Konnte gewünschte yq-Version aus toolchain.versions.yml nicht ermitteln."
   fi
   printf '%s' "${version}"

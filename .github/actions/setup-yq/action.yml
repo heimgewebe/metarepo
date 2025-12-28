@@ -40,28 +40,26 @@ runs:
           exit 1
         fi
 
-        # Extract yq version using robust grep/sed to avoid python dependency
-        # Handles: yq: "v4.49.2" # comment
-        # Logic mirrors scripts/tools/just-pin.sh:
-        # 1. Strip key
-        # 2. Strip comments
-        # 3. Trim whitespace
-        # 4. Strip quotes
+        # Extract yq version using robust Python script (primary) or grep/sed (fallback)
+        # Handles: yq: "v4.49.2" # comment, CRLF, BOM, whitespace irregularities
         
-        # Debug: show the file content around yq line
-        echo "Extracting yq version from ${TOOLCHAIN_FILE}..." >&2
-        echo "File snippet:" >&2
-        grep -C 2 'yq:' "${TOOLCHAIN_FILE}" || echo "WARNING: No yq: line found" >&2
+        # Debug: check file existence and head content
+        echo "Checking ${TOOLCHAIN_FILE}..." >&2
+        if [[ ! -f "${TOOLCHAIN_FILE}" ]]; then
+             echo "::error::File not found: ${TOOLCHAIN_FILE}"
+             ls -la "${REPO_ROOT}"
+             exit 1
+        fi
         
-        # Try primary extraction method
-        YQ_VER=$(grep -E '^\s*yq:' "${TOOLCHAIN_FILE}" | \
-          sed -E 's/^\s*[^:]+:\s*//; s/#.*$//; s/^[[:space:]]*//; s/[[:space:]]*$//; s/^"//; s/"$//; s/^'\''//; s/'\''$//' | \
-          tr -d '\n\r')
-        
-        # Fallback: try simpler pattern if primary failed
-        if [[ -z "${YQ_VER}" ]]; then
-          echo "Primary extraction failed, trying fallback..." >&2
-          YQ_VER=$(grep 'yq:' "${TOOLCHAIN_FILE}" | head -1 | sed 's/.*yq:[[:space:]]*["'\'']*//; s/["'\''[:space:]]*$//' | sed 's/#.*$//' | tr -d '\n\r')
+        # Python-based extraction (robust against encoding/whitespace/comments)
+        if command -v python3 >/dev/null 2>&1; then
+             echo "Using Python3 for yq version extraction..." >&2
+             YQ_VER=$(python3 -c "import re, pathlib; t = pathlib.Path('${TOOLCHAIN_FILE}').read_text(encoding='utf-8', errors='replace'); m = re.search(r'(?m)^\s*yq\s*:\s*[\"']?([^\"'\r\n#]+)[\"']?\s*(?:#.*)?$', t); print(m.group(1).strip() if m else '')")
+        else
+             echo "Python3 not found, falling back to grep/sed..." >&2
+             YQ_VER=$(grep -E '^\s*yq:' "${TOOLCHAIN_FILE}" | \
+               sed -E 's/^\s*[^:]+:\s*//; s/#.*$//; s/^[[:space:]]*//; s/[[:space:]]*$//; s/^"//; s/"$//; s/^'\''//; s/'\''$//' | \
+               tr -d '\n\r')
         fi
         
         echo "Extracted YQ_VER: '${YQ_VER}'" >&2
