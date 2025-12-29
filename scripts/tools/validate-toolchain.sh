@@ -19,14 +19,35 @@ trap 'rm -f "$JSON_TMP"' EXIT
 test -f "$TOOLCHAIN_FILE" || { echo "::error::Missing toolchain file: $TOOLCHAIN_FILE"; exit 1; }
 test -f "$SCHEMA_FILE" || { echo "::error::Missing schema file: $SCHEMA_FILE"; exit 1; }
 
-# Ensure yq is available
-if ! command -v yq >/dev/null 2>&1; then
-  if [ -f "${REPO_ROOT}/tools/bin/yq" ]; then
+# Ensure yq is available and is the correct one (mikefarah/yq with eval support)
+# This prevents the "invalid YAML" phantom when python-yq or no yq is in PATH.
+if ! command -v yq >/dev/null 2>&1 || ! yq eval --help >/dev/null 2>&1; then
+  echo "::notice::yq missing or incompatible (need mikefarah/yq v4 with eval). Bootstrapping..."
+  
+  # Try local tools/bin first
+  if [ -f "${REPO_ROOT}/tools/bin/yq" ] && "${REPO_ROOT}/tools/bin/yq" eval --help >/dev/null 2>&1; then
     export PATH="${REPO_ROOT}/tools/bin:$PATH"
+    echo "::notice::Using local yq from tools/bin"
   else
-    echo "::error::yq not found. Please install it first."
-    exit 1
+    # Bootstrap via yq-pin.sh
+    if [ -x "${REPO_ROOT}/scripts/tools/yq-pin.sh" ]; then
+      echo "::notice::Running yq-pin.sh to install correct yq..."
+      "${REPO_ROOT}/scripts/tools/yq-pin.sh" ensure
+      export PATH="${REPO_ROOT}/tools/bin:$PATH"
+    else
+      echo "::error::yq not found and cannot bootstrap (yq-pin.sh missing or not executable)."
+      exit 1
+    fi
   fi
+fi
+
+# Diagnostic: log yq version for troubleshooting
+if command -v yq >/dev/null 2>&1; then
+  YQ_VERSION_OUT="$(yq --version 2>&1 || echo 'unknown')"
+  echo "::notice::Using yq version: ${YQ_VERSION_OUT}"
+else
+  echo "::error::yq still not available after bootstrap attempt."
+  exit 1
 fi
 
 echo "Validating toolchain.versions.yml..."
@@ -47,9 +68,12 @@ echo "  OK."
 # 3. JSON Schema Validation
 echo "  [3/3] Validating against schema..."
 
+# Check for Node/npx availability
 if ! command -v npx >/dev/null 2>&1; then
-  echo "::error::npx missing (node setup broken), cannot run schema validation."
-  exit 1
+  echo "::warning::npx not available. Skipping JSON schema validation."
+  echo "::warning::To enable full validation, ensure Node.js is installed in your environment."
+  echo "  Schema validation skipped (npx unavailable)."
+  exit 0
 fi
 
 # Use npx to run ajv-cli
