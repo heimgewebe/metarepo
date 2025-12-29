@@ -166,7 +166,14 @@ jobs:
           fi
           echo "ACTIONLINT_VERSION=${ACTIONLINT}" >> "$GITHUB_ENV"
 
-          echo "Detected toolchain versions: Rust=${RUST}, Python=${PY}, uv=${UV}, just=${JUST}, sccache=${SCCACHE}, actionlint=${ACTIONLINT}"
+          YQ=$(jq -r '.yq' "$TOOLCHAIN_JSON")
+          if [ -z "${YQ}" ] || [ "${YQ}" = "null" ]; then
+            echo "yq version missing in toolchain.versions.yml"
+            exit 1
+          fi
+          echo "YQ_VERSION=${YQ}" >> "$GITHUB_ENV"
+
+          echo "Detected toolchain versions: Rust=${RUST}, Python=${PY}, uv=${UV}, just=${JUST}, sccache=${SCCACHE}, actionlint=${ACTIONLINT}, yq=${YQ}"
 
       - name: Setup Rust
         if: ${{ hashFiles('**/Cargo.toml') != '' }}
