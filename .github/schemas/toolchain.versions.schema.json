@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://heimgewebe/schemas/toolchain.versions.schema.json",
+  "title": "Toolchain Versions Schema",
+  "description": "Schema for validating toolchain.versions.yml",
+  "type": "object",
+  "properties": {
+    "rust": { "type": "string" },
+    "python": { "type": "string" },
+    "uv": { "type": "string" },
+    "yq": { "type": "string" },
+    "just": { "type": "string" },
+    "sccache": { "type": "string" },
+    "actionlint": { "type": "string" },
+    "lychee": { "type": "string" },
+    "shfmt": { "type": "string" },
+    "shellcheck": { "type": "string" }
+  },
+  "required": ["rust", "python", "uv", "yq", "just"],
+  "additionalProperties": false
+}
