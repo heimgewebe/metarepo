@@ -10,7 +10,8 @@ set -euo pipefail
 REPO_ROOT="${GITHUB_WORKSPACE:-$(git rev-parse --show-toplevel)}"
 TOOLCHAIN_FILE="${REPO_ROOT}/toolchain.versions.yml"
 SCHEMA_FILE="${REPO_ROOT}/.github/schemas/toolchain.versions.schema.json"
-JSON_TMP="$(mktemp -t toolchain.versions.XXXXXX.json)"
+# Note: ajv-cli requires .json extension to properly detect the file format
+JSON_TMP="$(mktemp --suffix=.json)"
 trap 'rm -f "$JSON_TMP"' EXIT
 
 # Robust existence checks
