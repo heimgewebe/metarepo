@@ -17,14 +17,24 @@ trap 'rm -f "$JSON_TMP"' EXIT
 test -f "$TOOLCHAIN_FILE" || { echo "::error::Missing toolchain file: $TOOLCHAIN_FILE"; exit 1; }
 test -f "$SCHEMA_FILE" || { echo "::error::Missing schema file: $SCHEMA_FILE"; exit 1; }
 
-# Ensure yq is available
+# Ensure yq is available and prioritize repo-local version
+if [ -f "${REPO_ROOT}/tools/bin/yq" ]; then
+  export PATH="${REPO_ROOT}/tools/bin:$PATH"
+fi
+
 if ! command -v yq >/dev/null 2>&1; then
-  if [ -f "${REPO_ROOT}/tools/bin/yq" ]; then
-    export PATH="${REPO_ROOT}/tools/bin:$PATH"
-  else
-    echo "::error::yq not found. Please install it first."
-    exit 1
-  fi
+  echo "::error::yq not found. Please install it first."
+  exit 1
+fi
+
+# Verify yq version/flavor
+YQ_PATH="$(command -v yq)"
+YQ_VER="$(yq --version 2>&1 || true)"
+echo "Using yq: $YQ_PATH ($YQ_VER)"
+
+if ! echo "$YQ_VER" | grep -q "version v4\."; then
+  echo "::error::Wrong yq version/flavor detected. Expected mikefarah/yq v4.x"
+  exit 1
 fi
 
 echo "Validating toolchain.versions.yml..."
