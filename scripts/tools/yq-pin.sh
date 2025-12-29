@@ -57,8 +57,9 @@ read_pinned_version() {
 
   if [[ -z "${version}" ]] || [[ "${version}" == "null" ]]; then
     # Parse version from toolchain.versions.yml robustly:
-    version=$(grep -E '^\s*yq:' "${ROOT_DIR}/toolchain.versions.yml" |
-      sed -E 's/^\s*[^:]+:\s*//; s/#.*$//; s/^[[:space:]]*//; s/[[:space:]]*$//; s/^"//; s/"$//; s/^'\''//; s/'\''$//' |
+    # Use fallback parser (grep/sed) when yq is missing or failed
+    version=$(grep -E '^[[:space:]]*yq[[:space:]]*:' "${ROOT_DIR}/toolchain.versions.yml" | head -n1 |
+      sed -E 's/^[[:space:]]*[^:]+:[[:space:]]*//; s/[[:space:]]*#.*$//; s/^[[:space:]]*//; s/[[:space:]]*$//; s/^"//; s/"$//; s/^'\''//; s/'\''$//' |
       tr -d '\n\r')
   fi
   if [[ -z "${version}" ]]; then
