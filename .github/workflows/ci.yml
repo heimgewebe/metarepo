@@ -100,6 +100,9 @@ jobs:
       - name: Guard toolchain integrity
         if: ${{ env.AGENT_MODE == '' }}
         run: |
+          # Ensure tools/bin is in PATH (yq was installed by setup-yq action)
+          export PATH="${{ github.workspace }}/tools/bin:$PATH"
+          
           if ! command -v ajv >/dev/null 2>&1; then
              npm install -g ajv-cli@5.0.0
           fi
