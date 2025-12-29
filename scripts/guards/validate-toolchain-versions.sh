@@ -45,7 +45,8 @@ log "Validating ${TOOLCHAIN_FILE} against schema..."
 
 # Convert YAML to JSON and pipe to ajv
 # Using a temporary file for JSON to ensure clean validation context
-TMP_JSON="$(mktemp)"
+# Note: ajv-cli requires .json extension to properly detect the file format
+TMP_JSON="$(mktemp --suffix=.json)"
 trap 'rm -f "${TMP_JSON}"' EXIT
 
 yq -o=json '.' "${TOOLCHAIN_FILE}" > "${TMP_JSON}"
