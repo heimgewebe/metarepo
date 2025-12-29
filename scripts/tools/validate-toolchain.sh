@@ -11,7 +11,8 @@ REPO_ROOT="${GITHUB_WORKSPACE:-$(git rev-parse --show-toplevel)}"
 TOOLCHAIN_FILE="${REPO_ROOT}/toolchain.versions.yml"
 SCHEMA_FILE="${REPO_ROOT}/.github/schemas/toolchain.versions.schema.json"
 # Note: ajv-cli requires .json extension to properly detect the file format
-JSON_TMP="$(mktemp --suffix=.json)"
+# Use portable mktemp syntax (macOS doesn't support --suffix)
+JSON_TMP="$(mktemp "${TMPDIR:-/tmp}/toolchain.XXXXXXXXXX.json")"
 trap 'rm -f "$JSON_TMP"' EXIT
 
 # Robust existence checks
