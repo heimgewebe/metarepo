@@ -115,31 +115,55 @@ jobs:
           TOOLCHAIN_FILE="${GITHUB_WORKSPACE}/toolchain.versions.yml"
           test -f "$TOOLCHAIN_FILE" || { echo "toolchain.versions.yml not found at $TOOLCHAIN_FILE"; exit 1; }
 
-          RUST=$(yq -r '.rust' "$TOOLCHAIN_FILE")
-          test -n "${RUST}" || { echo "rust version missing in toolchain.versions.yml"; exit 1; }
+          # Convert YAML to JSON using yq (yq v4 syntax)
+          TOOLCHAIN_JSON="$(mktemp)"
+          trap 'rm -f "$TOOLCHAIN_JSON"' EXIT
+          yq eval -o=json '.' "$TOOLCHAIN_FILE" > "$TOOLCHAIN_JSON"
+
+          # Read values from JSON (safe from YAML parsing issues)
+          RUST=$(jq -r '.rust' "$TOOLCHAIN_JSON")
+          if [ -z "${RUST}" ] || [ "${RUST}" = "null" ]; then
+            echo "rust version missing in toolchain.versions.yml"
+            exit 1
+          fi
           echo "RUST_VERSION=${RUST}" >> "$GITHUB_ENV"
 
-          PY=$(yq -r '.python' "$TOOLCHAIN_FILE")
-          test -n "${PY}" || { echo "python version missing in toolchain.versions.yml"; exit 1; }
+          PY=$(jq -r '.python' "$TOOLCHAIN_JSON")
+          if [ -z "${PY}" ] || [ "${PY}" = "null" ]; then
+            echo "python version missing in toolchain.versions.yml"
+            exit 1
+          fi
           echo "PYTHON_VERSION=${PY}" >> "$GITHUB_ENV"
 
-          UV=$(yq -r '.uv' "$TOOLCHAIN_FILE")
-          test -n "${UV}" || { echo "uv version missing in toolchain.versions.yml"; exit 1; }
+          UV=$(jq -r '.uv' "$TOOLCHAIN_JSON")
+          if [ -z "${UV}" ] || [ "${UV}" = "null" ]; then
+            echo "uv version missing in toolchain.versions.yml"
+            exit 1
+          fi
           echo "UV_VERSION=${UV}" >> "$GITHUB_ENV"
 
-          JUST=$(yq -r '.just' "$TOOLCHAIN_FILE")
-          test -n "${JUST}" || { echo "just version missing in toolchain.versions.yml"; exit 1; }
+          JUST=$(jq -r '.just' "$TOOLCHAIN_JSON")
+          if [ -z "${JUST}" ] || [ "${JUST}" = "null" ]; then
+            echo "just version missing in toolchain.versions.yml"
+            exit 1
+          fi
           echo "JUST_VERSION=${JUST}" >> "$GITHUB_ENV"
 
-          SCCACHE=$(yq -r '.sccache' "$TOOLCHAIN_FILE")
-          test -n "${SCCACHE}" || { echo "sccache version missing in toolchain.versions.yml"; exit 1; }
+          SCCACHE=$(jq -r '.sccache' "$TOOLCHAIN_JSON")
+          if [ -z "${SCCACHE}" ] || [ "${SCCACHE}" = "null" ]; then
+            echo "sccache version missing in toolchain.versions.yml"
+            exit 1
+          fi
           echo "SCCACHE_VERSION=${SCCACHE}" >> "$GITHUB_ENV"
 
-          ACTIONLINT=$(yq -r '.actionlint' "$TOOLCHAIN_FILE")
-          test -n "${ACTIONLINT}" || { echo "actionlint version missing in toolchain.versions.yml"; exit 1; }
+          ACTIONLINT=$(jq -r '.actionlint' "$TOOLCHAIN_JSON")
+          if [ -z "${ACTIONLINT}" ] || [ "${ACTIONLINT}" = "null" ]; then
+            echo "actionlint version missing in toolchain.versions.yml"
+            exit 1
+          fi
           echo "ACTIONLINT_VERSION=${ACTIONLINT}" >> "$GITHUB_ENV"
 
-          echo "Detected toolchain versions: Rust=${RUST}, Python=${PY}, uv=${UV}, yq=${YQ_VERSION}, just=${JUST}, sccache=${SCCACHE}, actionlint=${ACTIONLINT}"
+          echo "Detected toolchain versions: Rust=${RUST}, Python=${PY}, uv=${UV}, just=${JUST}, sccache=${SCCACHE}, actionlint=${ACTIONLINT}"
 
       - name: Setup Rust
         if: ${{ hashFiles('**/Cargo.toml') != '' }}

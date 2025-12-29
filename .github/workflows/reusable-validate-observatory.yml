@@ -91,17 +91,17 @@ jobs:
             fi
 
             # Determine AJV flags
-            AJV_FLAGS="--spec=draft2020 -c ajv-formats"
+            AJV_FLAGS=(--spec=draft2020 -c ajv-formats)
             if [[ "$STRICT_MODE" == "true" ]]; then
-               AJV_FLAGS="$AJV_FLAGS --strict=true"
+               AJV_FLAGS+=(--strict=true)
             else
-               AJV_FLAGS="$AJV_FLAGS --strict=log"
+               AJV_FLAGS+=(--strict=log)
             fi
 
             for f in "${FILES[@]}"; do
               if [[ "$f" == *"node_modules"* || "$f" == *".git"* ]]; then continue; fi
               echo "→ $f"
-              ajv validate $AJV_FLAGS -s /tmp/insights.schema.json -d "$f"
+              ajv validate "${AJV_FLAGS[@]}" -s /tmp/insights.schema.json -d "$f"
             done
           fi
 
@@ -143,17 +143,17 @@ jobs:
               curl -fsSL "$SCHEMA_URL" -o /tmp/observatory.schema.json
             fi
 
-            AJV_FLAGS="--spec=draft2020 -c ajv-formats"
+            AJV_FLAGS=(--spec=draft2020 -c ajv-formats)
             if [[ "$STRICT_MODE" == "true" ]]; then
-               AJV_FLAGS="$AJV_FLAGS --strict=true"
+               AJV_FLAGS+=(--strict=true)
             else
-               AJV_FLAGS="$AJV_FLAGS --strict=log"
+               AJV_FLAGS+=(--strict=log)
             fi
 
             for f in "${FILES[@]}"; do
               if [[ "$f" == *"node_modules"* || "$f" == *".git"* ]]; then continue; fi
               echo "→ $f"
-              ajv validate $AJV_FLAGS -s /tmp/observatory.schema.json -d "$f"
+              ajv validate "${AJV_FLAGS[@]}" -s /tmp/observatory.schema.json -d "$f"
             done
           fi
 
@@ -206,16 +206,16 @@ jobs:
               curl -fsSL "$SCHEMA_URL" -o /tmp/published.schema.json
             fi
 
-            AJV_FLAGS="--spec=draft2020 -c ajv-formats"
+            AJV_FLAGS=(--spec=draft2020 -c ajv-formats)
             if [[ "$STRICT_MODE" == "true" ]]; then
-               AJV_FLAGS="$AJV_FLAGS --strict=true"
+               AJV_FLAGS+=(--strict=true)
             else
-               AJV_FLAGS="$AJV_FLAGS --strict=log"
+               AJV_FLAGS+=(--strict=log)
             fi
 
             for f in "${FILES[@]}"; do
               if [[ "$f" == *"node_modules"* || "$f" == *".git"* ]]; then continue; fi
               echo "→ $f"
-              ajv validate $AJV_FLAGS -s /tmp/published.schema.json -d "$f"
+              ajv validate "${AJV_FLAGS[@]}" -s /tmp/published.schema.json -d "$f"
             done
           fi
