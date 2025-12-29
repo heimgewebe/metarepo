@@ -16,6 +16,6 @@
     "shfmt": { "type": "string" },
     "shellcheck": { "type": "string" }
   },
-  "required": ["rust", "python", "uv", "yq", "just"],
+  "required": ["rust", "python", "uv", "yq", "just", "sccache", "actionlint"],
   "additionalProperties": false
 }
