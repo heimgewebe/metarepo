@@ -10,7 +10,8 @@ set -euo pipefail
 REPO_ROOT="${GITHUB_WORKSPACE:-$(git rev-parse --show-toplevel)}"
 TOOLCHAIN_FILE="${REPO_ROOT}/toolchain.versions.yml"
 SCHEMA_FILE="${REPO_ROOT}/.github/schemas/toolchain.versions.schema.json"
-JSON_TMP="/tmp/toolchain.versions.json"
+JSON_TMP="$(mktemp -t toolchain.versions.XXXXXX.json)"
+trap 'rm -f "$JSON_TMP"' EXIT
 
 # Robust existence checks
 test -f "$TOOLCHAIN_FILE" || { echo "::error::Missing toolchain file: $TOOLCHAIN_FILE"; exit 1; }
@@ -29,33 +30,20 @@ fi
 echo "Validating toolchain.versions.yml..."
 
 # 1. YAML Syntax Check
-echo "  [1/4] Checking YAML syntax..."
+echo "  [1/3] Checking YAML syntax..."
 if ! yq eval '.' "$TOOLCHAIN_FILE" >/dev/null; then
   echo "::error::${TOOLCHAIN_FILE} contains invalid YAML syntax."
   exit 1
 fi
 echo "  OK."
 
-# 2. Empty/Null Value Check (prevent silent failures)
-echo "  [2/4] Checking for empty/null values..."
-# Inspect known critical keys for empty values
-CRITICAL_KEYS="rust python uv yq just sccache actionlint"
-for k in $CRITICAL_KEYS; do
-  val=$(yq -r ".${k} // \"\"" "$TOOLCHAIN_FILE")
-  if [[ -z "$val" || "$val" == "null" ]]; then
-    echo "::error::Key '${k}' is missing or empty in ${TOOLCHAIN_FILE}"
-    exit 1
-  fi
-done
-echo "  OK."
-
-# 3. Convert to JSON
-echo "  [3/4] Converting to JSON..."
+# 2. Convert to JSON
+echo "  [2/3] Converting to JSON..."
 yq eval -o=json '.' "$TOOLCHAIN_FILE" > "$JSON_TMP"
 echo "  OK."
 
-# 4. JSON Schema Validation
-echo "  [4/4] Validating against schema..."
+# 3. JSON Schema Validation
+echo "  [3/3] Validating against schema..."
 
 if ! command -v npx >/dev/null 2>&1; then
   echo "::error::npx missing (node setup broken), cannot run schema validation."

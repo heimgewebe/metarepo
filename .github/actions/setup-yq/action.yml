@@ -106,6 +106,12 @@ runs:
           echo "PATH=${PATH}" >&2
           echo "tools/bin contents:" >&2
           ls -la "${REPO_ROOT}/tools/bin" 2>/dev/null || echo "tools/bin not found" >&2
+          if [[ -f "${REPO_ROOT}/tools/bin/yq" ]]; then
+             echo "file tools/bin/yq:" >&2
+             file "${REPO_ROOT}/tools/bin/yq" || true
+             echo "sha256sum:" >&2
+             sha256sum "${REPO_ROOT}/tools/bin/yq" || true
+          fi
           echo "::endgroup::" >&2
           exit "${code}"
         }

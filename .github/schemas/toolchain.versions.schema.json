@@ -5,16 +5,16 @@
   "description": "Schema for validating toolchain.versions.yml",
   "type": "object",
   "properties": {
-    "rust": { "type": "string" },
-    "python": { "type": "string" },
-    "uv": { "type": "string" },
-    "yq": { "type": "string" },
-    "just": { "type": "string" },
-    "sccache": { "type": "string" },
-    "actionlint": { "type": "string" },
-    "lychee": { "type": "string" },
-    "shfmt": { "type": "string" },
-    "shellcheck": { "type": "string" }
+    "rust": { "type": "string", "minLength": 1 },
+    "python": { "type": "string", "minLength": 1 },
+    "uv": { "type": "string", "minLength": 1 },
+    "yq": { "type": "string", "minLength": 1 },
+    "just": { "type": "string", "minLength": 1 },
+    "sccache": { "type": "string", "minLength": 1 },
+    "actionlint": { "type": "string", "minLength": 1 },
+    "lychee": { "type": "string", "minLength": 1 },
+    "shfmt": { "type": "string", "minLength": 1 },
+    "shellcheck": { "type": "string", "minLength": 1 }
   },
   "required": ["rust", "python", "uv", "yq", "just", "sccache", "actionlint"],
   "additionalProperties": false
