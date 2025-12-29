@@ -43,8 +43,8 @@ fi
 
 # Diagnostic: log yq version for troubleshooting
 if command -v yq >/dev/null 2>&1; then
-  YQ_VERSION_OUT="$(yq --version 2>&1 || echo 'unknown')"
-  echo "::notice::Using yq version: ${YQ_VERSION_OUT}"
+  yq_version="$(yq --version 2>&1 || echo 'unknown')"
+  echo "::notice::Using yq version: ${yq_version}"
 else
   echo "::error::yq still not available after bootstrap attempt."
   exit 1
@@ -70,8 +70,7 @@ echo "  [3/3] Validating against schema..."
 
 # Check for Node/npx availability
 if ! command -v npx >/dev/null 2>&1; then
-  echo "::warning::npx not available. Skipping JSON schema validation."
-  echo "::warning::To enable full validation, ensure Node.js is installed in your environment."
+  echo "::warning::npx not available. Skipping JSON schema validation. To enable full validation, ensure Node.js is installed."
   echo "  Schema validation skipped (npx unavailable)."
   exit 0
 fi
