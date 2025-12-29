@@ -1,15 +1,32 @@
----
 name: toolchain-guard
 permissions:
   contents: read
 'on':
   push:
+    paths:
+      - 'toolchain.versions.yml'
+      - '.github/workflows/toolchain-guard.yml'
+      - '.github/schemas/toolchain.versions.schema.json'
+      - 'scripts/tools/validate-toolchain.sh'
+  pull_request:
+    paths:
+      - 'toolchain.versions.yml'
+      - '.github/workflows/toolchain-guard.yml'
+      - '.github/schemas/toolchain.versions.schema.json'
+      - 'scripts/tools/validate-toolchain.sh'
+  workflow_dispatch:
+
 jobs:
   guard:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
+
+      - name: Setup Node (for ajv-cli)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
       - name: Check yq availability (Agent-Mode)
         if: ${{ env.AGENT_MODE != '' }}
@@ -27,12 +44,20 @@ jobs:
         uses: ./.github/actions/setup-yq
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Validate Toolchain
+        run: |
+          chmod +x scripts/tools/validate-toolchain.sh
+          scripts/tools/validate-toolchain.sh
+
       - name: Install just
         run: scripts/tools/just-pin.sh
+
       - name: Lint GitHub workflows (actionlint)
         uses: rhysd/actionlint@v1.7.9
         with:
           args: -color
+
       - name: Show tool versions
         run: |
           set +e

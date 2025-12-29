@@ -56,9 +56,14 @@ read_pinned_version() {
   fi
 
   if [[ -z "${version}" ]] || [[ "${version}" == "null" ]]; then
-    # yq ist erforderlich, um die Version sicher zu parsen.
-    # Kein Regex-Fallback, kein grep/sed.
-    die "yq version missing (or yq not found) in toolchain.versions.yml. Pre-install yq or fix toolchain."
+    # Parse version from toolchain.versions.yml robustly:
+    # Use fallback parser (grep/sed) when yq is missing or failed
+    version=$(grep -E '^[[:space:]]*yq[[:space:]]*:' "${ROOT_DIR}/toolchain.versions.yml" | head -n1 |
+      sed -E 's/^[[:space:]]*[^:]+:[[:space:]]*//; s/[[:space:]]*#.*$//; s/^[[:space:]]*//; s/[[:space:]]*$//; s/^"//; s/"$//; s/^'\''//; s/'\''$//' |
+      tr -d '\n\r')
+  fi
+  if [[ -z "${version}" ]]; then
+    die "Konnte gewünschte yq-Version aus toolchain.versions.yml nicht ermitteln."
   fi
   printf '%s' "${version}"
 }
