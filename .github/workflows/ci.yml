@@ -103,8 +103,22 @@ jobs:
           export PATH="${{ github.workspace }}/tools/bin:$PATH"
           echo "${{ github.workspace }}/tools/bin" >> "$GITHUB_PATH"
 
+          # Explicitly verify yq capability before using it
+          if ! command -v yq >/dev/null; then echo "::error::yq missing in PATH"; exit 1; fi
+          YQ_VER=$(yq --version || true)
+          if ! echo "$YQ_VER" | grep -q "version v4"; then
+             echo "::error::yq is not mikefarah/yq v4 (got: $YQ_VER). Bootstrapping failed."
+             exit 1
+          fi
+
           TOOLCHAIN_FILE="${GITHUB_WORKSPACE}/toolchain.versions.yml"
           test -f "$TOOLCHAIN_FILE" || { echo "toolchain.versions.yml not found at $TOOLCHAIN_FILE"; exit 1; }
+
+          # Verify yq can parse the file
+          if ! yq eval '.' "$TOOLCHAIN_FILE" >/dev/null 2>&1; then
+             echo "::error::yq failed to parse toolchain.versions.yml. Check syntax or binary."
+             exit 1
+          fi
 
           RUST=$(yq -r '.rust' "$TOOLCHAIN_FILE")
           test -n "${RUST}" || { echo "rust version missing in toolchain.versions.yml"; exit 1; }

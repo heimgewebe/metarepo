@@ -48,20 +48,13 @@ read_pinned_version() {
     die "toolchain.versions.yml nicht gefunden: ${ROOT_DIR}/toolchain.versions.yml"
   fi
 
+  # Always parse version from toolchain.versions.yml robustly using grep/sed.
+  # Do NOT rely on `yq` command here to avoid bootstrap paradox (e.g. wrong yq in path).
   local version
-  if [[ -x "${YQ_LOCAL}" ]]; then
-    version=$("${YQ_LOCAL}" '.yq' "${ROOT_DIR}/toolchain.versions.yml" 2> /dev/null || true)
-  elif have_cmd yq; then
-    version=$(yq '.yq' "${ROOT_DIR}/toolchain.versions.yml" 2> /dev/null || true)
-  fi
+  version=$(grep -E '^[[:space:]]*yq[[:space:]]*:' "${ROOT_DIR}/toolchain.versions.yml" | head -n1 |
+    sed -E 's/^[[:space:]]*[^:]+:[[:space:]]*//; s/[[:space:]]*#.*$//; s/^[[:space:]]*//; s/[[:space:]]*$//; s/^"//; s/"$//; s/^'\''//; s/'\''$//' |
+    tr -d '\n\r')
 
-  if [[ -z "${version}" ]] || [[ "${version}" == "null" ]]; then
-    # Parse version from toolchain.versions.yml robustly:
-    # Use fallback parser (grep/sed) when yq is missing or failed
-    version=$(grep -E '^[[:space:]]*yq[[:space:]]*:' "${ROOT_DIR}/toolchain.versions.yml" | head -n1 |
-      sed -E 's/^[[:space:]]*[^:]+:[[:space:]]*//; s/[[:space:]]*#.*$//; s/^[[:space:]]*//; s/[[:space:]]*$//; s/^"//; s/"$//; s/^'\''//; s/'\''$//' |
-      tr -d '\n\r')
-  fi
   if [[ -z "${version}" ]]; then
     die "Konnte gewünschte yq-Version aus toolchain.versions.yml nicht ermitteln."
   fi
