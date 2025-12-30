@@ -525,12 +525,30 @@ jobs:
           git rev-parse --show-toplevel
           echo "PATH:"
           echo "$PATH" | tr ':' '\n'
-          command -v yq || true
+          type -a yq || true
           yq --version || true
           yq --help | head -n 3 || true
+
+          echo "Resolved yq inspection:"
+          YQ_BIN=$(command -v yq || true)
+          if [ -n "$YQ_BIN" ]; then
+            ls -la "$YQ_BIN" || true
+            shasum -a 256 "$YQ_BIN" || true
+          else
+            echo "No yq found in PATH"
+          fi
+
+          echo "tools/bin inspection:"
           ls -la tools/bin || true
-          file tools/bin/yq || true
-          shasum -a 256 tools/bin/yq || true
+          if [ -f tools/bin/yq ]; then
+            file tools/bin/yq || true
+            shasum -a 256 tools/bin/yq || true
+          fi
+
+          echo "Global locations inspection:"
+          ls -la /opt/homebrew/bin/yq 2>/dev/null || true
+          ls -la /usr/local/bin/yq 2>/dev/null || true
+          ls -la /usr/bin/yq 2>/dev/null || true
           echo "::endgroup::"
 
       - name: Upload logs on failure
