@@ -515,6 +515,21 @@ jobs:
         if: ${{ hashFiles('**/Cargo.toml') != '' }}
         run: sccache --show-stats
 
+      - name: Fail-Diagnostics
+        if: failure()
+        run: |
+          echo "::group::Fail-Diagnostics"
+          pwd
+          ls -la
+          git rev-parse --show-toplevel
+          echo "$PATH"
+          command -v yq || true
+          yq --version || true
+          ls -la tools/bin || true
+          file tools/bin/yq || true
+          shasum -a 256 tools/bin/yq || true
+          echo "::endgroup::"
+
       - name: Upload logs on failure
         if: failure()
         uses: actions/upload-artifact@v6
