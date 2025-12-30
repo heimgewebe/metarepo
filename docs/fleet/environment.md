@@ -46,3 +46,19 @@ Weitere Variablen entnimmst du den Sub-Repo-Dokumentationen (siehe
 
 - E2E-Dokumentation (siehe `scripts/e2e/`)
 - Weitere Use-Cases und Troubleshooting-Hinweise in Vorbereitung
+
+## Leitstand Runtime/Build Configuration
+
+Diese Variablen steuern das Verhalten des Leitstands (Artefakte, Strictness, Events).
+
+| Variable | Zweck | Status |
+| --- | --- | --- |
+| `OBSERVATORY_URL` | Basis-URL zum Laden des Observatory-Snapshots | Required |
+| `OBSERVATORY_ARTIFACT_PATH` | Pfad zum JSON-Artefakt relativ zur URL | Required |
+| `OBSERVATORY_STRICT` | `1` erzwingt Abbruch bei fehlenden Artefakten (kein Fallback) | Empfohlen (Prod) |
+| `NODE_ENV` | `production` aktiviert Optimierungen und Strict-Defaults | Required (Prod) |
+| `INSIGHTS_DAILY_URL` | Basis-URL für Daily Insights | Optional |
+| `INSIGHTS_DAILY_ARTIFACT_PATH` | Pfad zum Insights-JSON | Optional |
+| `LEITSTAND_EVENTS_TOKEN` | Secret Token für den Events-Ingest-Endpunkt | Required (Prod) |
+| `LEITSTAND_STRICT` | `1` schaltet Leitstand in den Fail-Loud Modus | Empfohlen |
+| `OBSERVATORY_OUT_PATH` | Veralteter Alias für Artifact-Path | **Deprecated** (Vermeiden) |
