@@ -165,12 +165,25 @@ runs:
         # Ensure scripts are executable
         chmod +x "${REPO_ROOT}/scripts/tools/yq-pin.sh"
 
-        # Pinned Version erzwingen (Download + Verifikation)
-        # The script uses BASH_SOURCE to find ROOT_DIR, so it will work from any location
-        # This will verify the bootstrapped yq or download the correct version if different
-        "${REPO_ROOT}/scripts/tools/yq-pin.sh" ensure
+        # Check if yq is already available and has correct version (from bootstrap)
+        SKIP_PIN_SH=false
+        if [[ -x "${REPO_ROOT}/tools/bin/yq" ]]; then
+          BOOTSTRAP_VERSION="$("${REPO_ROOT}/tools/bin/yq" --version 2>/dev/null || echo '')"
+          if echo "${BOOTSTRAP_VERSION}" | grep -q "version v${YQ_VER_TRIM}"; then
+            echo "✅ Bootstrap yq already has correct version v${YQ_VER_TRIM}, skipping yq-pin.sh"
+            SKIP_PIN_SH=true
+          fi
+        fi
 
-        # Re-export PATH to ensure tools/bin is prioritized after yq-pin.sh runs
+        # Only call yq-pin.sh if needed to avoid removing working bootstrap binary
+        if [[ "${SKIP_PIN_SH}" != "true" ]]; then
+          # Pinned Version erzwingen (Download + Verifikation)
+          # The script uses BASH_SOURCE to find ROOT_DIR, so it will work from any location
+          # This will verify the bootstrapped yq or download the correct version if different
+          "${REPO_ROOT}/scripts/tools/yq-pin.sh" ensure
+        fi
+
+        # Re-export PATH to ensure tools/bin is prioritized
         export PATH="${REPO_ROOT}/tools/bin:$PATH"
 
         # Final verification - check both in PATH and at explicit location
