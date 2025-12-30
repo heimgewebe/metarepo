@@ -189,7 +189,8 @@ runs:
           # Pinned Version erzwingen (Download + Verifikation)
           # The script uses BASH_SOURCE to find ROOT_DIR, so it will work from any location
           # This will verify the bootstrapped yq or download the correct version if different
-          "${REPO_ROOT}/scripts/tools/yq-pin.sh" ensure
+          # Allow network access for yq download/verification
+          ALLOW_NET=1 "${REPO_ROOT}/scripts/tools/yq-pin.sh" ensure
         fi
 
         # Re-export PATH to ensure tools/bin is prioritized
