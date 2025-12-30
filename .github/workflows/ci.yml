@@ -519,12 +519,15 @@ jobs:
         if: failure()
         run: |
           echo "::group::Fail-Diagnostics"
+          uname -a
           pwd
           ls -la
           git rev-parse --show-toplevel
-          echo "$PATH"
+          echo "PATH:"
+          echo "$PATH" | tr ':' '\n'
           command -v yq || true
           yq --version || true
+          yq --help | head -n 3 || true
           ls -la tools/bin || true
           file tools/bin/yq || true
           shasum -a 256 tools/bin/yq || true
