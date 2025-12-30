@@ -104,7 +104,17 @@ download_yq() {
 
   ensure_dir
 
-  # Force cleanup of existing binaries in target location
+  # Only remove existing binary if it's not working or wrong version
+  # This prevents removing a working binary during network issues
+  if [[ -x "${YQ_LOCAL}" ]]; then
+    local existing_version=""
+    existing_version=$("${YQ_LOCAL}" --version 2>/dev/null | sed -E 's/^yq .* version //' || echo "")
+    if [[ -n "${existing_version}" ]] && version_ok "${existing_version}" "${yq_version}"; then
+      log "Existing ${YQ_LOCAL} already has correct version ${existing_version}, skipping download"
+      return 0
+    fi
+    log "Removing incompatible yq binary (version ${existing_version:-unknown})"
+  fi
   rm -f "${YQ_LOCAL}"
 
   local tmp tmp_checksum

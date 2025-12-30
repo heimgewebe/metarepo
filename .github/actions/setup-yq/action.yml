@@ -165,12 +165,34 @@ runs:
         # Ensure scripts are executable
         chmod +x "${REPO_ROOT}/scripts/tools/yq-pin.sh"
 
-        # Pinned Version erzwingen (Download + Verifikation)
-        # The script uses BASH_SOURCE to find ROOT_DIR, so it will work from any location
-        # This will verify the bootstrapped yq or download the correct version if different
-        "${REPO_ROOT}/scripts/tools/yq-pin.sh" ensure
+        # Version comparison helper (consistent with yq-pin.sh)
+        version_matches() {
+          local v_have="$1" v_want="$2"
+          local v_have_clean v_want_clean
+          v_want_clean=$(echo "${v_want}" | tr -d "v")
+          v_have_clean=$(echo "${v_have}" | tr -d "v")
+          [[ "${v_have_clean}" == "${v_want_clean}" ]]
+        }
 
-        # Re-export PATH to ensure tools/bin is prioritized after yq-pin.sh runs
+        # Check if yq is already available and has correct version (from bootstrap)
+        SKIP_PIN_SH=false
+        if [[ -x "${REPO_ROOT}/tools/bin/yq" ]]; then
+          BOOTSTRAP_VERSION="$("${REPO_ROOT}/tools/bin/yq" --version 2>/dev/null | sed -E 's/^yq .* version //' || echo '')"
+          if [[ -n "${BOOTSTRAP_VERSION}" ]] && version_matches "${BOOTSTRAP_VERSION}" "${YQ_VER_TRIM}"; then
+            echo "✅ Bootstrap yq already has correct version ${BOOTSTRAP_VERSION}, skipping yq-pin.sh"
+            SKIP_PIN_SH=true
+          fi
+        fi
+
+        # Only call yq-pin.sh if needed to avoid removing working bootstrap binary
+        if [[ "${SKIP_PIN_SH}" != "true" ]]; then
+          # Pinned Version erzwingen (Download + Verifikation)
+          # The script uses BASH_SOURCE to find ROOT_DIR, so it will work from any location
+          # This will verify the bootstrapped yq or download the correct version if different
+          "${REPO_ROOT}/scripts/tools/yq-pin.sh" ensure
+        fi
+
+        # Re-export PATH to ensure tools/bin is prioritized
         export PATH="${REPO_ROOT}/tools/bin:$PATH"
 
         # Final verification - check both in PATH and at explicit location
