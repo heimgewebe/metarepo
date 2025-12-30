@@ -4,7 +4,6 @@ set -euxo pipefail
 # Erwartet, dass ein kompatibles Binary entweder in ./tools/bin/yq liegt oder im PATH verfügbar ist.
 # Optionaler Download ist NUR erlaubt, wenn ALLOW_NET=1 gesetzt ist.
 
-REQ_MAJOR=4
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 TOOLS_DIR="${ROOT_DIR}/tools"
 BIN_DIR="${TOOLS_DIR}/bin"
