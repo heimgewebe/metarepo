@@ -12,6 +12,10 @@ name: Notify Plexer
         description: "Optional status field for payload"
         required: false
         type: string
+      payload_json:
+        description: "Additional JSON string to merge into payload (overrides defaults on key collision)"
+        required: false
+        type: string
       plexer_url:
         description: "Base URL of Plexer (e.g. https://plexer.local)"
         required: true
@@ -29,28 +33,63 @@ jobs:
     steps:
       - name: Build event payload
         id: build
+        shell: bash
+        env:
+          INPUT_EVENT_TYPE: ${{ inputs.event_type }}
+          INPUT_STATUS: ${{ inputs.status || '' }}
+          INPUT_PAYLOAD_JSON: ${{ inputs.payload_json || '' }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_WORKFLOW: ${{ github.workflow }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
+          GITHUB_REF: ${{ github.ref }}
+          GITHUB_SHA: ${{ github.sha }}
         run: |
-          ts="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
-          cat > event.json <<'JSON'
-          {
-            "type": "${{ inputs.event_type }}",
-            "source": "${{ github.repository }}",
-            "timestamp": "__TS__",
-            "payload": {
-              "status": "${{ inputs.status || '' }}",
-              "workflow": "${{ github.workflow }}",
-              "run_id": "${{ github.run_id }}",
-              "run_attempt": "${{ github.run_attempt }}",
-              "ref": "${{ github.ref }}",
-              "sha": "${{ github.sha }}"
-            }
+          python3 -c '
+          import json, os, datetime
+
+          def get_env(key, default=""):
+              return os.environ.get(key, default)
+
+          ts = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+          payload = {
+              "ts": ts,
+              "status": get_env("INPUT_STATUS"),
+              "workflow": get_env("GITHUB_WORKFLOW"),
+              "run_id": get_env("GITHUB_RUN_ID"),
+              "run_attempt": get_env("GITHUB_RUN_ATTEMPT"),
+              "ref": get_env("GITHUB_REF"),
+              "sha": get_env("GITHUB_SHA")
           }
-          JSON
-          # simple timestamp replace
-          sed -i "s/__TS__/${ts}/" event.json
-          echo "payload=$(cat event.json)" >> "$GITHUB_OUTPUT"
+
+          payload_json_str = get_env("INPUT_PAYLOAD_JSON")
+          if payload_json_str:
+              try:
+                  extra = json.loads(payload_json_str)
+                  if isinstance(extra, dict):
+                      payload.update(extra)
+                  else:
+                      print("::warning::payload_json input is not a dictionary. Ignoring.")
+              except json.JSONDecodeError:
+                  print("::warning::payload_json input is invalid JSON. Ignoring.")
+
+          event = {
+              "type": get_env("INPUT_EVENT_TYPE"),
+              "source": get_env("GITHUB_REPOSITORY"),
+              "timestamp": ts,
+              "payload": payload
+          }
+
+          with open("event.json", "w") as f:
+              json.dump(event, f)
+          '
+          echo "payload<<EOF" >> "$GITHUB_OUTPUT"
+          cat event.json >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
 
       - name: POST to Plexer
+        shell: bash
         env:
           PLEXER_URL: ${{ inputs.plexer_url }}
           PLEXER_TOKEN: ${{ secrets.PLEXER_TOKEN }}
@@ -61,14 +100,13 @@ jobs:
             exit 1
           fi
 
-          header_auth=""
+          declare -a curl_opts=()
           if [ -n "${PLEXER_TOKEN:-}" ]; then
-            header_auth="-H \"Authorization: Bearer ${PLEXER_TOKEN}\""
+            curl_opts+=(-H "Authorization: Bearer ${PLEXER_TOKEN}")
           fi
 
-          # shellcheck disable=SC2086
           curl -sS -X POST \
             -H "Content-Type: application/json" \
-            ${header_auth} \
+            "${curl_opts[@]}" \
             "${PLEXER_URL%/}/events" \
             -d @"event.json"
