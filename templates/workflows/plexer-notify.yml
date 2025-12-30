@@ -13,7 +13,7 @@ name: Notify Plexer
         required: false
         type: string
       payload_json:
-        description: "Additional JSON string to merge into payload"
+        description: "Additional JSON string to merge into payload (overrides defaults on key collision)"
         required: false
         type: string
       plexer_url:
@@ -53,6 +53,7 @@ jobs:
           ts = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
           payload = {
+              "ts": ts,
               "status": get_env("INPUT_STATUS"),
               "workflow": get_env("GITHUB_WORKFLOW"),
               "run_id": get_env("GITHUB_RUN_ID"),
@@ -82,7 +83,9 @@ jobs:
           with open("event.json", "w") as f:
               json.dump(event, f)
           '
-          echo "payload=$(cat event.json)" >> "$GITHUB_OUTPUT"
+          echo "payload<<EOF" >> "$GITHUB_OUTPUT"
+          cat event.json >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
 
       - name: POST to Plexer
         env:

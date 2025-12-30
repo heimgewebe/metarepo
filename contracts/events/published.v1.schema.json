@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heimgewebe.local/contracts/events/published.v1.schema.json",
+  "title": "published.v1 event",
+  "type": "object",
+  "required": ["type", "source", "timestamp", "payload"],
+  "properties": {
+    "type": {
+      "type": "string",
+      "pattern": "^[a-z0-9\\.]+\\.published\\.v1$"
+    },
+    "source": { "type": "string", "minLength": 1 },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "payload": {
+      "type": "object",
+      "required": ["url"],
+      "properties": {
+        "ts": { "type": "string", "format": "date-time" },
+        "url": { "type": "string", "format": "uri" },
+        "generated_at": { "type": "string", "format": "date-time" }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}
