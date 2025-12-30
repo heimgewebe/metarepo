@@ -30,10 +30,29 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Setup yq
-        uses: ./.github/actions/setup-yq
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Toolchain: setup yq (deterministic)
+        shell: bash
+        env:
+          ALLOW_NET: 1
+        run: |
+          set -euo pipefail
+          test -x scripts/tools/yq-pin.sh || { echo "::error::missing scripts/tools/yq-pin.sh"; ls -la scripts/tools || true; exit 1; }
+          scripts/tools/yq-pin.sh ensure
+
+          # IMPORTANT: GITHUB_PATH affects next steps only; export for this step too
+          export PATH="${{ github.workspace }}/tools/bin:$PATH"
+          echo "${{ github.workspace }}/tools/bin" >> "$GITHUB_PATH"
+
+      - name: Assert: yq available
+        shell: bash
+        run: |
+          set -euo pipefail
+          export PATH="${{ github.workspace }}/tools/bin:$PATH"
+
+          command -v yq || { echo "::error::yq still missing after setup"; exit 1; }
+          yq --version || { echo "::error::yq not executable"; exit 1; }
+          yq --version | grep -q "version v4" || { echo "::error::wrong yq version"; exit 1; }
+          echo "✅ yq verified"
 
       - name: Read toolchain python version
         id: toolchain
