@@ -63,21 +63,59 @@ runs:
 
              BS_URL="https://github.com/mikefarah/yq/releases/download/${BS_VER}/yq_${BS_OS}_${BS_ARCH}"
 
-             # Install into tools/bin (standard location)
-             mkdir -p "${REPO_ROOT}/tools/bin"
-             echo "Downloading bootstrap yq from ${BS_URL}..." >&2
-             if ! curl -fsSL "${BS_URL}" -o "${REPO_ROOT}/tools/bin/yq"; then
-                  echo "::error::Failed to download yq from ${BS_URL}"
-                  exit 1
-             fi
-             chmod +x "${REPO_ROOT}/tools/bin/yq"
-             
-             # Verify binary is executable after download
-             if [[ ! -x "${REPO_ROOT}/tools/bin/yq" ]]; then
-                  echo "::error::yq binary nicht ausführbar"
-                  ls -la "${REPO_ROOT}/tools/bin/yq" >&2 || echo "Binary not found" >&2
-                  exit 1
-             fi
+              # Install into tools/bin (standard location)
+              mkdir -p "${REPO_ROOT}/tools/bin"
+              echo "Downloading bootstrap yq from ${BS_URL}..." >&2
+              
+              # Download with retries and better error handling
+              MAX_RETRIES=3
+              RETRY_COUNT=0
+              DOWNLOAD_SUCCESS=false
+              
+              while [[ ${RETRY_COUNT} -lt ${MAX_RETRIES} ]]; do
+                   if curl --fail --show-error --location --max-time 60 --connect-timeout 10 --retry 3 "${BS_URL}" -o "${REPO_ROOT}/tools/bin/yq"; then
+                        DOWNLOAD_SUCCESS=true
+                        break
+                   fi
+                   RETRY_COUNT=$((RETRY_COUNT + 1))
+                   if [[ ${RETRY_COUNT} -lt ${MAX_RETRIES} ]]; then
+                        echo "Download attempt ${RETRY_COUNT} failed, retrying..." >&2
+                        sleep 2
+                   fi
+              done
+              
+              if [[ "${DOWNLOAD_SUCCESS}" != "true" ]]; then
+                   echo "::error::Failed to download yq from ${BS_URL} after ${MAX_RETRIES} attempts"
+                   echo "::error::Check network connectivity and GitHub rate limits"
+                   exit 1
+              fi
+              
+              # Make binary executable immediately
+              chmod +x "${REPO_ROOT}/tools/bin/yq"
+              
+              # Verify binary exists and is executable
+              if [[ ! -f "${REPO_ROOT}/tools/bin/yq" ]]; then
+                   echo "::error::yq binary file not found after download"
+                   ls -la "${REPO_ROOT}/tools/bin/" >&2 || true
+                   exit 1
+              fi
+              
+              if [[ ! -x "${REPO_ROOT}/tools/bin/yq" ]]; then
+                   echo "::error::yq binary is not executable"
+                   ls -la "${REPO_ROOT}/tools/bin/yq" >&2
+                   file "${REPO_ROOT}/tools/bin/yq" >&2 || true
+                   exit 1
+              fi
+              
+              # Verify binary actually works
+              if ! "${REPO_ROOT}/tools/bin/yq" --version >/dev/null 2>&1; then
+                   echo "::error::yq binary downloaded but fails to execute"
+                   file "${REPO_ROOT}/tools/bin/yq" >&2 || true
+                   "${REPO_ROOT}/tools/bin/yq" --version >&2 || true
+                   exit 1
+              fi
+              
+              echo "Successfully downloaded and verified yq binary" >&2
 
              # Add to PATH for this step and subsequent steps
              echo "${REPO_ROOT}/tools/bin" >> "$GITHUB_PATH"

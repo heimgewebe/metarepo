@@ -1,52 +1,577 @@
+---
+name: ci
+permissions:
+  contents: read
+env:
+  CARGO_NET_GIT_FETCH_WITH_CLI: true
+  CARGO_REGISTRIES_CRATES_IO_PROTOCOL: sparse
+  RUSTFLAGS: "-Dwarnings"
+  RUSTDOCFLAGS: "-Dwarnings"
+
+"on":
+  push:
+    branches: [main]
+    paths:
+      - '**/*.rs'
+      - '**/Cargo.*'
+      - '**/*.py'
+      - '**/pyproject.toml'
+      - 'Justfile'
+      - '.lychee.toml'
+      - 'scripts/**'
+      - '.github/workflows/ci.yml'
+      - 'toolchain.versions.yml'
+  pull_request:
+    paths:
+      - '**/*.rs'
+      - '**/Cargo.*'
+      - '**/*.py'
+      - '**/pyproject.toml'
+      - 'Justfile'
+      - '.lychee.toml'
+      - 'scripts/**'
+      - '.github/workflows/ci.yml'
+      - 'toolchain.versions.yml'
+  workflow_dispatch:
+  schedule:
+    - cron: '17 3 * * *'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    # Keep strict, portable Bash defaults across all steps.
+    shell: bash --noprofile --norc -euo pipefail {0}
+
+jobs:
+  ci:
+    if: ${{ (github.event_name != 'push' || (!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '[ci skip]'))) && (github.event_name != 'pull_request' || github.event.pull_request.draft != true) }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    env:
+      RUST_BACKTRACE: 1
+      CARGO_TERM_COLOR: always
+      CARGO_INCREMENTAL: 0
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install checksum utilities (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          if ! command -v sha256sum >/dev/null 2>&1; then
+            echo "Installing coreutils for sha256sum..."
+            brew install coreutils
+            # On macOS, coreutils installs with 'g' prefix, ensure PATH includes them
+            COREUTILS_GNUBIN="$(brew --prefix coreutils)/libexec/gnubin"
+            echo "$COREUTILS_GNUBIN" >> "$GITHUB_PATH"
+            export PATH="$COREUTILS_GNUBIN:$PATH"
+            # Verify installation
+            if command -v sha256sum >/dev/null 2>&1; then
+              echo "sha256sum is now available"
+            else
+              echo "Warning: sha256sum still not available after coreutils install"
+            fi
+          else
+            echo "sha256sum already available"
+          fi
+
+      - name: Check toolchain.versions.yml exists
+        run: test -f "${GITHUB_WORKSPACE}/toolchain.versions.yml" || { echo "toolchain.versions.yml fehlt"; exit 1; }
+
+      - name: Setup Python for yq setup
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - uses: ./.github/actions/setup-yq
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Guard toolchain integrity
+        if: ${{ env.AGENT_MODE == '' }}
+        run: |
+          # Ensure tools/bin is in PATH (yq was installed by setup-yq action)
+          export PATH="${{ github.workspace }}/tools/bin:$PATH"
+          
+          if ! command -v ajv >/dev/null 2>&1; then
+             npm install -g ajv-cli@5.0.0
+          fi
+          chmod +x scripts/guards/validate-toolchain-versions.sh
+          scripts/guards/validate-toolchain-versions.sh
+
       - name: Read toolchain versions
         run: |
-          set -euo pipefail
-
-          # Ensure tools/bin is used in THIS step (GITHUB_PATH affects subsequent steps only)
+          # Add tools/bin to PATH for this step (GITHUB_PATH only affects next step)
           export PATH="${{ github.workspace }}/tools/bin:$PATH"
           echo "${{ github.workspace }}/tools/bin" >> "$GITHUB_PATH"
 
           TOOLCHAIN_FILE="${GITHUB_WORKSPACE}/toolchain.versions.yml"
-          test -f "$TOOLCHAIN_FILE" || { echo "::error::toolchain.versions.yml not found at $TOOLCHAIN_FILE"; exit 1; }
+          test -f "$TOOLCHAIN_FILE" || { echo "toolchain.versions.yml not found at $TOOLCHAIN_FILE"; exit 1; }
 
-          # Verify yq exists and is mikefarah/yq v4
-          command -v yq >/dev/null || { echo "::error::yq missing in PATH"; exit 1; }
-          YQ_VER="$(yq --version || true)"
-          echo "$YQ_VER" | grep -q "version v4" || { echo "::error::yq is not mikefarah/yq v4 (got: $YQ_VER)"; exit 1; }
-
-          # Verify the YAML parses before converting
-          yq eval '.' "$TOOLCHAIN_FILE" >/dev/null 2>&1 || { echo "::error::yq failed to parse toolchain.versions.yml (syntax?)"; exit 1; }
-
-          # Convert YAML -> JSON once, then read everything via jq
+          # Convert YAML to JSON using yq (yq v4 syntax)
           TOOLCHAIN_JSON="$(mktemp)"
           trap 'rm -f "$TOOLCHAIN_JSON"' EXIT
           yq eval -o=json '.' "$TOOLCHAIN_FILE" > "$TOOLCHAIN_JSON"
 
-          require_key() {
-            local key="$1"
-            local val
-            val="$(jq -r --arg k "$key" '.[$k]' "$TOOLCHAIN_JSON")"
-            if [ -z "$val" ] || [ "$val" = "null" ]; then
-              echo "::error::${key} version missing in toolchain.versions.yml"
-              exit 1
+          # Read values from JSON (safe from YAML parsing issues)
+          RUST=$(jq -r '.rust' "$TOOLCHAIN_JSON")
+          if [ -z "${RUST}" ] || [ "${RUST}" = "null" ]; then
+            echo "rust version missing in toolchain.versions.yml"
+            exit 1
+          fi
+          echo "RUST_VERSION=${RUST}" >> "$GITHUB_ENV"
+
+          PY=$(jq -r '.python' "$TOOLCHAIN_JSON")
+          if [ -z "${PY}" ] || [ "${PY}" = "null" ]; then
+            echo "python version missing in toolchain.versions.yml"
+            exit 1
+          fi
+          echo "PYTHON_VERSION=${PY}" >> "$GITHUB_ENV"
+
+          UV=$(jq -r '.uv' "$TOOLCHAIN_JSON")
+          if [ -z "${UV}" ] || [ "${UV}" = "null" ]; then
+            echo "uv version missing in toolchain.versions.yml"
+            exit 1
+          fi
+          echo "UV_VERSION=${UV}" >> "$GITHUB_ENV"
+
+          JUST=$(jq -r '.just' "$TOOLCHAIN_JSON")
+          if [ -z "${JUST}" ] || [ "${JUST}" = "null" ]; then
+            echo "just version missing in toolchain.versions.yml"
+            exit 1
+          fi
+          echo "JUST_VERSION=${JUST}" >> "$GITHUB_ENV"
+
+          SCCACHE=$(jq -r '.sccache' "$TOOLCHAIN_JSON")
+          if [ -z "${SCCACHE}" ] || [ "${SCCACHE}" = "null" ]; then
+            echo "sccache version missing in toolchain.versions.yml"
+            exit 1
+          fi
+          echo "SCCACHE_VERSION=${SCCACHE}" >> "$GITHUB_ENV"
+
+          ACTIONLINT=$(jq -r '.actionlint' "$TOOLCHAIN_JSON")
+          if [ -z "${ACTIONLINT}" ] || [ "${ACTIONLINT}" = "null" ]; then
+            echo "actionlint version missing in toolchain.versions.yml"
+            exit 1
+          fi
+          echo "ACTIONLINT_VERSION=${ACTIONLINT}" >> "$GITHUB_ENV"
+
+          YQ=$(jq -r '.yq' "$TOOLCHAIN_JSON")
+          if [ -z "${YQ}" ] || [ "${YQ}" = "null" ]; then
+            echo "yq version missing in toolchain.versions.yml"
+            exit 1
+          fi
+          echo "YQ_VERSION=${YQ}" >> "$GITHUB_ENV"
+
+          echo "Detected toolchain versions: Rust=${RUST}, Python=${PY}, uv=${UV}, just=${JUST}, sccache=${SCCACHE}, actionlint=${ACTIONLINT}, yq=${YQ}"
+
+      - name: Setup Rust
+        if: ${{ hashFiles('**/Cargo.toml') != '' }}
+        # actions-rs/toolchain ist deprecated und wird von GitHub blockiert.
+        # Ersatz: dtolnay/rust-toolchain – stabil, maintained, zukunftssicher.
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          # entspricht dem bisherigen Verhalten
+          toolchain: ${{ env.RUST_VERSION }}
+          components: rustfmt, clippy
+
+      - name: Install sccache
+        if: ${{ hashFiles('**/Cargo.toml') != '' }}
+        run: |
+          chmod +x scripts/tools/sccache-pin.sh
+          scripts/tools/sccache-pin.sh ensure
+          sccache --version
+
+      - name: Configure sccache
+        if: ${{ hashFiles('**/Cargo.toml') != '' }}
+        run: |
+          echo "RUSTC_WRAPPER=sccache" >> "$GITHUB_ENV"
+          # GHA-Backend deaktivieren, wir nutzen lokalen Cache
+          # echo "SCCACHE_GHA_ENABLED=1" >> "$GITHUB_ENV"
+          echo "SCCACHE_CACHE_TYPE=local" >> "$GITHUB_ENV"
+
+      - name: Capture rustc version
+        if: ${{ hashFiles('**/Cargo.toml') != '' }}
+        id: rustver
+        run: |
+          command -v rustc >/dev/null || { echo "rustc not available" >&2; exit 1; }
+          ver=$(rustc --version | tr ' ' '-' | tr -d '\n')
+          echo "ver=${ver}" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Cargo artifacts
+        if: ${{ hashFiles('**/Cargo.toml') != '' }}
+        uses: actions/cache@v5  # v4 (major tag)
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ env.RUST_VERSION }}-${{ steps.rustver.outputs.ver }}-${{ hashFiles('**/Cargo.lock', '**/Cargo.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-${{ env.RUST_VERSION }}-${{ steps.rustver.outputs.ver }}-
+            ${{ runner.os }}-cargo-${{ env.RUST_VERSION }}-
+            ${{ runner.os }}-cargo-
+
+      - name: Setup Python
+        if: ${{ hashFiles('**/pyproject.toml') != '' || hashFiles('**/requirements*.txt') != '' }}
+        uses: actions/setup-python@v6  # v5 (major tag)
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Configure pip environment
+        if: ${{ hashFiles('**/pyproject.toml') != '' || hashFiles('**/requirements*.txt') != '' }}
+        run: |
+          echo "PIP_DISABLE_PIP_VERSION_CHECK=1" >> "$GITHUB_ENV"
+          echo "PIP_NO_PYTHON_VERSION_WARNING=1" >> "$GITHUB_ENV"
+
+      - name: Cache uv package cache
+        if: ${{ hashFiles('**/pyproject.toml') != '' }}
+        uses: actions/cache@v5  # v4 (major tag)
+        with:
+          # OS-spezifische uv-Cachepfade
+          path: |
+            ~/.cache/uv
+            ~/Library/Caches/uv
+            C:\Users\runneradmin\AppData\Local\uv\cache
+          key: ${{ runner.os }}-${{ runner.arch }}-uv-${{ env.UV_VERSION }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('**/pyproject.toml', '**/uv.lock', '**/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-uv-${{ env.UV_VERSION }}-${{ env.PYTHON_VERSION }}-
+            ${{ runner.os }}-uv-${{ env.UV_VERSION }}-${{ env.PYTHON_VERSION }}-
+            ${{ runner.os }}-uv-${{ env.UV_VERSION }}-
+            ${{ runner.os }}-uv-
+            ${{ runner.os }}-${{ runner.arch }}-uv-
+
+      - name: Cache uv virtual environment (requirements)
+        if: ${{ hashFiles('**/requirements*.txt') != '' }}
+        uses: actions/cache@v5  # v4 (major tag)
+        with:
+          path: .venv
+          key: ${{ runner.os }}-${{ runner.arch }}-uv-venv-${{ env.UV_VERSION }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('**/requirements*.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-uv-venv-${{ env.UV_VERSION }}-${{ env.PYTHON_VERSION }}-
+            ${{ runner.os }}-uv-venv-${{ env.UV_VERSION }}-${{ env.PYTHON_VERSION }}-
+            ${{ runner.os }}-uv-venv-${{ env.PYTHON_VERSION }}-
+            ${{ runner.os }}-uv-venv-
+
+      - name: Cache uv virtual environment (pyproject)
+        if: ${{ hashFiles('**/pyproject.toml') != '' && hashFiles('**/requirements*.txt') == '' }}
+        uses: actions/cache@v5  # v4 (major tag)
+        with:
+          path: .venv
+          key: ${{ runner.os }}-${{ runner.arch }}-uv-venv-${{ env.UV_VERSION }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('**/pyproject.toml', '**/uv.lock', '**/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-uv-venv-${{ env.UV_VERSION }}-${{ env.PYTHON_VERSION }}-
+            ${{ runner.os }}-uv-venv-${{ env.UV_VERSION }}-${{ env.PYTHON_VERSION }}-
+            ${{ runner.os }}-uv-venv-${{ env.PYTHON_VERSION }}-
+            ${{ runner.os }}-uv-venv-
+
+      - name: Install uv
+        if: ${{ hashFiles('**/pyproject.toml') != '' || hashFiles('**/requirements*.txt') != '' }}
+        # v7
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: ${{ env.UV_VERSION }}
+
+      - name: Create uv virtual environment
+        if: ${{ hashFiles('**/requirements*.txt') != '' }}
+        run: |
+          if [[ -d .venv ]]; then
+            echo "Using cached uv virtual environment"
+          else
+            uv venv .venv
+          fi
+          echo "UV_PROJECT_ENVIRONMENT=$PWD/.venv" >> "$GITHUB_ENV"
+          echo "VIRTUAL_ENV=$PWD/.venv" >> "$GITHUB_ENV"
+          echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
+
+      - name: Aggregate requirements and install with uv
+        if: ${{ hashFiles('**/requirements*.txt') != '' && env.AGENT_MODE == '' }}
+        env:
+          UV_PROJECT_ENVIRONMENT: ${{ env.UV_PROJECT_ENVIRONMENT }}
+        run: |
+          TMP_REQUIREMENTS="$(mktemp)"
+          trap 'rm -f "${TMP_REQUIREMENTS}"' EXIT
+          {
+            echo "# aggregated requirements generated by CI"
+            git ls-files -z '**/requirements*.txt' \
+              | while IFS= read -r -d '' req; do
+                  echo
+                  echo "# --- file: ${req} ---"
+                  # Kommentare/Leerzeilen entfernen, damit keine leeren Einträge entstehen
+                  sed -e 's/^[[:space:]]*#.*$//' -e '/^[[:space:]]*$/d' "$req"
+                done
+          } > "${TMP_REQUIREMENTS}"
+          echo "Resolved aggregate requirements at: ${TMP_REQUIREMENTS}"
+          # Debug-Preview (erste 50 Zeilen)
+          head -n 50 "${TMP_REQUIREMENTS}" || true
+          # Fail-fast, wenn leer
+          if [[ ! -s "${TMP_REQUIREMENTS}" ]]; then
+            echo "No requirements to install (aggregate is empty)" >&2
+            exit 1
+          fi
+          echo "Inspecting package index configuration via 'uv pip index show pip'"
+          uv pip index show pip | head -n 10 || true
+          # Use `uv pip install` instead of `uv pip sync` because the aggregated
+          # requirements may include loose constraints that intentionally layer
+          # on top of the project's locked dependencies.
+          uv pip install -r "${TMP_REQUIREMENTS}"
+
+      - name: Skip requirements (Agent-Mode)
+        if: ${{ hashFiles('**/requirements*.txt') != '' && env.AGENT_MODE != '' }}
+        run: |
+          echo "Agent-Mode: skipping uv pip install, assuming dependencies pre-installed"
+
+      - name: Sync pyproject environment with uv
+        if: ${{ hashFiles('**/pyproject.toml') != '' }}
+        run: |
+          uv sync --frozen
+          uv pip list | sed -n '1,80p'
+          uv python --version
+
+      - name: Install just
+        run: |
+          chmod +x scripts/tools/just-pin.sh
+          scripts/tools/just-pin.sh ensure
+          echo "${PWD}/tools/bin" >> "$GITHUB_PATH"
+
+      - name: Show tool versions
+        run: |
+          if command -v rustc >/dev/null; then
+            rustc --version
+          else
+            echo "rustc not installed"
+          fi
+          if command -v python >/dev/null; then
+            python --version
+          else
+            echo "python not installed"
+          fi
+          if command -v uv >/dev/null; then
+            uv --version
+          else
+            echo "uv not installed"
+          fi
+          if command -v just >/dev/null; then
+            just --version
+          else
+            echo "just not installed"
+          fi
+
+      - name: Cache lychee URL state
+        if: runner.os == 'Linux' && hashFiles('.lychee.toml') != ''
+        uses: actions/cache@v5  # v4 (major tag)
+        with:
+          path: ~/.cache/lychee
+          key: ${{ runner.os }}-lychee-${{ hashFiles('.lychee.toml', 'README.md', 'docs/**/*.md') }}
+          restore-keys: |
+            ${{ runner.os }}-lychee-
+
+      - name: Link check with Lychee (Linux)
+        if: runner.os == 'Linux' && hashFiles('.lychee.toml') != ''
+        uses: lycheeverse/lychee-action@v2.7.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LYCHEE_CACHE_DIR: ~/.cache/lychee
+        with:
+          # nutzt deine .lychee.toml (inkl. inputs), kein doppelter Pfad nötig
+          args: --config .lychee.toml README.md docs/
+          # schlägt den Job hart fehl, wenn Links kaputt sind
+          fail: true
+
+      - name: Lint GitHub Actions workflows
+        if: runner.os == 'Linux'
+        run: |
+          chmod +x scripts/tools/actionlint-pin.sh
+          scripts/tools/actionlint-pin.sh ensure
+          echo "${PWD}/tools/bin" >> "$GITHUB_PATH"
+          tools/bin/actionlint -color
+
+      - name: Lint Shell scripts
+        if: runner.os == 'Linux'
+        run: |
+          chmod +x scripts/tools/shfmt-pin.sh scripts/tools/shellcheck-pin.sh
+          scripts/tools/shfmt-pin.sh ensure
+          scripts/tools/shellcheck-pin.sh ensure
+          echo "${PWD}/tools/bin" >> "$GITHUB_PATH"
+          just lint
+
+      - name: Check Rust formatting
+        if: ${{ hashFiles('**/Cargo.toml') != '' }}
+        run: cargo fmt --all --check
+
+      - name: Run Clippy
+        if: ${{ hashFiles('**/Cargo.toml') != '' }}
+        run: |
+          RUSTFLAGS="${RUSTFLAGS} --future-incompat-report" \
+            cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+
+      - name: Run Cargo tests
+        if: ${{ hashFiles('**/Cargo.toml') != '' }}
+        run: |
+          RUSTFLAGS="${RUSTFLAGS} --future-incompat-report" \
+            cargo test --locked --workspace --all-features -- --nocapture
+
+      - name: Build Rust docs
+        if: ${{ hashFiles('**/Cargo.toml') != '' }}
+        run: cargo doc --locked --workspace --no-deps
+
+      - name: Show available Just targets
+        run: just -l || true
+
+
+      - name: Validate project
+        run: |
+          test -f Justfile || { echo "Justfile missing"; exit 1; }
+          just ci
+
+      # Guard: determine whether the web scaffold is complete before running expensive steps.
+      - name: (web) Determine scaffold state
+        id: webvars
+        run: |
+          set -euo pipefail
+
+          if [ -f apps/web/package.json ]; then
+            echo "has_package_json=true" >>"$GITHUB_OUTPUT"
+          else
+            echo "has_package_json=false" >>"$GITHUB_OUTPUT"
+          fi
+
+          if [ -f apps/web/package-lock.json ]; then
+            has_lockfile=true
+          else
+            has_lockfile=false
+          fi
+
+          if compgen -G 'apps/web/svelte.config.*' >/dev/null || [ -f apps/web/tsconfig.json ]; then
+            has_config=true
+          else
+            has_config=false
+          fi
+
+          if [ "$has_lockfile" = true ] && [ "$has_config" = true ]; then
+            echo "enabled=true" >>"$GITHUB_OUTPUT"
+            echo "missing=" >>"$GITHUB_OUTPUT"
+          else
+            missing_parts=()
+            if [ "$has_lockfile" != true ]; then
+              missing_parts+=("package-lock.json")
             fi
-            echo "$val"
-          }
+            if [ "$has_config" != true ]; then
+              missing_parts+=("Svelte/TS config")
+            fi
 
-          RUST="$(require_key rust)"
-          PYTHON="$(require_key python)"
-          UV="$(require_key uv)"
-          JUST="$(require_key just)"
-          SCCACHE="$(require_key sccache)"
-          ACTIONLINT="$(require_key actionlint)"
-          YQ_PIN="$(require_key yq)"
+            if [ "${#missing_parts[@]}" -gt 0 ]; then
+              missing_joined=$(IFS=', '; echo "${missing_parts[*]}")
+            else
+              missing_joined=""
+            fi
 
-          echo "RUST_VERSION=$RUST" >> "$GITHUB_ENV"
-          echo "PYTHON_VERSION=$PYTHON" >> "$GITHUB_ENV"
-          echo "UV_VERSION=$UV" >> "$GITHUB_ENV"
-          echo "JUST_VERSION=$JUST" >> "$GITHUB_ENV"
-          echo "SCCACHE_VERSION=$SCCACHE" >> "$GITHUB_ENV"
-          echo "ACTIONLINT_VERSION=$ACTIONLINT" >> "$GITHUB_ENV"
-          echo "YQ_VERSION=$YQ_PIN" >> "$GITHUB_ENV"
+            echo "enabled=false" >>"$GITHUB_OUTPUT"
+            echo "missing=${missing_joined}" >>"$GITHUB_OUTPUT"
+          fi
 
-          echo "Detected toolchain versions: Rust=$RUST, Python=$PYTHON, uv=$UV, just=$JUST, sccache=$SCCACHE, actionlint=$ACTIONLINT, yq=$YQ_PIN"
+      # Guard: if apps/web exists but lock/configs are missing, skip the web pipeline loudly.
+      - name: (web) Skip web steps (scaffold incomplete)
+        if: ${{ steps.webvars.outputs.has_package_json == 'true' && steps.webvars.outputs.enabled != 'true' }}
+        env:
+          WEB_MISSING: ${{ steps.webvars.outputs.missing }}
+        run: |
+          missing_msg=${WEB_MISSING:-package-lock.json and/or Svelte/TS config}
+          echo "::notice::Found apps/web/package.json, but missing ${missing_msg}."
+          echo "::notice::Skipping web CI steps until scaffold is complete."
+
+      - name: (web) Setup Node for apps/web
+        if: ${{ steps.webvars.outputs.enabled == 'true' }}
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: |
+            apps/web/package-lock.json
+
+      - name: (web) Install deps
+        if: ${{ steps.webvars.outputs.enabled == 'true' }}
+        working-directory: apps/web
+        run: npm ci
+
+      - name: (web) Cache Playwright browsers
+        if: ${{ steps.webvars.outputs.enabled == 'true' }}
+        uses: actions/cache@v5  # v4 (major tag)
+        with:
+          path: ~/.cache/ms-playwright
+          # Version ist in devDependency gepinnt (@playwright/test 1.55.1)
+          key: ${{ runner.os }}-ms-playwright-1.55.1
+          restore-keys: |
+            ${{ runner.os }}-ms-playwright-
+
+      - name: (web) Install Playwright browsers (with deps)
+        if: ${{ steps.webvars.outputs.enabled == 'true' }}
+        working-directory: apps/web
+        run: npm run test:setup
+
+      - name: (web) Build app (required for preview)
+        if: ${{ steps.webvars.outputs.enabled == 'true' }}
+        working-directory: apps/web
+        run: npm run build
+
+      - name: (web) Lint & typecheck & budget (guarded)
+        if: ${{ steps.webvars.outputs.enabled == 'true' }}
+        working-directory: apps/web
+        run: |
+          set -euo pipefail
+          npm run lint
+          npm run check:ci
+          if [ -f ../../ci/scripts/assert-web-budget.mjs ]; then
+            node ../../ci/scripts/assert-web-budget.mjs
+          else
+            echo "::notice::Budget-Script fehlt – übersprungen."
+          fi
+
+      - name: (web) Run Playwright tests (HTML + line reporter)
+        if: ${{ steps.webvars.outputs.enabled == 'true' }}
+        env:
+          # Der Preview-Server wird vom Playwright webServer gestartet (siehe playwright.config.ts)
+          PLAYWRIGHT_SKIP_WEBSERVER: "0"
+        working-directory: apps/web
+        run: npm run test:ci
+
+      - name: Upload Playwright report (ignore missing)
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: playwright-report
+          path: apps/web/playwright-report
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Show sccache stats
+        if: ${{ hashFiles('**/Cargo.toml') != '' }}
+        run: sccache --show-stats
+
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v6
+        with:
+          name: ci-logs
+          path: |
+            **/target/**/*.log
+            apps/web/playwright-report/**
+            ./**/*.log
+            .runtime/**/*
+            !**/node_modules/**
+          retention-days: 7
+
+  check-action-refs:
+    needs: ci
+    if: ${{ (github.event_name != 'push' || (!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '[ci skip]'))) && (github.event_name != 'pull_request' || github.event.pull_request.draft != true) }}
+    uses: ./.github/workflows/reusable-check-action-refs.yml
