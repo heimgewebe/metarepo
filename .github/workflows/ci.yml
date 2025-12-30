@@ -523,6 +523,7 @@ jobs:
           pwd
           ls -la
           git rev-parse --show-toplevel
+          echo "TRUTH: os=$(uname -s) arch=$(uname -m) yq=$(command -v yq || echo NONE)"
           echo "PATH:"
           echo "$PATH" | tr ':' '\n'
           type -a yq || true
@@ -533,7 +534,9 @@ jobs:
           YQ_BIN=$(command -v yq || true)
           if [ -n "$YQ_BIN" ]; then
             ls -la "$YQ_BIN" || true
+            file "$YQ_BIN" || true
             shasum -a 256 "$YQ_BIN" || true
+            xattr -l "$YQ_BIN" 2>/dev/null || true
           else
             echo "No yq found in PATH"
           fi
