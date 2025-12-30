@@ -17,3 +17,6 @@ name: validate-observatory
 jobs:
   validate:
     uses: heimgewebe/metarepo/.github/workflows/reusable-validate-observatory.yml@main
+    with:
+      STRICT: true
+      FAIL_ON_EMPTY: false

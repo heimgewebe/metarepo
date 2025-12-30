@@ -96,6 +96,8 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
   - Zweck: Beschreibung von Workflows / Pipelines, die ein Agent ausführen kann.
 - `dev.tooling.schema.json`
   - Zweck: Struktur für Dev-Tooling-Informationen (z. B. Toolchain-Definitionen, Checks).
+- `tooling/toolchain.versions.schema.json`
+  - Zweck: Canonical schema für `toolchain.versions.yml`, definiert required keys und Versionsformate.
 
 ### 1.7 Review-Policies
 

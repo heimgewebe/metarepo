@@ -1,6 +1,6 @@
 ---
 name: 'Setup yq'
-description: 'Install yq using version from toolchain.versions.yml and verify checksum'
+description: 'Install yq using version from toolchain.versions.yml (bootstraps if needed) and verify checksum'
 inputs:
   github-token:
     description: 'GitHub token for API authentication (to avoid rate limits)'
@@ -27,57 +27,90 @@ runs:
         trap on_fail ERR
         
         # Determine repo root - composite actions run in caller's workspace
-        # GITHUB_WORKSPACE is set by GitHub Actions and points to the checked-out repo
         REPO_ROOT="${GITHUB_WORKSPACE:-.}"
         TOOLCHAIN_FILE="${REPO_ROOT}/toolchain.versions.yml"
         
+        # Debug: check file existence
+        echo "Checking ${TOOLCHAIN_FILE}..." >&2
         if [[ ! -f "${TOOLCHAIN_FILE}" ]]; then
-          echo "toolchain.versions.yml not found at ${TOOLCHAIN_FILE}" >&2
-          echo "Current directory: $(pwd)" >&2
-          echo "GITHUB_WORKSPACE: ${GITHUB_WORKSPACE:-<not set>}" >&2
-          echo "Contents of repo root:" >&2
-          ls -la "${REPO_ROOT}" | head -20 >&2
-          exit 1
+             echo "::error::File not found: ${TOOLCHAIN_FILE}"
+             ls -la "${REPO_ROOT}"
+             exit 1
         fi
 
-        # Extract yq version using robust grep/sed to avoid python dependency
-        # Handles: yq: "v4.49.2" # comment
-        # Logic mirrors scripts/tools/just-pin.sh:
-        # 1. Strip key
-        # 2. Strip comments
-        # 3. Trim whitespace
-        # 4. Strip quotes
-        
-        # Debug: show the file content around yq line
-        echo "Extracting yq version from ${TOOLCHAIN_FILE}..." >&2
-        echo "File snippet:" >&2
-        grep -C 2 'yq:' "${TOOLCHAIN_FILE}" || echo "WARNING: No yq: line found" >&2
-        
-        # Try primary extraction method
-        YQ_VER=$(grep -E '^\s*yq:' "${TOOLCHAIN_FILE}" | \
-          sed -E 's/^\s*[^:]+:\s*//; s/#.*$//; s/^[[:space:]]*//; s/[[:space:]]*$//; s/^"//; s/"$//; s/^'\''//; s/'\''$//' | \
-          tr -d '\n\r')
-        
-        # Fallback: try simpler pattern if primary failed
-        if [[ -z "${YQ_VER}" ]]; then
-          echo "Primary extraction failed, trying fallback..." >&2
-          YQ_VER=$(grep 'yq:' "${TOOLCHAIN_FILE}" | head -1 | sed 's/.*yq:[[:space:]]*["'\'']*//; s/["'\''[:space:]]*$//' | sed 's/#.*$//' | tr -d '\n\r')
+        # ---------------------------------------------------------------------
+        # BOOTSTRAP YQ
+        # YAML wird ausschließlich mit yq gelesen. Regex-Parsing ist verboten.
+        # Wenn yq nicht im System ist, laden wir eine Bootstrap-Version.
+        # ---------------------------------------------------------------------
+        if ! command -v yq >/dev/null 2>&1; then
+             echo "yq not found. Bootstrapping temporary yq for config parsing..." >&2
+             BS_VER="v4.49.2"
+             BS_OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+             BS_ARCH=$(uname -m)
+             case "${BS_ARCH}" in
+               x86_64) BS_ARCH="amd64" ;;
+               aarch64) BS_ARCH="arm64" ;;
+               arm64) BS_ARCH="arm64" ;;
+               *) echo "::error::Unsupported architecture for bootstrap: ${BS_ARCH}"; exit 1 ;;
+             esac
+
+             # Fallback for OS
+             case "${BS_OS}" in
+               linux|darwin) ;;
+               *) echo "::error::Unsupported OS for bootstrap: ${BS_OS}"; exit 1 ;;
+             esac
+
+             BS_URL="https://github.com/mikefarah/yq/releases/download/${BS_VER}/yq_${BS_OS}_${BS_ARCH}"
+
+             # Install into tools/bin (standard location)
+             mkdir -p "${REPO_ROOT}/tools/bin"
+             echo "Downloading bootstrap yq from ${BS_URL}..." >&2
+             if ! curl -fsSL "${BS_URL}" -o "${REPO_ROOT}/tools/bin/yq"; then
+                  echo "::error::Failed to download yq from ${BS_URL}"
+                  exit 1
+             fi
+             chmod +x "${REPO_ROOT}/tools/bin/yq"
+             
+             # Verify binary is executable after download
+             if [[ ! -x "${REPO_ROOT}/tools/bin/yq" ]]; then
+                  echo "::error::yq binary nicht ausführbar"
+                  ls -la "${REPO_ROOT}/tools/bin/yq" >&2 || echo "Binary not found" >&2
+                  exit 1
+             fi
+
+             # Add to PATH for this step and subsequent steps
+             echo "${REPO_ROOT}/tools/bin" >> "$GITHUB_PATH"
+             export PATH="${REPO_ROOT}/tools/bin:$PATH"
         fi
         
-        echo "Extracted YQ_VER: '${YQ_VER}'" >&2
+        # Verify we have yq now
+        if ! command -v yq >/dev/null 2>&1; then
+             echo "::error::yq bootstrap failed. yq command not found."
+             exit 1
+        fi
 
-        if [[ -z "${YQ_VER}" ]]; then
-           echo "Failed to extract yq version from toolchain.versions.yml" >&2
-           echo "File path: ${TOOLCHAIN_FILE}" >&2
-           echo "File exists: $(test -f "${TOOLCHAIN_FILE}" && echo yes || echo no)" >&2
-           echo "File size: $(wc -c < "${TOOLCHAIN_FILE}" 2>/dev/null || echo unknown)" >&2
-           echo "Full file content:" >&2
-           cat "${TOOLCHAIN_FILE}" >&2
+        # ---------------------------------------------------------------------
+        # PARSE VERSION
+        # ---------------------------------------------------------------------
+        YQ_VER=$(yq eval '.yq' "${TOOLCHAIN_FILE}")
+
+        # Ensure we got a valid string (not null)
+        test -n "${YQ_VER}" || { echo "::error::yq version missing in toolchain.versions.yml"; exit 1; }
+        if [[ "${YQ_VER}" == "null" ]]; then
+           echo "::error::yq key is null in toolchain.versions.yml"
            exit 1
         fi
 
+        echo "Resolved yq version: ${YQ_VER}" >&2
         echo "YQ_VERSION=${YQ_VER}" >> "$GITHUB_ENV"
-        echo "Resolved yq version ${YQ_VER}"
+
+        # ---------------------------------------------------------------------
+        # REGRESSION CHECK (Mini-Teststep)
+        # Ensure critical keys are present to prevent downstream failures
+        # ---------------------------------------------------------------------
+        echo "Verifying toolchain.versions.yml integrity..." >&2
+        yq eval -e '.yq, .rust, .python, .uv, .just, .sccache, .actionlint' "${TOOLCHAIN_FILE}" >/dev/null
 
     - name: Cache yq binary
       uses: actions/cache@v4
@@ -123,6 +156,7 @@ runs:
         
         # Add tools/bin to PATH for this step AND subsequent steps
         # $GITHUB_PATH takes effect in NEXT step, so we also export locally
+        # Note: If bootstrap ran, this might be duplicate, but harmless
         echo "${REPO_ROOT}/tools/bin" >> "$GITHUB_PATH"
         export PATH="${REPO_ROOT}/tools/bin:$PATH"
 
@@ -131,11 +165,35 @@ runs:
         # Ensure scripts are executable
         chmod +x "${REPO_ROOT}/scripts/tools/yq-pin.sh"
 
-        # Pinned Version erzwingen (Download + Verifikation)
-        # The script uses BASH_SOURCE to find ROOT_DIR, so it will work from any location
-        "${REPO_ROOT}/scripts/tools/yq-pin.sh" ensure
+        # Version comparison helper (consistent with yq-pin.sh)
+        version_matches() {
+          local v_have="$1" v_want="$2"
+          local v_have_clean v_want_clean
+          v_want_clean=$(echo "${v_want}" | tr -d "v")
+          v_have_clean=$(echo "${v_have}" | tr -d "v")
+          [[ "${v_have_clean}" == "${v_want_clean}" ]]
+        }
 
-        # Re-export PATH to ensure tools/bin is prioritized after yq-pin.sh runs
+        # Check if yq is already available and has correct version (from bootstrap)
+        SKIP_PIN_SH=false
+        if [[ -x "${REPO_ROOT}/tools/bin/yq" ]]; then
+          BOOTSTRAP_VERSION="$("${REPO_ROOT}/tools/bin/yq" --version 2>/dev/null | sed -E 's/^yq .* version //' || echo '')"
+          if [[ -n "${BOOTSTRAP_VERSION}" ]] && version_matches "${BOOTSTRAP_VERSION}" "${YQ_VER_TRIM}"; then
+            echo "✅ Bootstrap yq already has correct version ${BOOTSTRAP_VERSION}, skipping yq-pin.sh"
+            SKIP_PIN_SH=true
+          fi
+        fi
+
+        # Only call yq-pin.sh if needed to avoid removing working bootstrap binary
+        if [[ "${SKIP_PIN_SH}" != "true" ]]; then
+          # Pinned Version erzwingen (Download + Verifikation)
+          # The script uses BASH_SOURCE to find ROOT_DIR, so it will work from any location
+          # This will verify the bootstrapped yq or download the correct version if different
+          # Allow network access for yq download/verification
+          ALLOW_NET=1 "${REPO_ROOT}/scripts/tools/yq-pin.sh" ensure
+        fi
+
+        # Re-export PATH to ensure tools/bin is prioritized
         export PATH="${REPO_ROOT}/tools/bin:$PATH"
 
         # Final verification - check both in PATH and at explicit location
