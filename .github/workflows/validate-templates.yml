@@ -29,6 +29,12 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v6
+
+      - name: Setup yq
+        uses: ./.github/actions/setup-yq
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Read toolchain python version
         id: toolchain
         run: |
