@@ -18,6 +18,10 @@ Das Schema ist definiert in [`contracts/events/published.v1.schema.json`](../../
 - `ts`: Zeitstempel des Events (Kompatibilität).
 - `generated_at`: (Optional) Erstellungszeitpunkt des Artefakts.
 
+## Validierung
+Ein lokaler Guard (`.wgx/guards/published-event.sh`) kann zur Validierung genutzt werden.
+**Hinweis**: Dieser Guard ist **advisory** (informativ) und fail-soft. Er führt die Validierung nur durch, wenn `ajv` in der Umgebung verfügbar ist.
+
 ## Nutzung
 Produzenten senden dieses Event *nach* dem erfolgreichen Upload des Artefakts.
 Der Plexer dient hierbei lediglich als Router ("Event Bus"), um Entkopplung zu gewährleisten.
