@@ -108,7 +108,7 @@ download_yq() {
   # This prevents removing a working binary during network issues
   if [[ -x "${YQ_LOCAL}" ]]; then
     local existing_version=""
-    existing_version=$("${YQ_LOCAL}" --version 2>/dev/null | sed -E 's/^yq .* version v?//' || echo "")
+    existing_version=$("${YQ_LOCAL}" --version 2>/dev/null | sed -E 's/^yq .* version //' || echo "")
     if [[ -n "${existing_version}" ]] && version_ok "${existing_version}" "${yq_version}"; then
       log "Existing ${YQ_LOCAL} already has correct version ${existing_version}, skipping download"
       return 0

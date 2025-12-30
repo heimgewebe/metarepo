@@ -165,12 +165,21 @@ runs:
         # Ensure scripts are executable
         chmod +x "${REPO_ROOT}/scripts/tools/yq-pin.sh"
 
+        # Version comparison helper (consistent with yq-pin.sh)
+        version_matches() {
+          local v_have="$1" v_want="$2"
+          local v_have_clean v_want_clean
+          v_want_clean=$(echo "${v_want}" | tr -d "v")
+          v_have_clean=$(echo "${v_have}" | tr -d "v")
+          [[ "${v_have_clean}" == "${v_want_clean}" ]]
+        }
+
         # Check if yq is already available and has correct version (from bootstrap)
         SKIP_PIN_SH=false
         if [[ -x "${REPO_ROOT}/tools/bin/yq" ]]; then
-          BOOTSTRAP_VERSION="$("${REPO_ROOT}/tools/bin/yq" --version 2>/dev/null || echo '')"
-          if echo "${BOOTSTRAP_VERSION}" | grep -q "version v${YQ_VER_TRIM}"; then
-            echo "✅ Bootstrap yq already has correct version v${YQ_VER_TRIM}, skipping yq-pin.sh"
+          BOOTSTRAP_VERSION="$("${REPO_ROOT}/tools/bin/yq" --version 2>/dev/null | sed -E 's/^yq .* version //' || echo '')"
+          if [[ -n "${BOOTSTRAP_VERSION}" ]] && version_matches "${BOOTSTRAP_VERSION}" "${YQ_VER_TRIM}"; then
+            echo "✅ Bootstrap yq already has correct version ${BOOTSTRAP_VERSION}, skipping yq-pin.sh"
             SKIP_PIN_SH=true
           fi
         fi
