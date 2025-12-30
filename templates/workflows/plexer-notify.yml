@@ -33,6 +33,7 @@ jobs:
     steps:
       - name: Build event payload
         id: build
+        shell: bash
         env:
           INPUT_EVENT_TYPE: ${{ inputs.event_type }}
           INPUT_STATUS: ${{ inputs.status || '' }}
@@ -88,6 +89,7 @@ jobs:
           echo "EOF" >> "$GITHUB_OUTPUT"
 
       - name: POST to Plexer
+        shell: bash
         env:
           PLEXER_URL: ${{ inputs.plexer_url }}
           PLEXER_TOKEN: ${{ secrets.PLEXER_TOKEN }}
@@ -98,7 +100,7 @@ jobs:
             exit 1
           fi
 
-          declare -a curl_opts
+          declare -a curl_opts=()
           if [ -n "${PLEXER_TOKEN:-}" ]; then
             curl_opts+=(-H "Authorization: Bearer ${PLEXER_TOKEN}")
           fi
