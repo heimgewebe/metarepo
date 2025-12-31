@@ -9,12 +9,12 @@ if [[ -z "${EVENT_JSON}" || ! -f "${EVENT_JSON}" ]]; then
   exit 0
 fi
 
-if ! command -v ajv >/dev/null 2>&1; then
+if ! command -v ajv > /dev/null 2>&1; then
   echo "::notice::ajv not available; skipping schema validation."
   exit 0
 fi
 
-if ! ajv validate -s "${SCHEMA}" -d "${EVENT_JSON}" >/dev/null 2>&1; then
+if ! ajv validate -s "${SCHEMA}" -d "${EVENT_JSON}" > /dev/null 2>&1; then
   echo "::warning::published.v1 event does not conform to invariants."
   exit 0
 fi
