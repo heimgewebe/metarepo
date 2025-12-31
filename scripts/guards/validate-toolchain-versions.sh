@@ -23,14 +23,14 @@ if [[ ! -f "${SCHEMA_FILE}" ]]; then
 fi
 
 # Ensure yq is available (should be bootstrapped by setup-yq)
-if ! command -v yq >/dev/null 2>&1; then
+if ! command -v yq > /dev/null 2>&1; then
   err "yq command not found. Cannot convert YAML to JSON for validation."
   exit 1
 fi
 
 # Agent-Mode handling for ajv
 if [[ "${AGENT_MODE:-}" != "" ]]; then
-  if ! command -v ajv >/dev/null 2>&1; then
+  if ! command -v ajv > /dev/null 2>&1; then
     err "ajv-cli not found in Agent-Mode. Please pre-install it or disable Agent-Mode."
     exit 1
   fi

@@ -10,10 +10,13 @@ BIN_DIR="${TOOLS_DIR}/bin"
 YQ_LOCAL="${BIN_DIR}/yq"
 
 log() { printf '%s\n' "$*" >&2; }
-die() { log "ERR: $*"; exit 1; }
+die() {
+  log "ERR: $*"
+  exit 1
+}
 
 ensure_dir() { mkdir -p -- "${BIN_DIR}"; }
-have_cmd() { command -v "$1" >/dev/null 2>&1; }
+have_cmd() { command -v "$1" > /dev/null 2>&1; }
 
 version_ok() {
   local v_have="$1"
@@ -71,7 +74,7 @@ download_yq() {
   local os
   os="$(uname -s | tr '[:upper:]' '[:lower:]')"
   case "${os}" in
-    linux|darwin) ;;
+    linux | darwin) ;;
     *) die "Nicht unterstütztes Betriebssystem für automatischen yq-Download: ${os}" ;;
   esac
 
@@ -79,7 +82,7 @@ download_yq() {
   arch="$(uname -m)"
   case "${arch}" in
     x86_64) arch="amd64" ;;
-    aarch64|arm64) arch="arm64" ;;
+    aarch64 | arm64) arch="arm64" ;;
     *) die "Nicht unterstützte Architektur für automatischen yq-Download: ${arch}" ;;
   esac
 
@@ -102,7 +105,7 @@ download_yq() {
   # If a correct local binary already exists, do nothing.
   if [[ -x "${YQ_LOCAL}" ]]; then
     local existing_version=""
-    existing_version="$("${YQ_LOCAL}" --version 2>/dev/null | sed -E 's/^yq .* version //' || echo "")"
+    existing_version="$("${YQ_LOCAL}" --version 2> /dev/null | sed -E 's/^yq .* version //' || echo "")"
     if [[ -n "${existing_version}" ]] && version_ok "${existing_version}" "${yq_version}"; then
       log "Existing ${YQ_LOCAL} already has correct version ${existing_version}, skipping download"
       return 0
@@ -159,13 +162,13 @@ download_yq() {
       checksum_line="$(grep "^${binary_name}[[:space:]]" "${tmp_checksum}" | head -n1 || true)"
       if [[ -n "${checksum_line}" ]]; then
         local my_sum=""
-        if command -v sha256sum >/dev/null 2>&1; then
+        if command -v sha256sum > /dev/null 2>&1; then
           my_sum="$(sha256sum "${tmp}" | awk '{print $1}')"
-        elif command -v shasum >/dev/null 2>&1; then
+        elif command -v shasum > /dev/null 2>&1; then
           my_sum="$(shasum -a 256 "${tmp}" | awk '{print $1}')"
-        elif command -v python3 >/dev/null 2>&1; then
+        elif command -v python3 > /dev/null 2>&1; then
           my_sum="$(python3 -c "import hashlib; print(hashlib.sha256(open('${tmp}','rb').read()).hexdigest())")"
-        elif command -v python >/dev/null 2>&1; then
+        elif command -v python > /dev/null 2>&1; then
           my_sum="$(python -c "import hashlib; print(hashlib.sha256(open('${tmp}','rb').read()).hexdigest())")"
         fi
 
@@ -185,13 +188,13 @@ download_yq() {
 
     if [[ -n "${expected_sum}" ]]; then
       local actual_sum=""
-      if command -v sha256sum >/dev/null 2>&1; then
+      if command -v sha256sum > /dev/null 2>&1; then
         actual_sum="$(sha256sum "${tmp}" | awk '{print $1}')"
-      elif command -v shasum >/dev/null 2>&1; then
+      elif command -v shasum > /dev/null 2>&1; then
         actual_sum="$(shasum -a 256 "${tmp}" | awk '{print $1}')"
-      elif command -v python3 >/dev/null 2>&1; then
+      elif command -v python3 > /dev/null 2>&1; then
         actual_sum="$(python3 -c "import hashlib; print(hashlib.sha256(open('${tmp}','rb').read()).hexdigest())")"
-      elif command -v python >/dev/null 2>&1; then
+      elif command -v python > /dev/null 2>&1; then
         actual_sum="$(python -c "import hashlib; print(hashlib.sha256(open('${tmp}','rb').read()).hexdigest())")"
       fi
 
@@ -210,7 +213,7 @@ download_yq() {
   mv -f -- "${tmp}" "${YQ_LOCAL}"
   chmod +x "${YQ_LOCAL}"
 
-  "${YQ_LOCAL}" --version >/dev/null 2>&1 || die "Heruntergeladenes yq-Binary ist nicht ausführbar oder defekt."
+  "${YQ_LOCAL}" --version > /dev/null 2>&1 || die "Heruntergeladenes yq-Binary ist nicht ausführbar oder defekt."
   log "yq erfolgreich nach ${YQ_LOCAL} heruntergeladen."
 }
 
@@ -240,7 +243,7 @@ cmd_ensure() {
 
   if yq_bin="$(resolved_yq)"; then
     log "Benutze yq-Binary unter ${yq_bin}"
-    v="$("${yq_bin}" --version 2>/dev/null | sed -E 's/^yq .* version v?//')"
+    v="$("${yq_bin}" --version 2> /dev/null | sed -E 's/^yq .* version v?//')"
     if version_ok "${v}" "${pinned_version}"; then
       version_is_ok=true
     else
@@ -252,7 +255,7 @@ cmd_ensure() {
     download_yq
     [[ "${DRY_RUN:-}" = "1" ]] && return 0
     yq_bin="$(resolved_yq)" || die "yq nach Download immer noch nicht gefunden."
-    v="$("${yq_bin}" --version 2>/dev/null | sed -E 's/^yq .* version v?//')" || die "konnte yq-Version nach Download nicht ermitteln"
+    v="$("${yq_bin}" --version 2> /dev/null | sed -E 's/^yq .* version v?//')" || die "konnte yq-Version nach Download nicht ermitteln"
     version_ok "${v}" "${pinned_version}" || die "Heruntergeladenes yq hat falsche Version: ${v} (erwartet: ${pinned_version})"
   fi
 
