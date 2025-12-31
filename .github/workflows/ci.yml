@@ -60,7 +60,7 @@ jobs:
       CARGO_INCREMENTAL: 0
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608  # v4.1.0
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -89,7 +89,7 @@ jobs:
         run: test -f "${GITHUB_WORKSPACE}/toolchain.versions.yml" || { echo "toolchain.versions.yml fehlt"; exit 1; }
 
       - name: Setup Python for yq setup
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@0a5c61591373683505ea898e09a3ea4f39ef2b9c  # v5.0.0
         with:
           python-version: '3.11'
 
@@ -215,7 +215,7 @@ jobs:
 
       - name: Setup Python
         if: ${{ hashFiles('**/pyproject.toml') != '' || hashFiles('**/requirements*.txt') != '' }}
-        uses: actions/setup-python@v6  # v5 (major tag)
+        uses: actions/setup-python@0a5c61591373683505ea898e09a3ea4f39ef2b9c  # v5.0.0
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
