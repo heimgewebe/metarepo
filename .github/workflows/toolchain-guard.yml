@@ -39,7 +39,7 @@ jobs:
             exit 1
           fi
 
-      - name: Toolchain: setup yq (deterministic)
+      - name: "Toolchain: setup yq (deterministic)"
         if: ${{ env.AGENT_MODE == '' }}
         shell: bash
         env:
@@ -53,7 +53,7 @@ jobs:
           export PATH="${{ github.workspace }}/tools/bin:$PATH"
           echo "${{ github.workspace }}/tools/bin" >> "$GITHUB_PATH"
 
-      - name: Assert: yq available
+      - name: "Assert: yq available"
         shell: bash
         run: |
           set -euo pipefail
