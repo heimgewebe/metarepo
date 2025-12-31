@@ -55,11 +55,6 @@
     },
     "details": {
       "type": "object",
-      "required": [
-        "claims",
-        "artifacts",
-        "loop_gaps"
-      ],
       "properties": {
         "claims": {
           "type": "array",
@@ -75,12 +70,26 @@
           },
           "description": "Liste der gefundenen Artefakte (Ist)."
         },
+        "found_artifacts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Liste der gefundenen Artefakte (Alias für artifacts)."
+        },
         "loop_gaps": {
           "type": "array",
           "items": {
             "type": "string"
           },
           "description": "Beschreibung der Diskrepanzen."
+        },
+        "missing_artifacts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Liste der fehlenden Artefakte (Alias für loop_gaps)."
         },
         "unclear": {
           "type": "array",

@@ -23,6 +23,14 @@
     "unclear": [
       "Unclear 1",
       "Unclear 2"
+    ],
+    "missing_artifacts": [
+      "Gap 1",
+      "Gap 2",
+      "Gap 3"
+    ],
+    "found_artifacts": [
+      "Artifact 1"
     ]
   }
 }
