@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heimgewebe/contracts/integrity.summary.schema.json",
+  "title": "Integrity Summary Artifact",
+  "description": "Zusammenfassender Integritätsbericht (Artefakt). Dient der Diagnose von Behauptung (Claims) vs. Realität (Artifacts) und zeigt Lücken (Loop-Gaps) auf. Dieses Schema ist ein reines Beobachtungsartefakt; automatische Korrektur auf Basis dieses Artefakts ist explizit verboten.",
+  "type": "object",
+  "required": [
+    "repo",
+    "generated_at",
+    "counts",
+    "details"
+  ],
+  "properties": {
+    "repo": {
+      "type": "string",
+      "description": "Name des Repositories, das den Bericht erzeugt hat."
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Zeitpunkt der Erzeugung (ISO-8601)."
+    },
+    "counts": {
+      "type": "object",
+      "required": [
+        "claims",
+        "artifacts",
+        "loop_gaps",
+        "unclear"
+      ],
+      "properties": {
+        "claims": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Anzahl der geprüften Behauptungen (Soll)."
+        },
+        "artifacts": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Anzahl der gefundenen Artefakte (Ist)."
+        },
+        "loop_gaps": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Anzahl der Diskrepanzen zwischen Soll und Ist."
+        },
+        "unclear": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Anzahl der nicht eindeutig zuordenbaren Fälle."
+        }
+      },
+      "additionalProperties": false,
+      "description": "Quantitative Zusammenfassung der Integritätsprüfung."
+    },
+    "details": {
+      "type": "object",
+      "required": [
+        "claims",
+        "artifacts",
+        "loop_gaps"
+      ],
+      "properties": {
+        "claims": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Liste der identifizierten Behauptungen (Soll)."
+        },
+        "artifacts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Liste der gefundenen Artefakte (Ist)."
+        },
+        "loop_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Beschreibung der Diskrepanzen."
+        },
+        "unclear": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Liste der unklaren Punkte (optional)."
+        }
+      },
+      "additionalProperties": false,
+      "description": "Detaillierte Auflistung der Integritätsfunde."
+    }
+  },
+  "additionalProperties": false
+}

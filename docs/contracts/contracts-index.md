@@ -111,6 +111,14 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
 - `consumers.yaml`
   - Zweck: Maschinenlesbare Übersicht, welche Repos welche zentralen Heimgewebe-Contracts konsumieren (Modus: reference-only oder mirror) – quer über alle Contract-Kategorien hinweg.
 
+### 1.9 Integrität & Diagnose
+
+- `integrity.summary.schema.json`
+  - Zweck: Zusammenfassender Integritätsbericht (Artefakt) zur Diagnose von Claims vs. Artefakten.
+  - Hinweis: Dieses Schema ist ein reines Beobachtungsartefakt; automatische Korrektur ist explizit verboten.
+  - Produzent: semantAH
+  - Konsumenten: leitstand, wgx
+
 ---
 
 ## 2. Contracts-Repo (offizielle APIs)

@@ -62,6 +62,17 @@ metrics:
         files: []
         mode: reference-only
 
+integrity:
+  summary:
+    schema: contracts/integrity.summary.schema.json
+    consumers:
+      - repo: leitstand
+        files: []
+        mode: reference-only
+      - repo: wgx
+        files: []
+        mode: reference-only
+
 knowledge:
   insights.daily:
     schema: contracts/insights.daily.schema.json
