@@ -29,7 +29,7 @@
         "url": {
           "type": "string",
           "format": "uri",
-          "description": "URL to the published integrity.summary.json artifact."
+          "description": "URL to the published integrity.summary.json artifact. May use 'urn:pending:url' or 'about:blank#pending' if the artifact is not yet stably published."
         },
         "generated_at": {
           "type": "string",

@@ -25,5 +25,5 @@ Der Leitstand visualisiert diesen Status, greift aber nicht ein.
 *   `OK`: Alles in Ordnung, Claims und Artefakte stimmen überein.
 *   `WARN`: Kleinere Abweichungen, nicht kritisch.
 *   `FAIL`: Kritische Diskrepanz (z.B. Contract verletzt, Artefakt fehlt).
-*   `MISSING`: Keine Daten verfügbar (z.B. Repo liefert keinen Bericht).
+*   `MISSING`: **Transport-Status**. Kein Bericht geliefert oder erzeugt. Darf *nicht* verwendet werden, nur weil Artefakt-Zähler 0 sind (das wäre ein valider, leerer Bericht mit Status `OK` oder `WARN`).
 *   `UNCLEAR`: Status konnte nicht ermittelt werden (technischer Fehler bei der Diagnose).

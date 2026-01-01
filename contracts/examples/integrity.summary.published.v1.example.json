@@ -1,0 +1,10 @@
+{
+  "type": "integrity.summary.published.v1",
+  "source": "semantAH",
+  "payload": {
+    "url": "https://github.com/heimgewebe/semantAH/releases/download/integrity/summary.json",
+    "generated_at": "2023-10-27T10:05:00Z",
+    "repo": "semantAH",
+    "status": "WARN"
+  }
+}
