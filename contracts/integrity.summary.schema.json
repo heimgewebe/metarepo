@@ -7,8 +7,8 @@
   "required": [
     "repo",
     "generated_at",
-    "counts",
-    "details"
+    "status",
+    "counts"
   ],
   "properties": {
     "repo": {
@@ -20,78 +20,34 @@
       "format": "date-time",
       "description": "Zeitpunkt der Erzeugung (ISO-8601)."
     },
+    "status": {
+      "type": "string",
+      "enum": [
+        "OK",
+        "WARN",
+        "FAIL",
+        "MISSING",
+        "UNCLEAR"
+      ],
+      "description": "Der aggregierte Integritätsstatus des Repositories."
+    },
     "counts": {
       "type": "object",
-      "required": [
-        "claims",
-        "artifacts",
-        "loop_gaps",
-        "unclear"
-      ],
-      "properties": {
-        "claims": {
-          "type": "integer",
-          "minimum": 0,
-          "description": "Anzahl der geprüften Behauptungen (Soll)."
-        },
-        "artifacts": {
-          "type": "integer",
-          "minimum": 0,
-          "description": "Anzahl der gefundenen Artefakte (Ist)."
-        },
-        "loop_gaps": {
-          "type": "integer",
-          "minimum": 0,
-          "description": "Anzahl der Diskrepanzen zwischen Soll und Ist."
-        },
-        "unclear": {
-          "type": "integer",
-          "minimum": 0,
-          "description": "Anzahl der nicht eindeutig zuordenbaren Fälle."
-        }
-      },
-      "additionalProperties": false,
-      "description": "Quantitative Zusammenfassung der Integritätsprüfung."
+      "description": "Quantitative Zusammenfassung der Integritätsprüfung. Keys sind dynamisch; in der Praxis werden sprechende Bezeichner verwendet, häufig im snake_case-Format (z.B. orphan_outputs oder missing_consumers), aber auch einfachere Namen wie claims, artifacts, loop_gaps oder unclear sind zulässig. Die tatsächliche Menge der verwendeten Keys kann je Repository variieren.",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      }
     },
     "details": {
       "type": "object",
-      "required": [
-        "claims",
-        "artifacts",
-        "loop_gaps"
-      ],
-      "properties": {
-        "claims": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Liste der identifizierten Behauptungen (Soll)."
-        },
-        "artifacts": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Liste der gefundenen Artefakte (Ist)."
-        },
-        "loop_gaps": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Beschreibung der Diskrepanzen."
-        },
-        "unclear": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Liste der unklaren Punkte (optional)."
+      "description": "Detaillierte Auflistung der Integritätsfunde.",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
         }
-      },
-      "additionalProperties": false,
-      "description": "Detaillierte Auflistung der Integritätsfunde."
+      }
     }
   },
   "additionalProperties": false
