@@ -86,7 +86,7 @@ echo "=== Edge Cases ==="
 test_case "1.0.0" "v1.0.0" "OK" "Minimum version 1.0.0"
 test_case "1.0.1" "v1.0.0" "OK" "Patch upgrade from 1.0.0"
 test_case "0.0.1" "0.0.1" "OK" "Very early 0.0.x version exact"
-test_case "0.0.2" "0.0.1" "FAIL" "0.0.x minor must match (treated as breaking)"
+test_case "0.0.2" "0.0.1" "FAIL" "0.0.x patch must match exactly (treated as breaking)"
 
 echo ""
 echo "======================================"
