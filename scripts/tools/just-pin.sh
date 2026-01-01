@@ -49,7 +49,37 @@ version_ok() {
   local v_to_check="$1"      # e.g. "1.14.0"
   local req_version_raw="$2" # e.g. "v1.14.0"
   # compare them without the 'v'
-  [[ "${v_to_check#v}" == "${req_version_raw#v}" ]]
+  local v_have_clean="${v_to_check#v}"
+  local v_want_clean="${req_version_raw#v}"
+  
+  # Exact match is always ok
+  [[ "${v_have_clean}" == "${v_want_clean}" ]] && return 0
+  
+  # Allow newer versions using semantic versioning comparison
+  local have_major have_minor have_patch
+  IFS='.' read -r have_major have_minor have_patch <<< "${v_have_clean}"
+  local want_major want_minor want_patch
+  IFS='.' read -r want_major want_minor want_patch <<< "${v_want_clean}"
+  
+  # Remove any non-numeric suffixes
+  have_major="${have_major%%[^0-9]*}"
+  have_minor="${have_minor%%[^0-9]*}"
+  have_patch="${have_patch%%[^0-9]*}"
+  want_major="${want_major%%[^0-9]*}"
+  want_minor="${want_minor%%[^0-9]*}"
+  want_patch="${want_patch%%[^0-9]*}"
+  
+  # Major version must match
+  [[ "${have_major}" -ne "${want_major}" ]] && return 1
+  
+  # If major matches, newer minor/patch is acceptable
+  if [[ "${have_minor}" -gt "${want_minor}" ]]; then
+    return 0
+  elif [[ "${have_minor}" -eq "${want_minor}" ]] && [[ "${have_patch}" -ge "${want_patch}" ]]; then
+    return 0
+  fi
+  
+  return 1
 }
 
 map_arch() {
