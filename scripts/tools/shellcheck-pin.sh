@@ -38,7 +38,6 @@ read_pinned_version() {
   printf '%s' "${version}"
 }
 
-
 compute_target() {
   local os arch
   os="$(uname -s | tr '[:upper:]' '[:lower:]')"
@@ -116,11 +115,12 @@ cmd_ensure() {
   export PATH="${BIN_DIR}:${PATH}"
 
   if tool_bin="$(resolved_tool)"; then
-    if v="$("${tool_bin}" --version 2>&1)"; then
+    # Output format: "ShellCheck - shell script analysis tool\nversion: 0.9.0\n..."
+    if v="$("${tool_bin}" --version 2> /dev/null | grep -E '^version:' | awk '{print $2}' | tr -d 'v')"; then
       if version_ok "${v}" "${req_version_raw}"; then
         version_is_ok=true
       else
-        log "WARN: Gefundenes ${TOOL_NAME} hat falsche Version (erwartet: ${req_version_raw})"
+        log "WARN: Gefundenes ${TOOL_NAME} hat falsche Version: ${v} (erwartet: ${req_version_raw})"
       fi
     fi
   fi
@@ -130,13 +130,13 @@ cmd_ensure() {
     if ! tool_bin="$(resolved_tool)"; then
       die "${TOOL_NAME} nach Download nicht verfügbar."
     fi
-    v="$("${tool_bin}" --version 2>&1)"
+    v="$("${tool_bin}" --version | grep -E '^version:' | awk '{print $2}' | tr -d 'v')"
     if ! version_ok "${v}" "${req_version_raw}"; then
-      die "Installiertes ${TOOL_NAME} hat immer noch falsche Version."
+      die "Installiertes ${TOOL_NAME} hat immer noch falsche Version: ${v}"
     fi
   fi
 
-  log "OK: ${TOOL_NAME} ${req_version_raw} verfügbar."
+  log "OK: ${TOOL_NAME} ${v} verfügbar."
 }
 
 case "${1:-ensure}" in
