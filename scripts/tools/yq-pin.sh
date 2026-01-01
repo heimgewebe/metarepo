@@ -30,11 +30,12 @@ version_ok() {
   [[ "${v_have_clean}" == "${v_want_clean}" ]] && return 0
   
   # Allow newer versions using semantic versioning comparison
-  # Split versions into major.minor.patch
-  local have_major have_minor have_patch
-  IFS='.' read -r have_major have_minor have_patch <<< "${v_have_clean}"
-  local want_major want_minor want_patch
-  IFS='.' read -r want_major want_minor want_patch <<< "${v_want_clean}"
+  # Split versions into major.minor.patch using a subshell to avoid IFS side effects
+  local have_major have_minor have_patch want_major want_minor want_patch
+  {
+    IFS='.' read -r have_major have_minor have_patch <<< "${v_have_clean}"
+    IFS='.' read -r want_major want_minor want_patch <<< "${v_want_clean}"
+  }
   
   # Remove any non-numeric suffixes (e.g., "1.2.3-beta" -> "1.2.3")
   have_major="${have_major%%[^0-9]*}"
@@ -43,6 +44,14 @@ version_ok() {
   want_major="${want_major%%[^0-9]*}"
   want_minor="${want_minor%%[^0-9]*}"
   want_patch="${want_patch%%[^0-9]*}"
+  
+  # Default to 0 if empty
+  have_major="${have_major:-0}"
+  have_minor="${have_minor:-0}"
+  have_patch="${have_patch:-0}"
+  want_major="${want_major:-0}"
+  want_minor="${want_minor:-0}"
+  want_patch="${want_patch:-0}"
   
   # Major version must match
   [[ "${have_major}" -ne "${want_major}" ]] && return 1
