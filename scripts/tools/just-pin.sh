@@ -8,6 +8,10 @@ TOOLS_DIR="${ROOT_DIR}/tools"
 BIN_DIR="${TOOLS_DIR}/bin"
 JUST_LOCAL="${BIN_DIR}/just"
 
+# Source centralized semver library
+# shellcheck source=scripts/lib/semver.sh
+source "${ROOT_DIR}/scripts/lib/semver.sh"
+
 log() { printf '%s\n' "$*" >&2; }
 die() {
   log "ERR: $*"
@@ -43,13 +47,6 @@ read_pinned_version() {
     die "Konnte gewünschte just-Version aus toolchain.versions.yml nicht ermitteln."
   fi
   printf '%s' "${version}"
-}
-
-version_ok() {
-  local v_to_check="$1"      # e.g. "1.14.0"
-  local req_version_raw="$2" # e.g. "v1.14.0"
-  # compare them without the 'v'
-  [[ "${v_to_check#v}" == "${req_version_raw#v}" ]]
 }
 
 map_arch() {

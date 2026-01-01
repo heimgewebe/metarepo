@@ -9,6 +9,10 @@ TOOLS_DIR="${ROOT_DIR}/tools"
 BIN_DIR="${TOOLS_DIR}/bin"
 YQ_LOCAL="${BIN_DIR}/yq"
 
+# Source centralized semver library
+# shellcheck source=scripts/lib/semver.sh
+source "${ROOT_DIR}/scripts/lib/semver.sh"
+
 log() { printf '%s\n' "$*" >&2; }
 die() {
   log "ERR: $*"
@@ -17,16 +21,6 @@ die() {
 
 ensure_dir() { mkdir -p -- "${BIN_DIR}"; }
 have_cmd() { command -v "$1" > /dev/null 2>&1; }
-
-version_ok() {
-  local v_have="$1"
-  local v_want="$2"
-  local v_want_clean
-  v_want_clean="$(echo "${v_want}" | tr -d "'\"v")"
-  local v_have_clean
-  v_have_clean="$(echo "${v_have}" | tr -d "v")"
-  [[ "${v_have_clean}" == "${v_want_clean}" ]]
-}
 
 require_cmd() {
   local cmd="$1"

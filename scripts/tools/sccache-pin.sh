@@ -3,6 +3,9 @@ set -euo pipefail
 # Pin & Ensure for mozilla/sccache
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+# Source centralized semver library
+# shellcheck source=scripts/lib/semver.sh
+source "${ROOT_DIR}/scripts/lib/semver.sh"
 TOOLS_DIR="${ROOT_DIR}/tools"
 BIN_DIR="${TOOLS_DIR}/bin"
 TOOL_NAME="sccache"
@@ -38,12 +41,6 @@ read_pinned_version() {
   printf '%s' "${version}"
 }
 
-version_ok() {
-  local v_to_check="$1"
-  local req_version_raw="$2"
-  # sccache --version -> "sccache 0.2.15"
-  [[ "${v_to_check#v}" == "${req_version_raw#v}" ]]
-}
 
 detect_libc() {
   if [ "$(uname -s | tr '[:upper:]' '[:lower:]')" = "linux" ]; then

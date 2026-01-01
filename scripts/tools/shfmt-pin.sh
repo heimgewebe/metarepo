@@ -6,6 +6,9 @@ set -euo pipefail
 # wird die Version aus toolchain.versions.yml geholt und installiert.
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+# Source centralized semver library
+# shellcheck source=scripts/lib/semver.sh
+source "${ROOT_DIR}/scripts/lib/semver.sh"
 TOOLS_DIR="${ROOT_DIR}/tools"
 BIN_DIR="${TOOLS_DIR}/bin"
 TOOL_NAME="shfmt"
@@ -35,16 +38,6 @@ read_pinned_version() {
   printf '%s' "${version}"
 }
 
-version_ok() {
-  local v_to_check="$1"
-  local req_version_raw="$2"
-  # shfmt --version output: "v3.8.0"
-  local v_expect="${req_version_raw}"
-  if [[ "${v_expect}" != v* ]]; then
-    v_expect="v${v_expect}"
-  fi
-  [[ "${v_to_check}" == "${v_expect}" ]]
-}
 
 compute_target() {
   local os arch
