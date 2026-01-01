@@ -130,7 +130,7 @@ cmd_ensure() {
     if ! tool_bin="$(resolved_tool)"; then
       die "${TOOL_NAME} nach Download nicht verfügbar."
     fi
-    v="$("${tool_bin}" --version | grep -E '^version:' | awk '{print $2}' | tr -d 'v')"
+    v="$("${tool_bin}" --version 2> /dev/null | grep -E '^version:' | awk '{print $2}' | tr -d 'v')"
     if ! version_ok "${v}" "${req_version_raw}"; then
       die "Installiertes ${TOOL_NAME} hat immer noch falsche Version: ${v}"
     fi
