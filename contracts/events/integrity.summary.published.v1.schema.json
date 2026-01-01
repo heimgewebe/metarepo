@@ -36,7 +36,8 @@
           "format": "date-time"
         },
         "repo": {
-          "type": "string"
+          "type": "string",
+          "description": "Repository identifier that generated the summary."
         },
         "status": {
           "type": "string",
@@ -46,7 +47,8 @@
             "FAIL",
             "MISSING",
             "UNCLEAR"
-          ]
+          ],
+          "description": "Aggregated integrity status of the repository."
         }
       },
       "additionalProperties": false
