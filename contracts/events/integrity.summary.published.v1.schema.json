@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heimgewebe/contracts/events/integrity.summary.published.v1.schema.json",
+  "title": "Integrity Summary Published Event",
+  "description": "Event signaling that a new integrity summary artifact has been published.",
+  "type": "object",
+  "required": [
+    "type",
+    "source",
+    "payload"
+  ],
+  "properties": {
+    "type": {
+      "const": "integrity.summary.published.v1"
+    },
+    "source": {
+      "type": "string",
+      "description": "Repo that published the summary."
+    },
+    "payload": {
+      "type": "object",
+      "required": [
+        "url",
+        "generated_at",
+        "repo",
+        "status"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to the published integrity.summary.json artifact."
+        },
+        "generated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "repo": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "OK",
+            "WARN",
+            "FAIL",
+            "MISSING",
+            "UNCLEAR"
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
