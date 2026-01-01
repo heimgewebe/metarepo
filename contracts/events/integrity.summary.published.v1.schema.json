@@ -33,7 +33,8 @@
         },
         "generated_at": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "description": "Generation timestamp of the artifact."
         },
         "repo": {
           "type": "string",

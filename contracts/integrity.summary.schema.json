@@ -33,7 +33,7 @@
     },
     "counts": {
       "type": "object",
-      "description": "Quantitative Zusammenfassung der Integritätsprüfung. Keys sind dynamisch, folgen aber einem benannten Schema im snake_case-Format (z.B. <kategorie>_<gegenstand>). Beispiele sind orphan_outputs oder missing_consumers; die tatsächliche Menge der verwendeten Keys kann je Repository variieren.",
+      "description": "Quantitative Zusammenfassung der Integritätsprüfung. Keys sind dynamisch; in der Praxis werden sprechende Bezeichner verwendet, häufig im snake_case-Format (z.B. orphan_outputs oder missing_consumers), aber auch einfachere Namen wie claims, artifacts, loop_gaps oder unclear sind zulässig. Die tatsächliche Menge der verwendeten Keys kann je Repository variieren.",
       "additionalProperties": {
         "type": "integer",
         "minimum": 0
