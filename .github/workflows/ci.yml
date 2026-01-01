@@ -125,7 +125,7 @@ jobs:
 
           # Explicitly verify yq capability before using it
           if ! command -v yq >/dev/null; then echo "::error::yq missing in PATH"; exit 1; fi
-          YQ_VER=$(yq --version || true)
+          YQ_VER=$(yq --version 2>/dev/null || echo "")
           if ! echo "$YQ_VER" | grep -q "version v4"; then
              echo "::error::yq is not mikefarah/yq v4 (got: $YQ_VER). Bootstrapping failed."
              exit 1
@@ -164,7 +164,7 @@ jobs:
           test -n "${ACTIONLINT}" || { echo "actionlint version missing in toolchain.versions.yml"; exit 1; }
           echo "ACTIONLINT_VERSION=${ACTIONLINT}" >> "$GITHUB_ENV"
 
-          echo "Detected toolchain versions: Rust=${RUST}, Python=${PY}, uv=${UV}, yq=${YQ_VERSION}, just=${JUST}, sccache=${SCCACHE}, actionlint=${ACTIONLINT}"
+          echo "Detected toolchain versions: Rust=${RUST}, Python=${PY}, uv=${UV}, yq=${YQ_VER}, just=${JUST}, sccache=${SCCACHE}, actionlint=${ACTIONLINT}"
 
       - name: Setup Rust
         if: ${{ hashFiles('**/Cargo.toml') != '' }}
