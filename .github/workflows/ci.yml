@@ -89,7 +89,7 @@ jobs:
         run: test -f "${GITHUB_WORKSPACE}/toolchain.versions.yml" || { echo "toolchain.versions.yml fehlt"; exit 1; }
 
       - name: Setup Python for yq setup
-        uses: actions/setup-python@0a5c61591373683505ea898e09a3ea4f39ef2b9c  # v5.0.0
+        uses: actions/setup-python@4f41a90a1f38628c7ccc608d05fbafe701bc20ae  # v5.0.0
         with:
           python-version: '3.11'
 
@@ -215,7 +215,7 @@ jobs:
 
       - name: Setup Python
         if: ${{ hashFiles('**/pyproject.toml') != '' || hashFiles('**/requirements*.txt') != '' }}
-        uses: actions/setup-python@0a5c61591373683505ea898e09a3ea4f39ef2b9c  # v5.0.0
+        uses: actions/setup-python@4f41a90a1f38628c7ccc608d05fbafe701bc20ae  # v5.0.0
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
