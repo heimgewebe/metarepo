@@ -41,7 +41,6 @@ read_pinned_version() {
   printf '%s' "${version}"
 }
 
-
 detect_libc() {
   if [ "$(uname -s | tr '[:upper:]' '[:lower:]')" = "linux" ]; then
     # sccache v0.12.0+ uses musl for portable linux builds

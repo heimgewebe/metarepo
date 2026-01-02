@@ -22,19 +22,19 @@ semver_compare() {
   local v_have="$1"
   local v_want="$2"
   local strict="${3:-0}"
-  
+
   # Clean version strings (remove quotes and 'v' prefix)
   local v_want_clean
   v_want_clean="$(echo "${v_want}" | tr -d "'\"v")"
   local v_have_clean
   v_have_clean="$(echo "${v_have}" | tr -d "v")"
-  
+
   # Exact match is always ok
   [[ "${v_have_clean}" == "${v_want_clean}" ]] && return 0
-  
+
   # In strict mode, only exact match is acceptable
   [[ "${strict}" == "1" ]] && return 1
-  
+
   # Split versions into major.minor.patch
   # Use brace grouping to isolate IFS modification
   local have_major have_minor have_patch want_major want_minor want_patch
@@ -42,7 +42,7 @@ semver_compare() {
     IFS='.' read -r have_major have_minor have_patch <<< "${v_have_clean}"
     IFS='.' read -r want_major want_minor want_patch <<< "${v_want_clean}"
   }
-  
+
   # Remove any non-numeric suffixes (e.g., "1.2.3-beta" -> "1.2.3")
   have_major="${have_major%%[^0-9]*}"
   have_minor="${have_minor%%[^0-9]*}"
@@ -50,7 +50,7 @@ semver_compare() {
   want_major="${want_major%%[^0-9]*}"
   want_minor="${want_minor%%[^0-9]*}"
   want_patch="${want_patch%%[^0-9]*}"
-  
+
   # Default to 0 if empty
   have_major="${have_major:-0}"
   have_minor="${have_minor:-0}"
@@ -58,10 +58,10 @@ semver_compare() {
   want_major="${want_major:-0}"
   want_minor="${want_minor:-0}"
   want_patch="${want_patch:-0}"
-  
+
   # Major version must match
   [[ "${have_major}" -ne "${want_major}" ]] && return 1
-  
+
   # Special handling for 0.x versions (unstable API per SemVer spec)
   # In 0.x, minor version changes can be breaking, so require exact minor match
   if [[ "${want_major}" -eq 0 ]]; then
@@ -78,14 +78,14 @@ semver_compare() {
     fi
     return 1
   fi
-  
+
   # For major >= 1: newer minor/patch is acceptable
   if [[ "${have_minor}" -gt "${want_minor}" ]]; then
     return 0
   elif [[ "${have_minor}" -eq "${want_minor}" ]] && [[ "${have_patch}" -ge "${want_patch}" ]]; then
     return 0
   fi
-  
+
   # Have version is older than want
   return 1
 }
