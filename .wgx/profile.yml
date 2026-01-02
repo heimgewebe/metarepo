@@ -32,6 +32,15 @@ tasks:
       echo "decision-preimage guard not found; skipping."
     fi
 
+    # Integrity guard (blocking)
+    if [ -x "wgx/guards/integrity.bash" ]; then
+      echo "Running integrity guard..."
+      ./wgx/guards/integrity.bash || exit 1
+    else
+      echo "FAIL: Integrity guard missing"
+      exit 1
+    fi
+
     if command -v shellcheck >/dev/null 2>&1; then
       echo "Running shellcheck on wgx/**/*.bash..."
       # bewusst fokussiert auf WGX-Bash-Module; bei Bedarf erweiterbar
