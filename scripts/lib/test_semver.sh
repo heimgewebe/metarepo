@@ -20,13 +20,13 @@ test_case() {
   local expected="$3"
   local description="$4"
   local strict="${5:-0}"
-  
+
   if semver_compare "$have" "$want" "$strict"; then
     result="OK"
   else
     result="FAIL"
   fi
-  
+
   if [[ "$result" == "$expected" ]]; then
     echo "✅ PASS: $description"
     echo "   semver_compare('$have', '$want', strict=$strict) -> $result"

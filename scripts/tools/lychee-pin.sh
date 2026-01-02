@@ -35,7 +35,6 @@ read_pinned_version() {
   printf '%s' "${version}"
 }
 
-
 compute_target() {
   local os arch
   os="$(uname -s | tr '[:upper:]' '[:lower:]')"
