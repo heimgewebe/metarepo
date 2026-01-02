@@ -94,7 +94,7 @@ wgx – weave ground eXtensions
   usage:
     wgx <command> [args]
   commands:
-    plan|up|list|run|doctor|validate|smoke|guard|integrity
+    plan|up|list|run|doctor|validate|smoke|guard
     code <init|lint|test|gen>
     knowledge <extract|export|validate>
     agent <run|trace|validate>
@@ -129,7 +129,6 @@ case "${1:-}" in
   validate) cmd_validate ;;
   smoke) cmd_smoke ;;
   guard) cmd_guard ;;
-  integrity) cmd_integrity ;;
   code)
     shift
     cmd_code "$@"
