@@ -15,10 +15,48 @@ Der Leitstand visualisiert diesen Status, greift aber nicht ein.
 2.  **Keine Handlungspflicht**: Ein `FAIL` oder `MISSING` Status führt nicht zum Abbruch von CI-Pipelines.
 3.  **Missing ist erlaubt**: Ein Repository, das keine Daten liefert, hat den validen Status `MISSING`. Es wird nicht "interpoliert" oder geraten.
 
-## Artefakte
+## Integritäts-Kreislauf (The Loop)
 
-*   **integrity.summary.json**: Ein pro Repository erzeugtes JSON-Artefakt, das den aktuellen Status zusammenfasst.
-*   **integrity.summary.published.v1**: Das Event, das signalisiert, dass ein neuer Bericht verfügbar ist.
+Der Integritätsstatus fließt durch das System und bindet die Komponenten aneinander:
+
+*   **WGX (Guard):** Erzwingt die Erzeugung und Validierung der Artefakte (`wgx guard`, `wgx integrity`). Validiert strikt gegen das Payload-Schema.
+*   **semantAH (Producer):** Erzeugt den eigentlichen Bericht (`summary.json`) und den kanonischen Payload (`event_payload.json`).
+*   **Plexer (Router):** Leitet das Event (`integrity.summary.published.v1`) unverändert weiter (Pass-through).
+*   **Chronik (Store):** Speichert das Event als historischen Fakt. Unterscheidet zwischen Input-Event (Type top-level) und Storage/View (Type im Payload/Domain).
+*   **Leitstand (Display):** Visualisiert den Status. Nutzt `payload.url` um den detaillierten Bericht (`summary.json`) zu laden.
+
+## Contract & Semantik
+
+### Artefakte & Kanon
+
+*   **reports/integrity/summary.json**: Der vollständige Bericht (mensch- und maschinenlesbar). Enthält Details wie `counts`.
+*   **reports/integrity/event_payload.json**: Das **kanonische, strikte Payload-Artefakt**.
+    *   Muss exakt dem Schema entsprechen.
+    *   Darf **keine** `counts` oder andere Zusatzdaten enthalten.
+    *   Dient als "Proof of Existence" für den Bericht.
+*   **reports/integrity/event.json**: Ein abgeleiteter Transport-Envelope (Convenience für CI), der den Payload umschließt.
+
+### Payload Schema
+
+Der Payload in `integrity.summary.published.v1` ist strikt definiert:
+
+```json
+{
+  "url": "https://...",
+  "generated_at": "ISO8601",
+  "repo": "owner/repo",
+  "status": "OK|WARN|FAIL|MISSING|UNCLEAR"
+}
+```
+
+*   **Verboten:** Jegliche anderen Keys (insbesondere `counts`).
+*   **Pflicht:** Alle 4 oben genannten Felder.
+
+### URL Semantik
+
+*   **`payload.url`** zeigt zwingend auf **`reports/integrity/summary.json`** (den Bericht).
+*   Sie zeigt **nicht** auf `event_payload.json` oder `event.json`.
+*   Grund: Der Leitstand nutzt diese URL, um Details ("Warum ist Status FAIL?") nachzuladen.
 
 ## Status-Werte
 
