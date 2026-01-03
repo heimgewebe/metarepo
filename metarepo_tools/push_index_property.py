@@ -139,7 +139,15 @@ def _looks_like_columnar_mapping(data: Mapping[str, Any]) -> bool:
 
 
 def _is_sequence_like(value: Any) -> bool:
-    return isinstance(value, Sequence) and not isinstance(value, (str, bytes, bytearray))
+    """Return True for sequence- or iterator-style column inputs.
+
+    Strings/bytes and mappings are excluded to avoid accidental detection of
+    scalar values or record-like inputs.
+    """
+
+    if isinstance(value, (str, bytes, bytearray, Mapping)):
+        return False
+    return isinstance(value, (Sequence, Iterator))
 
 
 def _from_columnar_mapping(data: Mapping[str, Any]) -> Iterator[Dict[str, Any]]:
