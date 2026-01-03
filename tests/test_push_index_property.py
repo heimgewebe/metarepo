@@ -85,6 +85,37 @@ def test_default_namespace_applied(namespace_value: object, expected: str) -> No
     assert batches[0]["namespace"] == expected
 
 
+def test_columnar_mapping_consumes_iterables() -> None:
+    payload = {
+        "doc_id": (f"doc-{i}" for i in range(2)),
+        "namespace": (None for _ in range(2)),
+        "text": (f"text-{i}" for i in range(2)),
+        "embedding": ([0.1, 0.2] for _ in range(2)),
+    }
+
+    batches = list(to_batches(payload, default_namespace="vault-default"))
+
+    assert [batch["doc_id"] for batch in batches] == ["doc-0", "doc-1"]
+    assert all(batch["namespace"] == "vault-default" for batch in batches)
+    assert [batch["chunks"][0]["text"] for batch in batches] == ["text-0", "text-1"]
+
+
+def test_sequence_like_accepts_iterators_and_sequences_only() -> None:
+    assert push_index_property._is_sequence_like([1, 2, 3])
+    assert push_index_property._is_sequence_like((i for i in range(2)))
+    assert push_index_property._is_sequence_like(iter(range(1)))
+
+    assert not push_index_property._is_sequence_like({"a", "b"})
+    assert not push_index_property._is_sequence_like({"k": "v"})
+    assert not push_index_property._is_sequence_like("text")
+
+
+def test_columnar_mapping_requires_all_values_to_be_sequence_like() -> None:
+    mapping = {"doc_id": ["d1", "d2"], "text": {"a", "b"}}
+
+    assert not push_index_property._looks_like_columnar_mapping(mapping)
+
+
 def test_batches_shape_and_chunk_ids_clean() -> None:
     """Batches enthalten doc_id, zwei Chunks und keine 'nan'-IDs."""
     df = pd.DataFrame(
