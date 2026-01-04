@@ -3,6 +3,7 @@
 Das `metarepo` ist die **einzige Quelle der Wahrheit (Single Source of Truth)** für alle internen Organismus-Contracts.
 
 *   **Owner:** `metarepo` (hier werden Contracts definiert).
+*   **Enforcement:** Die technische Durchsetzung erfolgt über den **`wgx guard`** im Repository `heimgewebe/wgx`.
 *   **Mirror:** `contracts-mirror` dient **nur** als Spiegel für externe APIs (z. B. Protobuf, abgeleitete JSONs) und darf keine internen Contracts definieren.
 
 ## Struktur
@@ -22,7 +23,7 @@ Wir unterscheiden strikt zwischen:
 2.  **Payload (Inhalt):** Die fachliche Datenstruktur.
     *   Definiert in spezifischen Schemas wie `decision.outcome.v1.schema.json`.
 
-**Regel:** Ein Payload-Schema (z. B. `decision.outcome`) sollte keine Envelope-Daten (wie `mq_headers`, `routing_key`) enthalten, sondern nur die fachlichen Daten. Envelope-Schemas referenzieren Payloads oder binden sie ein.
+**Regel:** Ein Payload-Schema sollte keine Envelope-Daten (wie `mq_headers`, `routing_key`) enthalten, sondern nur die fachlichen Daten. Envelope-Schemas referenzieren Payloads oder binden sie ein.
 
 ## Producers & Consumers
 

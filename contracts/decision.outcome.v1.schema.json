@@ -2,8 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.heimgewebe.org/contracts/decision.outcome.v1.schema.json",
   "title": "heimlern decision outcome v1",
-  "x-producers": ["hausKI", "chronik"],
-  "x-consumers": ["heimlern"],
+  "x-producers": ["hausKI"],
+  "x-consumers": ["heimlern", "chronik"],
   "type": "object",
   "required": ["decision_id", "outcome", "ts"],
   "properties": {
@@ -18,27 +18,24 @@
     },
     "success": {
       "type": "boolean",
-      "description": "Explizites Success-Flag. Muss mit 'outcome' konsistent sein (true bei success, false bei failure)."
+      "description": "Explizites Success-Flag. Muss mit 'outcome' konsistent sein."
     },
     "ts": {
       "type": "string",
       "format": "date-time",
       "description": "Zeitpunkt des Ergebnisses."
     },
-    "reward": {
-      "type": "number",
-      "description": "Numerischer Reward für Reinforcement Learning."
-    },
-    "context": {
-      "type": "object",
-      "description": "Kontext zum Zeitpunkt des Ergebnisses (State)."
-    },
-    "metadata": {
-      "type": "object",
-      "additionalProperties": true
-    },
     "details": {
-      "type": "string"
+      "type": "string",
+      "description": "Optionale Details zum Ergebnis."
+    },
+    "metrics": {
+      "type": "object",
+      "description": "Strukturierte Messwerte.",
+      "patternProperties": {
+        "^[a-zA-Z0-9_]+$": { "type": "number" }
+      },
+      "additionalProperties": false
     }
   },
   "allOf": [
@@ -58,6 +55,14 @@
       "then": {
         "properties": { "success": { "const": false } },
         "required": ["success"]
+      }
+    },
+    {
+      "if": {
+        "properties": { "outcome": { "enum": ["partial", "unknown"] } }
+      },
+      "then": {
+        "not": { "required": ["success"] }
       }
     }
   ],

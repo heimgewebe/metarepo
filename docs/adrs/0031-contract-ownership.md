@@ -1,6 +1,6 @@
 # 0031. Contract Ownership & Guard
 
-* Status: Proposed
+* Status: Accepted
 * Datum: 2026-01-04
 * Deciders: Jules, User
 * Consulted: Fleet
@@ -42,4 +42,4 @@ Wir etablieren einen strikten **Contract-Ownership-Guard**, der folgende Invaria
 
 ## Compliance
 
-Der Guard `guards/contracts_ownership.guard.sh` setzt diese Regeln in CI und lokalen Hooks durch.
+Enforcement erfolgt ausschließlich über den WGX-Guard `contracts_ownership` im Repository `heimgewebe/wgx`. Alle Fleet-Repos müssen `wgx guard` in CI ausführen.

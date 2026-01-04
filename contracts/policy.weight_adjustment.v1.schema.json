@@ -21,9 +21,18 @@
     },
     "deltas": {
       "type": "object",
-      "description": "Map von Policy-ID zu Delta-Wert (z.B. {'pol_A': 0.1, 'pol_B': -0.05}).",
+      "description": "Map von Policy-ID zu Delta-Objekt.",
       "patternProperties": {
-        "^.+$": { "type": "number" }
+        "^.+$": {
+          "type": "object",
+          "required": ["kind", "value"],
+          "properties": {
+            "kind": { "enum": ["absolute", "relative"] },
+            "value": { "type": "number" },
+            "unit": { "type": "string" }
+          },
+          "additionalProperties": false
+        }
       },
       "additionalProperties": false
     },
@@ -45,7 +54,8 @@
           "type": "array",
           "items": { "type": "string" }
         }
-      }
+      },
+      "additionalProperties": false
     },
     "reasoning": {
       "type": "string",
@@ -57,5 +67,23 @@
       "default": "proposed"
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "evidence": {
+            "required": ["failure_rate_after_sim"]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "evidence": {
+            "required": ["simulation_method"]
+          }
+        }
+      }
+    }
+  ],
   "additionalProperties": false
 }
