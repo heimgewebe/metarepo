@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heimgewebe/contracts/decision.outcome.v1.schema.json",
+  "title": "Decision Outcome v1",
+  "description": "Canonical payload for decision outcomes. This is a payload schema, NOT an event envelope. It captures the result of a decision execution.",
+  "type": "object",
+  "x-producers": ["hausKI", "chronik"],
+  "x-consumers": ["heimlern"],
+  "properties": {
+    "outcome": {
+      "type": "string",
+      "enum": ["success", "failure", "partial", "unknown"],
+      "description": "The categorical outcome of the decision."
+    },
+    "success": {
+      "type": ["boolean", "null"],
+      "description": "Binary success flag. Must be consistent with 'outcome'. success=true requires outcome='success', success=false requires outcome='failure'. For 'partial' or 'unknown', this must be null or omitted."
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Arbitrary metadata regarding the outcome."
+    }
+  },
+  "required": ["outcome"],
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": { "outcome": { "const": "success" } }
+      },
+      "then": {
+        "properties": { "success": { "const": true } },
+        "required": ["success"]
+      }
+    },
+    {
+      "if": {
+        "properties": { "outcome": { "const": "failure" } }
+      },
+      "then": {
+        "properties": { "success": { "const": false } },
+        "required": ["success"]
+      }
+    },
+    {
+      "if": {
+        "properties": { "outcome": { "enum": ["partial", "unknown"] } }
+      },
+      "then": {
+        "anyOf": [
+          { "not": { "required": ["success"] } },
+          { "properties": { "success": { "type": "null" } } }
+        ]
+      }
+    }
+  ]
+}

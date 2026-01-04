@@ -1,0 +1,11 @@
+{
+  "deltas": {
+    "factor": {
+      "kind": "absolute",
+      "value": 1.0
+    }
+  },
+  "evidence": {
+    "failure_rate_after_sim": 0.1
+  }
+}

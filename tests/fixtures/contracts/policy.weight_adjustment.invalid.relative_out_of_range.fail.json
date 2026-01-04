@@ -1,0 +1,9 @@
+{
+  "deltas": {
+    "factor": {
+      "kind": "relative",
+      "value": 10.0,
+      "unit": "x"
+    }
+  }
+}

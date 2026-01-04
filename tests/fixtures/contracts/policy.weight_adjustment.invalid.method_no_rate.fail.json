@@ -1,0 +1,6 @@
+{
+  "deltas": { "factor": { "kind": "absolute", "value": 1 } },
+  "evidence": {
+    "simulation_method": "dry-run"
+  }
+}

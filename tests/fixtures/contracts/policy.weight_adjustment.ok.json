@@ -1,0 +1,13 @@
+{
+  "deltas": {
+    "factor": {
+      "kind": "relative",
+      "value": 1.2,
+      "unit": "factor"
+    }
+  },
+  "evidence": {
+    "failure_rate_after_sim": 0.1,
+    "simulation_method": "monte-carlo"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "deltas": {
+    "bad key with spaces": {
+      "kind": "absolute",
+      "value": 1
+    }
+  }
+}
