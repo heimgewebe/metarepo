@@ -1,7 +1,7 @@
 # 0031. Contract Ownership & Guard
 
 * Status: Proposed
-* Datum: 2025-05-24
+* Datum: 2026-01-04
 * Deciders: Jules, User
 * Consulted: Fleet
 * Informed: Fleet
@@ -42,4 +42,4 @@ Wir etablieren einen strikten **Contract-Ownership-Guard**, der folgende Invaria
 
 ## Compliance
 
-Der Guard `wgx/guards/contracts_ownership.guard.sh` (oder `guards/contracts_ownership.guard.sh` in der WGX-Distribution) setzt diese Regeln in CI und lokalen Hooks durch.
+Der Guard `guards/contracts_ownership.guard.sh` setzt diese Regeln in CI und lokalen Hooks durch.

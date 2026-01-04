@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.heimgewebe.org/contracts/policy.weight_change.applied.v1.schema.json",
+  "title": "heimlern policy weight change applied v1",
+  "x-producers": ["hausKI"],
+  "x-consumers": ["chronik", "heimlern"],
+  "type": "object",
+  "required": ["policy_ref", "old_weight", "new_weight", "delta", "ts", "reason"],
+  "properties": {
+    "policy_ref": {
+      "type": "string",
+      "description": "Referenz auf die Policy, deren Gewicht geändert wurde."
+    },
+    "old_weight": {
+      "type": "number",
+      "description": "Das Gewicht vor der Änderung."
+    },
+    "new_weight": {
+      "type": "number",
+      "description": "Das neue Gewicht."
+    },
+    "delta": {
+      "type": "number",
+      "description": "Die Differenz (new - old)."
+    },
+    "ts": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "source_adjustment_ref": {
+      "type": "string",
+      "description": "Referenz auf den Adjustment-Vorschlag (policy.weight_adjustment), falls vorhanden."
+    },
+    "reason": {
+      "type": "string",
+      "description": "Grund für die Änderung."
+    }
+  },
+  "additionalProperties": false
+}

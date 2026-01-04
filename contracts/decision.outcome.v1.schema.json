@@ -1,11 +1,11 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.heimgewebe.org/contracts/decision.outcome.schema.json",
-  "title": "heimlern decision outcome",
-  "x-producers": ["heimlern"],
-  "x-consumers": ["hausKI", "chronik"],
+  "$id": "https://schemas.heimgewebe.org/contracts/decision.outcome.v1.schema.json",
+  "title": "heimlern decision outcome v1",
+  "x-producers": ["hausKI", "chronik"],
+  "x-consumers": ["heimlern"],
   "type": "object",
-  "required": ["decision_id", "outcome", "timestamp"],
+  "required": ["decision_id", "outcome", "ts"],
   "properties": {
     "decision_id": {
       "type": "string",
@@ -13,20 +13,28 @@
     },
     "outcome": {
       "type": "string",
-      "enum": ["success", "failure", "neutral"],
+      "enum": ["success", "failure", "partial", "unknown"],
       "description": "Das Ergebnis der Entscheidung."
     },
     "success": {
       "type": "boolean",
-      "description": "Explizites Success-Flag. Muss mit 'outcome' konsistent sein."
+      "description": "Explizites Success-Flag. Muss mit 'outcome' konsistent sein (true bei success, false bei failure)."
     },
-    "timestamp": {
+    "ts": {
       "type": "string",
-      "format": "date-time"
+      "format": "date-time",
+      "description": "Zeitpunkt des Ergebnisses."
     },
-    "metrics": {
+    "reward": {
+      "type": "number",
+      "description": "Numerischer Reward für Reinforcement Learning."
+    },
+    "context": {
       "type": "object",
-      "description": "Messwerte, die zum Ergebnis führten.",
+      "description": "Kontext zum Zeitpunkt des Ergebnisses (State)."
+    },
+    "metadata": {
+      "type": "object",
       "additionalProperties": true
     },
     "details": {

@@ -53,8 +53,8 @@ teardown() {
     export HG_REPO_NAME="metarepo"
     mkdir -p fleet contracts
     touch fleet/repos.yml
-    touch contracts/new.schema.json
-    git add fleet/repos.yml contracts/new.schema.json
+    touch contracts/decision.outcome.v1.schema.json
+    git add fleet/repos.yml contracts/decision.outcome.v1.schema.json
 
     run "$GUARD_SCRIPT"
     [ "$status" -eq 0 ]
@@ -103,4 +103,22 @@ teardown() {
     run "$GUARD_SCRIPT"
     [ "$status" -eq 0 ]
     [[ "$output" == *"No changed files detected"* ]]
+}
+
+@test "PASSES: Detected as metarepo via filesystem (no env var)" {
+    unset HG_REPO_NAME
+    mkdir -p fleet contracts
+    touch fleet/repos.yml
+    touch contracts/test.json
+    git add fleet/repos.yml contracts/test.json
+
+    run "$GUARD_SCRIPT"
+    [ "$status" -eq 0 ]
+    # Since we are in a temp dir with no remote, it falls back to toplevel basename.
+    # The basename of mktemp -d is random, e.g., tmp.XXXX.
+    # But the script sets IS_METAREPO=true if fleet/repos.yml exists.
+    # Wait, the script logic is:
+    # if IS_METAREPO=true -> exit 0.
+    # It does NOT rely on REPO_NAME being "metarepo" for the allow-all check, only for the integrity check.
+    [[ "$output" == *"Contracts modification allowed"* ]]
 }
