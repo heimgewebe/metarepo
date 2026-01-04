@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.heimgewebe.org/contracts/decision.outcome.schema.json",
+  "title": "heimlern decision outcome",
+  "x-producers": ["heimlern"],
+  "x-consumers": ["hausKI", "chronik"],
+  "type": "object",
+  "required": ["decision_id", "outcome", "timestamp"],
+  "properties": {
+    "decision_id": {
+      "type": "string",
+      "description": "ID der ursprünglichen Entscheidung (policy.decision)."
+    },
+    "outcome": {
+      "type": "string",
+      "enum": ["success", "failure", "neutral"],
+      "description": "Das Ergebnis der Entscheidung."
+    },
+    "success": {
+      "type": "boolean",
+      "description": "Explizites Success-Flag. Muss mit 'outcome' konsistent sein."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "metrics": {
+      "type": "object",
+      "description": "Messwerte, die zum Ergebnis führten.",
+      "additionalProperties": true
+    },
+    "details": {
+      "type": "string"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "outcome": { "const": "success" } }
+      },
+      "then": {
+        "properties": { "success": { "const": true } },
+        "required": ["success"]
+      }
+    },
+    {
+      "if": {
+        "properties": { "outcome": { "const": "failure" } }
+      },
+      "then": {
+        "properties": { "success": { "const": false } },
+        "required": ["success"]
+      }
+    }
+  ],
+  "additionalProperties": false
+}
