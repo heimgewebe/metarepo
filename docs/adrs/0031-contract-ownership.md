@@ -1,6 +1,6 @@
 # 0031. Contract Ownership & Guard
 
-* Status: Accepted
+* Status: Proposed
 * Datum: 2026-01-04
 * Deciders: Jules, User
 * Consulted: Fleet

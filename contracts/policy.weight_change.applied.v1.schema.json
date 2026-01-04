@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.heimgewebe.org/contracts/policy.weight_change.applied.v1.schema.json",
-  "title": "heimlern policy weight change applied v1",
+  "title": "hausKI policy weight change applied v1",
   "x-producers": ["hausKI"],
   "x-consumers": ["chronik", "heimlern"],
   "type": "object",
