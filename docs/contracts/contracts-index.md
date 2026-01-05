@@ -99,19 +99,35 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
 - `tooling/toolchain.versions.schema.json`
   - Zweck: Canonical schema für `toolchain.versions.yml`, definiert required keys und Versionsformate.
 
-### 1.7 Review-Policies
+### 1.7 Webmaschine (State & Config)
+
+- `webmaschine/state/webmaschine.state.index.schema.json`
+  - Zweck: Index des Webmaschine-Zustands.
+- `webmaschine/state/webmaschine.state.repos.schema.json`
+  - Zweck: Repositories im Webmaschine-Kontext.
+- `webmaschine/state/webmaschine.state.uncertainties.schema.json`
+  - Zweck: Unsicherheits-Tracking der Webmaschine.
+- `webmaschine/state/webmaschine.state.insights.schema.json`
+  - Zweck: Insights/Erkenntnisse aus der Webmaschine.
+- `webmaschine/state/webmaschine.state.drift.schema.json`
+  - Zweck: Drift-Detection innerhalb der Webmaschine.
+- `webmaschine/config/zones.schema.json`
+  - Zweck: Konfiguration der Webmaschine-Zonen.
+- **Ownership:** `metarepo` (Definition) -> `webmaschine` (Konsum/Implementation).
+
+### 1.8 Review-Policies
 
 - `review.policy.yml`
   - Zweck: Richtlinien für Reviews (z. B. Sichter, heimgeist), dient als semantische Grundlage für automatisierte Bewertung.
 
-### 1.8 Planung & Szenarien
+### 1.9 Planung & Szenarien
 
 - `project.scenario.schema.json`
   - Zweck: Beschreibung alternativer Pfade für ein Thema oder Projekt (konservativ, ambitioniert, experimentell) mit Annahmen, Risiken und vorgeschlagenen Aktionen.
 - `consumers.yaml`
   - Zweck: Maschinenlesbare Übersicht, welche Repos welche zentralen Heimgewebe-Contracts konsumieren (Modus: reference-only oder mirror) – quer über alle Contract-Kategorien hinweg.
 
-### 1.9 Integrität & Diagnose
+### 1.10 Integrität & Diagnose
 
 - `integrity.summary.schema.json`
   - Zweck: Zusammenfassender Integritätsbericht (Artefakt) zur Diagnose von Claims vs. Artefakten.
