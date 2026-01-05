@@ -68,6 +68,10 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
 
 ### 1.4 Policy-Kreislauf
 
+- `decision.outcome.v1.schema.json`
+  - Zweck: Kanonisches Payload-Schema für Entscheidungsergebnisse mit strikter Validierung der Konsistenz zwischen Outcome und Success-Flag.
+  - Produzenten: hausKI, chronik
+  - Konsumenten: heimlern
 - `decision.preimage.schema.json`
   - Zweck: expliziter Erkenntnis-Vorlauf vor einer wirksamen Entscheidung – dient Auditierbarkeit, Lernfähigkeit und Sichtbarkeit von Unsicherheit/Alternativen.
 - `policy.decision.schema.json`
@@ -76,6 +80,10 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
   - Zweck: Feedback zu Entscheidungen (Erfolg, Fehler, Korrekturen).
 - `policy.snapshot.schema.json`
   - Zweck: momentane Policy-Konfiguration im zeitlichen Verlauf (Versionierung des Regelwerks).
+- `policy.weight_adjustment.v1.schema.json`
+  - Zweck: Strukturierte Policy-Gewichtsanpassungen mit Delta-Objekten und bidirektionalen Evidence/Rate-Regeln.
+  - Produzenten: heimlern
+  - Konsumenten: hausKI, chronik
 
 ### 1.5 OS-Kontext & Embeddings
 

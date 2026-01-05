@@ -1,0 +1,10 @@
+{
+  "version": "v1",
+  "policy_ref": "pol-123",
+  "old_weight": 0.5,
+  "new_weight": 0.6,
+  "delta": 0.1,
+  "ts": "2025-01-01T12:00:00Z",
+  "reason": "Feedback loop",
+  "source_adjustment_ref": "adj-456"
+}
