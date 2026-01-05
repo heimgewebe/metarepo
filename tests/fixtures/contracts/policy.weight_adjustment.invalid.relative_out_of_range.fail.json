@@ -6,7 +6,7 @@
     "factor": {
       "kind": "relative",
       "value": 10.0,
-      "unit": "x"
+      "unit": "factor"
     }
   },
   "confidence": 0.9,

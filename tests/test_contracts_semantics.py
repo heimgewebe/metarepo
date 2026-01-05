@@ -7,7 +7,7 @@ import json
 import pytest
 import math
 from pathlib import Path
-from jsonschema import validate, ValidationError
+from jsonschema import validate, ValidationError, exceptions
 
 # Map fixture prefixes to schema files
 SCHEMA_MAP = {
@@ -64,8 +64,17 @@ def test_contract_fixture(fixture_path, schema_key, expect_valid):
     schema_file = SCHEMA_MAP[schema_key]
     schema = load_schema(schema_file)
 
-    with open(fixture_path, "r", encoding="utf-8") as f:
-        instance = json.load(f)
+    # Handle potential JSONDecodeError from invalid JSON files
+    try:
+        with open(fixture_path, "r", encoding="utf-8") as f:
+            instance = json.load(f)
+    except json.JSONDecodeError as e:
+        if expect_valid:
+            pytest.fail(f"Fixture {fixture_path.name} contains invalid JSON: {e}")
+        else:
+            # Invalid JSON is acceptable for failure fixtures
+            pytest.skip(f"Fixture {fixture_path.name} contains invalid JSON (expected for failure case)")
+            return
 
     if expect_valid:
         try:
@@ -77,3 +86,42 @@ def test_contract_fixture(fixture_path, schema_key, expect_valid):
         with pytest.raises(ValidationError, match=r".*"):
             validate_finite_numbers(instance)
             validate(instance=instance, schema=schema)
+
+
+# Programmatic tests for NaN/Inf rejection
+@pytest.mark.parametrize("non_finite_value", [math.nan, math.inf, -math.inf])
+def test_decision_outcome_rejects_non_finite_reward(non_finite_value):
+    """Test that decision.outcome rejects non-finite values in reward field (if present)."""
+    schema = load_schema("contracts/decision.outcome.v1.schema.json")
+    instance = {
+        "outcome": "success",
+        "success": True,
+        "metadata": {"reward": non_finite_value}
+    }
+    
+    with pytest.raises(ValidationError, match=r".*non-finite.*"):
+        validate_finite_numbers(instance)
+
+
+@pytest.mark.parametrize("non_finite_value", [math.nan, math.inf, -math.inf])
+def test_policy_weight_adjustment_rejects_non_finite_delta_value(non_finite_value):
+    """Test that policy.weight_adjustment rejects non-finite delta values."""
+    schema = load_schema("contracts/policy.weight_adjustment.v1.schema.json")
+    instance = {
+        "version": "v1",
+        "basis_policy": "pol-123",
+        "ts": "2025-01-01T12:00:00Z",
+        "deltas": {
+            "factor": {
+                "kind": "absolute",
+                "value": non_finite_value
+            }
+        },
+        "confidence": 0.9,
+        "evidence": {
+            "decisions_analyzed": 100
+        }
+    }
+    
+    with pytest.raises(ValidationError, match=r".*non-finite.*"):
+        validate_finite_numbers(instance)

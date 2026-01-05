@@ -47,10 +47,10 @@
         "properties": { "outcome": { "enum": ["partial", "unknown"] } }
       },
       "then": {
-        "anyOf": [
-          { "not": { "required": ["success"] } },
-          { "properties": { "success": { "type": "null" } } }
-        ]
+        "not": {
+          "properties": { "success": { "type": "boolean" } },
+          "required": ["success"]
+        }
       }
     }
   ]
