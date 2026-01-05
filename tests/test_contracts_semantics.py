@@ -64,17 +64,12 @@ def test_contract_fixture(fixture_path, schema_key, expect_valid):
     schema_file = SCHEMA_MAP[schema_key]
     schema = load_schema(schema_file)
 
-    # Handle potential JSONDecodeError from invalid JSON files
+    # All fixtures must be valid JSON - fail immediately if not parseable
     try:
         with open(fixture_path, "r", encoding="utf-8") as f:
             instance = json.load(f)
     except json.JSONDecodeError as e:
-        if expect_valid:
-            pytest.fail(f"Fixture {fixture_path.name} contains invalid JSON: {e}")
-        else:
-            # Invalid JSON is acceptable for failure fixtures
-            pytest.skip(f"Fixture {fixture_path.name} contains invalid JSON (expected for failure case)")
-            return
+        pytest.fail(f"Fixture {fixture_path.name} contains invalid JSON: {e}. All fixtures must be valid JSON.")
 
     if expect_valid:
         try:
