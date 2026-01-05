@@ -7,7 +7,7 @@ import json
 import pytest
 import math
 from pathlib import Path
-from jsonschema import validate, ValidationError, exceptions
+from jsonschema import validate, ValidationError
 
 # Map fixture prefixes to schema files
 SCHEMA_MAP = {
@@ -87,7 +87,6 @@ def test_contract_fixture(fixture_path, schema_key, expect_valid):
 @pytest.mark.parametrize("non_finite_value", [math.nan, math.inf, -math.inf])
 def test_decision_outcome_rejects_non_finite_reward(non_finite_value):
     """Test that decision.outcome rejects non-finite values in reward field (if present)."""
-    schema = load_schema("contracts/decision.outcome.v1.schema.json")
     instance = {
         "outcome": "success",
         "success": True,
@@ -101,7 +100,6 @@ def test_decision_outcome_rejects_non_finite_reward(non_finite_value):
 @pytest.mark.parametrize("non_finite_value", [math.nan, math.inf, -math.inf])
 def test_policy_weight_adjustment_rejects_non_finite_delta_value(non_finite_value):
     """Test that policy.weight_adjustment rejects non-finite delta values."""
-    schema = load_schema("contracts/policy.weight_adjustment.v1.schema.json")
     instance = {
         "version": "v1",
         "basis_policy": "pol-123",
