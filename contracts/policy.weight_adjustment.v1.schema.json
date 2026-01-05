@@ -1,15 +1,27 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://heimgewebe/contracts/policy.weight_adjustment.v1.schema.json",
-  "title": "Policy Weight Adjustment v1",
-  "description": "Canonical payload for policy weight adjustments. This is a payload schema, NOT an event envelope. It structures how weights should change based on feedback.",
-  "type": "object",
+  "$id": "https://schemas.heimgewebe.org/contracts/policy.weight_adjustment.v1.schema.json",
+  "title": "heimlern policy weight adjustment proposal v1",
   "x-producers": ["heimlern"],
-  "x-consumers": ["hausKI"],
+  "x-consumers": ["hausKI", "chronik"],
+  "type": "object",
+  "required": ["version", "basis_policy", "ts", "deltas", "confidence", "evidence"],
   "properties": {
+    "version": {
+      "type": "string",
+      "const": "v1"
+    },
+    "basis_policy": {
+      "type": "string",
+      "description": "ID/Hash der Policy, auf der diese Anpassung basiert."
+    },
+    "ts": {
+      "type": "string",
+      "format": "date-time"
+    },
     "deltas": {
       "type": "object",
-      "description": "Map of weight keys to Delta objects.",
+      "description": "Map von Policy-ID zu Delta-Objekt.",
       "minProperties": 1,
       "propertyNames": {
         "pattern": "^[a-zA-Z0-9_.-]+$",
@@ -67,6 +79,8 @@
       "type": "object",
       "description": "Evidence or simulation results backing this adjustment.",
       "properties": {
+        "decisions_analyzed": { "type": "integer", "minimum": 0 },
+        "failure_rate_before": { "type": "number", "minimum": 0, "maximum": 1 },
         "failure_rate_after_sim": {
           "type": "number",
           "description": "Projected failure rate after applying the adjustment."
@@ -74,6 +88,10 @@
         "simulation_method": {
           "type": "string",
           "description": "The method used for simulation. Required if failure_rate_after_sim is present."
+        },
+        "patterns": {
+          "type": "array",
+          "items": { "type": "string" }
         }
       },
       "additionalProperties": false,

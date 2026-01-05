@@ -1,4 +1,14 @@
 {
-  "deltas": { "factor": { "kind": "absolute", "value": 1 } },
+  "version": "v1",
+  "basis_policy": "pol-123",
+  "ts": "2025-01-01T12:00:00Z",
+  "deltas": { "factor": { "kind": "absolute", "value": 1, "unit": "x" } },
+  "confidence": 0.9,
+  "evidence": {
+    "decisions_analyzed": 100,
+    "failure_rate_before": 0.2,
+    "failure_rate_after_sim": 0.1,
+    "simulation_method": "monte-carlo"
+  },
   "status": "rejected"
 }
