@@ -1,6 +1,6 @@
 {
-  "$id": "https://heimgewebe/contracts/webmaschine/state/index.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heimgewebe/contracts/webmaschine/state/webmaschine.state.index.schema.json",
   "title": "Webmaschine State Index",
   "description": "Index of the current state of the Webmaschine.",
   "type": "object",

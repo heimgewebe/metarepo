@@ -1,6 +1,6 @@
 {
-  "$id": "https://heimgewebe/contracts/webmaschine/state/drift.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heimgewebe/contracts/webmaschine/state/webmaschine.state.drift.schema.json",
   "title": "Webmaschine Drift State",
   "description": "Detected drift in the Webmaschine domain.",
   "type": "object",

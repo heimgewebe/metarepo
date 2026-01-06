@@ -101,15 +101,15 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
 
 ### 1.7 Webmaschine (State & Config)
 
-- `webmaschine/state/index.schema.json`
+- `webmaschine/state/webmaschine.state.index.schema.json`
   - Zweck: Index des Webmaschine-Zustands.
-- `webmaschine/state/repos.schema.json`
+- `webmaschine/state/webmaschine.state.repos.schema.json`
   - Zweck: Repositories im Webmaschine-Kontext.
-- `webmaschine/state/uncertainties.schema.json`
+- `webmaschine/state/webmaschine.state.uncertainties.schema.json`
   - Zweck: Unsicherheits-Tracking der Webmaschine.
-- `webmaschine/state/insights.schema.json`
+- `webmaschine/state/webmaschine.state.insights.schema.json`
   - Zweck: Insights/Erkenntnisse aus der Webmaschine.
-- `webmaschine/state/drift.schema.json`
+- `webmaschine/state/webmaschine.state.drift.schema.json`
   - Zweck: Drift-Detection innerhalb der Webmaschine.
 - `webmaschine/config/zones.schema.json`
   - Zweck: Konfiguration der Webmaschine-Zonen.
