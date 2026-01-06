@@ -2,6 +2,9 @@ import json
 import pytest
 from pathlib import Path
 
+# Notification-only event size limit (2KB)
+MAX_NOTIFICATION_EVENT_SIZE_BYTES = 2048
+
 def test_knowledge_observatory_published_constraints():
     """
     Enforces 'notification-only' constraints for knowledge.observatory.published.v1 event.
@@ -17,7 +20,8 @@ def test_knowledge_observatory_published_constraints():
 
     # 1. Size constraint (Notification should be lightweight)
     size_bytes = len(content.encode("utf-8"))
-    assert size_bytes < 2048, f"Event payload too large ({size_bytes} bytes). Must be < 2KB for notification-only events."
+    assert size_bytes < MAX_NOTIFICATION_EVENT_SIZE_BYTES, \
+        f"Event payload too large ({size_bytes} bytes). Must be < {MAX_NOTIFICATION_EVENT_SIZE_BYTES} bytes for notification-only events."
 
     # 2. Structure constraint
     payload = data.get("payload", {})
