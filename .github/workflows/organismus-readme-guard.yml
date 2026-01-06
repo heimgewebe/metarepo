@@ -5,6 +5,8 @@ name: organismus-readme-guard
   pull_request:
     paths:
       - "README.md"
+      - "docs/system/heimgewebe-organismus.md"
+      - "docs/system/heimgewebe-zielbild.md"
       - "docs/heimgewebe-organismus.md"
       - "docs/heimgewebe-zielbild.md"
       - ".github/workflows/organismus-readme-guard.yml"
@@ -14,6 +16,8 @@ name: organismus-readme-guard
       - master
     paths:
       - "README.md"
+      - "docs/system/heimgewebe-organismus.md"
+      - "docs/system/heimgewebe-zielbild.md"
       - "docs/heimgewebe-organismus.md"
       - "docs/heimgewebe-zielbild.md"
       - ".github/workflows/organismus-readme-guard.yml"
@@ -38,15 +42,16 @@ jobs:
             exit 0
           fi
 
-          if ! grep -qi "heimgewebe-organismus.md" README.md; then
-            echo "::error file=README.md::README.md verweist nicht auf docs/heimgewebe-organismus.md."
-            echo "Füge den Organismus-Kontextblock aus docs/organismus-kontextblock.md in das README ein."
+          # Check for canonical path: must contain 'system/'
+          if ! grep -Eqi '(^|[(/])docs/system/heimgewebe-organismus\.md([)#]|$)|github\.com/heimgewebe/metarepo/blob/main/docs/system/heimgewebe-organismus\.md' README.md; then
+            echo "::error file=README.md::README.md muss auf den kanonischen Pfad docs/system/heimgewebe-organismus.md verweisen."
+            echo "Veraltete Links auf Stubs (docs/heimgewebe-organismus.md) sind nicht zulässig."
             exit 1
           fi
 
-          if ! grep -qi "heimgewebe-zielbild.md" README.md; then
-            echo "::error file=README.md::README.md verweist nicht auf docs/heimgewebe-zielbild.md."
-            echo "Füge den Organismus-Kontextblock aus docs/organismus-kontextblock.md in das README ein."
+          if ! grep -Eqi '(^|[(/])docs/system/heimgewebe-zielbild\.md([)#]|$)|github\.com/heimgewebe/metarepo/blob/main/docs/system/heimgewebe-zielbild\.md' README.md; then
+            echo "::error file=README.md::README.md muss auf den kanonischen Pfad docs/system/heimgewebe-zielbild.md verweisen."
+            echo "Veraltete Links auf Stubs (docs/heimgewebe-zielbild.md) sind nicht zulässig."
             exit 1
           fi
 
