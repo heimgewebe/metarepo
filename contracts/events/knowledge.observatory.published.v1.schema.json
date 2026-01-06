@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://heimgewebe/contracts/events/knowledge.observatory.published.v1.schema.json",
+  "$id": "https://schemas.heimgewebe.org/contracts/events/knowledge.observatory.published.v1.schema.json",
   "title": "Knowledge Observatory Published Event",
   "description": "Notification that a new knowledge observatory snapshot has been published.",
   "type": "object",
@@ -11,6 +11,7 @@
     },
     "source": {
       "type": "string",
+      "minLength": 1,
       "description": "Producing system (e.g. semantAH)."
     },
     "timestamp": {
@@ -32,7 +33,8 @@
         },
         "ts": {
           "type": "string",
-          "description": "Optional timestamp or date reference."
+          "format": "date-time",
+          "description": "Optional timestamp in RFC 3339 date-time format."
         }
       },
       "additionalProperties": false
