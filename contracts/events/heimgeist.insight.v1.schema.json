@@ -38,7 +38,7 @@
       "properties": {
         "insight_type": {
           "type": "string",
-          "enum": ["risk", "drift", "pattern", "anomaly", "meta"],
+          "enum": ["risk", "drift", "pattern", "anomaly", "meta", "suggestion"],
           "description": "Kategorie"
         },
         "summary": { "type": "string" },

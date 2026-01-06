@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heimgewebe/contracts/events/knowledge.observatory.published.v1.schema.json",
+  "title": "Knowledge Observatory Published Event",
+  "description": "Notification that a new knowledge observatory snapshot has been published.",
+  "type": "object",
+  "required": ["type", "source", "timestamp", "payload"],
+  "properties": {
+    "type": {
+      "const": "knowledge.observatory.published.v1"
+    },
+    "source": {
+      "type": "string",
+      "description": "Producing system (e.g. semantAH)."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "payload": {
+      "type": "object",
+      "required": ["url"],
+      "properties": {
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to the published snapshot artifact."
+        },
+        "generated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "ts": {
+          "type": "string",
+          "description": "Optional timestamp or date reference."
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

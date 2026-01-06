@@ -22,7 +22,7 @@
         "url": { "type": "string", "format": "uri" },
         "generated_at": { "type": "string", "format": "date-time" }
       },
-      "additionalProperties": true
+      "additionalProperties": false
     }
   },
   "additionalProperties": false
