@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://heimgewebe.local/contracts/events/published.v1.schema.json",
+  "$id": "https://schemas.heimgewebe.org/contracts/events/published.v1.schema.json",
   "title": "published.v1 event",
   "type": "object",
   "required": ["type", "source", "timestamp", "payload"],
