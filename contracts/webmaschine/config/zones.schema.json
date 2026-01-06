@@ -4,5 +4,18 @@
   "title": "Webmaschine Zones Configuration",
   "description": "Configuration of zones for Webmaschine.",
   "type": "object",
+  "properties": {
+    "review_frequency": {
+      "type": "string",
+      "enum": [
+        "weekly",
+        "monthly",
+        "quarterly",
+        "yearly",
+        "never"
+      ],
+      "description": "Frequency of review for the zone."
+    }
+  },
   "additionalProperties": true
 }
