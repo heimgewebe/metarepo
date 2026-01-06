@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heimgewebe/contracts/webmaschine/config/zones.schema.json",
+  "title": "Webmaschine Zones Configuration",
+  "description": "Configuration of zones for Webmaschine.",
+  "type": "object",
+  "properties": {
+    "review_frequency": {
+      "type": "string",
+      "enum": [
+        "weekly",
+        "monthly",
+        "quarterly",
+        "yearly",
+        "never"
+      ],
+      "description": "Frequency of review for the zone."
+    }
+  },
+  "additionalProperties": true
+}

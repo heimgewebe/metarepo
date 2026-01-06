@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heimgewebe/contracts/webmaschine/state/webmaschine.state.uncertainties.schema.json",
+  "title": "Webmaschine Uncertainties State",
+  "description": "Tracked uncertainties in the Webmaschine domain.",
+  "type": "object",
+  "additionalProperties": true
+}

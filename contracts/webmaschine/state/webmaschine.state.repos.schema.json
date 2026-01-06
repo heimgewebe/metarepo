@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heimgewebe/contracts/webmaschine/state/webmaschine.state.repos.schema.json",
+  "title": "Webmaschine Repos State",
+  "description": "State of repositories tracked by Webmaschine.",
+  "type": "object",
+  "additionalProperties": true
+}
