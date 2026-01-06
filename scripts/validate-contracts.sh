@@ -95,15 +95,15 @@ else
         c_dir=$(dirname "$c")
         # Check if c_dir ends with rel_dir
         if [[ -z "$rel_dir" ]]; then
-           # If rel_dir is empty (root example), prefer root schema or 'contracts/events' (historical)
-           # We check if schema is in root 'contracts' or direct subfolder 'contracts/events'
-           # Simple heuristic: shorter path wins for root examples
-           matched_candidates+=("$c")
+          # If rel_dir is empty (root example), prefer root schema or 'contracts/events' (historical)
+          # We check if schema is in root 'contracts' or direct subfolder 'contracts/events'
+          # Simple heuristic: shorter path wins for root examples
+          matched_candidates+=("$c")
         else
-           # Check if path contains rel_dir
-           if [[ "$c_dir" == *"$rel_dir" ]]; then
-             matched_candidates+=("$c")
-           fi
+          # Check if path contains rel_dir
+          if [[ "$c_dir" == *"$rel_dir" ]]; then
+            matched_candidates+=("$c")
+          fi
         fi
       done
 
@@ -116,10 +116,10 @@ else
       if ((${#found[@]} == 1)); then
         final_candidate="${found[0]}"
       else
-         # Sort by length
-         sorted=$(printf '%s\n' "${found[@]}" | awk '{ print length, $0 }' | sort -n | cut -d" " -f2-)
-         # Pick first
-         final_candidate=$(echo "$sorted" | head -n1)
+        # Sort by length
+        sorted=$(printf '%s\n' "${found[@]}" | awk '{ print length, $0 }' | sort -n | cut -d" " -f2-)
+        # Pick first
+        final_candidate=$(echo "$sorted" | head -n1)
       fi
     fi
 
