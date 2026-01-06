@@ -1,3 +1,3 @@
-# Moved
+# Verschoben
 
-This document has moved to [docs/system/heimgewebe-organismus.md](system/heimgewebe-organismus.md).
+Kanonischer Ort: [`docs/system/heimgewebe-organismus.md`](system/heimgewebe-organismus.md)

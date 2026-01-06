@@ -1,3 +1,3 @@
-# Moved
+# Verschoben
 
-This document has moved to [docs/system/heimgewebe-zielbild.md](system/heimgewebe-zielbild.md).
+Kanonischer Ort: [`docs/system/heimgewebe-zielbild.md`](system/heimgewebe-zielbild.md)
