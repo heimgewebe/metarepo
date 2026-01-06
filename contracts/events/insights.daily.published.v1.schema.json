@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://heimgewebe.de/contracts/events/insights.daily.published.v1.schema.json",
+  "$id": "https://schemas.heimgewebe.org/contracts/events/insights.daily.published.v1.schema.json",
   "title": "Insights Daily Published Event",
   "description": "Notification that a new daily insights artifact has been published.",
   "type": "object",
