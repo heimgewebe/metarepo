@@ -31,7 +31,25 @@ if ((${#schemas[@]} == 0)); then
 else
   for schema in "${schemas[@]}"; do
     echo "::group::Schema ${schema}"
-    npx --yes -p ajv-cli@5 -p ajv-formats ajv compile -s "${schema}" --strict=log --spec=draft2020 -c ajv-formats
+
+    # Build a list of references excluding the current schema to avoid duplicate ID errors
+    refs=()
+    for s in "${schemas[@]}"; do
+      if [[ "$s" != "$schema" ]]; then
+        refs+=("$s")
+      fi
+    done
+
+    # AJV CLI allows multiple -r arguments
+    # We pass all other schemas as references
+
+    # Construct args array
+    args=("--strict=log" "--spec=draft2020" "-c" "ajv-formats" "-s" "${schema}")
+    for r in "${refs[@]}"; do
+      args+=("-r" "$r")
+    done
+
+    npx --yes -p ajv-cli@5 -p ajv-formats ajv compile "${args[@]}"
     echo "::endgroup::"
   done
 fi
@@ -126,23 +144,23 @@ else
     echo "::group::Validate Example ${example}"
     if [[ -n "$final_candidate" ]]; then
       schema="$final_candidate"
-      # Check if schema references base.event.schema.json (broad check)
-      if grep -q "base\.event\.schema\.json" "$schema" 2> /dev/null; then
-        ref_schema="contracts/events/base.event.schema.json"
-        if [[ -f "$ref_schema" ]]; then
-          npx --yes -p ajv-cli@5 -p ajv-formats ajv validate \
-            -s "$schema" \
-            -r "$ref_schema" \
-            -d "$example" \
-            --strict=false -c ajv-formats --spec=draft2020
-        else
-          echo "::error::Schema $schema references base.event.schema.json, but it was not found at $ref_schema"
-          exit 2
+
+      # Build reference args excluding current schema to be safe (though validate -s overrides -r usually)
+      # Actually for validation, we want ALL schemas as refs, including others.
+      # AJV might complain if -s and -r have same ID. Safe bet is to exclude.
+      refs=()
+      for s in "${schemas[@]}"; do
+        if [[ "$s" != "$schema" ]]; then
+          refs+=("$s")
         fi
-      else
-        npx --yes -p ajv-cli@5 -p ajv-formats ajv validate \
-          -s "$schema" -d "$example" --strict=false -c ajv-formats --spec=draft2020
-      fi
+      done
+
+      args=("--strict=false" "--spec=draft2020" "-c" "ajv-formats" "-s" "${schema}" "-d" "${example}")
+      for r in "${refs[@]}"; do
+        args+=("-r" "$r")
+      done
+
+      npx --yes -p ajv-cli@5 -p ajv-formats ajv validate "${args[@]}"
     else
       echo "::notice::No matching schema found for $example (searched contracts/**/${filename}.schema.json)"
     fi
@@ -183,7 +201,21 @@ if ((${#fixtures[@]} > 0)); then
     echo "::group::Validate ${fixture}"
     if ((${#found[@]} == 1)); then
       schema="${found[0]}"
-      npx --yes -p ajv-cli@5 -p ajv-formats ajv validate -s "${schema}" -d "${fixture}" --spec=draft2020 --errors=line --all-errors -c ajv-formats --strict=log
+
+      # Build reference args
+      refs=()
+      for s in "${schemas[@]}"; do
+        if [[ "$s" != "$schema" ]]; then
+          refs+=("$s")
+        fi
+      done
+
+      args=("--strict=log" "--spec=draft2020" "-c" "ajv-formats" "--errors=line" "--all-errors" "-s" "${schema}" "-d" "${fixture}")
+      for r in "${refs[@]}"; do
+        args+=("-r" "$r")
+      done
+
+      npx --yes -p ajv-cli@5 -p ajv-formats ajv validate "${args[@]}"
     elif ((${#found[@]} > 1)); then
       echo "::error::Ambiguous schema match for ${fixture}. Found multiple candidates:"
       printf '  - %s\n' "${found[@]}"
