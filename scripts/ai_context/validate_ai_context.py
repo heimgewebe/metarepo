@@ -7,12 +7,6 @@ import re
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
-try:
-    import yaml
-except Exception as e:
-    print("ERROR: PyYAML missing. Install with: pip install pyyaml", file=sys.stderr)
-    raise
-
 
 PLACEHOLDER_RE = re.compile(r"\b(TODO|TBD|FIXME|lorem|ipsum)\b", re.IGNORECASE)
 
@@ -27,6 +21,12 @@ def die(msg: str) -> None:
 
 
 def load_yaml(p: Path) -> Dict[str, Any]:
+    try:
+        import yaml
+    except ModuleNotFoundError as exc:
+        if exc.name != "yaml":
+            raise
+        die("PyYAML missing. See docs/fleet/push-to-fleet.md for install guidance.")
     try:
         data = yaml.safe_load(p.read_text(encoding="utf-8"))
     except Exception as e:
