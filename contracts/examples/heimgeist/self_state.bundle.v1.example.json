@@ -1,0 +1,29 @@
+{
+  "schema": "heimgeist.self_state.bundle.v1",
+  "current": {
+    "confidence": 0.92,
+    "fatigue": 0.05,
+    "risk_tension": 0.2,
+    "autonomy_level": "reflective",
+    "last_updated": "2023-10-28T12:00:00Z",
+    "basis_signals": ["ALL_GREEN"]
+  },
+  "history": [
+    {
+      "confidence": 0.85,
+      "fatigue": 0.12,
+      "risk_tension": 0.45,
+      "autonomy_level": "aware",
+      "last_updated": "2023-10-27T10:00:00Z",
+      "basis_signals": ["WARNINGS_PENDING"]
+    },
+    {
+      "confidence": 0.80,
+      "fatigue": 0.30,
+      "risk_tension": 0.60,
+      "autonomy_level": "critical",
+      "last_updated": "2023-10-26T09:00:00Z",
+      "basis_signals": ["CI_FAIL"]
+    }
+  ]
+}

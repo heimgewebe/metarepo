@@ -65,6 +65,19 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
   - Konsumenten: chronik, leitstand
   - Governance: siehe `heimgeist.insight.v1.meta.json` (getrennt für strict-mode Compliance)
   - Regel: Versionierung erfolgt über Dateiname (v1) und `schema_version`-Feld. Breaking Changes erfordern v2.
+- `contracts/heimgeist/self_state.schema.json`
+  - Zweck: Explizites Self-Model für Heimgeist (Confidence, Fatigue, Risk-Tension, Autonomy).
+  - Produzent: heimgeist
+  - Konsumenten: chronik, leitstand
+  - Typ: Meta-Kognition
+- `contracts/heimgeist/status.v1.schema.json`
+  - Zweck: Status-Meldung des Heimgeist-Systems inkl. Self-State.
+  - Produzent: heimgeist
+  - Konsumenten: leitstand
+- `contracts/heimgeist/self_state.bundle.v1.schema.json`
+  - Zweck: Bundle-Artifact für den Leitstand (aktueller Status + Historie).
+  - Produzent: heimgeist
+  - Konsumenten: leitstand
 
 ### 1.4 Policy-Kreislauf
 
