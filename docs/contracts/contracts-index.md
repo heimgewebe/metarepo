@@ -65,6 +65,10 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
   - Konsumenten: chronik, leitstand
   - Governance: siehe `heimgeist.insight.v1.meta.json` (getrennt für strict-mode Compliance)
   - Regel: Versionierung erfolgt über Dateiname (v1) und `schema_version`-Feld. Breaking Changes erfordern v2.
+- `contracts/events/heimgeist.self_state.snapshot.v1.schema.json`
+  - Zweck: Event-Envelope für Self-State Snapshots (Stream).
+  - Produzent: heimgeist
+  - Konsumenten: chronik
 - `contracts/heimgeist/self_state.schema.json`
   - Zweck: Explizites Self-Model für Heimgeist (Confidence, Fatigue, Risk-Tension, Autonomy).
   - Produzent: heimgeist
