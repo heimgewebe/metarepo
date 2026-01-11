@@ -17,13 +17,20 @@ globstar_ok=0
 shopt -q globstar 2> /dev/null && globstar_ok=1
 
 if [[ "$globstar_ok" -eq 1 ]]; then
-  schemas=(contracts/**/*.schema.json)
+  # We intentionally exclude examples from being treated as schemas
+  # Using find is safer for complex exclusion than extglob
+  # contracts/**/*.schema.json might pick up contracts/examples/foo.schema.json if we are not careful
+  # So we use find consistently for collection, ensuring deterministic sort
+  schemas=()
+  while IFS= read -r s; do
+    schemas+=("$s")
+  done < <(find contracts -path contracts/examples -prune -o -type f -name "*.schema.json" -print | sort)
 else
   # Bash 3 fallback
   schemas=()
   while IFS= read -r s; do
     schemas+=("$s")
-  done < <(find contracts -type f -name "*.schema.json" -print 2> /dev/null)
+  done < <(find contracts -path contracts/examples -prune -o -type f -name "*.schema.json" -print | sort)
 fi
 
 if ((${#schemas[@]} == 0)); then
@@ -40,16 +47,17 @@ else
       fi
     done
 
-    # AJV CLI allows multiple -r arguments
-    # We pass all other schemas as references
-
     # Construct args array
     args=("--strict=log" "--spec=draft2020" "-c" "ajv-formats" "-s" "${schema}")
     for r in "${refs[@]}"; do
       args+=("-r" "$r")
     done
 
-    npx --yes -p ajv-cli@5 -p ajv-formats ajv compile "${args[@]}"
+    if ! npx --yes -p ajv-cli@5 -p ajv-formats ajv compile "${args[@]}"; then
+      echo "::error::Validation failed for schema: ${schema}"
+      echo "Command args: ${args[*]}"
+      exit 1
+    fi
     echo "::endgroup::"
   done
 fi

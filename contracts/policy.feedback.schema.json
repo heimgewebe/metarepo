@@ -1,5 +1,5 @@
 {
-  "$id": "https://schemas.heimgewebe.org/contracts/policy.feedback.schema.json",
+  "$id": "https://heimgewebe/contracts/policy.feedback.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Policy Feedback",
   "type": "object"

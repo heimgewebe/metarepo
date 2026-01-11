@@ -1,5 +1,5 @@
 {
-  "$id": "https://schemas.heimgewebe.org/contracts/policy.snapshot.schema.json",
+  "$id": "https://heimgewebe/contracts/policy.snapshot.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Policy Snapshot",
   "type": "object"
