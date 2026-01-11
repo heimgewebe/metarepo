@@ -1,0 +1,43 @@
+{
+  "$id": "https://heimgewebe/contracts/heimgeist/self_state.bundle.v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Heimgeist Self-State Bundle V1",
+  "description": "Bundle-Artifact für den Leitstand, das aktuellen Self-State und Historie bündelt.",
+  "type": "object",
+  "required": [
+    "schema",
+    "current",
+    "history"
+  ],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "const": "heimgeist.self_state.bundle.v1",
+      "description": "Konstante Kennung des Schemas."
+    },
+    "current": {
+      "$ref": "./self_state.schema.json",
+      "description": "Der aktuelle Self-State Snapshot."
+    },
+    "history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["timestamp", "state"],
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "state": {
+            "$ref": "./self_state.schema.json"
+          }
+        },
+        "additionalProperties": false
+      },
+      "minItems": 0,
+      "description": "Historie vergangener Self-State Snapshots."
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,12 @@
+{
+  "confidence": 0.85,
+  "fatigue": 0.12,
+  "risk_tension": 0.45,
+  "autonomy_level": "aware",
+  "last_updated": "2023-10-27T10:00:00Z",
+  "basis_signals": [
+    "CI_SUCCESS_RATE=0.98",
+    "OPEN_ACTIONS=2",
+    "RISK_ASSESSMENT_SCORE=0.4"
+  ]
+}

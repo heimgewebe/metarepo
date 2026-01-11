@@ -1,0 +1,45 @@
+{
+  "$id": "https://heimgewebe/contracts/hauski/system.signals.v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "HausKI System Signals V1",
+  "description": "System-Ressourcen-Signale für Meta-Kognition (z.B. Heimgeist). Werte sind geglättet (EMA, alpha=0.1, 2s Intervall).",
+  "type": "object",
+  "required": [
+    "cpu_load",
+    "memory_pressure",
+    "gpu_available",
+    "occurred_at"
+  ],
+  "properties": {
+    "cpu_load": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 100.0,
+      "description": "CPU-Last in Prozent (geglättet)."
+    },
+    "memory_pressure": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 100.0,
+      "description": "Speicherdruck in Prozent (geglättet)."
+    },
+    "gpu_available": {
+      "type": "boolean",
+      "description": "Verfügbarkeit der GPU (Startup-Probe)."
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Zeitpunkt der Messung."
+    },
+    "source": {
+      "type": "string",
+      "description": "Quelle des Signals (z.B. 'hausKI-node-1')."
+    },
+    "host": {
+      "type": "string",
+      "description": "Hostname."
+    }
+  },
+  "additionalProperties": false
+}
