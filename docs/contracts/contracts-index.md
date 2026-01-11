@@ -78,6 +78,10 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
   - Zweck: Bundle-Artifact für den Leitstand (aktueller Status + Historie).
   - Produzent: heimgeist
   - Konsumenten: leitstand
+- `contracts/hauski/system.signals.v1.schema.json`
+  - Zweck: System-Ressourcen-Signale (CPU, Memory, GPU) für Meta-Kognition.
+  - Produzent: hausKI
+  - Konsumenten: heimgeist
 
 ### 1.4 Policy-Kreislauf
 

@@ -1,0 +1,8 @@
+{
+  "cpu_load": 45.2,
+  "memory_pressure": 60.5,
+  "gpu_available": true,
+  "occurred_at": "2023-10-28T14:30:00Z",
+  "source": "hausKI-main",
+  "host": "srv-01"
+}
