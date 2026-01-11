@@ -36,6 +36,31 @@ fi
 if ((${#schemas[@]} == 0)); then
   echo "::notice::No schemas found under contracts/"
 else
+  # Check for duplicate $ids before validation
+  echo "::group::Check for Duplicate IDs"
+  # Extract IDs and check for duplicates
+  # We use grep to find lines with "$id", then sed to extract the value between quotes.
+  # Assumes format: "$id": "VALUE",
+  duplicates=$(grep -r '"$id"' contracts \
+    | grep -v "contracts/examples" \
+    | sed -n 's/.*"\$id"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' \
+    | sort \
+    | uniq -d)
+
+  if [[ -n "$duplicates" ]]; then
+    echo "::error::Duplicate \$id found in schemas:"
+    echo "$duplicates"
+    # Identify files containing the duplicates
+    for dup in $duplicates; do
+      echo "Files with ID '$dup':"
+      grep -r "$dup" contracts | grep -v "contracts/examples" | awk -F: '{print "  - " $1}'
+    done
+    exit 1
+  else
+    echo "No duplicate IDs found."
+  fi
+  echo "::endgroup::"
+
   for schema in "${schemas[@]}"; do
     echo "::group::Schema ${schema}"
 
@@ -53,11 +78,17 @@ else
       args+=("-r" "$r")
     done
 
-    if ! npx --yes -p ajv-cli@5 -p ajv-formats ajv compile "${args[@]}"; then
+    if ! output=$(npx --yes -p ajv-cli@5 -p ajv-formats ajv compile "${args[@]}" 2>&1); then
       echo "::error::Validation failed for schema: ${schema}"
       echo "Command args: ${args[*]}"
+      echo "$output"
+
+      if echo "$output" | grep -q "already exists"; then
+        echo "::notice::Hint: This error often indicates a duplicate \$id. Check the 'Check for Duplicate IDs' group output above or verify that the schema is not referencing itself via \$ref with the same ID."
+      fi
       exit 1
     fi
+    echo "$output"
     echo "::endgroup::"
   done
 fi
