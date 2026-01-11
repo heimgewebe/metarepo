@@ -22,7 +22,18 @@
     "history": {
       "type": "array",
       "items": {
-        "$ref": "./self_state.schema.json"
+        "type": "object",
+        "required": ["timestamp", "state"],
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "state": {
+            "$ref": "./self_state.schema.json"
+          }
+        },
+        "additionalProperties": false
       },
       "minItems": 0,
       "description": "Historie vergangener Self-State Snapshots."

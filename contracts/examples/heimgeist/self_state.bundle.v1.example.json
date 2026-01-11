@@ -10,20 +10,26 @@
   },
   "history": [
     {
-      "confidence": 0.85,
-      "fatigue": 0.12,
-      "risk_tension": 0.45,
-      "autonomy_level": "aware",
-      "last_updated": "2023-10-27T10:00:00Z",
-      "basis_signals": ["WARNINGS_PENDING"]
+      "timestamp": "2023-10-27T10:00:00Z",
+      "state": {
+        "confidence": 0.85,
+        "fatigue": 0.12,
+        "risk_tension": 0.45,
+        "autonomy_level": "aware",
+        "last_updated": "2023-10-27T10:00:00Z",
+        "basis_signals": ["WARNINGS_PENDING"]
+      }
     },
     {
-      "confidence": 0.80,
-      "fatigue": 0.30,
-      "risk_tension": 0.60,
-      "autonomy_level": "critical",
-      "last_updated": "2023-10-26T09:00:00Z",
-      "basis_signals": ["CI_FAIL"]
+      "timestamp": "2023-10-26T09:00:00Z",
+      "state": {
+        "confidence": 0.80,
+        "fatigue": 0.30,
+        "risk_tension": 0.60,
+        "autonomy_level": "critical",
+        "last_updated": "2023-10-26T09:00:00Z",
+        "basis_signals": ["CI_FAIL"]
+      }
     }
   ]
 }
