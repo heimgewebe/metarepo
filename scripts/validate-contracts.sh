@@ -12,14 +12,16 @@ fi
 
 # --- Optimization: Setup local AJV ---
 echo "::group::Setup Validator"
-TMP_DIR=$(mktemp -d)
+# Robust mktemp for Linux/macOS/BSD
+TMP_DIR=$(mktemp -d 2>/dev/null || mktemp -d -t 'ajv')
 trap 'rm -rf "$TMP_DIR"' EXIT
 
 echo "Installing ajv-cli@5 and ajv-formats..."
 # --loglevel error suppresses warnings but keeps errors
 # --ignore-scripts prevents execution of malicious/unnecessary lifecycle scripts
 # --no-fund hides funding messages
-if ! npm install --prefix "$TMP_DIR" --no-save --no-audit --ignore-scripts --no-fund --loglevel error ajv-cli@5 ajv-formats; then
+# --no-package-lock prevents lockfile generation (IO reduction)
+if ! npm install --prefix "$TMP_DIR" --no-save --no-audit --ignore-scripts --no-fund --no-package-lock --loglevel error ajv-cli@5 ajv-formats; then
   echo "::error::Failed to install ajv-cli"
   exit 1
 fi
