@@ -13,7 +13,7 @@ fi
 # --- Optimization: Setup local AJV ---
 echo "::group::Setup Validator"
 # Robust mktemp for Linux/macOS/BSD
-TMP_DIR=$(mktemp -d 2>/dev/null || mktemp -d -t 'ajv')
+TMP_DIR=$(mktemp -d 2> /dev/null || mktemp -d -t 'ajv')
 trap 'rm -rf "$TMP_DIR"' EXIT
 
 echo "Installing ajv-cli@5 and ajv-formats..."
@@ -70,11 +70,11 @@ else
   # We use grep to find lines with "$id", then sed to extract the value between quotes.
   # Assumes format: "$id": "VALUE",
   # shellcheck disable=SC2016
-  duplicates=$(grep -r '"$id"' contracts \
-    | grep -v "contracts/examples" \
-    | sed -n 's/.*"\$id"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' \
-    | sort \
-    | uniq -d)
+  duplicates=$(grep -r '"$id"' contracts |
+    grep -v "contracts/examples" |
+    sed -n 's/.*"\$id"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' |
+    sort |
+    uniq -d)
 
   if [[ -n "$duplicates" ]]; then
     echo "::error::Duplicate \$id found in schemas:"
