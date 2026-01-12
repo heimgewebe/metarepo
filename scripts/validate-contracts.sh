@@ -9,7 +9,36 @@ if ! command -v npm > /dev/null 2>&1; then
   echo "::error::npm is required to validate contracts"
   exit 1
 fi
-# Prefer npx to avoid global state on shared runners
+
+# --- Optimization: Setup local AJV ---
+echo "::group::Setup Validator"
+# Robust mktemp for Linux/macOS/BSD
+TMP_DIR=$(mktemp -d 2> /dev/null || mktemp -d -t 'ajv')
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+echo "Installing ajv-cli@5 and ajv-formats..."
+# --loglevel error suppresses warnings but keeps errors
+# --ignore-scripts prevents execution of malicious/unnecessary lifecycle scripts
+# --no-fund hides funding messages
+# --no-package-lock prevents lockfile generation (IO reduction)
+# Pinned versions: ajv-cli@5.0.0, ajv-formats@3.0.1 (ensure determinism)
+if ! npm install --prefix "$TMP_DIR" --no-save --no-audit --ignore-scripts --no-fund --no-package-lock --loglevel error ajv-cli@5.0.0 ajv-formats@3.0.1; then
+  echo "::error::Failed to install ajv-cli"
+  exit 1
+fi
+
+AJV="$TMP_DIR/node_modules/.bin/ajv"
+if [[ ! -x "$AJV" ]]; then
+  echo "::error::Validator binary not found or not executable at $AJV"
+  exit 1
+fi
+
+echo "Validator installed at $AJV"
+# ajv-cli v5 does not support --version, so we list the package instead
+npm list --prefix "$TMP_DIR" ajv-cli --depth=0 || true
+echo "::endgroup::"
+# -------------------------------------
+
 shopt -s nullglob globstar 2> /dev/null || true
 
 # Check if globstar is actually active (Bash 4+)
@@ -41,11 +70,12 @@ else
   # Extract IDs and check for duplicates
   # We use grep to find lines with "$id", then sed to extract the value between quotes.
   # Assumes format: "$id": "VALUE",
-  duplicates=$(grep -r '"$id"' contracts \
-    | grep -v "contracts/examples" \
-    | sed -n 's/.*"\$id"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' \
-    | sort \
-    | uniq -d)
+  # shellcheck disable=SC2016
+  duplicates=$(grep -r '"$id"' contracts |
+    grep -v "contracts/examples" |
+    sed -n 's/.*"\$id"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' |
+    sort |
+    uniq -d)
 
   if [[ -n "$duplicates" ]]; then
     echo "::error::Duplicate \$id found in schemas:"
@@ -78,7 +108,8 @@ else
       args+=("-r" "$r")
     done
 
-    if ! output=$(npx --yes -p ajv-cli@5 -p ajv-formats ajv compile "${args[@]}" 2>&1); then
+    # Optimized: use local AJV binary
+    if ! output=$("$AJV" compile "${args[@]}" 2>&1); then
       echo "::error::Validation failed for schema: ${schema}"
       echo "Command args: ${args[*]}"
       echo "$output"
@@ -199,7 +230,8 @@ else
         args+=("-r" "$r")
       done
 
-      npx --yes -p ajv-cli@5 -p ajv-formats ajv validate "${args[@]}"
+      # Optimized call
+      "$AJV" validate "${args[@]}"
     else
       echo "::notice::No matching schema found for $example (searched contracts/**/${filename}.schema.json)"
     fi
@@ -254,7 +286,8 @@ if ((${#fixtures[@]} > 0)); then
         args+=("-r" "$r")
       done
 
-      npx --yes -p ajv-cli@5 -p ajv-formats ajv validate "${args[@]}"
+      # Optimized call
+      "$AJV" validate "${args[@]}"
     elif ((${#found[@]} > 1)); then
       echo "::error::Ambiguous schema match for ${fixture}. Found multiple candidates:"
       printf '  - %s\n' "${found[@]}"
