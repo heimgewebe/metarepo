@@ -69,6 +69,7 @@ else
   # Extract IDs and check for duplicates
   # We use grep to find lines with "$id", then sed to extract the value between quotes.
   # Assumes format: "$id": "VALUE",
+  # shellcheck disable=SC2016
   duplicates=$(grep -r '"$id"' contracts \
     | grep -v "contracts/examples" \
     | sed -n 's/.*"\$id"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' \
