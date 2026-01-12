@@ -17,12 +17,22 @@ trap 'rm -rf "$TMP_DIR"' EXIT
 
 echo "Installing ajv-cli@5 and ajv-formats..."
 # --loglevel error suppresses warnings but keeps errors
-if ! npm install --prefix "$TMP_DIR" --no-save --no-audit --loglevel error ajv-cli@5 ajv-formats; then
+# --ignore-scripts prevents execution of malicious/unnecessary lifecycle scripts
+# --no-fund hides funding messages
+if ! npm install --prefix "$TMP_DIR" --no-save --no-audit --ignore-scripts --no-fund --loglevel error ajv-cli@5 ajv-formats; then
   echo "::error::Failed to install ajv-cli"
   exit 1
 fi
+
 AJV="$TMP_DIR/node_modules/.bin/ajv"
+if [[ ! -x "$AJV" ]]; then
+  echo "::error::Validator binary not found or not executable at $AJV"
+  exit 1
+fi
+
 echo "Validator installed at $AJV"
+# ajv-cli v5 does not support --version, so we list the package instead
+npm list --prefix "$TMP_DIR" ajv-cli --depth=0 || true
 echo "::endgroup::"
 # -------------------------------------
 
