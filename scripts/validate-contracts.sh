@@ -9,7 +9,23 @@ if ! command -v npm > /dev/null 2>&1; then
   echo "::error::npm is required to validate contracts"
   exit 1
 fi
-# Prefer npx to avoid global state on shared runners
+
+# --- Optimization: Setup local AJV ---
+echo "::group::Setup Validator"
+TMP_DIR=$(mktemp -d)
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+echo "Installing ajv-cli@5 and ajv-formats..."
+# --loglevel error suppresses warnings but keeps errors
+if ! npm install --prefix "$TMP_DIR" --no-save --no-audit --loglevel error ajv-cli@5 ajv-formats; then
+  echo "::error::Failed to install ajv-cli"
+  exit 1
+fi
+AJV="$TMP_DIR/node_modules/.bin/ajv"
+echo "Validator installed at $AJV"
+echo "::endgroup::"
+# -------------------------------------
+
 shopt -s nullglob globstar 2> /dev/null || true
 
 # Check if globstar is actually active (Bash 4+)
@@ -78,7 +94,8 @@ else
       args+=("-r" "$r")
     done
 
-    if ! output=$(npx --yes -p ajv-cli@5 -p ajv-formats ajv compile "${args[@]}" 2>&1); then
+    # Optimized: use local AJV binary
+    if ! output=$("$AJV" compile "${args[@]}" 2>&1); then
       echo "::error::Validation failed for schema: ${schema}"
       echo "Command args: ${args[*]}"
       echo "$output"
@@ -199,7 +216,8 @@ else
         args+=("-r" "$r")
       done
 
-      npx --yes -p ajv-cli@5 -p ajv-formats ajv validate "${args[@]}"
+      # Optimized call
+      "$AJV" validate "${args[@]}"
     else
       echo "::notice::No matching schema found for $example (searched contracts/**/${filename}.schema.json)"
     fi
@@ -254,7 +272,8 @@ if ((${#fixtures[@]} > 0)); then
         args+=("-r" "$r")
       done
 
-      npx --yes -p ajv-cli@5 -p ajv-formats ajv validate "${args[@]}"
+      # Optimized call
+      "$AJV" validate "${args[@]}"
     elif ((${#found[@]} > 1)); then
       echo "::error::Ambiguous schema match for ${fixture}. Found multiple candidates:"
       printf '  - %s\n' "${found[@]}"
