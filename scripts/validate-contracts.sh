@@ -21,7 +21,8 @@ echo "Installing ajv-cli@5 and ajv-formats..."
 # --ignore-scripts prevents execution of malicious/unnecessary lifecycle scripts
 # --no-fund hides funding messages
 # --no-package-lock prevents lockfile generation (IO reduction)
-if ! npm install --prefix "$TMP_DIR" --no-save --no-audit --ignore-scripts --no-fund --no-package-lock --loglevel error ajv-cli@5 ajv-formats; then
+# Pinned versions: ajv-cli@5.0.0, ajv-formats@3.0.1 (ensure determinism)
+if ! npm install --prefix "$TMP_DIR" --no-save --no-audit --ignore-scripts --no-fund --no-package-lock --loglevel error ajv-cli@5.0.0 ajv-formats@3.0.1; then
   echo "::error::Failed to install ajv-cli"
   exit 1
 fi
