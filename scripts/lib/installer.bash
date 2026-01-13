@@ -11,6 +11,7 @@ inst_log() {
 }
 
 inst_die() {
+  # Errors always print (even if INSTALLER_QUIET=1)
   printf 'ERR: %s\n' "$*" >&2
   exit 1
 }
@@ -113,7 +114,11 @@ inst_download_file() {
 
   inst_log "Downloading ${url} -> ${dest}"
 
-  if ! curl --fail --location --retry 3 --connect-timeout 10 --max-time "${max_time}" -o "${dest}" "${url}"; then
+  # -f: fail silently (no output) on server errors
+  # -s: silent mode (no progress bar)
+  # -S: show error message if it fails (when used with -s)
+  # -L: follow redirects
+  if ! curl -fsSL --retry 3 --connect-timeout 10 --max-time "${max_time}" -o "${dest}" "${url}"; then
     inst_log "Download failed: ${url}"
     return 1
   fi
