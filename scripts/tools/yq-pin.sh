@@ -21,9 +21,9 @@ source "${ROOT_DIR}/scripts/lib/installer.bash"
 # The original script strictly read from file. We'll stick to that for now to avoid behavior change.
 read_pinned_version() {
   local v
-  v="$(read_toolchain_version "yq" "${ROOT_DIR}/toolchain.versions.yml")"
+  v="$(inst_read_toolchain_version "yq" "${ROOT_DIR}/toolchain.versions.yml")"
   if [[ -z "${v}" ]]; then
-     die "Konnte gewünschte yq-Version aus toolchain.versions.yml nicht ermitteln."
+     inst_die "Konnte gewünschte yq-Version aus toolchain.versions.yml nicht ermitteln."
   fi
   printf '%s' "${v}"
 }
@@ -31,19 +31,19 @@ read_pinned_version() {
 download_yq() {
   # Default: OFFLINE. Download only when explicitly allowed.
   if [[ "${ALLOW_NET:-}" != "1" ]]; then
-    die "yq fehlt/inkompatibel und Download ist deaktiviert. Setze ALLOW_NET=1, oder lege ein gepinntes Binary nach ${YQ_LOCAL}."
+    inst_die "yq fehlt/inkompatibel und Download ist deaktiviert. Setze ALLOW_NET=1, oder lege ein gepinntes Binary nach ${YQ_LOCAL}."
   fi
 
-  ensure_dir "${BIN_DIR}"
-  log "yq nicht gefunden/inkompatibel. Download ist erlaubt (ALLOW_NET=1)."
+  inst_ensure_dir "${BIN_DIR}"
+  inst_log "yq nicht gefunden/inkompatibel. Download ist erlaubt (ALLOW_NET=1)."
 
-  require_cmd curl "Bitte curl installieren oder in PATH bereitstellen."
+  inst_require_cmd curl "Bitte curl installieren oder in PATH bereitstellen."
 
   local os
-  os="$(detect_os_normalized)"
+  os="$(inst_detect_os)"
 
   local arch
-  arch="$(detect_arch_normalized)"
+  arch="$(inst_detect_arch)"
   # Map generic arch to yq specific naming (x86_64 -> amd64)
   if [[ "${arch}" == "x86_64" ]]; then arch="amd64"; fi
   if [[ "${arch}" == "aarch64" ]]; then arch="arm64"; fi
@@ -69,10 +69,10 @@ download_yq() {
     local existing_version=""
     existing_version="$("${YQ_LOCAL}" --version 2> /dev/null | sed -E 's/^yq .* version //' || echo "")"
     if [[ -n "${existing_version}" ]] && version_ok "${existing_version}" "${yq_version}"; then
-      log "Existing ${YQ_LOCAL} already has correct version ${existing_version}, skipping download"
+      inst_log "Existing ${YQ_LOCAL} already has correct version ${existing_version}, skipping download"
       return 0
     fi
-    log "Removing incompatible yq binary (version ${existing_version:-unknown})"
+    inst_log "Removing incompatible yq binary (version ${existing_version:-unknown})"
     rm -f "${YQ_LOCAL}"
   fi
 
@@ -81,11 +81,11 @@ download_yq() {
   tmp_checksum="$(mktemp "${YQ_LOCAL}.sha256.XXXXXX")"
   trap 'rm -f -- "${tmp-}" "${tmp_checksum-}" 2>/dev/null || true' EXIT
 
-  log "Probiere Download-URL für ${yq_version}: ${url}"
-  log "Binary name: ${binary_name}, OS: ${os}, Arch: ${arch}"
+  inst_log "Probiere Download-URL für ${yq_version}: ${url}"
+  inst_log "Binary name: ${binary_name}, OS: ${os}, Arch: ${arch}"
 
-  if ! download_file "${url}" "${tmp}"; then
-    die "Download von yq fehlgeschlagen: ${url}"
+  if ! inst_download_file "${url}" "${tmp}"; then
+    inst_die "Download von yq fehlgeschlagen: ${url}"
   fi
 
   # Checksums (best effort)
@@ -102,21 +102,21 @@ download_yq() {
   rm -f -- "${tmp_checksum}" || true
   for candidate in "${checksum_candidates[@]}"; do
     checksum_url="${checksum_base}/${candidate}"
-    log "Probiere Checksummen-Datei: ${checksum_url}"
-    if download_file "${checksum_url}" "${tmp_checksum}" > /dev/null 2>&1; then
+    inst_log "Probiere Checksummen-Datei: ${checksum_url}"
+    if inst_download_file "${checksum_url}" "${tmp_checksum}" > /dev/null 2>&1; then
        if [[ -s "${tmp_checksum}" ]]; then
         checksum_asset="${candidate}"
-        log "Gefundene Checksummen-Datei: ${checksum_asset} ($(wc -l < "${tmp_checksum}") Zeilen)"
+        inst_log "Gefundene Checksummen-Datei: ${checksum_asset} ($(wc -l < "${tmp_checksum}") Zeilen)"
         break
       else
-        log "WARN: Checksummen-Datei ${candidate} ist leer, versuche nächste..."
+        inst_log "WARN: Checksummen-Datei ${candidate} ist leer, versuche nächste..."
         rm -f -- "${tmp_checksum}"
       fi
     fi
   done
 
   if [[ -n "${checksum_asset}" ]]; then
-    log "Verifiziere Checksumme aus ${checksum_asset}..."
+    inst_log "Verifiziere Checksumme aus ${checksum_asset}..."
     local expected_sum=""
 
     if [[ "${checksum_asset}" == "checksums" || "${checksum_asset}" == "checksums.txt" || "${checksum_asset}" == "checksums-bsd" ]]; then
@@ -124,12 +124,12 @@ download_yq() {
       checksum_line="$(grep "^${binary_name}[[:space:]]" "${tmp_checksum}" | head -n1 || true)"
       if [[ -n "${checksum_line}" ]]; then
         local my_sum=""
-        my_sum="$(calculate_sha256 "${tmp}")"
+        my_sum="$(inst_calculate_sha256 "${tmp}")"
 
         if [[ -n "${my_sum}" ]] && echo "${checksum_line}" | grep -q "${my_sum}"; then
           expected_sum="${my_sum}"
         else
-          log "WARN: Multi-Column-Checksumme konnte nicht sicher validiert werden, überspringe Verifikation."
+          inst_log "WARN: Multi-Column-Checksumme konnte nicht sicher validiert werden, überspringe Verifikation."
         fi
       fi
     else
@@ -142,25 +142,25 @@ download_yq() {
 
     if [[ -n "${expected_sum}" ]]; then
       local actual_sum=""
-      actual_sum="$(calculate_sha256 "${tmp}")"
+      actual_sum="$(inst_calculate_sha256 "${tmp}")"
 
       if [[ -n "${actual_sum}" && "${expected_sum}" != "${actual_sum}" ]]; then
-        die "Checksum-Verifikation fehlgeschlagen! Erwartet: ${expected_sum}, Ist: ${actual_sum} (Quelle: ${checksum_asset})"
+        inst_die "Checksum-Verifikation fehlgeschlagen! Erwartet: ${expected_sum}, Ist: ${actual_sum} (Quelle: ${checksum_asset})"
       fi
-      log "Checksumme ok (Quelle ${checksum_asset}): ${actual_sum:-unverified}"
+      inst_log "Checksumme ok (Quelle ${checksum_asset}): ${actual_sum:-unverified}"
     else
-      log "WARN: Keine passende SHA256-Checksumme gefunden – Verifikation übersprungen."
+      inst_log "WARN: Keine passende SHA256-Checksumme gefunden – Verifikation übersprungen."
     fi
   else
-    log "WARN: Keine Checksummen-Datei im Release gefunden, überspringe Verifikation."
+    inst_log "WARN: Keine Checksummen-Datei im Release gefunden, überspringe Verifikation."
   fi
 
   chmod +x "${tmp}" || true
   mv -f -- "${tmp}" "${YQ_LOCAL}"
   chmod +x "${YQ_LOCAL}"
 
-  "${YQ_LOCAL}" --version > /dev/null 2>&1 || die "Heruntergeladenes yq-Binary ist nicht ausführbar oder defekt."
-  log "yq erfolgreich nach ${YQ_LOCAL} heruntergeladen."
+  "${YQ_LOCAL}" --version > /dev/null 2>&1 || inst_die "Heruntergeladenes yq-Binary ist nicht ausführbar oder defekt."
+  inst_log "yq erfolgreich nach ${YQ_LOCAL} heruntergeladen."
 }
 
 resolved_yq() {
@@ -168,7 +168,7 @@ resolved_yq() {
     echo "${YQ_LOCAL}"
     return 0
   fi
-  if have_cmd yq; then
+  if inst_have_cmd yq; then
     command -v yq
     return 0
   fi
@@ -176,7 +176,7 @@ resolved_yq() {
 }
 
 cmd_ensure() {
-  ensure_dir "${BIN_DIR}"
+  inst_ensure_dir "${BIN_DIR}"
   local pinned_version
   pinned_version="$(read_pinned_version)"
 
@@ -188,30 +188,30 @@ cmd_ensure() {
   local version_is_ok=false
 
   if yq_bin="$(resolved_yq)"; then
-    log "Benutze yq-Binary unter ${yq_bin}"
+    inst_log "Benutze yq-Binary unter ${yq_bin}"
     v="$("${yq_bin}" --version 2> /dev/null | sed -E 's/^yq .* version v?//')"
     if version_ok "${v}" "${pinned_version}"; then
       version_is_ok=true
     else
-      log "WARN: Found yq is wrong version: ${v} (erwartet: ${pinned_version})"
+      inst_log "WARN: Found yq is wrong version: ${v} (erwartet: ${pinned_version})"
     fi
   fi
 
   if ! ${version_is_ok}; then
     download_yq
     [[ "${DRY_RUN:-}" = "1" ]] && return 0
-    yq_bin="$(resolved_yq)" || die "yq nach Download immer noch nicht gefunden."
-    v="$("${yq_bin}" --version 2> /dev/null | sed -E 's/^yq .* version v?//')" || die "konnte yq-Version nach Download nicht ermitteln"
-    version_ok "${v}" "${pinned_version}" || die "Heruntergeladenes yq hat falsche Version: ${v} (erwartet: ${pinned_version})"
+    yq_bin="$(resolved_yq)" || inst_die "yq nach Download immer noch nicht gefunden."
+    v="$("${yq_bin}" --version 2> /dev/null | sed -E 's/^yq .* version v?//')" || inst_die "konnte yq-Version nach Download nicht ermitteln"
+    version_ok "${v}" "${pinned_version}" || inst_die "Heruntergeladenes yq hat falsche Version: ${v} (erwartet: ${pinned_version})"
   fi
 
   if [[ "${yq_bin}" != "${YQ_LOCAL}" && ! -e "${YQ_LOCAL}" ]]; then
     ln -s -- "${yq_bin}" "${YQ_LOCAL}" || true
   fi
-  log "OK: yq ${v} verfügbar"
+  inst_log "OK: yq ${v} verfügbar"
 }
 
 case "${1:-ensure}" in
   ensure) cmd_ensure "$@" ;;
-  *) die "usage: $0 ensure" ;;
+  *) inst_die "usage: $0 ensure" ;;
 esac

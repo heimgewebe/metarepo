@@ -2,45 +2,52 @@
 # Shared installer utilities for tool pinning scripts.
 # Contains: logging, standardized OS/Arch detection, robust checksum calculation, and version parsing.
 
-log() { printf '%s\n' "$*" >&2; }
-die() {
-  log "ERR: $*"
+# Namespace: inst_ (installer)
+
+inst_log() {
+  if [[ "${INSTALLER_QUIET:-}" != "1" ]]; then
+    printf '%s\n' "$*" >&2
+  fi
+}
+
+inst_die() {
+  printf 'ERR: %s\n' "$*" >&2
   exit 1
 }
 
-ensure_dir() {
+inst_ensure_dir() {
   if [[ -z "${1:-}" ]]; then
-    die "ensure_dir: missing argument"
+    inst_die "inst_ensure_dir: missing argument"
   fi
   mkdir -p -- "$1"
 }
 
-have_cmd() { command -v "$1" > /dev/null 2>&1; }
+inst_have_cmd() { command -v "$1" > /dev/null 2>&1; }
 
-require_cmd() {
+inst_require_cmd() {
   local cmd="$1"
   local hint="${2:-}"
-  if ! have_cmd "${cmd}"; then
+  if ! inst_have_cmd "${cmd}"; then
     if [[ -n "${hint}" ]]; then
-      die "Benötigtes Kommando '${cmd}' fehlt. ${hint}"
+      inst_die "Benötigtes Kommando '${cmd}' fehlt. ${hint}"
     else
-      die "Benötigtes Kommando '${cmd}' fehlt."
+      inst_die "Benötigtes Kommando '${cmd}' fehlt."
     fi
   fi
 }
 
-# detect_os_normalized: returns 'linux' or 'darwin'
-detect_os_normalized() {
+# inst_detect_os: returns 'linux' or 'darwin'
+inst_detect_os() {
   local os
   os="$(uname -s | tr '[:upper:]' '[:lower:]')"
   case "${os}" in
     linux|darwin) echo "${os}" ;;
-    *) die "Unsupported OS: ${os}" ;;
+    *) inst_die "Unsupported OS: ${os}" ;;
   esac
 }
 
-# detect_arch_normalized: returns 'x86_64' or 'aarch64'
-detect_arch_normalized() {
+# inst_detect_arch: returns 'x86_64' or 'aarch64'
+inst_detect_arch() {
   local arch
   arch="$(uname -m)"
   case "${arch}" in
@@ -50,14 +57,14 @@ detect_arch_normalized() {
   esac
 }
 
-# read_toolchain_version:
-# usage: read_toolchain_version <tool_name> <toolchain_file>
-read_toolchain_version() {
+# inst_read_toolchain_version:
+# usage: inst_read_toolchain_version <tool_name> <toolchain_file>
+inst_read_toolchain_version() {
   local tool_name="$1"
   local toolchain_file="$2"
 
   if [[ ! -f "${toolchain_file}" ]]; then
-    die "toolchain file not found: ${toolchain_file}"
+    inst_die "toolchain file not found: ${toolchain_file}"
   fi
 
   local version
@@ -67,47 +74,47 @@ read_toolchain_version() {
     tr -d '\n\r')
 
   if [[ -z "${version}" ]]; then
-    # Do not die here, let the caller handle empty version (e.g. try env var first)
-    # But usually this is called when we expect it.
-    # For now, return empty string.
+    # Return empty string
     echo ""
   else
     printf '%s' "${version}"
   fi
 }
 
-# calculate_sha256:
-# usage: calculate_sha256 <filepath>
+# inst_calculate_sha256:
+# usage: inst_calculate_sha256 <filepath>
 # Returns only the hex hash to stdout.
-calculate_sha256() {
+inst_calculate_sha256() {
   local file="$1"
   if [[ ! -f "${file}" ]]; then
-    die "calculate_sha256: file not found: ${file}"
+    inst_die "inst_calculate_sha256: file not found: ${file}"
   fi
 
-  if have_cmd sha256sum; then
+  if inst_have_cmd sha256sum; then
     sha256sum "${file}" | awk '{print $1}'
-  elif have_cmd shasum; then
+  elif inst_have_cmd shasum; then
     shasum -a 256 "${file}" | awk '{print $1}'
-  elif have_cmd python3; then
-    python3 -c "import hashlib; print(hashlib.sha256(open('${file}', 'rb').read()).hexdigest())"
-  elif have_cmd python; then
-    python -c "import hashlib; print(hashlib.sha256(open('${file}', 'rb').read()).hexdigest())"
+  elif inst_have_cmd python3; then
+    python3 -c "import hashlib, sys; print(hashlib.sha256(open(sys.argv[1], 'rb').read()).hexdigest())" "$file"
+  elif inst_have_cmd python; then
+    python -c "import hashlib, sys; print(hashlib.sha256(open(sys.argv[1], 'rb').read()).hexdigest())" "$file"
   else
     # Return empty string to indicate failure to calculate
     echo ""
   fi
 }
 
-# download_file:
-# usage: download_file <url> <dest>
-download_file() {
+# inst_download_file:
+# usage: inst_download_file <url> <dest>
+inst_download_file() {
   local url="$1"
   local dest="$2"
+  local max_time="${CURL_MAX_TIME:-60}"
 
-  log "Downloading ${url} -> ${dest}"
-  if ! curl --fail --location --retry 3 --connect-timeout 10 -o "${dest}" "${url}"; then
-    log "Download failed: ${url}"
+  inst_log "Downloading ${url} -> ${dest}"
+
+  if ! curl --fail --location --retry 3 --connect-timeout 10 --max-time "${max_time}" -o "${dest}" "${url}"; then
+    inst_log "Download failed: ${url}"
     return 1
   fi
   return 0
