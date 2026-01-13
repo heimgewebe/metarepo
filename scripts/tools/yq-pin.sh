@@ -9,49 +9,23 @@ TOOLS_DIR="${ROOT_DIR}/tools"
 BIN_DIR="${TOOLS_DIR}/bin"
 YQ_LOCAL="${BIN_DIR}/yq"
 
-# Source centralized semver library
+# Source centralized semver and installer libraries
 # shellcheck source=scripts/lib/semver.sh
 source "${ROOT_DIR}/scripts/lib/semver.sh"
+# shellcheck source=scripts/lib/installer.bash
+source "${ROOT_DIR}/scripts/lib/installer.bash"
 
-log() { printf '%s\n' "$*" >&2; }
-die() {
-  log "ERR: $*"
-  exit 1
-}
-
-ensure_dir() { mkdir -p -- "${BIN_DIR}"; }
-have_cmd() { command -v "$1" > /dev/null 2>&1; }
-
-require_cmd() {
-  local cmd="$1"
-  local hint="${2:-}"
-  if ! have_cmd "${cmd}"; then
-    if [[ -n "${hint}" ]]; then
-      die "Benötigtes Kommando '${cmd}' fehlt. ${hint}"
-    else
-      die "Benötigtes Kommando '${cmd}' fehlt."
-    fi
-  fi
-}
-
+# Override read_pinned_version to add specific yq prefix handling if needed,
+# or just use the generic one.
+# yq-pin.sh previously didn't support YQ_VERSION env override, but we can add it or just stick to file.
+# The original script strictly read from file. We'll stick to that for now to avoid behavior change.
 read_pinned_version() {
-  if [[ ! -f "${ROOT_DIR}/toolchain.versions.yml" ]]; then
-    die "toolchain.versions.yml nicht gefunden: ${ROOT_DIR}/toolchain.versions.yml"
+  local v
+  v="$(read_toolchain_version "yq" "${ROOT_DIR}/toolchain.versions.yml")"
+  if [[ -z "${v}" ]]; then
+     die "Konnte gewünschte yq-Version aus toolchain.versions.yml nicht ermitteln."
   fi
-
-  # Parse version from toolchain.versions.yml robustly using grep/sed.
-  # Do NOT rely on `yq` here to avoid bootstrap paradox (wrong yq in PATH).
-  local version
-  version="$(
-    grep -E '^[[:space:]]*yq[[:space:]]*:' "${ROOT_DIR}/toolchain.versions.yml" | head -n1 |
-      sed -E 's/^[[:space:]]*[^:]+:[[:space:]]*//; s/[[:space:]]*#.*$//; s/^[[:space:]]*//; s/[[:space:]]*$//; s/^"//; s/"$//; s/^'\''//; s/'\''$//' |
-      tr -d '\n\r'
-  )"
-
-  if [[ -z "${version}" ]]; then
-    die "Konnte gewünschte yq-Version aus toolchain.versions.yml nicht ermitteln."
-  fi
-  printf '%s' "${version}"
+  printf '%s' "${v}"
 }
 
 download_yq() {
@@ -60,25 +34,19 @@ download_yq() {
     die "yq fehlt/inkompatibel und Download ist deaktiviert. Setze ALLOW_NET=1, oder lege ein gepinntes Binary nach ${YQ_LOCAL}."
   fi
 
-  ensure_dir
+  ensure_dir "${BIN_DIR}"
   log "yq nicht gefunden/inkompatibel. Download ist erlaubt (ALLOW_NET=1)."
 
   require_cmd curl "Bitte curl installieren oder in PATH bereitstellen."
 
   local os
-  os="$(uname -s | tr '[:upper:]' '[:lower:]')"
-  case "${os}" in
-    linux | darwin) ;;
-    *) die "Nicht unterstütztes Betriebssystem für automatischen yq-Download: ${os}" ;;
-  esac
+  os="$(detect_os_normalized)"
 
   local arch
-  arch="$(uname -m)"
-  case "${arch}" in
-    x86_64) arch="amd64" ;;
-    aarch64 | arm64) arch="arm64" ;;
-    *) die "Nicht unterstützte Architektur für automatischen yq-Download: ${arch}" ;;
-  esac
+  arch="$(detect_arch_normalized)"
+  # Map generic arch to yq specific naming (x86_64 -> amd64)
+  if [[ "${arch}" == "x86_64" ]]; then arch="amd64"; fi
+  if [[ "${arch}" == "aarch64" ]]; then arch="arm64"; fi
 
   local binary_name="yq_${os}_${arch}"
   local yq_version
@@ -116,7 +84,7 @@ download_yq() {
   log "Probiere Download-URL für ${yq_version}: ${url}"
   log "Binary name: ${binary_name}, OS: ${os}, Arch: ${arch}"
 
-  if ! curl --fail --max-time 60 --connect-timeout 10 --retry 3 -fsSL "${url}" -o "${tmp}"; then
+  if ! download_file "${url}" "${tmp}"; then
     die "Download von yq fehlgeschlagen: ${url}"
   fi
 
@@ -135,8 +103,8 @@ download_yq() {
   for candidate in "${checksum_candidates[@]}"; do
     checksum_url="${checksum_base}/${candidate}"
     log "Probiere Checksummen-Datei: ${checksum_url}"
-    if curl --fail --max-time 60 --connect-timeout 10 --retry 3 -fsSL "${checksum_url}" -o "${tmp_checksum}"; then
-      if [[ -s "${tmp_checksum}" ]]; then
+    if download_file "${checksum_url}" "${tmp_checksum}" > /dev/null 2>&1; then
+       if [[ -s "${tmp_checksum}" ]]; then
         checksum_asset="${candidate}"
         log "Gefundene Checksummen-Datei: ${checksum_asset} ($(wc -l < "${tmp_checksum}") Zeilen)"
         break
@@ -156,15 +124,7 @@ download_yq() {
       checksum_line="$(grep "^${binary_name}[[:space:]]" "${tmp_checksum}" | head -n1 || true)"
       if [[ -n "${checksum_line}" ]]; then
         local my_sum=""
-        if command -v sha256sum > /dev/null 2>&1; then
-          my_sum="$(sha256sum "${tmp}" | awk '{print $1}')"
-        elif command -v shasum > /dev/null 2>&1; then
-          my_sum="$(shasum -a 256 "${tmp}" | awk '{print $1}')"
-        elif command -v python3 > /dev/null 2>&1; then
-          my_sum="$(python3 -c "import hashlib; print(hashlib.sha256(open('${tmp}','rb').read()).hexdigest())")"
-        elif command -v python > /dev/null 2>&1; then
-          my_sum="$(python -c "import hashlib; print(hashlib.sha256(open('${tmp}','rb').read()).hexdigest())")"
-        fi
+        my_sum="$(calculate_sha256 "${tmp}")"
 
         if [[ -n "${my_sum}" ]] && echo "${checksum_line}" | grep -q "${my_sum}"; then
           expected_sum="${my_sum}"
@@ -182,15 +142,7 @@ download_yq() {
 
     if [[ -n "${expected_sum}" ]]; then
       local actual_sum=""
-      if command -v sha256sum > /dev/null 2>&1; then
-        actual_sum="$(sha256sum "${tmp}" | awk '{print $1}')"
-      elif command -v shasum > /dev/null 2>&1; then
-        actual_sum="$(shasum -a 256 "${tmp}" | awk '{print $1}')"
-      elif command -v python3 > /dev/null 2>&1; then
-        actual_sum="$(python3 -c "import hashlib; print(hashlib.sha256(open('${tmp}','rb').read()).hexdigest())")"
-      elif command -v python > /dev/null 2>&1; then
-        actual_sum="$(python -c "import hashlib; print(hashlib.sha256(open('${tmp}','rb').read()).hexdigest())")"
-      fi
+      actual_sum="$(calculate_sha256 "${tmp}")"
 
       if [[ -n "${actual_sum}" && "${expected_sum}" != "${actual_sum}" ]]; then
         die "Checksum-Verifikation fehlgeschlagen! Erwartet: ${expected_sum}, Ist: ${actual_sum} (Quelle: ${checksum_asset})"
@@ -224,7 +176,7 @@ resolved_yq() {
 }
 
 cmd_ensure() {
-  ensure_dir
+  ensure_dir "${BIN_DIR}"
   local pinned_version
   pinned_version="$(read_pinned_version)"
 

@@ -8,60 +8,31 @@ TOOLS_DIR="${ROOT_DIR}/tools"
 BIN_DIR="${TOOLS_DIR}/bin"
 JUST_LOCAL="${BIN_DIR}/just"
 
-# Source centralized semver library
+# Source centralized semver and installer libraries
 # shellcheck source=scripts/lib/semver.sh
 source "${ROOT_DIR}/scripts/lib/semver.sh"
+# shellcheck source=scripts/lib/installer.bash
+source "${ROOT_DIR}/scripts/lib/installer.bash"
 
-log() { printf '%s\n' "$*" >&2; }
-die() {
-  log "ERR: $*"
-  exit 1
-}
-
-ensure_dir() { mkdir -p -- "${BIN_DIR}"; }
-
-have_cmd() { command -v "$1" > /dev/null 2>&1; }
-
-# Parse version from toolchain.versions.yml using simple tools to avoid circular dependency on yq
+# Override read_pinned_version to use the library but handle JUST_VERSION env var
 read_pinned_version() {
   if [[ -n "${JUST_VERSION:-}" ]]; then
     printf '%s' "${JUST_VERSION}"
     return 0
   fi
-
-  if [[ ! -f "${ROOT_DIR}/toolchain.versions.yml" ]]; then
-    die "toolchain.versions.yml nicht gefunden: ${ROOT_DIR}/toolchain.versions.yml"
-  fi
-
-  local version
-  # Parse version from toolchain.versions.yml robustly:
-  # 1. Remove key prefix (up to and including ':')
-  # 2. Strip comments (everything after '#')
-  # 3. Trim leading and trailing whitespace
-  # 4. Remove surrounding quotes (double or single)
-  # 5. Remove line breaks
-  version=$(grep -E '^\s*just:' "${ROOT_DIR}/toolchain.versions.yml" |
-    sed -E 's/^\s*[^:]+:\s*//; s/#.*$//; s/^[[:space:]]*//; s/[[:space:]]*$//; s/^"//; s/"$//; s/^'\''//; s/'\''$//' |
-    tr -d '\n\r')
-  if [[ -z "${version}" ]]; then
+  local v
+  v="$(read_toolchain_version "just" "${ROOT_DIR}/toolchain.versions.yml")"
+  if [[ -z "${v}" ]]; then
     die "Konnte gewünschte just-Version aus toolchain.versions.yml nicht ermitteln."
   fi
-  printf '%s' "${version}"
-}
-
-map_arch() {
-  case "$(uname -m)" in
-    x86_64 | amd64) echo x86_64 ;;
-    arm64 | aarch64) echo aarch64 ;;
-    *) uname -m ;;
-  esac
+  printf '%s' "${v}"
 }
 
 detect_libc() {
   # Linux: default to gnu (glibc); allow override
   if [ -n "${JUST_LIBC:-}" ]; then
     echo "$JUST_LIBC"
-  elif [ "$(uname -s | tr '[:upper:]' '[:lower:]')" = "linux" ]; then
+  elif [ "$(detect_os_normalized)" = "linux" ]; then
     # just v1.43.0 only has musl builds for linux
     local req_version_raw
     req_version_raw="$(read_pinned_version)"
@@ -81,8 +52,8 @@ detect_libc() {
 
 compute_target() {
   local os arch libc
-  os="$(uname -s | tr '[:upper:]' '[:lower:]')"
-  arch="$(map_arch)"
+  os="$(detect_os_normalized)"
+  arch="$(detect_arch_normalized)"
   libc="$(detect_libc)"
   if [ "$os" = "darwin" ]; then
     echo "${arch}-apple-darwin"
@@ -111,23 +82,19 @@ download_just() {
     return 0
   fi
 
-  ensure_dir
+  ensure_dir "${BIN_DIR}"
   local tmp_bin tmp_checksum
   tmp_bin="$(mktemp)"
   tmp_checksum="$(mktemp)"
   # Safe cleanup
   trap 'rm -f -- "${tmp_bin-}" "${tmp_checksum-}" 2>/dev/null || true' EXIT
 
-  log "Downloading just binary from ${url}"
-  log "Version: ${req_version_raw}, Target: ${target}, Filename: ${filename}"
-  if ! curl -fSL --retry 3 --connect-timeout 10 "${url}" -o "${tmp_bin}"; then
-    log "FEHLER: Download von just fehlgeschlagen"
-    log "URL: ${url}"
-    log "Mögliche Ursachen:"
-    log "  - Netzwerkproblem oder GitHub API-Limit"
-    log "  - Release ${tag} hat kein Asset ${filename}"
-    log "  - Überprüfen Sie: https://github.com/casey/just/releases/tag/${tag}"
-    die "Download fehlgeschlagen: ${url}"
+  if ! download_file "${url}" "${tmp_bin}"; then
+     log "Mögliche Ursachen:"
+     log "  - Netzwerkproblem oder GitHub API-Limit"
+     log "  - Release ${tag} hat kein Asset ${filename}"
+     log "  - Überprüfen Sie: https://github.com/casey/just/releases/tag/${tag}"
+     die "Download fehlgeschlagen: ${url}"
   fi
 
   local checksum_candidates=("SHA256SUMS" "checksums.txt" "checksums")
@@ -135,8 +102,7 @@ download_just() {
 
   for cand in "${checksum_candidates[@]}"; do
     local c_url="${checksum_base}/${cand}"
-    # Only log if we fail or if verbose
-    if curl -fSL --retry 3 --connect-timeout 10 "${c_url}" -o "${tmp_checksum}" 2> /dev/null; then
+    if download_file "${c_url}" "${tmp_checksum}" 2>/dev/null; then
       log "Checksummen geladen: ${cand}"
       checksum_found=true
       break
@@ -153,22 +119,11 @@ download_just() {
       log "WARN: Keine Checksumme für ${filename} in Datei gefunden."
     else
       local actual_sum
-      if have_cmd sha256sum; then
-        actual_sum=$(sha256sum "${tmp_bin}" | awk '{print $1}')
-      elif have_cmd shasum; then
-        actual_sum=$(shasum -a 256 "${tmp_bin}" | awk '{print $1}')
-      elif have_cmd python3; then
-        log "Using Python3 fallback for SHA256 checksum..."
-        actual_sum=$(python3 -c "import hashlib; print(hashlib.sha256(open('${tmp_bin}', 'rb').read()).hexdigest())")
-      elif have_cmd python; then
-        log "Using Python fallback for SHA256 checksum..."
-        actual_sum=$(python -c "import hashlib; print(hashlib.sha256(open('${tmp_bin}', 'rb').read()).hexdigest())")
-      else
-        log "WARN: No checksum tool (sha256sum, shasum, python) available - skipping checksum verification."
-        actual_sum=""
-      fi
+      actual_sum="$(calculate_sha256 "${tmp_bin}")"
 
-      if [[ -n "${actual_sum}" ]]; then
+      if [[ -z "${actual_sum}" ]]; then
+        log "WARN: No checksum tool available - skipping checksum verification."
+      else
         if [[ "${expected_sum}" != "${actual_sum}" ]]; then
           die "Checksum-Fehler! Erwartet: ${expected_sum}, Ist: ${actual_sum}"
         fi
@@ -197,7 +152,7 @@ resolved_just() {
 }
 
 cmd_ensure() {
-  ensure_dir
+  ensure_dir "${BIN_DIR}"
   local just_bin
   local v
   local version_is_ok=false
