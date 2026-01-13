@@ -114,7 +114,7 @@ inst_download_file() {
 
   inst_log "Downloading ${url} -> ${dest}"
 
-  # -f: fail silently (no output) on server errors
+  # -f: fail on server errors (404, 500) without outputting the response body
   # -s: silent mode (no progress bar)
   # -S: show error message if it fails (when used with -s)
   # -L: follow redirects
