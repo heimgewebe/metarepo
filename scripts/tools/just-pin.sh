@@ -9,9 +9,9 @@ BIN_DIR="${TOOLS_DIR}/bin"
 JUST_LOCAL="${BIN_DIR}/just"
 
 # Source centralized semver and installer libraries
-# shellcheck source=scripts/lib/semver.sh
+# shellcheck source=../lib/semver.sh
 source "${ROOT_DIR}/scripts/lib/semver.sh"
-# shellcheck source=scripts/lib/installer.bash
+# shellcheck source=../lib/installer.bash
 source "${ROOT_DIR}/scripts/lib/installer.bash"
 
 # Override read_pinned_version to use the library but handle JUST_VERSION env var
@@ -90,11 +90,11 @@ download_just() {
   trap 'rm -f -- "${tmp_bin-}" "${tmp_checksum-}" 2>/dev/null || true' EXIT
 
   if ! inst_download_file "${url}" "${tmp_bin}"; then
-     inst_log "Mögliche Ursachen:"
-     inst_log "  - Netzwerkproblem oder GitHub API-Limit"
-     inst_log "  - Release ${tag} hat kein Asset ${filename}"
-     inst_log "  - Überprüfen Sie: https://github.com/casey/just/releases/tag/${tag}"
-     inst_die "Download fehlgeschlagen: ${url}"
+    inst_log "Mögliche Ursachen:"
+    inst_log "  - Netzwerkproblem oder GitHub API-Limit"
+    inst_log "  - Release ${tag} hat kein Asset ${filename}"
+    inst_log "  - Überprüfen Sie: https://github.com/casey/just/releases/tag/${tag}"
+    inst_die "Download fehlgeschlagen: ${url}"
   fi
 
   local checksum_candidates=("SHA256SUMS" "checksums.txt" "checksums")
@@ -102,7 +102,7 @@ download_just() {
 
   for cand in "${checksum_candidates[@]}"; do
     local c_url="${checksum_base}/${cand}"
-    if inst_download_file "${c_url}" "${tmp_checksum}" 2>/dev/null; then
+    if inst_download_file "${c_url}" "${tmp_checksum}" 2> /dev/null; then
       inst_log "Checksummen geladen: ${cand}"
       checksum_found=true
       break

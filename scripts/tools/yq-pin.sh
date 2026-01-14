@@ -10,9 +10,9 @@ BIN_DIR="${TOOLS_DIR}/bin"
 YQ_LOCAL="${BIN_DIR}/yq"
 
 # Source centralized semver and installer libraries
-# shellcheck source=scripts/lib/semver.sh
+# shellcheck source=../lib/semver.sh
 source "${ROOT_DIR}/scripts/lib/semver.sh"
-# shellcheck source=scripts/lib/installer.bash
+# shellcheck source=../lib/installer.bash
 source "${ROOT_DIR}/scripts/lib/installer.bash"
 
 # Override read_pinned_version to add specific yq prefix handling if needed,
@@ -23,7 +23,7 @@ read_pinned_version() {
   local v
   v="$(inst_read_toolchain_version "yq" "${ROOT_DIR}/toolchain.versions.yml")"
   if [[ -z "${v}" ]]; then
-     inst_die "Konnte gewünschte yq-Version aus toolchain.versions.yml nicht ermitteln."
+    inst_die "Konnte gewünschte yq-Version aus toolchain.versions.yml nicht ermitteln."
   fi
   printf '%s' "${v}"
 }
@@ -104,7 +104,7 @@ download_yq() {
     checksum_url="${checksum_base}/${candidate}"
     inst_log "Probiere Checksummen-Datei: ${checksum_url}"
     if inst_download_file "${checksum_url}" "${tmp_checksum}" > /dev/null 2>&1; then
-       if [[ -s "${tmp_checksum}" ]]; then
+      if [[ -s "${tmp_checksum}" ]]; then
         checksum_asset="${candidate}"
         inst_log "Gefundene Checksummen-Datei: ${checksum_asset} ($(wc -l < "${tmp_checksum}") Zeilen)"
         break
