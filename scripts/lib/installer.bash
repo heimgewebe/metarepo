@@ -42,7 +42,7 @@ inst_detect_os() {
   local os
   os="$(uname -s | tr '[:upper:]' '[:lower:]')"
   case "${os}" in
-    linux|darwin) echo "${os}" ;;
+    linux | darwin) echo "${os}" ;;
     *) inst_die "Unsupported OS: ${os}" ;;
   esac
 }
@@ -52,8 +52,8 @@ inst_detect_arch() {
   local arch
   arch="$(uname -m)"
   case "${arch}" in
-    x86_64|amd64) echo "x86_64" ;;
-    arm64|aarch64) echo "aarch64" ;;
+    x86_64 | amd64) echo "x86_64" ;;
+    arm64 | aarch64) echo "aarch64" ;;
     *) echo "${arch}" ;; # Fallback for others
   esac
 }
