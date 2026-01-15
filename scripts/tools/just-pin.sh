@@ -8,60 +8,31 @@ TOOLS_DIR="${ROOT_DIR}/tools"
 BIN_DIR="${TOOLS_DIR}/bin"
 JUST_LOCAL="${BIN_DIR}/just"
 
-# Source centralized semver library
-# shellcheck source=scripts/lib/semver.sh
+# Source centralized semver and installer libraries
+# shellcheck source=../lib/semver.sh
 source "${ROOT_DIR}/scripts/lib/semver.sh"
+# shellcheck source=../lib/installer.bash
+source "${ROOT_DIR}/scripts/lib/installer.bash"
 
-log() { printf '%s\n' "$*" >&2; }
-die() {
-  log "ERR: $*"
-  exit 1
-}
-
-ensure_dir() { mkdir -p -- "${BIN_DIR}"; }
-
-have_cmd() { command -v "$1" > /dev/null 2>&1; }
-
-# Parse version from toolchain.versions.yml using simple tools to avoid circular dependency on yq
+# Override read_pinned_version to use the library but handle JUST_VERSION env var
 read_pinned_version() {
   if [[ -n "${JUST_VERSION:-}" ]]; then
     printf '%s' "${JUST_VERSION}"
     return 0
   fi
-
-  if [[ ! -f "${ROOT_DIR}/toolchain.versions.yml" ]]; then
-    die "toolchain.versions.yml nicht gefunden: ${ROOT_DIR}/toolchain.versions.yml"
+  local v
+  v="$(inst_read_toolchain_version "just" "${ROOT_DIR}/toolchain.versions.yml")"
+  if [[ -z "${v}" ]]; then
+    inst_die "Konnte gewünschte just-Version aus toolchain.versions.yml nicht ermitteln."
   fi
-
-  local version
-  # Parse version from toolchain.versions.yml robustly:
-  # 1. Remove key prefix (up to and including ':')
-  # 2. Strip comments (everything after '#')
-  # 3. Trim leading and trailing whitespace
-  # 4. Remove surrounding quotes (double or single)
-  # 5. Remove line breaks
-  version=$(grep -E '^\s*just:' "${ROOT_DIR}/toolchain.versions.yml" |
-    sed -E 's/^\s*[^:]+:\s*//; s/#.*$//; s/^[[:space:]]*//; s/[[:space:]]*$//; s/^"//; s/"$//; s/^'\''//; s/'\''$//' |
-    tr -d '\n\r')
-  if [[ -z "${version}" ]]; then
-    die "Konnte gewünschte just-Version aus toolchain.versions.yml nicht ermitteln."
-  fi
-  printf '%s' "${version}"
-}
-
-map_arch() {
-  case "$(uname -m)" in
-    x86_64 | amd64) echo x86_64 ;;
-    arm64 | aarch64) echo aarch64 ;;
-    *) uname -m ;;
-  esac
+  printf '%s' "${v}"
 }
 
 detect_libc() {
   # Linux: default to gnu (glibc); allow override
   if [ -n "${JUST_LIBC:-}" ]; then
     echo "$JUST_LIBC"
-  elif [ "$(uname -s | tr '[:upper:]' '[:lower:]')" = "linux" ]; then
+  elif [ "$(inst_detect_os)" = "linux" ]; then
     # just v1.43.0 only has musl builds for linux
     local req_version_raw
     req_version_raw="$(read_pinned_version)"
@@ -81,8 +52,8 @@ detect_libc() {
 
 compute_target() {
   local os arch libc
-  os="$(uname -s | tr '[:upper:]' '[:lower:]')"
-  arch="$(map_arch)"
+  os="$(inst_detect_os)"
+  arch="$(inst_detect_arch)"
   libc="$(detect_libc)"
   if [ "$os" = "darwin" ]; then
     echo "${arch}-apple-darwin"
@@ -96,7 +67,7 @@ download_just() {
   req_version_raw="$(read_pinned_version)"
   local ver_numeric="${req_version_raw#v}"
 
-  log "just nicht gefunden/inkompatibel. Lade ${req_version_raw} herunter..."
+  inst_log "just nicht gefunden/inkompatibel. Lade ${req_version_raw} herunter..."
 
   local target
   target="$(compute_target)"
@@ -111,23 +82,19 @@ download_just() {
     return 0
   fi
 
-  ensure_dir
+  inst_ensure_dir "${BIN_DIR}"
   local tmp_bin tmp_checksum
   tmp_bin="$(mktemp)"
   tmp_checksum="$(mktemp)"
   # Safe cleanup
   trap 'rm -f -- "${tmp_bin-}" "${tmp_checksum-}" 2>/dev/null || true' EXIT
 
-  log "Downloading just binary from ${url}"
-  log "Version: ${req_version_raw}, Target: ${target}, Filename: ${filename}"
-  if ! curl -fSL --retry 3 --connect-timeout 10 "${url}" -o "${tmp_bin}"; then
-    log "FEHLER: Download von just fehlgeschlagen"
-    log "URL: ${url}"
-    log "Mögliche Ursachen:"
-    log "  - Netzwerkproblem oder GitHub API-Limit"
-    log "  - Release ${tag} hat kein Asset ${filename}"
-    log "  - Überprüfen Sie: https://github.com/casey/just/releases/tag/${tag}"
-    die "Download fehlgeschlagen: ${url}"
+  if ! inst_download_file "${url}" "${tmp_bin}"; then
+    inst_log "Mögliche Ursachen:"
+    inst_log "  - Netzwerkproblem oder GitHub API-Limit"
+    inst_log "  - Release ${tag} hat kein Asset ${filename}"
+    inst_log "  - Überprüfen Sie: https://github.com/casey/just/releases/tag/${tag}"
+    inst_die "Download fehlgeschlagen: ${url}"
   fi
 
   local checksum_candidates=("SHA256SUMS" "checksums.txt" "checksums")
@@ -135,53 +102,41 @@ download_just() {
 
   for cand in "${checksum_candidates[@]}"; do
     local c_url="${checksum_base}/${cand}"
-    # Only log if we fail or if verbose
-    if curl -fSL --retry 3 --connect-timeout 10 "${c_url}" -o "${tmp_checksum}" 2> /dev/null; then
-      log "Checksummen geladen: ${cand}"
+    if inst_download_file "${c_url}" "${tmp_checksum}" 2> /dev/null; then
+      inst_log "Checksummen geladen: ${cand}"
       checksum_found=true
       break
     fi
   done
 
   if $checksum_found; then
-    log "Verifiziere Checksumme..."
+    inst_log "Verifiziere Checksumme..."
     local expected_sum
     # Format: SHA256  filename
     expected_sum=$(grep "${filename}$" "${tmp_checksum}" | awk '{print $1}' || true)
 
     if [[ -z "${expected_sum}" ]]; then
-      log "WARN: Keine Checksumme für ${filename} in Datei gefunden."
+      inst_log "WARN: Keine Checksumme für ${filename} in Datei gefunden."
     else
       local actual_sum
-      if have_cmd sha256sum; then
-        actual_sum=$(sha256sum "${tmp_bin}" | awk '{print $1}')
-      elif have_cmd shasum; then
-        actual_sum=$(shasum -a 256 "${tmp_bin}" | awk '{print $1}')
-      elif have_cmd python3; then
-        log "Using Python3 fallback for SHA256 checksum..."
-        actual_sum=$(python3 -c "import hashlib; print(hashlib.sha256(open('${tmp_bin}', 'rb').read()).hexdigest())")
-      elif have_cmd python; then
-        log "Using Python fallback for SHA256 checksum..."
-        actual_sum=$(python -c "import hashlib; print(hashlib.sha256(open('${tmp_bin}', 'rb').read()).hexdigest())")
-      else
-        log "WARN: No checksum tool (sha256sum, shasum, python) available - skipping checksum verification."
-        actual_sum=""
-      fi
+      actual_sum="$(inst_calculate_sha256 "${tmp_bin}")"
 
-      if [[ -n "${actual_sum}" ]]; then
+      if [[ -z "${actual_sum}" ]]; then
+        inst_log "WARN: No checksum tool available - skipping checksum verification."
+      else
         if [[ "${expected_sum}" != "${actual_sum}" ]]; then
-          die "Checksum-Fehler! Erwartet: ${expected_sum}, Ist: ${actual_sum}"
+          inst_die "Checksum-Fehler! Erwartet: ${expected_sum}, Ist: ${actual_sum}"
         fi
-        log "Checksumme OK: ${actual_sum}"
+        inst_log "Checksumme OK: ${actual_sum}"
       fi
     fi
   else
-    log "WARN: Konnte keine Checksummen-Datei laden. Überspringe Verifikation."
+    inst_log "WARN: Konnte keine Checksummen-Datei laden. Überspringe Verifikation."
   fi
 
   tar -xzf "${tmp_bin}" -C "${BIN_DIR}" just
   chmod +x "${JUST_LOCAL}" || true
-  log "just erfolgreich nach ${JUST_LOCAL} installiert."
+  inst_log "just erfolgreich nach ${JUST_LOCAL} installiert."
 }
 
 resolved_just() {
@@ -189,7 +144,7 @@ resolved_just() {
     echo "${JUST_LOCAL}"
     return 0
   fi
-  if have_cmd just; then
+  if inst_have_cmd just; then
     command -v just
     return 0
   fi
@@ -197,7 +152,7 @@ resolved_just() {
 }
 
 cmd_ensure() {
-  ensure_dir
+  inst_ensure_dir "${BIN_DIR}"
   local just_bin
   local v
   local version_is_ok=false
@@ -209,19 +164,19 @@ cmd_ensure() {
 
   # Agent-Mode: only verify that just is available, do not download
   if [[ "${AGENT_MODE:-}" != "" ]]; then
-    log "Agent-Mode: skipping dynamic just installation"
+    inst_log "Agent-Mode: skipping dynamic just installation"
     if just_bin="$(resolved_just)"; then
       if v="$("${just_bin}" --version 2> /dev/null | cut -d' ' -f2)"; then
         if version_ok "${v}" "${req_version_raw}"; then
-          log "OK: just ${v} verfügbar (Agent-Mode)."
+          inst_log "OK: just ${v} verfügbar (Agent-Mode)."
           return 0
         else
-          log "WARN: Gefundenes just hat falsche Version: ${v} (erwartet: ${req_version_raw})"
-          die "just version mismatch in Agent-Mode. Expected: ${req_version_raw}, Found: ${v}"
+          inst_log "WARN: Gefundenes just hat falsche Version: ${v} (erwartet: ${req_version_raw})"
+          inst_die "just version mismatch in Agent-Mode. Expected: ${req_version_raw}, Found: ${v}"
         fi
       fi
     fi
-    die "just not available in Agent-Mode. Please pre-install just ${req_version_raw} or vendor it."
+    inst_die "just not available in Agent-Mode. Please pre-install just ${req_version_raw} or vendor it."
   fi
 
   if just_bin="$(resolved_just)"; then
@@ -229,7 +184,7 @@ cmd_ensure() {
       if version_ok "${v}" "${req_version_raw}"; then
         version_is_ok=true
       else
-        log "WARN: Gefundenes just hat falsche Version: ${v} (erwartet: ${req_version_raw})"
+        inst_log "WARN: Gefundenes just hat falsche Version: ${v} (erwartet: ${req_version_raw})"
       fi
     fi
   fi
@@ -240,12 +195,12 @@ cmd_ensure() {
       return 0
     fi
     if ! just_bin="$(resolved_just)"; then
-      die "just nach Download nicht verfügbar."
+      inst_die "just nach Download nicht verfügbar."
     fi
     # Verify again
     v="$("${just_bin}" --version | cut -d' ' -f2)"
     if ! version_ok "${v}" "${req_version_raw}"; then
-      die "Installiertes just hat immer noch falsche Version: ${v}"
+      inst_die "Installiertes just hat immer noch falsche Version: ${v}"
     fi
   fi
 
@@ -253,7 +208,7 @@ cmd_ensure() {
   if [[ "${just_bin}" != "${JUST_LOCAL}" && ! -e "${JUST_LOCAL}" ]]; then
     ln -s -- "${just_bin}" "${JUST_LOCAL}" || true
   fi
-  log "OK: just ${v} verfügbar."
+  inst_log "OK: just ${v} verfügbar."
 }
 
 case "${1:-ensure}" in
@@ -261,6 +216,6 @@ case "${1:-ensure}" in
     cmd_ensure "$@"
     ;;
   *)
-    die "usage: $0 ensure"
+    inst_die "usage: $0 ensure"
     ;;
 esac
