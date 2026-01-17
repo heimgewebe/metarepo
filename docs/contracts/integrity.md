@@ -15,6 +15,7 @@ Der Leitstand visualisiert diesen Status, greift aber nicht ein.
 2.  **Keine Handlungspflicht**: Ein `FAIL` oder `MISSING` Status führt nicht zum Abbruch von CI-Pipelines.
 3.  **Missing ist erlaubt**: Ein Repository, das keine Daten liefert, hat den validen Status `MISSING`. Es wird nicht "interpoliert" oder geraten.
 4.  **Pull-based**: Die Aggregation erfolgt durch aktives Abrufen (Pull) durch die Chronik, nicht durch Events (Push).
+5.  **Events sind Hints**: Events vom Typ `integrity.summary.published.v1` dienen nur als unverbindliche Benachrichtigung ("Hint"). Sie sind niemals Wahrheitsträger.
 
 ## Integritäts-Kreislauf (The Loop)
 
@@ -68,8 +69,7 @@ Der abgerufene Bericht muss mindestens folgende Felder enthalten, um von der Chr
 ```
 
 *   `url` ist optional im Bericht. Die Chronik ergänzt dieses Feld ("Backfilling") basierend auf der Abruf-Quelle.
-*   **Keine weitere Heilung**: Andere Felder wie `generated_at`, `status` oder `repo` werden **nicht** interpoliert oder erraten.
-*   Weitere Felder (wie `counts`, `details`) sind erlaubt und erwünscht für Debugging, werden aber für den High-Level-Status nicht zwingend benötigt.
+*   **Keine weitere Heilung**: Andere Felder wie `status` oder `repo` werden **nicht** interpoliert oder erraten.
 
 ## Status-Werte
 
@@ -80,11 +80,30 @@ Consumer (Chronik/Leitstand) mappen technische Ergebnisse auf semantische Status
 *   **`FAIL`**:
     *   Inhaltlich kritisch (`status: FAIL` im Bericht).
     *   **Schema-Verletzung**: JSON ist ungültig oder Pflichtfelder fehlen.
-    *   **Ungültiger Timestamp**: `generated_at` fehlt oder ist kein valider ISO-String.
-    *   *Sanitization*: Die Chronik darf zur Persistenz `generated_at` auf `received_at` setzen, muss dies aber mit dem Flag `generated_at_sanitized: true` markieren. Der Status bleibt `FAIL` (oder wird entsprechend der Severity-Policy bewertet), da die Integrität der Quelle verletzt ist.
+    *   **Ungültiger Timestamp**: `generated_at` fehlt oder ist kein valider ISO-String. Dies führt zwingend zu `FAIL`.
 *   **`MISSING`**:
     *   Technischer Fehler beim Abruf (HTTP 404, Timeout, Network Error).
     *   Repo liefert keine Daten (Release Asset fehlt).
 *   **`UNCLEAR`**:
     *   Status im Bericht ist unbekannt/undefiniert (Enum-Verletzung).
     *   Logisch nicht interpretierbar (z.B. Bericht valide, aber `repo`-Name passt nicht zur Quelle).
+
+### Sanitization is not Healing
+
+Um die Persistenz in der Chronik zu ermöglichen (Datenbank-Constraints), darf bei einem fehlenden oder ungültigen `generated_at` der Zeitpunkt `received_at` verwendet werden. Dies gilt jedoch **nicht als Heilung**:
+
+1.  Der Status wird zwingend auf `FAIL` gesetzt (sofern er nicht ohnehin `MISSING` oder `FAIL` war).
+2.  Der Eintrag muss mit dem Flag `generated_at_sanitized: true` markiert werden.
+
+Beispiel für einen sanierten Fail-Eintrag:
+
+```json
+{
+  "status": "FAIL",
+  "repo": "heimgewebe/example",
+  "generated_at": "2026-01-17T12:00:00Z",
+  "received_at": "2026-01-17T12:00:00Z",
+  "generated_at_sanitized": true,
+  "error_reason": "Missing generated_at in report"
+}
+```
