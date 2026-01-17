@@ -174,3 +174,69 @@ def test_generate_integrity_sources_dict_format(tmp_path):
     assert "heimgewebe/repo1" in repos
     assert "heimgewebe/repo2" not in repos
     assert "heimgewebe/repo3" in repos
+
+def test_generate_integrity_sources_duplicate(tmp_path):
+    # Test duplicate repo detection
+    fleet_dir = tmp_path / "fleet"
+    fleet_dir.mkdir()
+
+    # Same repo twice
+    fleet_repos_content = {
+        "repos": ["repo1", "repo1"]
+    }
+    with open(fleet_dir / "repos.yml", "w") as f:
+        yaml.dump(fleet_repos_content, f)
+
+    env = os.environ.copy()
+    env["HG_ROOT"] = str(tmp_path)
+
+    result = subprocess.run(
+        [sys.executable, str(SCRIPT_PATH)],
+        env=env,
+        capture_output=True,
+        text=True
+    )
+
+    assert result.returncode == 1
+    assert "Duplicate repo detected" in result.stderr
+
+def test_generate_integrity_sources_override_enabled(tmp_path):
+    # Test integrity.enabled override
+    fleet_dir = tmp_path / "fleet"
+    fleet_dir.mkdir()
+
+    fleet_repos_content = {
+        "repos": ["repo1"]
+    }
+    with open(fleet_dir / "repos.yml", "w") as f:
+        yaml.dump(fleet_repos_content, f)
+
+    # Override enabled=False in repos.yml
+    repos_content = {
+        "repos": [
+            {
+                "name": "repo1",
+                "integrity": {"enabled": False}
+            }
+        ]
+    }
+    with open(tmp_path / "repos.yml", "w") as f:
+        yaml.dump(repos_content, f)
+
+    env = os.environ.copy()
+    env["HG_ROOT"] = str(tmp_path)
+
+    result = subprocess.run(
+        [sys.executable, str(SCRIPT_PATH)],
+        env=env,
+        capture_output=True,
+        text=True
+    )
+
+    assert result.returncode == 0
+
+    output_file = tmp_path / "reports/integrity/sources.v1.json"
+    with open(output_file, "r") as f:
+        data = json.load(f)
+
+    assert data["sources"][0]["enabled"] is False

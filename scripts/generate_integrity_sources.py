@@ -104,21 +104,33 @@ def main():
                     repo_configs[name] = r
 
     sources = []
+    seen_repos = set()
+
     for repo_name in sorted(fleet_list):
         config = repo_configs.get(repo_name, {})
         # repos.yml entry doesn't strictly have 'owner', but root has github.owner
         # We assume all are under default owner unless specified (not currently supported in repos.yml schema but good for logic)
         owner = default_owner
+        full_repo_name = f"{owner}/{repo_name}"
+
+        if full_repo_name in seen_repos:
+            print(f"Error: Duplicate repo detected: {full_repo_name}", file=sys.stderr)
+            sys.exit(1)
+        seen_repos.add(full_repo_name)
 
         # Determine URL
         # Contract: https://github.com/<owner>/<repo>/releases/download/integrity/summary.json
         summary_url = f"https://github.com/{owner}/{repo_name}/releases/download/integrity/summary.json"
 
-        # Check if enabled? Assume all fleet repos are enabled.
+        # Check if enabled via overrides
+        # Logic: fleet implies enabled, unless explicitly disabled in repos.yml metadata
         enabled = True
+        integrity_config = config.get("integrity", {})
+        if isinstance(integrity_config, dict) and integrity_config.get("enabled") is False:
+            enabled = False
 
         sources.append({
-            "repo": f"{owner}/{repo_name}",
+            "repo": full_repo_name,
             "summary_url": summary_url,
             "enabled": enabled
         })

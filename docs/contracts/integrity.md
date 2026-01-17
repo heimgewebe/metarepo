@@ -79,8 +79,8 @@ Consumer (Chronik/Leitstand) mappen technische Ergebnisse auf semantische Status
 *   **`WARN`**: Bericht erfolgreich abgerufen und Inhalt ist `WARN`.
 *   **`FAIL`**:
     *   Inhaltlich kritisch (`status: FAIL` im Bericht).
-    *   **Schema-Verletzung**: JSON ist ungültig, `generated_at` fehlt/ungültig, oder `repo`/`status` fehlen.
-    *   Wirklich invalid (Datenmüll).
+    *   **Schema-Verletzung**: JSON ist ungültig oder Pflichtfelder fehlen.
+    *   **Ungültiger Timestamp**: `generated_at` fehlt oder ist kein valider ISO-String. Es findet kein Fallback auf `received_at` statt.
 *   **`MISSING`**:
     *   Technischer Fehler beim Abruf (HTTP 404, Timeout, Network Error).
     *   Repo liefert keine Daten (Release Asset fehlt).
