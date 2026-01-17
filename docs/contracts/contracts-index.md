@@ -163,6 +163,11 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
   - Hinweis: Dieses Schema ist ein reines Beobachtungsartefakt; automatische Korrektur ist explizit verboten.
   - Produzent: semantAH
   - Konsumenten: leitstand, wgx
+- `integrity.sources.v1.schema.json`
+  - Zweck: Single Source of Truth für Integritätsquellen (Pull-Modell).
+  - Produzent: metarepo (generiert)
+  - Konsumenten: chronik
+  - Referenz: Siehe auch [`docs/architecture/integrity-neurose.md`](../../docs/architecture/integrity-neurose.md) für die normative Architektur.
 
 ---
 
