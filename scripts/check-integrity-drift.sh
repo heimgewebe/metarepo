@@ -13,7 +13,7 @@ echo "Checking for drift in integrity sources..."
 # Run the generator
 CMD="python3"
 if command -v uv >/dev/null 2>&1; then
-    CMD="uv run python3"
+    CMD="uv run -- python3"
 fi
 
 if ! $CMD "$SCRIPT_PATH"; then

@@ -1,0 +1,51 @@
+{
+  "$id": "https://heimgewebe/contracts/integrity.sources.v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Integrity Sources v1",
+  "description": "Single Source of Truth for integrity monitoring sources (Pull Model).",
+  "type": "object",
+  "required": [
+    "apiVersion",
+    "generated_at",
+    "sources"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "apiVersion": {
+      "const": "integrity.sources.v1"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp of generation (ISO 8601)."
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "repo",
+          "summary_url",
+          "enabled"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "repo": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9._-]+/[a-zA-Z0-9._-]+$",
+            "description": "Repository name (owner/name)."
+          },
+          "summary_url": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL to fetch the summary.json report from (usually a Release Asset)."
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Whether this source should be actively polled."
+          }
+        }
+      }
+    }
+  }
+}

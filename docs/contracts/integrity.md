@@ -21,7 +21,7 @@ Der Leitstand visualisiert diesen Status, greift aber nicht ein.
 Der Integritätsstatus wird aktiv gesammelt:
 
 *   **WGX / Producer**: Erzeugt den Integritätsbericht (`reports/integrity/summary.json`) und veröffentlicht ihn als Release Asset.
-*   **Metarepo (Constitution)**: Definiert die Liste der zu prüfenden Quellen in `reports/integrity/sources.v1.json`.
+*   **Metarepo (Constitution)**: Definiert die Liste der zu prüfenden Quellen in `reports/integrity/sources.v1.json` (Contract: `contracts/integrity.sources.v1.schema.json`).
 *   **Chronik (Orchestrator)**: Liest die Quellenliste, ruft periodisch die Berichte ab, validiert und speichert den aktuellen Status.
 *   **Leitstand (Display)**: Visualisiert den von der Chronik bereitgestellten Status.
 
@@ -35,7 +35,7 @@ Der Integritätsstatus wird aktiv gesammelt:
     *   Die `summary_url` in der Quellenliste zeigt auf dieses Asset.
 *   **`reports/integrity/sources.v1.json`**: Die **Single Source of Truth (SoT)** für Integritätsquellen.
     *   Wird generiert aus der Fleet-Definition (`fleet/repos.yml`).
-    *   Definiert für jedes Repo die `summary_url`.
+    *   Schema: `contracts/integrity.sources.v1.schema.json`.
 
 ### Quellen-Liste (SoT)
 
@@ -67,21 +67,23 @@ Der abgerufene Bericht muss mindestens folgende Felder enthalten, um von der Chr
 }
 ```
 
-*   `url` ist optional im Bericht (wird von Chronik ergänzt, falls fehlend).
+*   `url` ist optional im Bericht. Die Chronik ergänzt dieses Feld ("Backfilling") basierend auf der Abruf-Quelle.
+*   **Keine weitere Heilung**: Andere Felder wie `generated_at`, `status` oder `repo` werden **nicht** interpoliert oder erraten. Fehlen sie, ist der Bericht ungültig (`FAIL`).
 *   Weitere Felder (wie `counts`, `details`) sind erlaubt und erwünscht für Debugging, werden aber für den High-Level-Status nicht zwingend benötigt.
 
 ## Status-Werte
 
-Consumer (Chronik/Leitstand) mappen technische Ergebnisse auf semantische Status-Werte:
+Consumer (Chronik/Leitstand) mappen technische Ergebnisse auf semantische Status-Werte. Es gilt der **Strict Mode**:
 
 *   **`OK`**: Bericht erfolgreich abgerufen und Inhalt ist `OK`.
 *   **`WARN`**: Bericht erfolgreich abgerufen und Inhalt ist `WARN`.
 *   **`FAIL`**:
     *   Inhaltlich kritisch (`status: FAIL` im Bericht).
-    *   **Schema-Verletzung**: JSON ist ungültig oder Pflichtfelder fehlen.
+    *   **Schema-Verletzung**: JSON ist ungültig, `generated_at` fehlt/ungültig, oder `repo`/`status` fehlen.
+    *   Wirklich invalid (Datenmüll).
 *   **`MISSING`**:
     *   Technischer Fehler beim Abruf (HTTP 404, Timeout, Network Error).
     *   Repo liefert keine Daten (Release Asset fehlt).
 *   **`UNCLEAR`**:
-    *   Status im Bericht ist unbekannt oder undefiniert.
-    *   Bericht ist valide, aber logisch nicht interpretierbar.
+    *   Status im Bericht ist unbekannt/undefiniert (Enum-Verletzung).
+    *   Logisch nicht interpretierbar (z.B. Bericht valide, aber `repo`-Name passt nicht zur Quelle).

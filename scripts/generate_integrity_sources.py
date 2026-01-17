@@ -22,37 +22,15 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-# Try to import repo_config, but handle failure gracefully
-try:
-    from wgx import repo_config
-    HAS_WGX = True
-except ImportError:
-    HAS_WGX = False
-
 try:
     import yaml
-    HAS_YAML = True
 except ImportError:
-    HAS_YAML = False
+    # Metarepo Control Plane requires PyYAML via uv
+    sys.exit("Error: pyyaml not installed. Please run via 'uv run scripts/generate_integrity_sources.py'.")
 
 def load_yaml(path: Path) -> Any:
-    if HAS_YAML:
-        with open(path, "r", encoding="utf-8") as f:
-            return yaml.safe_load(f)
-    if HAS_WGX:
-        # repo_config doesn't support '---', so we manually read and strip it
-        try:
-            text = path.read_text(encoding="utf-8")
-            # Strip YAML directives
-            lines = [l for l in text.splitlines() if not l.strip().startswith("---")]
-            clean_text = "\n".join(lines)
-            return repo_config.parse_simple_yaml(clean_text)
-        except Exception as e:
-            print(f"Warning: Failed to parse {path} with repo_config: {e}", file=sys.stderr)
-            raise
-
-    # Fallback manual parsing or error
-    raise ImportError("No yaml parser available (install pyyaml or wgx module)")
+    with open(path, "r", encoding="utf-8") as f:
+        return yaml.safe_load(f)
 
 def utc_now_iso() -> str:
     # Support SOURCE_DATE_EPOCH for reproducible builds
