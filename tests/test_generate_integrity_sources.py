@@ -10,7 +10,7 @@ import yaml
 # Path to the script
 SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "generate_integrity_sources.py"
 
-def test_generate_integrity_sources(tmp_path):
+def test_generate_integrity_sources_standard(tmp_path):
     # Setup mock file structure
     fleet_dir = tmp_path / "fleet"
     fleet_dir.mkdir()
@@ -102,3 +102,75 @@ def test_generate_integrity_sources_no_repo_config(tmp_path):
     # Default owner should be heimgewebe
     assert data["sources"][0]["repo"] == "heimgewebe/simple-repo"
     assert "heimgewebe/simple-repo/releases" in data["sources"][0]["summary_url"]
+
+def test_generate_integrity_sources_fleet_false_list(tmp_path):
+    # Test fleet: false in list format
+    fleet_dir = tmp_path / "fleet"
+    fleet_dir.mkdir()
+
+    fleet_repos_content = {
+        "repos": [
+            {"name": "repo1", "fleet": True},
+            {"name": "repo2", "fleet": False},
+            {"name": "repo3"}  # implicit true
+        ]
+    }
+    with open(fleet_dir / "repos.yml", "w") as f:
+        yaml.dump(fleet_repos_content, f)
+
+    env = os.environ.copy()
+    env["HG_ROOT"] = str(tmp_path)
+
+    result = subprocess.run(
+        [sys.executable, str(SCRIPT_PATH)],
+        env=env,
+        capture_output=True,
+        text=True
+    )
+
+    assert result.returncode == 0
+
+    output_file = tmp_path / "reports/integrity/sources.v1.json"
+    with open(output_file, "r") as f:
+        data = json.load(f)
+
+    repos = [s["repo"] for s in data["sources"]]
+    assert "heimgewebe/repo1" in repos
+    assert "heimgewebe/repo2" not in repos
+    assert "heimgewebe/repo3" in repos
+
+def test_generate_integrity_sources_dict_format(tmp_path):
+    # Test repos as dict format
+    fleet_dir = tmp_path / "fleet"
+    fleet_dir.mkdir()
+
+    fleet_repos_content = {
+        "repos": {
+            "repo1": {"fleet": True},
+            "repo2": {"fleet": False},
+            "repo3": {} # implicit true
+        }
+    }
+    with open(fleet_dir / "repos.yml", "w") as f:
+        yaml.dump(fleet_repos_content, f)
+
+    env = os.environ.copy()
+    env["HG_ROOT"] = str(tmp_path)
+
+    result = subprocess.run(
+        [sys.executable, str(SCRIPT_PATH)],
+        env=env,
+        capture_output=True,
+        text=True
+    )
+
+    assert result.returncode == 0
+
+    output_file = tmp_path / "reports/integrity/sources.v1.json"
+    with open(output_file, "r") as f:
+        data = json.load(f)
+
+    repos = [s["repo"] for s in data["sources"]]
+    assert "heimgewebe/repo1" in repos
+    assert "heimgewebe/repo2" not in repos
+    assert "heimgewebe/repo3" in repos

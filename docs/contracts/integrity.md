@@ -20,7 +20,7 @@ Der Leitstand visualisiert diesen Status, greift aber nicht ein.
 
 Der Integritätsstatus wird aktiv gesammelt:
 
-*   **WGX / Producer**: Erzeugt den Integritätsbericht (`summary.json`) und veröffentlicht ihn an einer kanonischen URL (Release Asset).
+*   **WGX / Producer**: Erzeugt den Integritätsbericht (`reports/integrity/summary.json`) und veröffentlicht ihn als Release Asset.
 *   **Metarepo (Constitution)**: Definiert die Liste der zu prüfenden Quellen in `reports/integrity/sources.v1.json`.
 *   **Chronik (Orchestrator)**: Liest die Quellenliste, ruft periodisch die Berichte ab, validiert und speichert den aktuellen Status.
 *   **Leitstand (Display)**: Visualisiert den von der Chronik bereitgestellten Status.
@@ -29,9 +29,10 @@ Der Integritätsstatus wird aktiv gesammelt:
 
 ### Artefakte & Kanon
 
-*   **`summary.json`**: Der vollständige Bericht.
-    *   Muss als **Release Asset** unter dem Tag **`integrity`** veröffentlicht werden.
-    *   Alternativ: Stabil erreichbare URL (z.B. Raw GitHub Content), wenn in `sources.v1.json` konfiguriert.
+*   **`reports/integrity/summary.json`**: Der Erzeugungspfad des Berichts im Repository.
+*   **Release Asset `summary.json`**: Das Publikationsartefakt.
+    *   Der Bericht muss als Datei `summary.json` unter dem Release-Tag **`integrity`** veröffentlicht werden.
+    *   Die `summary_url` in der Quellenliste zeigt auf dieses Asset.
 *   **`reports/integrity/sources.v1.json`**: Die **Single Source of Truth (SoT)** für Integritätsquellen.
     *   Wird generiert aus der Fleet-Definition (`fleet/repos.yml`).
     *   Definiert für jedes Repo die `summary_url`.
@@ -71,8 +72,16 @@ Der abgerufene Bericht muss mindestens folgende Felder enthalten, um von der Chr
 
 ## Status-Werte
 
-*   `OK`: Alles in Ordnung.
-*   `WARN`: Kleinere Abweichungen.
-*   `FAIL`: Kritische Diskrepanz oder Schema-Verletzung beim Abruf.
-*   `MISSING`: Bericht konnte technisch nicht abgerufen werden (404, Network Error).
-*   `UNCLEAR`: Inhaltlich nicht interpretierbar.
+Consumer (Chronik/Leitstand) mappen technische Ergebnisse auf semantische Status-Werte:
+
+*   **`OK`**: Bericht erfolgreich abgerufen und Inhalt ist `OK`.
+*   **`WARN`**: Bericht erfolgreich abgerufen und Inhalt ist `WARN`.
+*   **`FAIL`**:
+    *   Inhaltlich kritisch (`status: FAIL` im Bericht).
+    *   **Schema-Verletzung**: JSON ist ungültig oder Pflichtfelder fehlen.
+*   **`MISSING`**:
+    *   Technischer Fehler beim Abruf (HTTP 404, Timeout, Network Error).
+    *   Repo liefert keine Daten (Release Asset fehlt).
+*   **`UNCLEAR`**:
+    *   Status im Bericht ist unbekannt oder undefiniert.
+    *   Bericht ist valide, aber logisch nicht interpretierbar.

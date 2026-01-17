@@ -40,11 +40,25 @@ def load_yaml(path: Path) -> Any:
         with open(path, "r", encoding="utf-8") as f:
             return yaml.safe_load(f)
     if HAS_WGX:
-        return repo_config.load_config(path)
+        # repo_config doesn't support '---', so we manually read and strip it
+        try:
+            text = path.read_text(encoding="utf-8")
+            # Strip YAML directives
+            lines = [l for l in text.splitlines() if not l.strip().startswith("---")]
+            clean_text = "\n".join(lines)
+            return repo_config.parse_simple_yaml(clean_text)
+        except Exception as e:
+            print(f"Warning: Failed to parse {path} with repo_config: {e}", file=sys.stderr)
+            raise
+
     # Fallback manual parsing or error
     raise ImportError("No yaml parser available (install pyyaml or wgx module)")
 
 def utc_now_iso() -> str:
+    # Support SOURCE_DATE_EPOCH for reproducible builds
+    if "SOURCE_DATE_EPOCH" in os.environ:
+        ts = int(os.environ["SOURCE_DATE_EPOCH"])
+        return datetime.fromtimestamp(ts, timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 def detect_repo_root() -> Path:
@@ -67,12 +81,35 @@ def main():
     fleet_data = load_yaml(fleet_repos_file)
 
     fleet_list = []
-    if "repos" in fleet_data and isinstance(fleet_data["repos"], list):
-        for entry in fleet_data["repos"]:
-            if isinstance(entry, dict) and "name" in entry:
-                fleet_list.append(entry["name"])
-            elif isinstance(entry, str):
-                fleet_list.append(entry)
+
+    # Robust parsing of fleet/repos.yml
+    if "repos" in fleet_data:
+        repos_node = fleet_data["repos"]
+
+        if isinstance(repos_node, list):
+            for entry in repos_node:
+                if isinstance(entry, dict):
+                    name = entry.get("name")
+                    if not name:
+                        continue
+                    # Check for explicit fleet: false in list items
+                    if entry.get("fleet") is False:
+                        continue
+                    fleet_list.append(name)
+                elif isinstance(entry, str):
+                    fleet_list.append(entry)
+
+        elif isinstance(repos_node, dict):
+            # Dict form: { "repo_name": { ... metadata ... } }
+            for name, meta in repos_node.items():
+                if isinstance(meta, dict):
+                    # Filter out if fleet is explicitly false
+                    if meta.get("fleet") is False:
+                        continue
+                    fleet_list.append(name)
+                else:
+                    # Treat simple key as valid repo
+                    fleet_list.append(name)
 
     # Load Repo Configs (for overrides/owner)
     repo_configs = {}
@@ -108,9 +145,27 @@ def main():
             "enabled": enabled
         })
 
+    # Check for idempotence to avoid drift in timestamps
+    existing_data = None
+    if output_file.exists():
+        try:
+            with open(output_file, "r", encoding="utf-8") as f:
+                existing_data = json.load(f)
+        except Exception:
+            pass
+
+    new_generated_at = utc_now_iso()
+
+    if existing_data and existing_data.get("sources") == sources:
+        # Content didn't change, preserve timestamp to avoid noise
+        new_generated_at = existing_data.get("generated_at", new_generated_at)
+        print(f"No changes detected for {output_file}, preserving timestamp.")
+    else:
+        print(f"Changes detected, updating {output_file}")
+
     output_data = {
         "apiVersion": "integrity.sources.v1",
-        "generated_at": utc_now_iso(),
+        "generated_at": new_generated_at,
         "sources": sources
     }
 
@@ -118,8 +173,6 @@ def main():
     with open(output_file, "w", encoding="utf-8") as f:
         json.dump(output_data, f, indent=2)
         f.write("\n")
-
-    print(f"Generated {output_file}")
 
 if __name__ == "__main__":
     main()
