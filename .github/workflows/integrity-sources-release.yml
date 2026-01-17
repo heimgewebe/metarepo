@@ -30,8 +30,6 @@ jobs:
         with:
           tag_name: integrity
           files: reports/integrity/sources.v1.json
-          name: Integrity Artifacts
-          body: "Canonical integrity sources and reports."
+          # Do not set name/body to avoid overwriting existing release metadata
+          # if other producers also upload to this tag.
           make_latest: false
-          # clobber is not explicitly supported by action-gh-release input,
-          # but the action overwrites existing assets by default or handles updates.

@@ -1,7 +1,9 @@
 import json
 import os
+import shutil
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 import pytest
@@ -9,6 +11,19 @@ import yaml
 
 # Path to the script
 SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "generate_integrity_sources.py"
+
+def run_script(env):
+    # Try to use uv if available, otherwise fallback to sys.executable
+    cmd = [sys.executable, str(SCRIPT_PATH)]
+    if shutil.which("uv"):
+        cmd = ["uv", "run", str(SCRIPT_PATH)]
+
+    return subprocess.run(
+        cmd,
+        env=env,
+        capture_output=True,
+        text=True
+    )
 
 def test_generate_integrity_sources_standard(tmp_path):
     # Setup mock file structure
@@ -42,12 +57,7 @@ def test_generate_integrity_sources_standard(tmp_path):
     env = os.environ.copy()
     env["HG_ROOT"] = str(tmp_path)
 
-    result = subprocess.run(
-        [sys.executable, str(SCRIPT_PATH)],
-        env=env,
-        capture_output=True,
-        text=True
-    )
+    result = run_script(env)
 
     assert result.returncode == 0, f"Script failed: {result.stderr}"
 
@@ -86,12 +96,7 @@ def test_generate_integrity_sources_no_repo_config(tmp_path):
     env = os.environ.copy()
     env["HG_ROOT"] = str(tmp_path)
 
-    result = subprocess.run(
-        [sys.executable, str(SCRIPT_PATH)],
-        env=env,
-        capture_output=True,
-        text=True
-    )
+    result = run_script(env)
 
     assert result.returncode == 0
 
@@ -121,12 +126,7 @@ def test_generate_integrity_sources_fleet_false_list(tmp_path):
     env = os.environ.copy()
     env["HG_ROOT"] = str(tmp_path)
 
-    result = subprocess.run(
-        [sys.executable, str(SCRIPT_PATH)],
-        env=env,
-        capture_output=True,
-        text=True
-    )
+    result = run_script(env)
 
     assert result.returncode == 0
 
@@ -157,12 +157,7 @@ def test_generate_integrity_sources_dict_format(tmp_path):
     env = os.environ.copy()
     env["HG_ROOT"] = str(tmp_path)
 
-    result = subprocess.run(
-        [sys.executable, str(SCRIPT_PATH)],
-        env=env,
-        capture_output=True,
-        text=True
-    )
+    result = run_script(env)
 
     assert result.returncode == 0
 
@@ -190,12 +185,7 @@ def test_generate_integrity_sources_duplicate(tmp_path):
     env = os.environ.copy()
     env["HG_ROOT"] = str(tmp_path)
 
-    result = subprocess.run(
-        [sys.executable, str(SCRIPT_PATH)],
-        env=env,
-        capture_output=True,
-        text=True
-    )
+    result = run_script(env)
 
     assert result.returncode == 1
     assert "Duplicate repo detected" in result.stderr
@@ -226,12 +216,7 @@ def test_generate_integrity_sources_override_enabled(tmp_path):
     env = os.environ.copy()
     env["HG_ROOT"] = str(tmp_path)
 
-    result = subprocess.run(
-        [sys.executable, str(SCRIPT_PATH)],
-        env=env,
-        capture_output=True,
-        text=True
-    )
+    result = run_script(env)
 
     assert result.returncode == 0
 
@@ -240,3 +225,50 @@ def test_generate_integrity_sources_override_enabled(tmp_path):
         data = json.load(f)
 
     assert data["sources"][0]["enabled"] is False
+
+def test_generate_integrity_sources_idempotence(tmp_path):
+    # Test that timestamp is preserved if content is unchanged
+    fleet_dir = tmp_path / "fleet"
+    fleet_dir.mkdir()
+
+    fleet_repos_content = {
+        "repos": ["repo1"]
+    }
+    with open(fleet_dir / "repos.yml", "w") as f:
+        yaml.dump(fleet_repos_content, f)
+
+    env = os.environ.copy()
+    env["HG_ROOT"] = str(tmp_path)
+
+    # First run
+    run_script(env)
+    output_file = tmp_path / "reports/integrity/sources.v1.json"
+
+    with open(output_file, "r") as f:
+        data1 = json.load(f)
+    ts1 = data1["generated_at"]
+
+    # Wait a moment to ensure clock advances
+    time.sleep(1.1)
+
+    # Second run (no config changes)
+    run_script(env)
+
+    with open(output_file, "r") as f:
+        data2 = json.load(f)
+    ts2 = data2["generated_at"]
+
+    assert ts1 == ts2, "Timestamp should be preserved for identical content"
+
+    # Third run (with change)
+    fleet_repos_content["repos"].append("repo2")
+    with open(fleet_dir / "repos.yml", "w") as f:
+        yaml.dump(fleet_repos_content, f)
+
+    run_script(env)
+
+    with open(output_file, "r") as f:
+        data3 = json.load(f)
+    ts3 = data3["generated_at"]
+
+    assert ts1 != ts3, "Timestamp should update when content changes"
