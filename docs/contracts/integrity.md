@@ -68,7 +68,7 @@ Der abgerufene Bericht muss mindestens folgende Felder enthalten, um von der Chr
 ```
 
 *   `url` ist optional im Bericht. Die Chronik ergänzt dieses Feld ("Backfilling") basierend auf der Abruf-Quelle.
-*   **Keine weitere Heilung**: Andere Felder wie `generated_at`, `status` oder `repo` werden **nicht** interpoliert oder erraten. Fehlen sie, ist der Bericht ungültig (`FAIL`).
+*   **Keine weitere Heilung**: Andere Felder wie `generated_at`, `status` oder `repo` werden **nicht** interpoliert oder erraten.
 *   Weitere Felder (wie `counts`, `details`) sind erlaubt und erwünscht für Debugging, werden aber für den High-Level-Status nicht zwingend benötigt.
 
 ## Status-Werte
@@ -80,7 +80,8 @@ Consumer (Chronik/Leitstand) mappen technische Ergebnisse auf semantische Status
 *   **`FAIL`**:
     *   Inhaltlich kritisch (`status: FAIL` im Bericht).
     *   **Schema-Verletzung**: JSON ist ungültig oder Pflichtfelder fehlen.
-    *   **Ungültiger Timestamp**: `generated_at` fehlt oder ist kein valider ISO-String. Es findet kein Fallback auf `received_at` statt.
+    *   **Ungültiger Timestamp**: `generated_at` fehlt oder ist kein valider ISO-String.
+    *   *Sanitization*: Die Chronik darf zur Persistenz `generated_at` auf `received_at` setzen, muss dies aber mit dem Flag `generated_at_sanitized: true` markieren. Der Status bleibt `FAIL` (oder wird entsprechend der Severity-Policy bewertet), da die Integrität der Quelle verletzt ist.
 *   **`MISSING`**:
     *   Technischer Fehler beim Abruf (HTTP 404, Timeout, Network Error).
     *   Repo liefert keine Daten (Release Asset fehlt).
