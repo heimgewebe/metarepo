@@ -326,7 +326,8 @@ def test_generate_integrity_sources_empty_fleet(tmp_path):
     result = run_script(env)
 
     assert result.returncode == 0
-    assert "Warning: No fleet repositories found" in result.stderr
+    # Check for the updated warning message format
+    assert "Warning: No repositories found in" in result.stderr and "generated sources list will be empty" in result.stderr
 
     output_file = tmp_path / "reports/integrity/sources.v1.json"
     with open(output_file, "r") as f:
