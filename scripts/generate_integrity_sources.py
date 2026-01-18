@@ -15,7 +15,7 @@ import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 # Ensure the repository root is in the path for wgx imports
 _REPO_ROOT = Path(__file__).resolve().parents[1]
