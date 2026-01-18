@@ -35,6 +35,10 @@ jobs:
           chmod +x scripts/check-integrity-drift.sh
           ./scripts/check-integrity-drift.sh
 
+      - name: Run Integrity Generator Tests
+        run: |
+          uv run pytest tests/test_generate_integrity_sources.py
+
       - name: Ensure sources file exists
         run: |
           if [ ! -f "reports/integrity/sources.v1.json" ]; then
