@@ -17,7 +17,8 @@ exclude = [
   "https://archlinux.org/*",
   "https://www.gnu.org/software/emacs/manual/html_node/flymake/",
   "https://docs.oasis-open.org/sarif/sarif/v2.1.0/sarif-v2.1.0.html",
-  "https://go.dev/doc/install"
+  "https://go.dev/doc/install",
+  "https://search.nixos.org/*"
 ]
 
 # Optional: Domains lassen sich hier ausschließen, falls einzelne Ziele drosseln oder 429 liefern.

@@ -61,7 +61,7 @@
           "additionalProperties": false
         },
         "self_state": {
-          "$ref": "https://heimgewebe/contracts/heimgeist/self_state.schema.json",
+          "$ref": "https://schemas.heimgewebe.org/contracts/heimgeist/self_state.schema.json",
           "description": "Optionaler Meta-Snapshot zum Zeitpunkt der Einsicht."
         }
       },

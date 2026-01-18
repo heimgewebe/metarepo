@@ -1,0 +1,91 @@
+{
+  "apiVersion": "integrity.sources.v1",
+  "generated_at": "2026-01-17T08:05:04Z",
+  "sources": [
+    {
+      "repo": "heimgewebe/aussensensor",
+      "summary_url": "https://github.com/heimgewebe/aussensensor/releases/download/integrity/summary.json",
+      "enabled": true
+    },
+    {
+      "repo": "heimgewebe/chronik",
+      "summary_url": "https://github.com/heimgewebe/chronik/releases/download/integrity/summary.json",
+      "enabled": true
+    },
+    {
+      "repo": "heimgewebe/contracts-mirror",
+      "summary_url": "https://github.com/heimgewebe/contracts-mirror/releases/download/integrity/summary.json",
+      "enabled": true
+    },
+    {
+      "repo": "heimgewebe/hausKI",
+      "summary_url": "https://github.com/heimgewebe/hausKI/releases/download/integrity/summary.json",
+      "enabled": true
+    },
+    {
+      "repo": "heimgewebe/hausKI-audio",
+      "summary_url": "https://github.com/heimgewebe/hausKI-audio/releases/download/integrity/summary.json",
+      "enabled": true
+    },
+    {
+      "repo": "heimgewebe/heimgeist",
+      "summary_url": "https://github.com/heimgewebe/heimgeist/releases/download/integrity/summary.json",
+      "enabled": true
+    },
+    {
+      "repo": "heimgewebe/heimlern",
+      "summary_url": "https://github.com/heimgewebe/heimlern/releases/download/integrity/summary.json",
+      "enabled": true
+    },
+    {
+      "repo": "heimgewebe/leitstand",
+      "summary_url": "https://github.com/heimgewebe/leitstand/releases/download/integrity/summary.json",
+      "enabled": true
+    },
+    {
+      "repo": "heimgewebe/metarepo",
+      "summary_url": "https://github.com/heimgewebe/metarepo/releases/download/integrity/summary.json",
+      "enabled": true
+    },
+    {
+      "repo": "heimgewebe/mitschreiber",
+      "summary_url": "https://github.com/heimgewebe/mitschreiber/releases/download/integrity/summary.json",
+      "enabled": true
+    },
+    {
+      "repo": "heimgewebe/plexer",
+      "summary_url": "https://github.com/heimgewebe/plexer/releases/download/integrity/summary.json",
+      "enabled": true
+    },
+    {
+      "repo": "heimgewebe/semantAH",
+      "summary_url": "https://github.com/heimgewebe/semantAH/releases/download/integrity/summary.json",
+      "enabled": true
+    },
+    {
+      "repo": "heimgewebe/sichter",
+      "summary_url": "https://github.com/heimgewebe/sichter/releases/download/integrity/summary.json",
+      "enabled": true
+    },
+    {
+      "repo": "heimgewebe/tools",
+      "summary_url": "https://github.com/heimgewebe/tools/releases/download/integrity/summary.json",
+      "enabled": true
+    },
+    {
+      "repo": "heimgewebe/vault-gewebe",
+      "summary_url": "https://github.com/heimgewebe/vault-gewebe/releases/download/integrity/summary.json",
+      "enabled": true
+    },
+    {
+      "repo": "heimgewebe/webmaschine",
+      "summary_url": "https://github.com/heimgewebe/webmaschine/releases/download/integrity/summary.json",
+      "enabled": true
+    },
+    {
+      "repo": "heimgewebe/wgx",
+      "summary_url": "https://github.com/heimgewebe/wgx/releases/download/integrity/summary.json",
+      "enabled": true
+    }
+  ]
+}

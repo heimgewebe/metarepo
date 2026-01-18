@@ -1,5 +1,5 @@
 {
-  "$id": "https://heimgewebe/contracts/heimgeist/self_state.schema.json",
+  "$id": "https://schemas.heimgewebe.org/contracts/heimgeist/self_state.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Heimgeist Self-State",
   "description": "Explizites Self-Model für Heimgeist: interne Zustände und Meta-Kognition.",

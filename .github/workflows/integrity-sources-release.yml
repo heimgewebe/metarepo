@@ -1,0 +1,56 @@
+name: Publish Integrity Sources
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "reports/integrity/sources.v1.json"
+      - "fleet/repos.yml"
+      - "repos.yml"
+      - "scripts/generate_integrity_sources.py"
+      - "contracts/integrity.sources.v1.schema.json"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish-sources:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Ensure sources file is up-to-date (Drift Check)
+        run: |
+          chmod +x scripts/check-integrity-drift.sh
+          ./scripts/check-integrity-drift.sh
+
+      - name: Run Integrity Generator Tests
+        run: |
+          uv run pytest tests/test_generate_integrity_sources.py
+
+      - name: Ensure sources file exists
+        run: |
+          if [ ! -f "reports/integrity/sources.v1.json" ]; then
+            echo "Error: reports/integrity/sources.v1.json not found!"
+            exit 1
+          fi
+
+      - name: Publish sources.v1.json to Release
+        uses: softprops/action-gh-release@c95fe1489396fe8a9eb87c0abf8aa5b2ef267fda # v2.2.1
+        with:
+          tag_name: integrity
+          files: reports/integrity/sources.v1.json
+          # Do not set name/body to avoid overwriting existing release metadata
+          # if other producers also upload to this tag.
+          make_latest: false
