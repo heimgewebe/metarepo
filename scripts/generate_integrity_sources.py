@@ -15,7 +15,7 @@ import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Optional
 
 # Ensure the repository root is in the path for wgx imports
 _REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -104,7 +104,10 @@ def main():
                     repo_configs[name] = r
 
     if not fleet_list:
-        print("Warning: No fleet repositories found.", file=sys.stderr)
+        print(
+            f"Warning: No repositories found in {fleet_repos_file}; generated sources list will be empty.",
+            file=sys.stderr,
+        )
 
     sources = []
     seen_repos = set()
@@ -113,8 +116,7 @@ def main():
         config = repo_configs.get(repo_name, {})
         # config usage: specifically to check for integrity.enabled override
 
-        # repos.yml entry doesn't strictly have 'owner', but root has github.owner
-        # We assume all are under default owner unless specified (not currently supported in repos.yml schema but good for logic)
+        # Use default owner for all repos (per-repo owner override not currently supported)
         owner = default_owner
         full_repo_name = f"{owner}/{repo_name}"
 
