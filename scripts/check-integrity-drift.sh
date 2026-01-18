@@ -11,12 +11,12 @@ OUTPUT_FILE="${REPO_ROOT}/reports/integrity/sources.v1.json"
 echo "Checking for drift in integrity sources..."
 
 # Run the generator
-CMD="python3"
+CMD=("python3")
 if command -v uv >/dev/null 2>&1; then
-    CMD="uv run -- python3"
+    CMD=("uv" "run" "--" "python3")
 fi
 
-if ! $CMD "$SCRIPT_PATH"; then
+if ! "${CMD[@]}" "$SCRIPT_PATH"; then
   echo "Error: Generator script failed."
   exit 1
 fi
