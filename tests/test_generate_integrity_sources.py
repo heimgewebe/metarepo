@@ -300,3 +300,61 @@ def test_generated_output_matches_schema(tmp_path):
         schema = json.load(f)
 
     validate(instance=data, schema=schema)
+
+def test_generate_integrity_sources_missing_fleet_file(tmp_path):
+    # Test execution when fleet/repos.yml is missing
+    env = os.environ.copy()
+    env["HG_ROOT"] = str(tmp_path)
+
+    # Do NOT create fleet/repos.yml
+
+    result = run_script(env)
+
+    assert result.returncode == 1
+    assert "not found" in result.stdout
+
+def test_generate_integrity_sources_empty_fleet(tmp_path):
+    # Test warning on empty fleet list
+    fleet_dir = tmp_path / "fleet"
+    fleet_dir.mkdir()
+
+    with open(fleet_dir / "repos.yml", "w") as f:
+        yaml.dump({"repos": []}, f)
+
+    env = os.environ.copy()
+    env["HG_ROOT"] = str(tmp_path)
+
+    result = run_script(env)
+
+    assert result.returncode == 0
+    assert "Warning: No fleet repositories found" in result.stderr
+
+    output_file = tmp_path / "reports/integrity/sources.v1.json"
+    with open(output_file, "r") as f:
+        data = json.load(f)
+
+    assert data["sources"] == []
+
+def test_generate_integrity_sources_sorting(tmp_path):
+    # Verify sources are sorted by repo name
+    fleet_dir = tmp_path / "fleet"
+    fleet_dir.mkdir()
+
+    fleet_repos_content = {
+        "repos": ["beta-repo", "alpha-repo"]
+    }
+    with open(fleet_dir / "repos.yml", "w") as f:
+        yaml.dump(fleet_repos_content, f)
+
+    env = os.environ.copy()
+    env["HG_ROOT"] = str(tmp_path)
+
+    result = run_script(env)
+    assert result.returncode == 0
+
+    output_file = tmp_path / "reports/integrity/sources.v1.json"
+    with open(output_file, "r") as f:
+        data = json.load(f)
+
+    repos = [s["repo"] for s in data["sources"]]
+    assert repos == ["heimgewebe/alpha-repo", "heimgewebe/beta-repo"]

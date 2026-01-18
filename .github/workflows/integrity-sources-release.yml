@@ -18,6 +18,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Ensure sources file is up-to-date (Drift Check)
+        run: |
+          chmod +x scripts/check-integrity-drift.sh
+          ./scripts/check-integrity-drift.sh
+
       - name: Ensure sources file exists
         run: |
           if [ ! -f "reports/integrity/sources.v1.json" ]; then
