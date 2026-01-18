@@ -149,7 +149,7 @@ jobs:
           }
           trap on_fail ERR
           
-          shopt -s nullglob
+          shopt -s nullglob globstar
           schemas=( contracts/**/*.schema.json )
 
           if [ ${#schemas[@]} -eq 0 ]; then
@@ -159,19 +159,17 @@ jobs:
 
           echo "Compiling ${#schemas[@]} schema(s)..."
           
-          # Build a complete reference list of all schemas (excluding the one being compiled)
-          # This generic approach avoids repo-specific heuristics and ensures all $ref targets are resolvable
-          shopt -s nullglob
+          # Build a complete reference list of all schemas once (generic approach)
+          # This avoids repo-specific heuristics and ensures all $ref targets are resolvable
           all_schemas=( contracts/**/*.schema.json )
-          shopt -u nullglob
+          shopt -u nullglob globstar
           
           for schema in "${schemas[@]}"; do
             echo "Compiling $schema"
             
-            # Build reference list: all other schemas
+            # Build reference list: all other schemas (exclude self)
             refs=()
             for ref_schema in "${all_schemas[@]}"; do
-              # Don't reference self
               if [[ "$ref_schema" != "$schema" ]]; then
                 refs+=(-r "$ref_schema")
               fi
@@ -214,14 +212,14 @@ jobs:
           }
           trap on_fail ERR
           
-          shopt -s nullglob
+          shopt -s nullglob globstar
           # Build complete reference list once for all validations (generic approach)
           all_schemas=( contracts/**/*.schema.json )
           all_refs=()
           for ref_schema in "${all_schemas[@]}"; do
             all_refs+=(-r "$ref_schema")
           done
-          shopt -u nullglob
+          shopt -u nullglob globstar
           
           # Find all examples that match the pattern *.json (including .example.json)
           for example in contracts/examples/*.json; do
