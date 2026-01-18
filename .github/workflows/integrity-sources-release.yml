@@ -6,6 +6,10 @@ on:
       - main
     paths:
       - "reports/integrity/sources.v1.json"
+      - "fleet/repos.yml"
+      - "repos.yml"
+      - "scripts/generate_integrity_sources.py"
+      - "contracts/integrity.sources.v1.schema.json"
   workflow_dispatch:
 
 permissions:
