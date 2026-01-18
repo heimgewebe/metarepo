@@ -1,5 +1,5 @@
 {
-  "$id": "https://heimgewebe/contracts/integrity.sources.v1.schema.json",
+  "$id": "https://schemas.heimgewebe.org/contracts/integrity.sources.v1.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Integrity Sources v1",
   "description": "Single Source of Truth for integrity monitoring sources (Pull Model).",
