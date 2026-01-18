@@ -8,9 +8,11 @@ from pathlib import Path
 
 import pytest
 import yaml
+from jsonschema import validate
 
 # Path to the script
 SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "generate_integrity_sources.py"
+SCHEMA_PATH = Path(__file__).resolve().parents[1] / "contracts" / "integrity.sources.v1.schema.json"
 
 def run_script(env):
     # Try to use uv if available, otherwise fallback to sys.executable
@@ -272,3 +274,29 @@ def test_generate_integrity_sources_idempotence(tmp_path):
     ts3 = data3["generated_at"]
 
     assert ts1 != ts3, "Timestamp should update when content changes"
+
+def test_generated_output_matches_schema(tmp_path):
+    # Test that generated output is valid against the schema
+    fleet_dir = tmp_path / "fleet"
+    fleet_dir.mkdir()
+
+    fleet_repos_content = {
+        "repos": ["repo1"]
+    }
+    with open(fleet_dir / "repos.yml", "w") as f:
+        yaml.dump(fleet_repos_content, f)
+
+    env = os.environ.copy()
+    env["HG_ROOT"] = str(tmp_path)
+
+    result = run_script(env)
+    assert result.returncode == 0
+
+    output_file = tmp_path / "reports/integrity/sources.v1.json"
+    with open(output_file, "r") as f:
+        data = json.load(f)
+
+    with open(SCHEMA_PATH, "r") as f:
+        schema = json.load(f)
+
+    validate(instance=data, schema=schema)
