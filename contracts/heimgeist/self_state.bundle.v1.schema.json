@@ -1,5 +1,5 @@
 {
-  "$id": "https://heimgewebe/contracts/heimgeist/self_state.bundle.v1.schema.json",
+  "$id": "https://schemas.heimgewebe.org/contracts/heimgeist/self_state.bundle.v1.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Heimgeist Self-State Bundle V1",
   "description": "Bundle-Artifact für den Leitstand, das aktuellen Self-State und Historie bündelt.",

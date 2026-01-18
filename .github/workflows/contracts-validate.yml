@@ -160,14 +160,40 @@ jobs:
           echo "Compiling ${#schemas[@]} schema(s)..."
           for schema in "${schemas[@]}"; do
             echo "Compiling $schema"
-            # Check if schema references base.event.schema.json and include it if so
+            
+            # Build reference list for schemas with $ref dependencies
+            refs=()
+            
+            # Check for base.event.schema.json reference
             # shellcheck disable=SC2016
             if grep -q '"\$ref".*base\.event\.schema\.json' "$schema" 2>/dev/null; then
-              echo "  → Schema references base.event.schema.json, including as reference"
-              ajv compile -s "$schema" -r contracts/events/base.event.schema.json --strict=log --spec=draft2020 -c ajv-formats
+              echo "  → Schema references base.event.schema.json"
+              refs+=(-r contracts/events/base.event.schema.json)
+            fi
+            
+            # Check for heimgeist schema references (from other directories or within heimgeist/)
+            # shellcheck disable=SC2016
+            if grep -q '"\$ref".*heimgeist.*\.schema\.json' "$schema" 2>/dev/null || \
+               [[ "$schema" == contracts/heimgeist/* ]] && grep -q '"\$ref".*\.schema\.json' "$schema" 2>/dev/null; then
+              echo "  → Schema references heimgeist schemas"
+              # Add all heimgeist schemas as references
+              shopt -s nullglob
+              for hg_schema in contracts/heimgeist/*.schema.json; do
+                # Don't reference self
+                if [[ "$hg_schema" != "$schema" ]]; then
+                  refs+=(-r "$hg_schema")
+                fi
+              done
+              shopt -u nullglob
+            fi
+            
+            # Compile with or without references
+            if [ ${#refs[@]} -gt 0 ]; then
+              ajv compile -s "$schema" "${refs[@]}" --strict=log --spec=draft2020 -c ajv-formats
             else
               ajv compile -s "$schema" --strict=log --spec=draft2020 -c ajv-formats
             fi
+            echo "schema $schema is valid"
           done
 
       - name: Validate Specific Examples
@@ -219,13 +245,37 @@ jobs:
 
             if [[ -n "$schema" ]]; then
               echo "Validating $example against $schema"
-              # Check if schema references base.event.schema.json
+              
+              # Build reference list for schemas with $ref dependencies
+              refs=()
+              
+              # Check for base.event.schema.json reference
               # shellcheck disable=SC2016
               if grep -q '"\$ref".*base\.event\.schema\.json' "$schema" 2>/dev/null; then
-                echo "  → Schema references base.event.schema.json, including as reference"
+                echo "  → Schema references base.event.schema.json"
+                refs+=(-r contracts/events/base.event.schema.json)
+              fi
+              
+              # Check for heimgeist schema references (from other directories or within heimgeist/)
+              # shellcheck disable=SC2016
+              if grep -q '"\$ref".*heimgeist.*\.schema\.json' "$schema" 2>/dev/null || \
+                 [[ "$schema" == contracts/heimgeist/* ]] && grep -q '"\$ref".*\.schema\.json' "$schema" 2>/dev/null; then
+                echo "  → Schema references heimgeist schemas"
+                shopt -s nullglob
+                for hg_schema in contracts/heimgeist/*.schema.json; do
+                  # Don't reference self
+                  if [[ "$hg_schema" != "$schema" ]]; then
+                    refs+=(-r "$hg_schema")
+                  fi
+                done
+                shopt -u nullglob
+              fi
+              
+              # Validate with or without references
+              if [ ${#refs[@]} -gt 0 ]; then
                 ajv validate \
                   -s "$schema" \
-                  -r contracts/events/base.event.schema.json \
+                  "${refs[@]}" \
                   -d "$example" \
                   --strict=false \
                   -c ajv-formats --spec=draft2020
