@@ -16,7 +16,7 @@
       "description": "Konstante Kennung des Schemas."
     },
     "current": {
-      "$ref": "./self_state.schema.json",
+      "$ref": "https://schemas.heimgewebe.org/contracts/heimgeist/self_state.schema.json",
       "description": "Der aktuelle Self-State Snapshot."
     },
     "history": {
@@ -30,7 +30,7 @@
             "format": "date-time"
           },
           "state": {
-            "$ref": "./self_state.schema.json"
+            "$ref": "https://schemas.heimgewebe.org/contracts/heimgeist/self_state.schema.json"
           }
         },
         "additionalProperties": false

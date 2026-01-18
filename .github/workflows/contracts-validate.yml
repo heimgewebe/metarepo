@@ -158,41 +158,27 @@ jobs:
           fi
 
           echo "Compiling ${#schemas[@]} schema(s)..."
+          
+          # Build a complete reference list of all schemas (excluding the one being compiled)
+          # This generic approach avoids repo-specific heuristics and ensures all $ref targets are resolvable
+          shopt -s nullglob
+          all_schemas=( contracts/**/*.schema.json )
+          shopt -u nullglob
+          
           for schema in "${schemas[@]}"; do
             echo "Compiling $schema"
             
-            # Build reference list for schemas with $ref dependencies
+            # Build reference list: all other schemas
             refs=()
+            for ref_schema in "${all_schemas[@]}"; do
+              # Don't reference self
+              if [[ "$ref_schema" != "$schema" ]]; then
+                refs+=(-r "$ref_schema")
+              fi
+            done
             
-            # Check for base.event.schema.json reference
-            # shellcheck disable=SC2016
-            if grep -q '"\$ref".*base\.event\.schema\.json' "$schema" 2>/dev/null; then
-              echo "  → Schema references base.event.schema.json"
-              refs+=(-r contracts/events/base.event.schema.json)
-            fi
-            
-            # Check for heimgeist schema references (from other directories or within heimgeist/)
-            # shellcheck disable=SC2016
-            if grep -q '"\$ref".*heimgeist.*\.schema\.json' "$schema" 2>/dev/null || \
-               [[ "$schema" == contracts/heimgeist/* ]] && grep -q '"\$ref".*\.schema\.json' "$schema" 2>/dev/null; then
-              echo "  → Schema references heimgeist schemas"
-              # Add all heimgeist schemas as references
-              shopt -s nullglob
-              for hg_schema in contracts/heimgeist/*.schema.json; do
-                # Don't reference self
-                if [[ "$hg_schema" != "$schema" ]]; then
-                  refs+=(-r "$hg_schema")
-                fi
-              done
-              shopt -u nullglob
-            fi
-            
-            # Compile with or without references
-            if [ ${#refs[@]} -gt 0 ]; then
-              ajv compile -s "$schema" "${refs[@]}" --strict=log --spec=draft2020 -c ajv-formats
-            else
-              ajv compile -s "$schema" --strict=log --spec=draft2020 -c ajv-formats
-            fi
+            # Compile with all schemas as potential references
+            ajv compile -s "$schema" "${refs[@]}" --strict=log --spec=draft2020 -c ajv-formats
             echo "schema $schema is valid"
           done
 
@@ -229,6 +215,14 @@ jobs:
           trap on_fail ERR
           
           shopt -s nullglob
+          # Build complete reference list once for all validations (generic approach)
+          all_schemas=( contracts/**/*.schema.json )
+          all_refs=()
+          for ref_schema in "${all_schemas[@]}"; do
+            all_refs+=(-r "$ref_schema")
+          done
+          shopt -u nullglob
+          
           # Find all examples that match the pattern *.json (including .example.json)
           for example in contracts/examples/*.json; do
             # Extract base name, handling .example.json or just .json
@@ -246,46 +240,13 @@ jobs:
             if [[ -n "$schema" ]]; then
               echo "Validating $example against $schema"
               
-              # Build reference list for schemas with $ref dependencies
-              refs=()
-              
-              # Check for base.event.schema.json reference
-              # shellcheck disable=SC2016
-              if grep -q '"\$ref".*base\.event\.schema\.json' "$schema" 2>/dev/null; then
-                echo "  → Schema references base.event.schema.json"
-                refs+=(-r contracts/events/base.event.schema.json)
-              fi
-              
-              # Check for heimgeist schema references (from other directories or within heimgeist/)
-              # shellcheck disable=SC2016
-              if grep -q '"\$ref".*heimgeist.*\.schema\.json' "$schema" 2>/dev/null || \
-                 [[ "$schema" == contracts/heimgeist/* ]] && grep -q '"\$ref".*\.schema\.json' "$schema" 2>/dev/null; then
-                echo "  → Schema references heimgeist schemas"
-                shopt -s nullglob
-                for hg_schema in contracts/heimgeist/*.schema.json; do
-                  # Don't reference self
-                  if [[ "$hg_schema" != "$schema" ]]; then
-                    refs+=(-r "$hg_schema")
-                  fi
-                done
-                shopt -u nullglob
-              fi
-              
-              # Validate with or without references
-              if [ ${#refs[@]} -gt 0 ]; then
-                ajv validate \
-                  -s "$schema" \
-                  "${refs[@]}" \
-                  -d "$example" \
-                  --strict=false \
-                  -c ajv-formats --spec=draft2020
-              else
-                ajv validate \
-                  -s "$schema" \
-                  -d "$example" \
-                  --strict=false \
-                  -c ajv-formats --spec=draft2020
-              fi
+              # Validate with all schemas as potential references
+              ajv validate \
+                -s "$schema" \
+                "${all_refs[@]}" \
+                -d "$example" \
+                --strict=false \
+                -c ajv-formats --spec=draft2020
             else
               echo "::notice::No matching schema found for $example (tried contracts/${filename}.schema.json and contracts/events/${filename}.schema.json)"
             fi

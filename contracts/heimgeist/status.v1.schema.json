@@ -21,7 +21,7 @@
       "description": "Globaler Systemstatus."
     },
     "self_state": {
-      "$ref": "./self_state.schema.json",
+      "$ref": "https://schemas.heimgewebe.org/contracts/heimgeist/self_state.schema.json",
       "description": "Aktueller Meta-kognitiver Zustand."
     },
     "timestamp": {
