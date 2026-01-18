@@ -216,10 +216,6 @@ jobs:
           shopt -s nullglob globstar
           # Build complete reference list once for all validations (generic approach)
           all_schemas=( contracts/**/*.schema.json )
-          all_refs=()
-          for ref_schema in "${all_schemas[@]}"; do
-            all_refs+=(-r "$ref_schema")
-          done
           shopt -u nullglob globstar
           
           # Find all examples that match the pattern *.json (including .example.json)
@@ -239,10 +235,18 @@ jobs:
             if [[ -n "$schema" ]]; then
               echo "Validating $example against $schema"
               
-              # Validate with all schemas as potential references
+              # Build reference list: all other schemas (exclude the schema being validated)
+              refs=()
+              for ref_schema in "${all_schemas[@]}"; do
+                if [[ "$ref_schema" != "$schema" ]]; then
+                  refs+=(-r "$ref_schema")
+                fi
+              done
+              
+              # Validate with all other schemas as potential references
               ajv validate \
                 -s "$schema" \
-                "${all_refs[@]}" \
+                "${refs[@]}" \
                 -d "$example" \
                 --strict=false \
                 -c ajv-formats --spec=draft2020
