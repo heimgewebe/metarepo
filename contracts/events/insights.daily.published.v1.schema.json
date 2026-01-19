@@ -31,6 +31,15 @@
           "type": "string",
           "format": "date-time",
           "description": "Exact generation timestamp of the artifact."
+        },
+        "schema_ref": {
+          "type": "string",
+          "format": "uri",
+          "description": "Canonical URI of the schema used for validation."
+        },
+        "sha": {
+          "type": "string",
+          "description": "SHA256 checksum of the artifact content."
         }
       },
       "additionalProperties": false
