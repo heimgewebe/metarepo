@@ -10,14 +10,14 @@
       "type": "object",
       "required": ["pending", "failed"],
       "properties": {
-        "pending": { "type": "integer" },
-        "failed": { "type": "integer" },
-        "delivered": { "type": "integer" },
-        "retried": { "type": "integer" }
+        "pending": { "type": "integer", "minimum": 0 },
+        "failed": { "type": "integer", "minimum": 0 },
+        "delivered": { "type": "integer", "minimum": 0 },
+        "retried": { "type": "integer", "minimum": 0 }
       },
       "additionalProperties": false
     },
-    "retryable_now": { "type": "integer" },
+    "retryable_now": { "type": "integer", "minimum": 0 },
     "next_due_at": { "type": ["string", "null"], "format": "date-time" },
     "last_error": { "type": ["string", "null"] },
     "last_retry_at": { "type": ["string", "null"], "format": "date-time" }

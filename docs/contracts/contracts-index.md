@@ -35,6 +35,19 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
   - Produzenten: chronik
   - Konsumenten: heimgeist, heimlern
 
+### 1.1a Event Routing & Delivery
+
+- `contracts/plexer/event.envelope.v1.schema.json`
+  - Zweck: Standardisierte Envelope für Events, die durch Plexer geroutet werden.
+- `contracts/plexer/delivery.report.v1.schema.json`
+  - Zweck: Report on event delivery status (counts, retries).
+  - Produzent: plexer
+  - Konsumenten: wgx, chronik, leitstand
+- `contracts/plexer/failed_event.v1.schema.json`
+  - Zweck: Persisted state for failed event deliveries.
+  - Produzent: plexer (internal persistence)
+  - Konsumenten: plexer (retry loop)
+
 ### 1.2 Fleet & Metriken
 
 - `fleet.health.schema.json`
@@ -125,15 +138,6 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
   - Zweck: Texte, die eingebettet (Vektorraum) werden sollen.
 - `os.context.text.redacted.schema.json`
   - Zweck: bereinigte / geschwärzte Textvarianten für Privacy.
-- `contracts/plexer/delivery.report.v1.schema.json`
-  - Zweck: Report on event delivery status (counts, retries).
-  - Produzent: plexer
-  - Konsumenten: wgx, chronik, leitstand
-- `contracts/plexer/failed_event.v1.schema.json`
-  - Zweck: Persisted state for failed event deliveries.
-  - Produzent: plexer (internal persistence)
-  - Konsumenten: plexer (retry loop)
-
 ### 1.6 Agenten, Werkzeuge & Workflows
 
 - `agent.tool.schema.json`

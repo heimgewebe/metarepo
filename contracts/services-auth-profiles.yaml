@@ -18,4 +18,4 @@ services:
   hausKI:
     authKind: bearer
     header: Authorization
-    prefix: "Bearer "
+    prefix: "Bearer " # trailing space is intentional
