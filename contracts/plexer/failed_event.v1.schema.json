@@ -8,8 +8,8 @@
   "properties": {
     "consumerKey": { "type": "string" },
     "event": {
-      "$ref": "https://schemas.heimgewebe.org/contracts/events/base.event.schema.json",
-      "description": "The original event payload."
+      "$ref": "https://schemas.heimgewebe.org/contracts/plexer/event.envelope.v1.schema.json",
+      "description": "The original event payload (Plexer envelope)."
     },
     "retryCount": { "type": "integer", "minimum": 0 },
     "lastAttempt": { "type": "string", "format": "date-time" },
