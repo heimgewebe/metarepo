@@ -1,0 +1,16 @@
+{
+  "$id": "https://schemas.heimgewebe.org/contracts/events/plexer.delivery.report.v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Plexer Delivery Report Event v1",
+  "description": "Event wrapper for Plexer delivery reports.",
+  "type": "object",
+  "required": ["type", "source", "payload"],
+  "properties": {
+    "type": { "const": "plexer.delivery.report.v1" },
+    "source": { "const": "plexer" },
+    "payload": {
+      "$ref": "https://schemas.heimgewebe.org/contracts/plexer/delivery.report.v1.schema.json"
+    }
+  },
+  "additionalProperties": false
+}

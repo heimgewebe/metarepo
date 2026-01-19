@@ -116,6 +116,19 @@ knowledge:
         files: []
         mode: reference-only
 
+  knowledge.observatory.published:
+    schema: contracts/events/knowledge.observatory.published.v1.schema.json
+    consumers:
+      - repo: leitstand
+        files: []
+        mode: reference-only
+      - repo: hausKI
+        files: []
+        mode: reference-only
+      - repo: plexer
+        files: []
+        mode: notification-only
+
 os_context:
   state:
     schema: contracts/os.context.state.schema.json
@@ -153,6 +166,19 @@ policy:
     schema: contracts/policy.snapshot.schema.json
     consumers:
       - repo: heimlern
+        files: []
+        mode: reference-only
+
+  ingest.state:
+    schema: contracts/heimlern.ingest.state.schema.json
+    consumers:
+      - repo: heimlern
+        files: []
+        mode: mirror
+      - repo: leitstand
+        files: []
+        mode: reference-only
+      - repo: heimgeist
         files: []
         mode: reference-only
 
