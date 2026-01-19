@@ -30,6 +30,10 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
   - Zweck: Audio-bezogene Ereignisse (z. B. Aufnahmen, Transkriptionen, TTS).
 - `intent.event.schema.json`
   - Zweck: Intent-Events aus Audio/Text für chronik/hausKI (Intent-Erkennung mit Confidence).
+- `contracts/chronik/event.batch.v1.schema.json`
+  - Zweck: Batch-Antwort für /v1/events (Pull-Modell).
+  - Produzenten: chronik
+  - Konsumenten: heimgeist, heimlern
 
 ### 1.2 Fleet & Metriken
 
@@ -105,10 +109,6 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
   - Zweck: Strukturierte Policy-Gewichtsanpassungen mit Delta-Objekten und bidirektionalen Evidence/Rate-Regeln.
   - Produzenten: heimlern
   - Konsumenten: hausKI, chronik
-- `heimlern.ingest.state.schema.json`
-  - Zweck: Persistenter Fortschrittszustand (Cursor, last_ok) für den Heimlern-Ingest-Prozess.
-  - Produzenten: heimlern (CLI)
-  - Konsumenten: leitstand, heimgeist
 
 ### 1.5 OS-Kontext & Embeddings
 
@@ -241,6 +241,10 @@ Repository: **heimgewebe/heimlern**
 - `contracts/policy.decision.schema.json`
 - `contracts/policy_feedback.schema.json`
 - `contracts/policy_snapshot.schema.json`
+- `heimlern.ingest.state.schema.json`
+  - Zweck: Persistenter Fortschrittszustand (Cursor, last_ok) für den Ingest-Prozess (CLI).
+  - Produzenten: heimlern (CLI)
+  - Konsumenten: leitstand, heimgeist
 
 Zweck:
 
