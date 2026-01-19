@@ -1,0 +1,20 @@
+{
+  "$id": "https://schemas.heimgewebe.org/contracts/heimlern/ingest.state.v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Heimlern Ingest State v1",
+  "description": "Tracks the state of Heimlern's ingestion process.",
+  "type": "object",
+  "required": ["cursor", "last_ok"],
+  "properties": {
+    "cursor": { "type": "string", "description": "Last processed event ID or timestamp." },
+    "last_ok": { "type": "string", "format": "date-time" },
+    "last_error": {
+        "anyOf": [
+            { "type": "string" },
+            { "type": "object" },
+            { "type": "null" }
+        ]
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,25 @@
+{
+  "$id": "https://schemas.heimgewebe.org/contracts/chronik/event.batch.v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Chronik Event Batch v1",
+  "description": "A batch of events retrieved from Chronik.",
+  "type": "object",
+  "required": ["events", "meta"],
+  "properties": {
+    "events": {
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "next_cursor": { "type": ["string", "null"] },
+    "meta": {
+      "type": "object",
+      "required": ["count", "generated_at"],
+      "properties": {
+        "count": { "type": "integer" },
+        "generated_at": { "type": "string", "format": "date-time" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

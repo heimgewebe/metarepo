@@ -1,0 +1,21 @@
+{
+  "$id": "https://schemas.heimgewebe.org/contracts/plexer/event.envelope.v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Plexer Event Envelope v1",
+  "description": "Standard envelope for events routed by Plexer.",
+  "type": "object",
+  "required": ["type", "source", "payload"],
+  "properties": {
+    "type": { "type": "string", "description": "Event type (e.g. heimgeist.insight.v1)." },
+    "source": { "type": "string", "description": "Source component name." },
+    "payload": { "type": "object", "description": "The actual event payload." },
+    "size_hints": {
+      "type": "object",
+      "properties": {
+        "payload_bytes": { "type": "integer" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
