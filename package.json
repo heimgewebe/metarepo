@@ -4,7 +4,8 @@
   "description": "JSON Schema contracts for Heimgewebe protocols.",
   "main": "index.js",
   "files": [
-    "contracts"
+    "contracts",
+    "index.js"
   ],
   "scripts": {
     "validate": "ajv compile -s 'contracts/**/*.schema.json' -c ajv-formats --spec=draft2020 --strict=log"

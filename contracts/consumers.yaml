@@ -116,7 +116,7 @@ knowledge:
         files: []
         mode: reference-only
 
-  observatory.published:
+  knowledge.observatory.published:
     schema: contracts/events/knowledge.observatory.published.v1.schema.json
     consumers:
       - repo: leitstand

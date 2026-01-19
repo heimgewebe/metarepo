@@ -8,12 +8,12 @@
   "properties": {
     "counts": {
       "type": "object",
-      "required": ["delivered", "failed", "retried", "pending"],
+      "required": ["pending", "failed"],
       "properties": {
-        "delivered": { "type": "integer" },
+        "pending": { "type": "integer" },
         "failed": { "type": "integer" },
-        "retried": { "type": "integer" },
-        "pending": { "type": "integer" }
+        "delivered": { "type": "integer" },
+        "retried": { "type": "integer" }
       },
       "additionalProperties": false
     },

@@ -4,12 +4,12 @@
   "title": "Plexer Failed Event v1",
   "description": "Persisted state for a failed event delivery in Plexer.",
   "type": "object",
-  "required": ["consumerKey", "event", "retryCount", "lastAttempt", "nextAttempt"],
+  "required": ["consumerKey", "event", "retryCount", "lastAttempt", "nextAttempt", "error"],
   "properties": {
     "consumerKey": { "type": "string" },
     "event": {
-      "type": "object",
-      "description": "The original event payload (should match base.event)."
+      "$ref": "https://schemas.heimgewebe.org/contracts/events/base.event.schema.json",
+      "description": "The original event payload."
     },
     "retryCount": { "type": "integer", "minimum": 0 },
     "lastAttempt": { "type": "string", "format": "date-time" },
