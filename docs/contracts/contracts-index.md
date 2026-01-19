@@ -105,6 +105,10 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
   - Zweck: Strukturierte Policy-Gewichtsanpassungen mit Delta-Objekten und bidirektionalen Evidence/Rate-Regeln.
   - Produzenten: heimlern
   - Konsumenten: hausKI, chronik
+- `heimlern.ingest.state.schema.json`
+  - Zweck: Persistenter Fortschrittszustand (Cursor, last_ok) für den Heimlern-Ingest-Prozess.
+  - Produzenten: heimlern (CLI)
+  - Konsumenten: leitstand, heimgeist
 
 ### 1.5 OS-Kontext & Embeddings
 

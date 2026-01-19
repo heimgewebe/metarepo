@@ -156,6 +156,19 @@ policy:
         files: []
         mode: reference-only
 
+  ingest.state:
+    schema: contracts/heimlern.ingest.state.schema.json
+    consumers:
+      - repo: heimlern
+        files: []
+        mode: mirror
+      - repo: leitstand
+        files: []
+        mode: reference-only
+      - repo: heimgeist
+        files: []
+        mode: reference-only
+
 webmaschine:
   state.index:
     schema: contracts/webmaschine/state/webmaschine.state.index.schema.json
