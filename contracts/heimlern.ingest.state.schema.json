@@ -6,8 +6,8 @@
   "type": "object",
   "properties": {
     "cursor": {
-      "type": "string",
-      "description": "Markierung des letzten erfolgreich verarbeiteten Events (z. B. ISO-Timestamp oder offizielle Cursor-ID)."
+      "type": ["integer", "null"],
+      "description": "Markierung des letzten erfolgreich verarbeiteten Events (Byte-Offset)."
     },
     "last_ok": {
       "type": "string",
