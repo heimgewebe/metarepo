@@ -87,7 +87,7 @@ knowledge:
         files: []
         mode: reference-only
 
-  insights.daily.published:
+  insights.daily.published.v1:
     schema: contracts/events/insights.daily.published.v1.schema.json
     consumers:
       - repo: plexer
@@ -116,7 +116,7 @@ knowledge:
         files: []
         mode: reference-only
 
-  knowledge.observatory.published:
+  knowledge.observatory.published.v1:
     schema: contracts/events/knowledge.observatory.published.v1.schema.json
     consumers:
       - repo: leitstand
@@ -169,7 +169,7 @@ policy:
         files: []
         mode: reference-only
 
-  ingest.state:
+  heimlern.ingest.state.v1:
     schema: contracts/heimlern.ingest.state.schema.json
     consumers:
       - repo: heimlern

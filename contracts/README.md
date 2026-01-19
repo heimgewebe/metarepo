@@ -46,3 +46,7 @@ Governance metadata files (defining producers, consumers, and ownership) are loc
 ## Validation
 
 All schemas must be valid JSON Schema Draft 2020-12. Changes are validated via CI using `ajv-cli`.
+
+## Conventions
+
+- **SHA-256**: Must be formatted as `sha256:<64-hex-chars>`. Pattern: `^sha256:[a-f0-9]{64}$`.

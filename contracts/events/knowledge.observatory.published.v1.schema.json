@@ -43,7 +43,8 @@
         },
         "sha": {
           "type": "string",
-          "description": "SHA256 checksum of the artifact content."
+          "pattern": "^sha256:[a-f0-9]{64}$",
+          "description": "SHA256 checksum of the artifact content (format: sha256:<hex>)."
         }
       },
       "additionalProperties": false
