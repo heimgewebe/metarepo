@@ -1,0 +1,33 @@
+{
+  "$id": "https://schemas.heimgewebe.org/contracts/plexer/services-auth-profiles.v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Services Auth Profiles v1",
+  "description": "Configuration for service authentication headers.",
+  "type": "object",
+  "required": ["services"],
+  "properties": {
+    "services": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z0-9_-]+$": {
+          "type": "object",
+          "required": ["authKind", "header"],
+          "properties": {
+            "authKind": {
+              "type": "string",
+              "enum": ["bearer", "x-auth", "none"]
+            },
+            "header": {
+              "type": ["string", "null"]
+            },
+            "prefix": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

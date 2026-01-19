@@ -8,7 +8,9 @@
   "properties": {
     "events": {
       "type": "array",
-      "items": { "type": "object" }
+      "items": {
+        "$ref": "https://schemas.heimgewebe.org/contracts/events/base.event.schema.json"
+      }
     },
     "next_cursor": {
       "type": ["integer", "null"],

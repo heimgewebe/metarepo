@@ -6,6 +6,10 @@ This directory contains the canonical JSON Schema definitions for the Heimgewebe
 
 The canonical base URI for all schemas is `https://schemas.heimgewebe.org/`. While this domain may not be operational for hosting, it serves as the stable identifier for validation and referencing.
 
+## Migration to Draft 2020-12
+
+All new contracts **MUST** use JSON Schema Draft 2020-12. Legacy contracts using older drafts (e.g. Draft 07) remain valid until explicitly migrated.
+
 ## Usage Guidelines
 
 **DO NOT** copy or embed these schemas into your service's source code directly. Doing so leads to drift and validation errors.
@@ -25,6 +29,10 @@ The canonical base URI for all schemas is `https://schemas.heimgewebe.org/`. Whi
 2.  **Vendoring (Automated)**: If you must vendor (e.g., non-JS services), use a script to download the specific version from the `metarepo` release artifacts or raw content. Ensure this process is automated and checks for updates.
 
 3.  **Reference**: Use absolute canonical URIs (e.g., `https://schemas.heimgewebe.org/...`) when referencing schemas in `consumers.yaml` or other contracts.
+
+## Governance Metadata
+
+Governance metadata files (defining producers, consumers, and ownership) are located in `contracts/meta/`. These files are **NOT** JSON Schemas and are excluded from schema validation.
 
 ## Structure
 
