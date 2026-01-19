@@ -116,6 +116,19 @@ knowledge:
         files: []
         mode: reference-only
 
+  observatory.published:
+    schema: contracts/events/knowledge.observatory.published.v1.schema.json
+    consumers:
+      - repo: leitstand
+        files: []
+        mode: reference-only
+      - repo: hausKI
+        files: []
+        mode: reference-only
+      - repo: plexer
+        files: []
+        mode: notification-only
+
 os_context:
   state:
     schema: contracts/os.context.state.schema.json

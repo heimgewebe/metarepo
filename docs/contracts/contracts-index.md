@@ -56,6 +56,11 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
   - Typ: Notification (Payload < 1KB, kein Inline-Daten-Transport).
   - Produzent: semantAH (nach Release).
   - Konsumenten: plexer (Router), chronik, leitstand.
+- `contracts/events/knowledge.observatory.published.v1.schema.json`
+  - Zweck: Notification-Event, das Verfügbarkeit eines neuen Knowledge-Observatory-Snapshots signalisiert.
+  - Typ: Notification.
+  - Produzent: semantAH.
+  - Konsumenten: plexer, leitstand, hausKI.
 - `knowledge.graph.schema.json`
   - Zweck: generisches Wissensgraph-Schema (Knoten, Kanten, Beziehungen).
 - `knowledge.observatory.schema.json`
