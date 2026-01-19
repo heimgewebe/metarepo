@@ -8,14 +8,17 @@
   "properties": {
     "counts": {
       "type": "object",
-      "required": ["delivered", "failed", "retried"],
+      "required": ["delivered", "failed", "retried", "pending"],
       "properties": {
         "delivered": { "type": "integer" },
         "failed": { "type": "integer" },
-        "retried": { "type": "integer" }
+        "retried": { "type": "integer" },
+        "pending": { "type": "integer" }
       },
       "additionalProperties": false
     },
+    "retryable_now": { "type": "integer" },
+    "next_due_at": { "type": "string", "format": "date-time" },
     "last_error": { "type": ["string", "null"] },
     "last_retry_at": { "type": "string", "format": "date-time" }
   },
