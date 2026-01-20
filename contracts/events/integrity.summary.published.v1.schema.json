@@ -23,7 +23,9 @@
         "url",
         "generated_at",
         "repo",
-        "status"
+        "status",
+        "sha",
+        "schema_ref"
       ],
       "properties": {
         "url": {

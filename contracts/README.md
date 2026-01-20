@@ -34,7 +34,10 @@ All new contracts **MUST** use JSON Schema Draft 2020-12. Legacy contracts using
 
 ## Governance Metadata
 
-Governance metadata files (defining producers, consumers, and ownership) are located in `contracts/meta/`. These files are **NOT** JSON Schemas and are excluded from schema validation.
+Governance metadata files are **NOT** JSON Schemas and are excluded from schema validation.
+
+*   `contracts/meta/`: Detailed governance definitions.
+*   `contracts/consumers.yaml`: Registry of contract consumption (producers/consumers).
 
 ## Structure
 

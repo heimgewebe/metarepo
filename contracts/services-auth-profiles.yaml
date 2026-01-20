@@ -6,10 +6,12 @@ services:
   heimgeist:
     authKind: x-auth
     header: X-Auth
+    prefix: ""
 
   chronik:
     authKind: x-auth
     header: X-Auth
+    prefix: ""
 
   leitstand:
     authKind: bearer

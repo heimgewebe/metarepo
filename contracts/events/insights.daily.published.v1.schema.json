@@ -15,7 +15,7 @@
     },
     "payload": {
       "type": "object",
-      "required": ["ts", "url", "generated_at"],
+      "required": ["ts", "url", "generated_at", "sha", "schema_ref"],
       "properties": {
         "ts": {
           "type": "string",
