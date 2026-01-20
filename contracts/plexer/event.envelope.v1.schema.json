@@ -8,7 +8,7 @@
   "properties": {
     "type": { "type": "string", "description": "Event type (e.g. heimgeist.insight.v1)." },
     "source": { "type": "string", "description": "Source component name." },
-    "payload": { "type": "object", "description": "The actual event payload." },
+    "payload": { "description": "The actual event payload (any type)." },
     "size_hints": {
       "type": "object",
       "properties": {

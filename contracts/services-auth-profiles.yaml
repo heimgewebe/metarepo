@@ -12,8 +12,9 @@ services:
     header: X-Auth
 
   leitstand:
-    authKind: none # optional
-    header: null
+    authKind: bearer
+    header: Authorization
+    prefix: "Bearer " # trailing space is intentional
 
   hausKI:
     authKind: bearer
