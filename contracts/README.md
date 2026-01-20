@@ -28,9 +28,12 @@ All new contracts **MUST** use JSON Schema Draft 2020-12. Legacy contracts using
     const schemaPath = path.join(contractsPath, 'chronik/event.batch.v1.schema.json');
     ```
 
-2.  **Vendoring (Automated)**: If you must vendor (e.g., non-JS services), use a script to download the specific version from the `metarepo` release artifacts or raw content. Ensure this process is automated and checks for updates.
+2.  **Vendoring (Automated)**: If you must vendor (e.g., non-JS services), use a script to download the specific version from the `metarepo` release artifacts.
+    *   **Strict Rule**: Vendoring **MUST** be automated and pinned (e.g., via Release Tag or Commit SHA + SHA256 verification). Do NOT blindly fetch from `main`.
+    *   Manual copying is prohibited to prevent semantic drift.
 
 3.  **Reference**: Use absolute canonical URIs (e.g., `https://schemas.heimgewebe.org/...`) when referencing schemas in `consumers.yaml` or other contracts.
+    *   `schema_ref` in events/artifacts **MUST** match the canonical `$id` of the referenced schema (e.g., the artifact schema or event schema).
 
 ## Governance Metadata
 

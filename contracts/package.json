@@ -5,6 +5,10 @@
   "main": "index.js",
   "files": [
     "**/*.schema.json",
+    "examples/**",
+    "meta/**",
+    "consumers.yaml",
+    "services-auth-profiles.yaml",
     "index.js",
     "README.md"
   ],
