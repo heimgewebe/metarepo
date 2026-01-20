@@ -87,6 +87,11 @@ knowledge:
         files: []
         mode: reference-only
 
+  insights.daily.published: # Deprecated alias
+    schema: contracts/events/insights.daily.published.v1.schema.json
+    consumers: []
+    mode: reference-only
+
   insights.daily.published.v1:
     schema: contracts/events/insights.daily.published.v1.schema.json
     consumers:

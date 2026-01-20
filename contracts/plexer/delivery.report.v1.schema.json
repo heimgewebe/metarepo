@@ -4,7 +4,7 @@
   "title": "Plexer Delivery Report v1",
   "description": "Report on event delivery status.",
   "type": "object",
-  "required": ["counts", "last_retry_at"],
+  "required": ["counts"],
   "properties": {
     "counts": {
       "type": "object",

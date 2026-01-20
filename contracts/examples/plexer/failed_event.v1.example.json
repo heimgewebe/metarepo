@@ -1,14 +1,21 @@
 {
   "consumerKey": "target-service",
   "event": {
-    "kind": "base.event",
-    "version": 1,
-    "id": "evt-failed-1",
-    "meta": {
-      "occurred_at": "2023-10-27T09:00:00Z",
-      "producer": "origin"
+    "type": "base.event",
+    "source": "origin",
+    "payload": {
+      "kind": "base.event",
+      "version": 1,
+      "id": "evt-failed-1",
+      "meta": {
+        "occurred_at": "2023-10-27T09:00:00Z",
+        "producer": "origin"
+      },
+      "data": {}
     },
-    "data": {}
+    "size_hints": {
+      "payload_bytes": 100
+    }
   },
   "retryCount": 3,
   "lastAttempt": "2023-10-27T10:00:00Z",

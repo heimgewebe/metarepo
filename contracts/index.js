@@ -3,5 +3,5 @@
 const path = require('path');
 
 module.exports = {
-  contractsPath: path.join(__dirname, 'contracts'),
+  contractsPath: __dirname,
 };

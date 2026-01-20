@@ -4,11 +4,12 @@
   "description": "JSON Schema contracts for Heimgewebe protocols.",
   "main": "index.js",
   "files": [
-    "contracts",
-    "index.js"
+    "**/*.schema.json",
+    "index.js",
+    "README.md"
   ],
   "scripts": {
-    "validate": "ajv compile -s 'contracts/**/*.schema.json' -c ajv-formats --spec=draft2020 --strict=log"
+    "validate": "ajv compile -s '**/*.schema.json' -r '**/*.schema.json' -c ajv-formats --spec=draft2020 --strict=log"
   },
   "keywords": [
     "heimgewebe",
