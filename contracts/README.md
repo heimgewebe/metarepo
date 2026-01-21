@@ -18,6 +18,7 @@ All new contracts **MUST** use JSON Schema Draft 2020-12. Legacy contracts using
 
 1.  **NPM Package**: Use the `@heimgewebe/contracts` package if your service is node-based.
     *   **Note**: `metarepo/contracts` is the **SSOT** (canonical source). The `@heimgewebe/contracts` package is a **distribution artifact** built from this source.
+    *   **Publishing**: The package manifest in this directory exists for local validation and structure definition. Actual publishing to a registry is handled by the CI/Release pipeline (e.g. from a separate build step).
     *   Install via your package manager (e.g., `pnpm`, `npm`):
     ```bash
     npm install @heimgewebe/contracts
