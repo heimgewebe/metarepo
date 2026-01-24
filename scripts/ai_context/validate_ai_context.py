@@ -7,14 +7,7 @@ import re
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
-try:
-    import yaml
-except Exception as e:
-    print("ERROR: PyYAML missing. Install with: pip install pyyaml", file=sys.stderr)
-    raise
-
-
-PLACEHOLDER_RE = re.compile(r"\b(TODO|TBD|FIXME|lorem|ipsum)\b", re.IGNORECASE)
+yaml: Any | None = None
 
 
 def err(msg: str) -> None:
@@ -24,6 +17,9 @@ def err(msg: str) -> None:
 def die(msg: str) -> None:
     err(msg)
     raise SystemExit(2)
+
+
+PLACEHOLDER_RE = re.compile(r"\b(TODO|TBD|FIXME|lorem|ipsum)\b", re.IGNORECASE)
 
 
 def load_yaml(p: Path) -> Dict[str, Any]:
@@ -126,6 +122,11 @@ def validate_file(file_path: Path) -> int:
 
 
 def main() -> int:
+    global yaml
+    import yaml as yaml_module
+
+    yaml = yaml_module
+
     ap = argparse.ArgumentParser()
     ap.add_argument("--file", help="Validate a single .ai-context.yml file")
     ap.add_argument("--templates-dir", help="Validate templates directory (metarepo)")
@@ -143,4 +144,9 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    try:
+        raise SystemExit(main())
+    except ModuleNotFoundError as exc:
+        if exc.name == "yaml":
+            die("PyYAML missing. See docs/fleet/push-to-fleet.md for install guidance.")
+        raise
