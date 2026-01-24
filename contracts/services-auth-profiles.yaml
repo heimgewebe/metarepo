@@ -1,0 +1,24 @@
+# Service Authentication Profiles
+# Defines the expected authentication headers for each service consumer.
+# Used by Plexer and other routers to apply correct credentials.
+
+services:
+  heimgeist:
+    authKind: x-auth
+    header: X-Auth
+    prefix: ""
+
+  chronik:
+    authKind: x-auth
+    header: X-Auth
+    prefix: ""
+
+  leitstand:
+    authKind: bearer
+    header: Authorization
+    prefix: "Bearer " # trailing space is intentional
+
+  hausKI:
+    authKind: bearer
+    header: Authorization
+    prefix: "Bearer " # trailing space is intentional

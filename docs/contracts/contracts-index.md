@@ -30,6 +30,23 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
   - Zweck: Audio-bezogene Ereignisse (z. B. Aufnahmen, Transkriptionen, TTS).
 - `intent.event.schema.json`
   - Zweck: Intent-Events aus Audio/Text für chronik/hausKI (Intent-Erkennung mit Confidence).
+- `contracts/chronik/event.batch.v1.schema.json`
+  - Zweck: Batch-Antwort für /v1/events (Pull-Modell).
+  - Produzenten: chronik
+  - Konsumenten: heimgeist, heimlern
+
+### 1.1a Event Routing & Delivery
+
+- `contracts/plexer/event.envelope.v1.schema.json`
+  - Zweck: Standardisierte Envelope für Events, die durch Plexer geroutet werden.
+- `contracts/plexer/delivery.report.v1.schema.json`
+  - Zweck: Report on event delivery status (counts, retries).
+  - Produzent: plexer
+  - Konsumenten: wgx, chronik, leitstand
+- `contracts/plexer/failed_event.v1.schema.json`
+  - Zweck: Persisted state for failed event deliveries.
+  - Produzent: plexer (internal persistence)
+  - Konsumenten: plexer (retry loop)
 
 ### 1.2 Fleet & Metriken
 
@@ -52,6 +69,11 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
   - Typ: Notification (Payload < 1KB, kein Inline-Daten-Transport).
   - Produzent: semantAH (nach Release).
   - Konsumenten: plexer (Router), chronik, leitstand.
+- `contracts/events/knowledge.observatory.published.v1.schema.json`
+  - Zweck: Notification-Event, das Verfügbarkeit eines neuen Knowledge-Observatory-Snapshots signalisiert.
+  - Typ: Notification.
+  - Produzent: semantAH.
+  - Konsumenten: plexer, leitstand, hausKI.
 - `knowledge.graph.schema.json`
   - Zweck: generisches Wissensgraph-Schema (Knoten, Kanten, Beziehungen).
 - `knowledge.observatory.schema.json`
@@ -116,7 +138,6 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
   - Zweck: Texte, die eingebettet (Vektorraum) werden sollen.
 - `os.context.text.redacted.schema.json`
   - Zweck: bereinigte / geschwärzte Textvarianten für Privacy.
-
 ### 1.6 Agenten, Werkzeuge & Workflows
 
 - `agent.tool.schema.json`
@@ -237,6 +258,10 @@ Repository: **heimgewebe/heimlern**
 - `contracts/policy.decision.schema.json`
 - `contracts/policy_feedback.schema.json`
 - `contracts/policy_snapshot.schema.json`
+- `heimlern.ingest.state.schema.json`
+  - Zweck: Persistenter Fortschrittszustand (Cursor, last_ok) für den Ingest-Prozess (CLI).
+  - Produzenten: heimlern (CLI)
+  - Konsumenten: leitstand, heimgeist
 
 Zweck:
 

@@ -1,0 +1,10 @@
+{
+  "type": "some.event.v1",
+  "source": "producer-service",
+  "payload": {
+    "foo": "bar"
+  },
+  "size_hints": {
+    "payload_bytes": 128
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "name": "@heimgewebe/contracts",
+  "version": "0.1.0",
+  "description": "JSON Schema contracts for Heimgewebe protocols.",
+  "main": "index.js",
+  "files": [
+    "**/*.schema.json",
+    "examples/**",
+    "meta/**",
+    "consumers.yaml",
+    "services-auth-profiles.yaml",
+    "index.js",
+    "README.md"
+  ],
+  "scripts": {
+    "validate": "ajv compile -s '**/*.schema.json' -r '**/*.schema.json' -c ajv-formats --spec=draft2020 --strict=log"
+  },
+  "keywords": [
+    "heimgewebe",
+    "contracts",
+    "json-schema"
+  ],
+  "author": "Heimgewebe Fleet",
+  "license": "MIT",
+  "devDependencies": {
+    "ajv-cli": "^5.0.0",
+    "ajv-formats": "^3.0.1"
+  }
+}

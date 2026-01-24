@@ -13,6 +13,7 @@
 - wgx → `metrics.snapshot.schema.json`
 - hausKI JSONL Event-Log → `event.line.schema.json`
 - heimlern Decisions → `policy.decision.schema.json`
+- heimlern Ingest-Status → `heimlern.ingest.state.schema.json`
 
 ## Security
 - Ingest lokal; optional Shared-Secret via Header `x-auth`.

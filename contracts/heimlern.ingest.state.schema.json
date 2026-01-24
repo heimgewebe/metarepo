@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.heimgewebe.org/contracts/heimlern.ingest.state.schema.json",
+  "title": "Heimlern Ingest State",
+  "description": "Persistenter Fortschrittszustand für den Heimlern-Ingest-Prozess.",
+  "type": "object",
+  "properties": {
+    "cursor": {
+      "type": ["integer", "null"],
+      "description": "Markierung des letzten erfolgreich verarbeiteten Events (Byte-Offset)."
+    },
+    "last_ok": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Zeitpunkt des letzten erfolgreichen Durchlaufs."
+    },
+    "last_error": {
+      "type": ["string", "null"],
+      "description": "Fehlernachricht, falls der letzte Durchlauf mit Fehler endete."
+    }
+  },
+  "required": ["cursor", "last_ok"],
+  "additionalProperties": false
+}
