@@ -20,7 +20,7 @@
     },
     "payload": {
       "type": "object",
-      "required": ["url", "sha", "schema_ref"],
+      "required": ["url"],
       "properties": {
         "url": {
           "type": "string",

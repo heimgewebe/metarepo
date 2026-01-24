@@ -21,7 +21,7 @@
               "type": ["string", "null"]
             },
             "prefix": {
-              "type": "string"
+              "type": ["string", "null"]
             }
           },
           "additionalProperties": false
