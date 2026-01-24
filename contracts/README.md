@@ -59,3 +59,35 @@ All schemas must be valid JSON Schema Draft 2020-12. Changes are validated via C
 ## Conventions
 
 - **SHA-256**: Must be formatted as `sha256:<64-hex-chars>`. Pattern: `^sha256:[a-f0-9]{64}$`.
+
+## Schema Versioning & Breaking Changes
+
+### Semantic Versioning for Schemas
+
+Schema versions (e.g., `v1`, `v2`) follow semantic versioning principles:
+
+- **v1 = Stable**: Once a schema reaches `v1`, it should remain backward compatible. Adding new optional fields is acceptable, but making existing optional fields required is a **breaking change**.
+- **Breaking Changes**: Require a new version (e.g., `v2`). Examples include:
+  - Adding new required fields to existing schemas
+  - Changing field types or constraints
+  - Removing fields
+  - Changing enum values
+
+### Rollout Strategy for Schema Changes
+
+When introducing enhanced validation (e.g., making optional fields required):
+
+1. **Path A (Recommended)**: Create a new version (e.g., `*.v2.schema.json`)
+   - Keep `v1` unchanged for backward compatibility
+   - Producers upgrade to emit `v2` events
+   - Consumers update to accept both `v1` and `v2`
+   - Deprecate `v1` after fleet-wide adoption
+
+2. **Path B (Fleet Cutover)**: Tighten existing schema with coordinated rollout
+   - **Step 1**: Update all producers to emit new required fields
+   - **Step 2**: Wait for confirmation that all producers are deployed
+   - **Step 3**: Update schema to make fields required
+   - **Step 4**: Update consumers/validators to enforce new requirements
+   - **Risk**: High coordination overhead, potential for silent failures
+
+**Recommended**: Use Path A (new version) to minimize risk and maintain clear migration paths.
