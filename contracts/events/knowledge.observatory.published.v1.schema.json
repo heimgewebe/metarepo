@@ -39,11 +39,12 @@
         "schema_ref": {
           "type": "string",
           "format": "uri",
+          "pattern": "^https://schemas\\.heimgewebe\\.org/.*$",
           "description": "Canonical URI of the schema used for validation."
         },
         "sha": {
           "type": "string",
-          "pattern": "^sha256:[a-f0-9]{64}$",
+          "pattern": "^(sha256:)?[0-9a-fA-F]{64}$",
           "description": "SHA256 checksum of the artifact content (format: sha256:<hex>)."
         }
       },
