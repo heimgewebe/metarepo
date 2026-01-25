@@ -66,7 +66,7 @@ All schemas must be valid JSON Schema Draft 2020-12. Changes are validated via C
 
 Schema versions (e.g., `v1`, `v2`) follow semantic versioning principles adapted for schemas:
 
-- **v1 = Stable**: Once a schema reaches `v1`, it should remain backward compatibility. Adding new optional fields is acceptable, but making existing optional fields required is a **breaking change**.
+- **v1 = Stable**: Once a schema reaches `v1`, it should remain backward compatible. Adding new optional fields is acceptable, but making existing optional fields required is a **breaking change**.
 - **Version Format**: Schemas use major version numbers in filenames (e.g., `*.v1.schema.json`, `*.v2.schema.json`). Minor/patch versions do not exist as separate files—all changes within a major version (e.g., v1) must maintain backward compatibility.
 - **Breaking Changes**: Require a new major version (e.g., `v2`). Examples include:
   - Adding new required fields to existing schemas
