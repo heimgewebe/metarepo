@@ -60,21 +60,44 @@ All schemas must be valid JSON Schema Draft 2020-12. Changes are validated via C
 
 - **SHA-256**: Must be formatted as `sha256:<64-hex-chars>`. Pattern: `^sha256:[a-f0-9]{64}$`.
 
-## Schema Versioning Policy
+## Schema Versioning & Breaking Changes
 
-We apply **SemVer principles** (Semantic Versioning) but only encode **MAJOR** versions in filenames (e.g., `event.v1.schema.json`).
+### Major-Versioning for Schemas (SemVer major-only)
 
--   **Major Versions (Breaking)**: Require a new file (e.g., `v2`).
-    -   Migration Path: **Version Bump**. Consumers must explicitly upgrade.
--   **Minor/Patch Versions (Compatible)**: Applied in-place to the existing `v1` file.
-    -   Migration Path: **Fleet Cutover**. Consumers automatically receive new optional fields or relaxed constraints.
+Schema versions (e.g., `v1`, `v2`) use major-only versioning adapted from semantic versioning principles:
 
-## Event Payload Policy
+- **v1 = Stable**: Once a schema reaches `v1`, it should remain backward compatible. Adding new optional fields is acceptable, but making existing optional fields required is a **breaking change**.
+- **Version Format**: Schemas use major version numbers in filenames (e.g., `*.v1.schema.json`, `*.v2.schema.json`). Minor/patch versions do not exist as separate files—all changes within a major version (e.g., v1) must maintain backward compatibility.
+- **Breaking Changes**: Require a new major version (e.g., `v2`). Examples include:
+  - Adding new required fields to existing schemas
+  - Changing field types or constraints
+  - Removing fields
+  - Removing or renaming enum values (breaking)
+  - Adding new enum values (potentially breaking, depending on consumer strictness)
 
-To ensure long-term traceability and integrity without breaking current consumers:
+### Rollout Strategy for Schema Changes
 
--   **`sha` (Content Identity)**: SHOULD be present in payload.
--   **`schema_ref` (Semantic Identity)**: SHOULD be present in payload.
--   **Consumer Behavior**:
-    -   Consumers **MUST NOT** fail validation if these fields are missing in `v1` events.
-    -   Consumers **MAY** warn if they are missing.
+When introducing enhanced validation (e.g., making optional fields required):
+
+1. **Path A (Recommended)**: Create a new version (e.g., `*.v2.schema.json`)
+   - Keep `v1` unchanged for backward compatibility
+   - Producers upgrade to emit `v2` events
+   - Consumers update to accept both `v1` and `v2`
+   - Deprecate `v1` after fleet-wide adoption
+
+2. **Path B (Fleet Cutover)**: Tighten existing schema with coordinated rollout
+   - **Step 1**: Update all producers to emit new required fields
+   - **Step 2**: Wait for confirmation that all producers are deployed
+   - **Step 3**: Update schema to make fields required
+   - **Step 4**: Update consumers/validators to enforce new requirements
+   - **Risk**: High coordination overhead, potential for silent failures
+
+**Recommended**: Use Path A (new version) to minimize risk and maintain clear migration paths.
+
+### Optional vs Required Fields
+
+Fields like `sha` and `schema_ref` in v1 published events are intentionally **optional** to accommodate gradual producer adoption:
+
+- **Intent**: These fields SHOULD be present for integrity and traceability, but producers may not yet emit them reliably.
+- **Migration Path**: Once all producers consistently emit these fields, consider introducing v2 schemas with stricter validation (making them required).
+- **Consumer Guidance**: Consumers SHOULD handle missing optional fields gracefully but MAY log warnings to encourage producer updates.
