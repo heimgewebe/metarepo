@@ -59,3 +59,22 @@ All schemas must be valid JSON Schema Draft 2020-12. Changes are validated via C
 ## Conventions
 
 - **SHA-256**: Must be formatted as `sha256:<64-hex-chars>`. Pattern: `^sha256:[a-f0-9]{64}$`.
+
+## Schema Versioning Policy
+
+We apply **SemVer principles** (Semantic Versioning) but only encode **MAJOR** versions in filenames (e.g., `event.v1.schema.json`).
+
+-   **Major Versions (Breaking)**: Require a new file (e.g., `v2`).
+    -   Migration Path: **Version Bump**. Consumers must explicitly upgrade.
+-   **Minor/Patch Versions (Compatible)**: Applied in-place to the existing `v1` file.
+    -   Migration Path: **Fleet Cutover**. Consumers automatically receive new optional fields or relaxed constraints.
+
+## Event Payload Policy
+
+To ensure long-term traceability and integrity without breaking current consumers:
+
+-   **`sha` (Content Identity)**: SHOULD be present in payload.
+-   **`schema_ref` (Semantic Identity)**: SHOULD be present in payload.
+-   **Consumer Behavior**:
+    -   Consumers **MUST NOT** fail validation if these fields are missing in `v1` events.
+    -   Consumers **MAY** warn if they are missing.

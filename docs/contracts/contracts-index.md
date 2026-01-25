@@ -49,6 +49,10 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
   - Zweck: Batch-Antwort für /v1/events (Pull-Modell).
   - Produzenten: chronik
   - Konsumenten: heimgeist, heimlern
+- `contracts/heimlern.ingest.state.schema.json`
+  - Zweck: Persistenter Fortschrittszustand (Cursor, last_ok) für den Ingest-Prozess (CLI).
+  - Produzenten: heimlern (CLI)
+  - Konsumenten: leitstand, heimgeist
 
 ### 1.2 Fleet & Metriken
 
