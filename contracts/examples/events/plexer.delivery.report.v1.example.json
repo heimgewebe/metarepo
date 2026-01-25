@@ -1,0 +1,14 @@
+{
+  "type": "plexer.delivery.report.v1",
+  "source": "plexer",
+  "payload": {
+    "counts": {
+      "pending": 12,
+      "failed": 3
+    },
+    "retryable_now": 3,
+    "next_due_at": "2025-01-24T14:30:00.000Z",
+    "last_error": "Connection timeout to chronik",
+    "last_retry_at": "2025-01-24T14:25:00.000Z"
+  }
+}
