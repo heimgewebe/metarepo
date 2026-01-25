@@ -64,10 +64,11 @@ All schemas must be valid JSON Schema Draft 2020-12. Changes are validated via C
 
 ### Semantic Versioning for Schemas
 
-Schema versions (e.g., `v1`, `v2`) follow semantic versioning principles:
+Schema versions (e.g., `v1`, `v2`) follow semantic versioning principles adapted for schemas:
 
-- **v1 = Stable**: Once a schema reaches `v1`, it should remain backward compatible. Adding new optional fields is acceptable, but making existing optional fields required is a **breaking change**.
-- **Breaking Changes**: Require a new version (e.g., `v2`). Examples include:
+- **v1 = Stable**: Once a schema reaches `v1`, it should remain backward compatibility. Adding new optional fields is acceptable, but making existing optional fields required is a **breaking change**.
+- **Version Format**: Schemas use major version numbers in filenames (e.g., `*.v1.schema.json`, `*.v2.schema.json`). Minor/patch versions do not exist as separate files—all changes within a major version (e.g., v1) must maintain backward compatibility.
+- **Breaking Changes**: Require a new major version (e.g., `v2`). Examples include:
   - Adding new required fields to existing schemas
   - Changing field types or constraints
   - Removing fields
@@ -91,3 +92,11 @@ When introducing enhanced validation (e.g., making optional fields required):
    - **Risk**: High coordination overhead, potential for silent failures
 
 **Recommended**: Use Path A (new version) to minimize risk and maintain clear migration paths.
+
+### Optional vs Required Fields
+
+Fields like `sha` and `schema_ref` in v1 published events are intentionally **optional** to accommodate gradual producer adoption:
+
+- **Intent**: These fields SHOULD be present for integrity and traceability, but producers may not yet emit them reliably.
+- **Migration Path**: Once all producers consistently emit these fields, consider introducing v2 schemas with stricter validation (making them required).
+- **Consumer Guidance**: Consumers SHOULD handle missing optional fields gracefully but MAY log warnings to encourage producer updates.
