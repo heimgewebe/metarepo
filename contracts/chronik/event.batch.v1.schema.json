@@ -9,7 +9,7 @@
     "events": {
       "type": "array",
       "items": {
-        "$ref": "https://schemas.heimgewebe.org/contracts/events/base.event.schema.json"
+        "$ref": "../events/base.event.schema.json"
       }
     },
     "next_cursor": {
