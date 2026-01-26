@@ -179,7 +179,7 @@ policy:
     consumers:
       - repo: heimlern
         files: []
-        mode: mirror # Self-mirror: state is persisted and recovered by heimlern itself
+        mode: mirror # Self-mirror: state is persisted and recovered by heimlern itself.
       - repo: leitstand
         files: []
         mode: reference-only

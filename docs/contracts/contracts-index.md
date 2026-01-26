@@ -30,15 +30,13 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
   - Zweck: Audio-bezogene Ereignisse (z. B. Aufnahmen, Transkriptionen, TTS).
 - `intent.event.schema.json`
   - Zweck: Intent-Events aus Audio/Text für chronik/hausKI (Intent-Erkennung mit Confidence).
-- `contracts/chronik/event.batch.v1.schema.json`
-  - Zweck: Batch-Antwort für /v1/events (Pull-Modell).
-  - Produzenten: chronik
-  - Konsumenten: heimgeist, heimlern
 
 ### 1.1a Event Routing & Delivery
 
 - `contracts/plexer/event.envelope.v1.schema.json`
   - Zweck: Standardisierte Envelope für Events, die durch Plexer geroutet werden.
+  - Produzent: alle (wrapping)
+  - Konsumenten: plexer (routing)
 - `contracts/plexer/delivery.report.v1.schema.json`
   - Zweck: Report on event delivery status (counts, retries).
   - Produzent: plexer
@@ -47,6 +45,14 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
   - Zweck: Persisted state for failed event deliveries.
   - Produzent: plexer (internal persistence)
   - Konsumenten: plexer (retry loop)
+- `contracts/chronik/event.batch.v1.schema.json`
+  - Zweck: Batch-Antwort für /v1/events (Pull-Modell).
+  - Produzenten: chronik
+  - Konsumenten: heimgeist, heimlern
+- `contracts/heimlern.ingest.state.schema.json`
+  - Zweck: Persistenter Fortschrittszustand (Cursor, last_ok) für den Ingest-Prozess (CLI).
+  - Produzenten: heimlern (CLI)
+  - Konsumenten: leitstand, heimgeist
 
 ### 1.2 Fleet & Metriken
 

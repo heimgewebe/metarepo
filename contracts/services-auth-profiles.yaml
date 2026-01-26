@@ -16,9 +16,9 @@ services:
   leitstand:
     authKind: bearer
     header: Authorization
-    prefix: "Bearer " # trailing space is intentional
+    prefix: "Bearer " # trailing space is intentional and must not be removed
 
   hausKI:
     authKind: bearer
     header: Authorization
-    prefix: "Bearer " # trailing space is intentional
+    prefix: "Bearer " # trailing space is intentional and must not be removed
