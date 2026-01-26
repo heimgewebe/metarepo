@@ -42,7 +42,7 @@ def detect_repo_root() -> Path:
 def main():
     try:
         import yaml
-    except ImportError:
+    except ModuleNotFoundError:
         # Metarepo Control Plane requires PyYAML via uv
         sys.exit("Error: pyyaml not installed. Please run via 'uv run scripts/generate_integrity_sources.py'.")
 
