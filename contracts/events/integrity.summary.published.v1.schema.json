@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://heimgewebe/contracts/events/integrity.summary.published.v1.schema.json",
+  "$id": "https://schemas.heimgewebe.org/contracts/events/integrity.summary.published.v1.schema.json",
   "title": "Integrity Summary Published Event",
   "description": "Event signaling that a new integrity summary artifact has been published.",
   "type": "object",
@@ -50,6 +50,17 @@
             "UNCLEAR"
           ],
           "description": "Aggregated integrity status of the repository."
+        },
+        "schema_ref": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://schemas\\.heimgewebe\\.org/.*$",
+          "description": "Canonical URI of the schema used for validation."
+        },
+        "sha": {
+          "type": "string",
+          "pattern": "^(sha256:)?[0-9a-fA-F]{64}$",
+          "description": "SHA256 checksum of the artifact content (canonical form: sha256:<lowercase-hex>)."
         }
       },
       "additionalProperties": false

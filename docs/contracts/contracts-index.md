@@ -31,6 +31,29 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
 - `intent.event.schema.json`
   - Zweck: Intent-Events aus Audio/Text für chronik/hausKI (Intent-Erkennung mit Confidence).
 
+### 1.1a Event Routing & Delivery
+
+- `contracts/plexer/event.envelope.v1.schema.json`
+  - Zweck: Standardisierte Envelope für Events, die durch Plexer geroutet werden.
+  - Produzent: alle (wrapping)
+  - Konsumenten: plexer (routing)
+- `contracts/plexer/delivery.report.v1.schema.json`
+  - Zweck: Report on event delivery status (counts, retries).
+  - Produzent: plexer
+  - Konsumenten: wgx, chronik, leitstand
+- `contracts/plexer/failed_event.v1.schema.json`
+  - Zweck: Persisted state for failed event deliveries.
+  - Produzent: plexer (internal persistence)
+  - Konsumenten: plexer (retry loop)
+- `contracts/chronik/event.batch.v1.schema.json`
+  - Zweck: Batch-Antwort für /v1/events (Pull-Modell).
+  - Produzenten: chronik
+  - Konsumenten: heimgeist, heimlern
+- `contracts/heimlern.ingest.state.schema.json`
+  - Zweck: Persistenter Fortschrittszustand (Cursor, last_ok) für den Ingest-Prozess (CLI).
+  - Produzenten: heimlern (CLI)
+  - Konsumenten: leitstand, heimgeist
+
 ### 1.2 Fleet & Metriken
 
 - `fleet.health.schema.json`
@@ -52,6 +75,11 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
   - Typ: Notification (Payload < 1KB, kein Inline-Daten-Transport).
   - Produzent: semantAH (nach Release).
   - Konsumenten: plexer (Router), chronik, leitstand.
+- `contracts/events/knowledge.observatory.published.v1.schema.json`
+  - Zweck: Notification-Event, das Verfügbarkeit eines neuen Knowledge-Observatory-Snapshots signalisiert.
+  - Typ: Notification.
+  - Produzent: semantAH.
+  - Konsumenten: plexer, leitstand, hausKI.
 - `knowledge.graph.schema.json`
   - Zweck: generisches Wissensgraph-Schema (Knoten, Kanten, Beziehungen).
 - `knowledge.observatory.schema.json`
@@ -65,6 +93,27 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
   - Konsumenten: chronik, leitstand
   - Governance: siehe `heimgeist.insight.v1.meta.json` (getrennt für strict-mode Compliance)
   - Regel: Versionierung erfolgt über Dateiname (v1) und `schema_version`-Feld. Breaking Changes erfordern v2.
+- `contracts/events/heimgeist.self_state.snapshot.v1.schema.json`
+  - Zweck: Event-Envelope für Self-State Snapshots (Stream).
+  - Produzent: heimgeist
+  - Konsumenten: chronik
+- `contracts/heimgeist/self_state.schema.json`
+  - Zweck: Explizites Self-Model für Heimgeist (Confidence, Fatigue, Risk-Tension, Autonomy).
+  - Produzent: heimgeist
+  - Konsumenten: chronik, leitstand
+  - Typ: Meta-Kognition
+- `contracts/heimgeist/status.v1.schema.json`
+  - Zweck: Status-Meldung des Heimgeist-Systems inkl. Self-State.
+  - Produzent: heimgeist
+  - Konsumenten: leitstand
+- `contracts/heimgeist/self_state.bundle.v1.schema.json`
+  - Zweck: Bundle-Artifact für den Leitstand (aktueller Status + Historie).
+  - Produzent: heimgeist
+  - Konsumenten: leitstand
+- `contracts/hauski/system.signals.v1.schema.json`
+  - Zweck: System-Ressourcen-Signale (CPU, Memory, GPU) für Meta-Kognition.
+  - Produzent: hausKI
+  - Konsumenten: heimgeist
 
 ### 1.4 Policy-Kreislauf
 
@@ -95,7 +144,6 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
   - Zweck: Texte, die eingebettet (Vektorraum) werden sollen.
 - `os.context.text.redacted.schema.json`
   - Zweck: bereinigte / geschwärzte Textvarianten für Privacy.
-
 ### 1.6 Agenten, Werkzeuge & Workflows
 
 - `agent.tool.schema.json`
@@ -142,6 +190,11 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
   - Hinweis: Dieses Schema ist ein reines Beobachtungsartefakt; automatische Korrektur ist explizit verboten.
   - Produzent: semantAH
   - Konsumenten: leitstand, wgx
+- `integrity.sources.v1.schema.json`
+  - Zweck: Single Source of Truth für Integritätsquellen (Pull-Modell).
+  - Produzent: metarepo (generiert)
+  - Konsumenten: chronik
+  - Referenz: Siehe auch [`docs/architecture/integrity-neurose.md`](../../docs/architecture/integrity-neurose.md) für die normative Architektur.
 
 ---
 
@@ -211,6 +264,10 @@ Repository: **heimgewebe/heimlern**
 - `contracts/policy.decision.schema.json`
 - `contracts/policy_feedback.schema.json`
 - `contracts/policy_snapshot.schema.json`
+- `heimlern.ingest.state.schema.json`
+  - Zweck: Persistenter Fortschrittszustand (Cursor, last_ok) für den Ingest-Prozess (CLI).
+  - Produzenten: heimlern (CLI)
+  - Konsumenten: leitstand, heimgeist
 
 Zweck:
 

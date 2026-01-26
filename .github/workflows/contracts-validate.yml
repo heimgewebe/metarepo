@@ -149,7 +149,7 @@ jobs:
           }
           trap on_fail ERR
           
-          shopt -s nullglob
+          shopt -s nullglob globstar
           schemas=( contracts/**/*.schema.json )
 
           if [ ${#schemas[@]} -eq 0 ]; then
@@ -158,17 +158,28 @@ jobs:
           fi
 
           echo "Compiling ${#schemas[@]} schema(s)..."
+          
+          # Build a complete reference list of all schemas once (generic approach)
+          # This avoids repo-specific heuristics and ensures all $ref targets are resolvable
+          all_schemas=( contracts/**/*.schema.json )
+          
           for schema in "${schemas[@]}"; do
             echo "Compiling $schema"
-            # Check if schema references base.event.schema.json and include it if so
-            # shellcheck disable=SC2016
-            if grep -q '"\$ref".*base\.event\.schema\.json' "$schema" 2>/dev/null; then
-              echo "  → Schema references base.event.schema.json, including as reference"
-              ajv compile -s "$schema" -r contracts/events/base.event.schema.json --strict=log --spec=draft2020 -c ajv-formats
-            else
-              ajv compile -s "$schema" --strict=log --spec=draft2020 -c ajv-formats
-            fi
+            
+            # Build reference list: all other schemas (exclude self)
+            refs=()
+            for ref_schema in "${all_schemas[@]}"; do
+              if [[ "$ref_schema" != "$schema" ]]; then
+                refs+=(-r "$ref_schema")
+              fi
+            done
+            
+            # Compile with all schemas as potential references
+            ajv compile -s "$schema" "${refs[@]}" --strict=log --spec=draft2020 -c ajv-formats
+            echo "schema $schema is valid"
           done
+          
+          shopt -u nullglob globstar
 
       - name: Validate Specific Examples
         run: |
@@ -202,7 +213,11 @@ jobs:
           }
           trap on_fail ERR
           
-          shopt -s nullglob
+          shopt -s nullglob globstar
+          # Build complete reference list once for all validations (generic approach)
+          all_schemas=( contracts/**/*.schema.json )
+          shopt -u nullglob globstar
+          
           # Find all examples that match the pattern *.json (including .example.json)
           for example in contracts/examples/*.json; do
             # Extract base name, handling .example.json or just .json
@@ -219,23 +234,22 @@ jobs:
 
             if [[ -n "$schema" ]]; then
               echo "Validating $example against $schema"
-              # Check if schema references base.event.schema.json
-              # shellcheck disable=SC2016
-              if grep -q '"\$ref".*base\.event\.schema\.json' "$schema" 2>/dev/null; then
-                echo "  → Schema references base.event.schema.json, including as reference"
-                ajv validate \
-                  -s "$schema" \
-                  -r contracts/events/base.event.schema.json \
-                  -d "$example" \
-                  --strict=false \
-                  -c ajv-formats --spec=draft2020
-              else
-                ajv validate \
-                  -s "$schema" \
-                  -d "$example" \
-                  --strict=false \
-                  -c ajv-formats --spec=draft2020
-              fi
+              
+              # Build reference list: all other schemas (exclude the schema being validated)
+              refs=()
+              for ref_schema in "${all_schemas[@]}"; do
+                if [[ "$ref_schema" != "$schema" ]]; then
+                  refs+=(-r "$ref_schema")
+                fi
+              done
+              
+              # Validate with all other schemas as potential references
+              ajv validate \
+                -s "$schema" \
+                "${refs[@]}" \
+                -d "$example" \
+                --strict=false \
+                -c ajv-formats --spec=draft2020
             else
               echo "::notice::No matching schema found for $example (tried contracts/${filename}.schema.json and contracts/events/${filename}.schema.json)"
             fi

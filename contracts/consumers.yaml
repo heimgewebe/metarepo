@@ -87,7 +87,12 @@ knowledge:
         files: []
         mode: reference-only
 
-  insights.daily.published:
+  insights.daily.published: # Deprecated alias
+    schema: contracts/events/insights.daily.published.v1.schema.json
+    consumers: []
+    mode: reference-only
+
+  insights.daily.published.v1:
     schema: contracts/events/insights.daily.published.v1.schema.json
     consumers:
       - repo: plexer
@@ -115,6 +120,19 @@ knowledge:
       - repo: heimlern
         files: []
         mode: reference-only
+
+  knowledge.observatory.published.v1:
+    schema: contracts/events/knowledge.observatory.published.v1.schema.json
+    consumers:
+      - repo: leitstand
+        files: []
+        mode: reference-only
+      - repo: hausKI
+        files: []
+        mode: reference-only
+      - repo: plexer
+        files: []
+        mode: notification-only
 
 os_context:
   state:
@@ -153,6 +171,19 @@ policy:
     schema: contracts/policy.snapshot.schema.json
     consumers:
       - repo: heimlern
+        files: []
+        mode: reference-only
+
+  heimlern.ingest.state.v1:
+    schema: contracts/heimlern.ingest.state.schema.json
+    consumers:
+      - repo: heimlern
+        files: []
+        mode: mirror # Self-mirror: state is persisted and recovered by heimlern itself.
+      - repo: leitstand
+        files: []
+        mode: reference-only
+      - repo: heimgeist
         files: []
         mode: reference-only
 

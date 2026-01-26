@@ -1,0 +1,34 @@
+{
+  "$id": "https://schemas.heimgewebe.org/contracts/chronik/event.batch.v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Chronik Event Batch v1",
+  "description": "Batch-Antwort für /v1/events (Cursor ist Byte-Offset).",
+  "type": "object",
+  "required": ["events", "next_cursor", "has_more"],
+  "properties": {
+    "events": {
+      "type": "array",
+      "items": {
+        "$ref": "../events/base.event.schema.json"
+      }
+    },
+    "next_cursor": {
+      "type": ["integer", "null"],
+      "minimum": 0,
+      "description": "Byte-Offset für den nächsten Batch (null bei EOF)."
+    },
+    "has_more": {
+      "type": "boolean",
+      "description": "True, wenn weitere Events verfügbar sind."
+    },
+    "meta": {
+      "type": "object",
+      "properties": {
+        "count": { "type": "integer", "minimum": 0 },
+        "generated_at": { "type": "string", "format": "date-time" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

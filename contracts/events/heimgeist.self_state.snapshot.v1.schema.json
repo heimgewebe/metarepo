@@ -1,0 +1,43 @@
+{
+  "$id": "https://schemas.heimgewebe.org/contracts/events/heimgeist.self_state.snapshot.v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Heimgeist Self-State Snapshot Event V1",
+  "description": "Event-Envelope für Self-State-Snapshots (Stream). data referenziert Self-State Objekt-Contract.",
+  "type": "object",
+  "required": [
+    "kind",
+    "version",
+    "id",
+    "meta",
+    "data"
+  ],
+  "properties": {
+    "kind": {
+      "const": "heimgeist.self_state.snapshot"
+    },
+    "version": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "meta": {
+      "type": "object",
+      "required": [
+        "occurred_at"
+      ],
+      "properties": {
+        "occurred_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    },
+    "data": {
+      "$ref": "https://schemas.heimgewebe.org/contracts/heimgeist/self_state.schema.json"
+    }
+  },
+  "additionalProperties": false
+}

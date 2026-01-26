@@ -194,4 +194,4 @@ lint:
     scripts/tools/shfmt-pin.sh ensure; \
     scripts/tools/shellcheck-pin.sh ensure; \
     shfmt -d -i 2 -ci -sr -- "${files[@]}"; \
-    shellcheck -S style -- "${files[@]}";
+    shellcheck -x -P scripts/lib -S style -- "${files[@]}";

@@ -1,0 +1,37 @@
+{
+  "$id": "https://schemas.heimgewebe.org/contracts/heimgeist/status.v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Heimgeist Status V1",
+  "description": "Status-Meldung des Heimgeist-Systems inkl. Self-State.",
+  "type": "object",
+  "required": [
+    "status",
+    "self_state",
+    "timestamp"
+  ],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "ok",
+        "degraded",
+        "down",
+        "maintenance"
+      ],
+      "description": "Globaler Systemstatus."
+    },
+    "self_state": {
+      "$ref": "https://schemas.heimgewebe.org/contracts/heimgeist/self_state.schema.json",
+      "description": "Aktueller Meta-kognitiver Zustand."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "message": {
+      "type": "string",
+      "description": "Optionale Statusnachricht."
+    }
+  },
+  "additionalProperties": false
+}

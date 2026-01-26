@@ -35,11 +35,11 @@ jobs:
         run: |
           set -euo pipefail
 
-          mapfile -t scripts < <(git ls-files '*.sh')
+          mapfile -t scripts < <(git ls-files '*.sh' '*.bash' 'scripts/wgx' 'wgx/wgx' | grep -v '^completions/')
 
           if [ "${#scripts[@]}" -eq 0 ]; then
             echo "No shell scripts found."
             exit 0
           fi
 
-          shellcheck --format=gcc "${scripts[@]}"
+          shellcheck -x -P scripts/lib --format=gcc -S style "${scripts[@]}"

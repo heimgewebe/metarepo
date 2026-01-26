@@ -1,0 +1,17 @@
+{
+  "consumerKey": "target-service",
+  "event": {
+    "type": "some.event.v1",
+    "source": "producer-service",
+    "payload": {
+      "foo": "bar"
+    },
+    "size_hints": {
+      "payload_bytes": 128
+    }
+  },
+  "retryCount": 3,
+  "lastAttempt": "2023-10-27T10:00:00Z",
+  "nextAttempt": "2023-10-27T10:10:00Z",
+  "error": "503 Service Unavailable"
+}

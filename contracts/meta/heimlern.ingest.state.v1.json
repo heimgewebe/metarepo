@@ -1,0 +1,11 @@
+{
+  "contract": "heimlern.ingest.state.v1",
+  "schema": "contracts/heimlern.ingest.state.schema.json",
+  "governance": {
+    "producers": ["heimlern-cli"],
+    "consumers": ["leitstand", "heimgeist"]
+  },
+  "notes": [
+    "This file is intentionally NOT JSON-Schema. It is governance metadata."
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "type": "plexer.delivery.report.v1",
+  "source": "plexer",
+  "payload": {
+    "counts": {
+      "pending": 5,
+      "failed": 2
+    },
+    "retryable_now": 2,
+    "next_due_at": "2023-10-27T10:05:00Z",
+    "last_error": "Connection timeout",
+    "last_retry_at": "2023-10-27T10:00:00Z"
+  }
+}
