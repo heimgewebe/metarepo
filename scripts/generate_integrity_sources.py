@@ -15,20 +15,20 @@ import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 # Ensure the repository root is in the path for wgx imports
 _REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-try:
-    import yaml
-except ImportError:
-    # Metarepo Control Plane requires PyYAML via uv
-    sys.exit("Error: pyyaml not installed. Please run via 'uv run scripts/generate_integrity_sources.py'.")
+yaml: Optional[Any] = None
+
 
 def load_yaml(path: Path) -> Any:
+    # yaml is initialized in main()
+    if yaml is None:
+        raise RuntimeError("yaml module not initialized. Call main() first.")
     with open(path, "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
 
@@ -46,6 +46,13 @@ def detect_repo_root() -> Path:
     return _REPO_ROOT
 
 def main():
+    global yaml
+    try:
+        import yaml
+    except ImportError:
+        # Metarepo Control Plane requires PyYAML via uv
+        sys.exit("Error: pyyaml not installed. Please run via 'uv run scripts/generate_integrity_sources.py'.")
+
     repo_root = detect_repo_root()
     fleet_repos_file = repo_root / "fleet/repos.yml"
     repos_yml_file = repo_root / "repos.yml"
