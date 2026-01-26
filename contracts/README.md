@@ -58,7 +58,8 @@ All schemas must be valid JSON Schema Draft 2020-12. Changes are validated via C
 
 ## Conventions
 
-- **SHA-256**: Must be formatted as `sha256:<64-hex-chars>`. Pattern: `^sha256:[a-f0-9]{64}$`.
+- **SHA-256 (Canonical Form)**: `sha256:<64-hex-chars>`. Pattern: `^sha256:[a-f0-9]{64}$`.
+  (Ingress may accept relaxed formats; see Normalization Policy below.)
 
 ## Schema Versioning Policy
 
@@ -91,4 +92,5 @@ To ensure long-term traceability:
 
 -   **`sha` (Content Identity)**: SHOULD be present.
 -   **`schema_ref` (Semantic Identity)**: SHOULD be present (Pattern: `https://schemas.heimgewebe.org/...`).
+    -   `schema_ref` identifies the validating schema, not the producer implementation.
 -   **Consumer Behavior**: Consumers **MAY** warn if these fields are missing, but **MUST NOT** reject valid v1 events.
