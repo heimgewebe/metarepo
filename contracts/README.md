@@ -69,12 +69,26 @@ We apply **SemVer principles** (Semantic Versioning) but only encode **MAJOR** v
 -   **Minor/Patch Versions (Compatible)**: Applied in-place to the existing `v1` file.
     -   Migration Path: **Fleet Cutover**. Consumers automatically receive new optional fields or relaxed constraints.
 
+## Normalization Policy
+
+**Policy:** *Lenient on ingest, strict on store.*
+
+To ensure robustness across the fleet while maintaining canonical persistence:
+
+1.  **Ingest (v1 Schemas)**
+    -   **`sha` is optional.**
+    -   **Lenient Pattern**: Inputs MAY include or omit the `sha256:` prefix and MAY use uppercase or mixed-case hex.
+    -   Consumers **MUST NOT** fail validation if `sha` is missing or strictly formatted in v1.
+
+2.  **Store / Persistence**
+    -   **Canonical Form**: `sha256:<lowercase-hex>`.
+    -   **Responsibility**: The consuming service (Store/Archivist) **MUST** normalize values before persistence.
+    -   Examples in this repository **MUST** use the canonical form.
+
 ## Event Payload Policy
 
-To ensure long-term traceability and integrity without breaking current consumers:
+To ensure long-term traceability:
 
--   **`sha` (Content Identity)**: SHOULD be present in payload.
--   **`schema_ref` (Semantic Identity)**: SHOULD be present in payload.
--   **Consumer Behavior**:
-    -   Consumers **MUST NOT** fail validation if these fields are missing in `v1` events.
-    -   Consumers **MAY** warn if they are missing.
+-   **`sha` (Content Identity)**: SHOULD be present.
+-   **`schema_ref` (Semantic Identity)**: SHOULD be present (Pattern: `https://schemas.heimgewebe.org/...`).
+-   **Consumer Behavior**: Consumers **MAY** warn if these fields are missing, but **MUST NOT** reject valid v1 events.
