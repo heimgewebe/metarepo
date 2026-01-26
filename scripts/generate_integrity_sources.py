@@ -22,15 +22,9 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-try:
-    import yaml
-except ImportError:
-    # Metarepo Control Plane requires PyYAML via uv
-    sys.exit("Error: pyyaml not installed. Please run via 'uv run scripts/generate_integrity_sources.py'.")
-
-def load_yaml(path: Path) -> Any:
+def load_yaml(yaml_mod: Any, path: Path) -> Any:
     with open(path, "r", encoding="utf-8") as f:
-        return yaml.safe_load(f)
+        return yaml_mod.safe_load(f)
 
 def utc_now_iso() -> str:
     # Support SOURCE_DATE_EPOCH for reproducible builds
@@ -46,6 +40,12 @@ def detect_repo_root() -> Path:
     return _REPO_ROOT
 
 def main():
+    try:
+        import yaml
+    except ImportError:
+        # Metarepo Control Plane requires PyYAML via uv
+        sys.exit("Error: pyyaml not installed. Please run via 'uv run scripts/generate_integrity_sources.py'.")
+
     repo_root = detect_repo_root()
     fleet_repos_file = repo_root / "fleet/repos.yml"
     repos_yml_file = repo_root / "repos.yml"
@@ -56,7 +56,7 @@ def main():
         print(f"Error: {fleet_repos_file} not found.")
         sys.exit(1)
 
-    fleet_data = load_yaml(fleet_repos_file)
+    fleet_data = load_yaml(yaml, fleet_repos_file)
 
     fleet_list = []
 
@@ -94,7 +94,7 @@ def main():
     default_owner = "heimgewebe"
 
     if repos_yml_file.exists():
-        raw_repos = load_yaml(repos_yml_file)
+        raw_repos = load_yaml(yaml, repos_yml_file)
         default_owner = raw_repos.get("github", {}).get("owner", default_owner)
 
         if "repos" in raw_repos and isinstance(raw_repos["repos"], list):
