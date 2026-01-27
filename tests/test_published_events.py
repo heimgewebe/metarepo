@@ -140,9 +140,8 @@ def test_all_published_examples_comply_with_strict_payload():
 
         # Derive schema path
         schema_path = _schema_path_for_example(example_path, doc)
-        assert schema_path.exists(), (
-            f"{example_path.name}: missing schema at {schema_path}"
-        )
+        if not schema_path.exists():
+            pytest.fail(f"{example_path.name}: missing schema at {schema_path}")
 
         schema = _load_json(schema_path)
         allowed = _allowed_payload_keys_from_schema(schema_path, schema)
