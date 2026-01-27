@@ -13,11 +13,20 @@ EVENT_SCHEMAS_DIR = CONTRACTS_DIR / "events"
 def _load_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
-def _schema_path_for_example(example_path: Path) -> Path:
+def _schema_path_for_example(example_path: Path, doc: dict) -> Path:
     """
-    Derives the schema path from the example filename.
-    contracts/examples/<name>.example.json -> contracts/events/<name>.schema.json
+    Derives the schema path.
+    1. Try from 'type' field in the document: contracts/events/<type>.schema.json
+    2. Fallback to filename: contracts/examples/<name>.example.json -> contracts/events/<name>.schema.json
     """
+    # 1. Try deriving from 'type' field
+    event_type = doc.get("type")
+    if event_type and isinstance(event_type, str):
+        schema_candidate = EVENT_SCHEMAS_DIR / f"{event_type}.schema.json"
+        if schema_candidate.exists():
+            return schema_candidate
+
+    # 2. Fallback: Derive from filename
     schema_name = example_path.name.replace(".example.json", ".schema.json")
     return EVENT_SCHEMAS_DIR / schema_name
 
@@ -97,8 +106,7 @@ def test_published_v1_strict_payload_enforcement():
         "timestamp": "2025-12-25T06:05:00Z",
         "payload": {
             "url": "https://example.com/insights.json",
-            "generated_at": "2025-12-25T06:00:00Z",
-            "ts": "2025-12-25"
+            "generated_at": "2025-12-25T06:00:00Z"
         }
     }
     
@@ -120,7 +128,7 @@ def test_all_published_examples_comply_with_strict_payload():
         assert isinstance(payload, dict), f"{example_path.name}: payload must be an object"
 
         # Derive schema path
-        schema_path = _schema_path_for_example(example_path)
+        schema_path = _schema_path_for_example(example_path, doc)
         assert schema_path.exists(), (
             f"{example_path.name}: missing schema at {schema_path}"
         )
