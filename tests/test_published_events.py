@@ -22,9 +22,11 @@ def _schema_path_for_example(example_path: Path, doc: dict) -> Path:
     # 1. Try deriving from 'type' field
     event_type = doc.get("type")
     if event_type and isinstance(event_type, str):
-        schema_candidate = EVENT_SCHEMAS_DIR / f"{event_type}.schema.json"
-        if schema_candidate.exists():
-            return schema_candidate
+        event_type = event_type.strip()
+        if event_type:
+            schema_candidate = EVENT_SCHEMAS_DIR / f"{event_type}.schema.json"
+            if schema_candidate.exists():
+                return schema_candidate
 
     # 2. Fallback: Derive from filename
     schema_name = example_path.name.replace(".example.json", ".schema.json")
@@ -101,8 +103,12 @@ def test_knowledge_observatory_published_constraints():
 
 def test_published_v1_strict_payload_enforcement():
     """
-    Tests that published.v1.schema.json enforces additionalProperties: false in payload.
-    This breaking change ensures producers cannot send extra fields.
+    Documentation test: demonstrates that published.v1 events typically adhere to a strict payload structure.
+
+    This test serves as an executable convention documentation. It explicitly lists the fields
+    historically expected in published.v1 events (url, generated_at, ts).
+    Note that the definitive validation logic is in test_all_published_examples_comply_with_strict_payload,
+    which derives rules directly from the schema.
     """
     # Valid event with only allowed fields
     valid_event = {
@@ -115,10 +121,8 @@ def test_published_v1_strict_payload_enforcement():
         }
     }
     
-    # This test documents the contract: producers must not add extra fields
-    # The schema validation will reject events with additional payload fields
-    # Note: ts is optional in some schemas, so we don't strictly enforce it here in the test data,
-    # but we allow it in the subset check.
+    # This assertion mirrors the expected minimal structure for published.v1 events.
+    # We check against a known subset to document the "core" fields.
     assert set(valid_event["payload"].keys()).issubset({"url", "generated_at", "ts"}), \
         "Payload can only contain url, generated_at (and optionally ts)"
 
