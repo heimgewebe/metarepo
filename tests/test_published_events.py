@@ -39,22 +39,22 @@ def _allowed_payload_keys_from_schema(schema_path: Path, schema: dict) -> set[st
     """
     props = schema.get("properties")
     if not isinstance(props, dict):
-        pytest.fail(f"{schema_path.name}: Schema missing top-level 'properties' object")
+        pytest.fail(f"{schema_path}: Schema missing top-level 'properties' object")
 
     payload = props.get("payload")
     if not isinstance(payload, dict):
-        pytest.fail(f"{schema_path.name}: Schema missing 'properties.payload' object")
+        pytest.fail(f"{schema_path}: Schema missing 'properties.payload' object")
 
     payload_props = payload.get("properties")
     if not isinstance(payload_props, dict):
         # If schema intentionally allows any payload keys, it should say so explicitly.
-        pytest.fail(f"{schema_path.name}: Schema missing 'properties.payload.properties' object")
+        pytest.fail(f"{schema_path}: Schema missing 'properties.payload.properties' object")
 
     # If schema claims payload is strict, it should declare additionalProperties=false.
     addl = payload.get("additionalProperties", None)
     if addl is not False:
         pytest.fail(
-            f"{schema_path.name}: Test requirement: for strict published.v1 payload examples, the schema must set "
+            f"{schema_path}: Test requirement: for strict published.v1 payload examples, the schema must set "
             "'properties.payload.additionalProperties': false to lock down allowed keys. "
             "JSON Schema allows omitting 'additionalProperties' (defaults to true) or using a schema "
             "object; this suite enforces the stricter convention for published.v1 payloads."
