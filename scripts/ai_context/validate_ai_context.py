@@ -27,12 +27,15 @@ def load_yaml(p: Path) -> Dict[str, Any]:
         if exc.name != "yaml":
             raise
         die("PyYAML missing. See docs/fleet/push-to-fleet.md for install guidance.")
+
     try:
         data = yaml.safe_load(p.read_text(encoding="utf-8"))
     except Exception as e:
         die(f"{p}: YAML parse failed: {e}")
+
     if not isinstance(data, dict):
         die(f"{p}: top-level must be a mapping/object")
+
     return data
 
 
@@ -68,7 +71,8 @@ def validate_one(p: Path) -> List[str]:
     d = load_yaml(p)
     errs: List[str] = []
 
-    # Backwards-compatible: v1.0 has these keys; v1.1 adds more, but we keep required minimal.
+    # Backwards-compatible:
+    # v1.0 requires these keys; v1.1 may add more.
     name = get_str(d, "project.name")
     summary = get_str(d, "project.summary")
     role = get_str(d, "project.role")
@@ -82,9 +86,9 @@ def validate_one(p: Path) -> List[str]:
 
     do = get_list(d, "ai_guidance.do")
     dont = get_list(d, "ai_guidance.dont")
-    if len(do) == 0:
+    if not do:
         errs.append("ai_guidance.do must not be empty")
-    if len(dont) == 0:
+    if not dont:
         errs.append("ai_guidance.dont must not be empty")
 
     if has_placeholders(d):
@@ -96,19 +100,24 @@ def validate_one(p: Path) -> List[str]:
 def validate_templates(dir_path: Path) -> int:
     if not dir_path.exists() or not dir_path.is_dir():
         die(f"templates dir missing: {dir_path}")
-    problems: List[Tuple[Path, List[str]]] = []
+
     files = sorted(dir_path.glob("*.ai-context.yml"))
     if not files:
         die(f"no template files found in {dir_path}")
+
+    problems: List[Tuple[Path, List[str]]] = []
+
     for p in files:
         errs = validate_one(p)
         if errs:
             problems.append((p, errs))
+
     if problems:
         for p, errs in problems:
             for e in errs:
                 err(f"{p}: {e}")
         return 2
+
     print("ai-context template validation OK")
     return 0
 
@@ -116,11 +125,13 @@ def validate_templates(dir_path: Path) -> int:
 def validate_file(file_path: Path) -> int:
     if not file_path.exists():
         die(f"file missing: {file_path}")
+
     errs = validate_one(file_path)
     if errs:
         for e in errs:
             err(f"{file_path}: {e}")
         return 2
+
     print("ai-context file validation OK")
     return 0
 
@@ -139,6 +150,7 @@ def main() -> int:
         rc = max(rc, validate_file(Path(args.file)))
     if args.templates_dir:
         rc = max(rc, validate_templates(Path(args.templates_dir)))
+
     return rc
 
 
