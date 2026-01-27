@@ -30,28 +30,33 @@ def _schema_path_for_example(example_path: Path, doc: dict) -> Path:
     schema_name = example_path.name.replace(".example.json", ".schema.json")
     return EVENT_SCHEMAS_DIR / schema_name
 
-def _allowed_payload_keys_from_schema(schema: dict) -> set[str]:
+def _allowed_payload_keys_from_schema(schema_path: Path, schema: dict) -> set[str]:
     """
     Extract allowed payload keys from an event schema:
       schema.properties.payload.properties => allowed keys
     """
     props = schema.get("properties")
     if not isinstance(props, dict):
-        raise AssertionError("Schema missing top-level 'properties' object")
+        pytest.fail(f"{schema_path.name}: Schema missing top-level 'properties' object")
 
     payload = props.get("payload")
     if not isinstance(payload, dict):
-        raise AssertionError("Schema missing 'properties.payload' object")
+        pytest.fail(f"{schema_path.name}: Schema missing 'properties.payload' object")
 
     payload_props = payload.get("properties")
     if not isinstance(payload_props, dict):
         # If schema intentionally allows any payload keys, it should say so explicitly.
-        raise AssertionError("Schema missing 'properties.payload.properties' object")
+        pytest.fail(f"{schema_path.name}: Schema missing 'properties.payload.properties' object")
 
     # If schema claims payload is strict, it should declare additionalProperties=false.
     addl = payload.get("additionalProperties", None)
     if addl is not False:
-        raise AssertionError("Schema payload must set 'additionalProperties': false for strict examples")
+        pytest.fail(
+            f"{schema_path.name}: Test requirement: for strict published.v1 payload examples, the schema must set "
+            "'properties.payload.additionalProperties': false to lock down allowed keys. "
+            "JSON Schema allows omitting 'additionalProperties' (defaults to true) or using a schema "
+            "object; this suite enforces the stricter convention for published.v1 payloads."
+        )
 
     return set(payload_props.keys())
 
@@ -112,8 +117,10 @@ def test_published_v1_strict_payload_enforcement():
     
     # This test documents the contract: producers must not add extra fields
     # The schema validation will reject events with additional payload fields
-    assert set(valid_event["payload"].keys()).issubset({"url", "ts", "generated_at"}), \
-        "Payload can only contain url, ts, and generated_at"
+    # Note: ts is optional in some schemas, so we don't strictly enforce it here in the test data,
+    # but we allow it in the subset check.
+    assert set(valid_event["payload"].keys()).issubset({"url", "generated_at", "ts"}), \
+        "Payload can only contain url, generated_at (and optionally ts)"
 
 
 def test_all_published_examples_comply_with_strict_payload():
@@ -134,10 +141,19 @@ def test_all_published_examples_comply_with_strict_payload():
         )
 
         schema = _load_json(schema_path)
-        allowed = _allowed_payload_keys_from_schema(schema)
+        allowed = _allowed_payload_keys_from_schema(schema_path, schema)
 
         got = set(payload.keys())
         forbidden = got - allowed
         assert not forbidden, (
             f"{example_path.name}: payload has forbidden keys: {forbidden}; allowed: {sorted(allowed)}"
+        )
+
+        # Check for required payload keys
+        required = schema.get("properties", {}).get("payload", {}).get("required", [])
+        required_set = set(required) if isinstance(required, list) else set()
+
+        missing = required_set - got
+        assert not missing, (
+            f"{example_path.name}: payload missing required keys: {missing}; required: {sorted(required_set)}"
         )
