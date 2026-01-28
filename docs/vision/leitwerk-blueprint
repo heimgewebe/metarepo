@@ -1,4 +1,4 @@
-# **Blaupause: leitfaden**
+# **Blaupause: leitwerk**
 
 ## Agentengesteuerte Multirepo-Koordination für Heimgewebe
 
@@ -15,7 +15,7 @@ Ein autopoetisches Heimgewebe entsteht **nicht** durch maximale Agenten-Autonomi
 > **Command → Planung → Ausführung → Guard/Contracts → Artefakt → Beobachtung → nächste Entscheidung**
 
 **ACS** ist die Control-Surface.
-**Leitfaden** ist das koordinierende Organ.
+**leitwerk** ist das koordinierende Organ.
 **Copilot SDK** ist (vorläufig) nur der Muskel.
 **WGX, Contracts, Chronik, Leitstand** bilden die **Membran**, ohne die Geschwindigkeit in Drift umschlägt.
 
@@ -42,9 +42,9 @@ Ein schneller Agent ohne Membran ist kein Evolutionsmotor, sondern ein Driftbesc
 
 Die stabile Form ist:
 
-> **Leitfaden-first, Engine-second**
+> **leitwerk-first, Engine-second**
 
-Leitfaden trägt:
+leitwerk trägt:
 
 * Heimgewebe-Wissen (Fleet-SoT, Contract-Ownership, Event-Semantik),
 * Durchsetzungslogik (WGX, Branch-Gates),
@@ -60,7 +60,7 @@ So wird „Power“ zu **prüfbarer Wirksamkeit**.
 
 ### Zielbild
 
-**Leitfaden** ist ein in ACS eingebettetes (Sidecar-basiertes) Koordinationsorgan, das:
+**leitwerk** ist ein in ACS eingebettetes (Sidecar-basiertes) Koordinationsorgan, das:
 
 * menschliche Prompts **und** systemische Trigger verarbeitet,
 * daraus **geplante**, nachvollziehbare Multi-Repo-Änderungen erzeugt,
@@ -76,7 +76,7 @@ So wird „Power“ zu **prüfbarer Wirksamkeit**.
 
 * **metarepo ist Control-Plane** (Fleet-SoT, Policies, interne Contracts).
 * **Contracts-first**: Artefakt ohne Schema = nicht existent.
-* **Events ≠ Commands**: Leitfaden nimmt Commands an, emittiert Events.
+* **Events ≠ Commands**: leitwerk nimmt Commands an, emittiert Events.
 * **Durchsetzung vor Vertrauen**: WGX entscheidet, nicht Agent-Selbstauskunft.
 * **Branch-Only-Writes**: niemals `main/master`.
 * **Observability = Audit**: Leitstand zeigt Belege, nicht nur Status.
@@ -86,7 +86,7 @@ So wird „Power“ zu **prüfbarer Wirksamkeit**.
 
 ## 2) Namens- und Begriffsbindung (Etymologie)
 
-* **Leitfaden**
+* **leitwerk**
   *leiten* + *Faden* → Führung durch Verbindung
   → Kein Autopilot, sondern bewusstes Zusammenführen.
 
@@ -105,7 +105,7 @@ Diese Begriffe sind **nicht dekorativ**, sondern normativ.
 
 ## 3) Organismus-Karte (präzisiert)
 
-### Bestehende Organe (relevant für Leitfaden)
+### Bestehende Organe (relevant für leitwerk)
 
 * **agent-control-surface (ACS)**
   UI, sichere Git-Wizards, lokale Betriebsinvarianten.
@@ -141,7 +141,7 @@ Diese Begriffe sind **nicht dekorativ**, sondern normativ.
 
 ### Neues Organ
 
-## **leitfaden**
+## **leitwerk**
 
 *(Sidecar empfohlen)*
 
@@ -157,12 +157,12 @@ Koordination, Planung, Durchsetzung, Audit – **nicht** direkte UI, **nicht** r
 **Client (Pop!_OS / iPad)**
 → SSH LocalForward
 → **ACS (127.0.0.1:8099)**
-→ **leitfaden Sidecar (localhost, z. B. :8098)**
+→ **leitwerk Sidecar (localhost, z. B. :8098)**
 → Engine (Copilot SDK heute)
 → Git / PR / WGX
 → Chronik (Events)
 → Leitstand / Heimgeist / Heimlern
-→ Rückkopplung an Leitfaden
+→ Rückkopplung an leitwerk
 
 ### Warum Sidecar?
 
@@ -199,7 +199,7 @@ Koordination, Planung, Durchsetzung, Audit – **nicht** direkte UI, **nicht** r
   * Patch-Vorschläge
   * Tool-Intents
   * Unsicherheitsbericht
-* Leitfaden führt aus **oder verweigert**.
+* leitwerk führt aus **oder verweigert**.
 
 ---
 
@@ -249,14 +249,14 @@ Jeder Übergang = Event + Artefakt.
 
 ### Chronik-Events (Minimalset)
 
-* `leitfaden.task.created`
-* `leitfaden.context.built`
-* `leitfaden.plan.ready`
-* `leitfaden.exec.started`
-* `leitfaden.guard.finished`
-* `leitfaden.pr.created`
-* `leitfaden.task.failed`
-* `leitfaden.task.completed`
+* `leitwerk.task.created`
+* `leitwerk.context.built`
+* `leitwerk.plan.ready`
+* `leitwerk.exec.started`
+* `leitwerk.guard.finished`
+* `leitwerk.pr.created`
+* `leitwerk.task.failed`
+* `leitwerk.task.completed`
 
 ---
 
@@ -274,13 +274,13 @@ Jeder Übergang = Event + Artefakt.
 ### ACS-API (Vorschlag)
 
 ```
-POST /api/leitfaden/tasks
-GET  /api/leitfaden/tasks/{id}
-POST /api/leitfaden/tasks/{id}/plan
-POST /api/leitfaden/tasks/{id}/exec
-POST /api/leitfaden/tasks/{id}/abort
-GET  /api/leitfaden/fleet
-GET  /api/leitfaden/artifacts/{ref}
+POST /api/leitwerk/tasks
+GET  /api/leitwerk/tasks/{id}
+POST /api/leitwerk/tasks/{id}/plan
+POST /api/leitwerk/tasks/{id}/exec
+POST /api/leitwerk/tasks/{id}/abort
+GET  /api/leitwerk/fleet
+GET  /api/leitwerk/artifacts/{ref}
 ```
 
 ---
@@ -314,10 +314,10 @@ Engine.run(
 
   * kein Web
   * kein sudo
-  * Git nur über Leitfaden
+  * Git nur über leitwerk
 * Idealfall:
 
-  > Agent liefert Patch, Leitfaden wendet an.
+  > Agent liefert Patch, leitwerk wendet an.
 
 ---
 
@@ -325,7 +325,7 @@ Engine.run(
 
 * lokales LLM oder eigener Dienst
 * semantAH + heimgeist als Wissensschicht
-* Tool-Execution bleibt bei Leitfaden
+* Tool-Execution bleibt bei leitwerk
 
 ---
 
@@ -362,7 +362,7 @@ Engine.run(
 ### Services
 
 * `agent-control-surface.service`
-* **`leitfaden.service`**
+* **`leitwerk.service`**
 
 Mit:
 
@@ -402,14 +402,14 @@ Heimgeist / Sichter erzeugen Actions, Agent dient nur noch als Umsetzer.
 
 ## 14) Verdichtete Essenz
 
-**Leitfaden ist das Organ, das Geschwindigkeit in Kohärenz übersetzt.
-Der Agent bewegt – Leitfaden entscheidet.**
+**leitwerk ist das Organ, das Geschwindigkeit in Kohärenz übersetzt.
+Der Agent bewegt – leitwerk entscheidet.**
 
 ---
 
 ## 15) Ironische Auslassung
 
-Ein Agent ohne Leitfaden ist wie ein GPS, das jede Abkürzung kennt, aber nicht weiß, ob die Brücke noch steht.
+Ein Agent ohne leitwerk ist wie ein GPS, das jede Abkürzung kennt, aber nicht weiß, ob die Brücke noch steht.
 
 ---
 
