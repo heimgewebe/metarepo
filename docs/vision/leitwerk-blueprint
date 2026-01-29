@@ -1,427 +1,346 @@
-# **Blaupause: leitwerk**
+# leitwerk
 
-## Agentengesteuerte Multirepo-Koordination für Heimgewebe
+## Koordinationsorgan für agentische Multirepo-Arbeit im Heimgewebe
 
-*(ACS Control-Surface · Copilot SDK heute · eigene Engine morgen)*
-
----
-
-## Dialektische Erörterung
-
-### These
-
-Ein autopoetisches Heimgewebe entsteht **nicht** durch maximale Agenten-Autonomie, sondern durch **harte, geschlossene Regelkreise**:
-
-> **Command → Planung → Ausführung → Guard/Contracts → Artefakt → Beobachtung → nächste Entscheidung**
-
-**ACS** ist die Control-Surface.
-**leitwerk** ist das koordinierende Organ.
-**Copilot SDK** ist (vorläufig) nur der Muskel.
-**WGX, Contracts, Chronik, Leitstand** bilden die **Membran**, ohne die Geschwindigkeit in Drift umschlägt.
-
-Autopoiesis heißt hier:
-👉 *Der Organismus verändert sich, ohne seine Invarianten zu verlieren.*
+*(ACS Control-Surface · agentenneutral · durchsetzungsstark · auditierbar)*
 
 ---
 
-### Antithese
+## Dialektische Grundlegung
 
-Direkte Agenten-Writes über 20+ Repos erzeugen kurzfristig Eindruck von Macht – langfristig jedoch:
+Ein autopoetisches Heimgewebe entsteht nicht durch möglichst autonome Agenten,  
+sondern durch **harte, geschlossene Regelkreise zwischen Vorschlag und Wirklichkeit**:
 
-* semantische Inkonsistenz
-* stillen Contract-Bruch
-* PR-Fluten ohne Kontext
-* epistemische Blindheit („es lief doch durch“)
+**Intent → Vorschlag → Entscheidung → Ausführung → Prüfung → Artefakt → Beobachtung**
 
-Das ist keine Selbstorganisation, sondern **Git-getriebenes Rauschen**.
-Ein schneller Agent ohne Membran ist kein Evolutionsmotor, sondern ein Driftbeschleuniger.
+ACS ist die Control-Surface.  
+Agenten liefern Vorschläge.  
+**leitwerk entscheidet, was Realität werden darf.**
 
----
+WGX, Contracts, Chronik und Leitstand bilden die Membran,  
+ohne die Geschwindigkeit zwangsläufig in Drift umschlägt.
 
-### Synthese
-
-Die stabile Form ist:
-
-> **leitwerk-first, Engine-second**
-
-leitwerk trägt:
-
-* Heimgewebe-Wissen (Fleet-SoT, Contract-Ownership, Event-Semantik),
-* Durchsetzungslogik (WGX, Branch-Gates),
-* Audit-Pflicht (Chronik-Artefakte),
-* Lernkopplung (Heimgeist / Heimlern).
-
-Die Engine (Copilot heute, eigene morgen) bleibt **austauschbar**.
-So wird „Power“ zu **prüfbarer Wirksamkeit**.
+Autopoiesis bedeutet hier:
+> Der Organismus verändert sich, ohne seine Invarianten zu verlieren.
 
 ---
 
-## 1) Zielbild und Invarianten
+## Klärung (entscheidend)
 
-### Zielbild
+**leitwerk ist kein Agent.**  
+**leitwerk ist kein Erkenntnisorgan.**  
+**leitwerk generiert keinen Code aus sich heraus.**
 
-**leitwerk** ist ein in ACS eingebettetes (Sidecar-basiertes) Koordinationsorgan, das:
+leitwerk ist das **Koordinations-, Durchsetzungs- und Audit-Organ**  
+zwischen externen Agenten und dem Heimgewebe-Organismus.
 
-* menschliche Prompts **und** systemische Trigger verarbeitet,
-* daraus **geplante**, nachvollziehbare Multi-Repo-Änderungen erzeugt,
-* jede Änderung **branch-only** ausführt,
-* pro Repo strukturierte PRs erzeugt,
-* **WGX-Guards erzwingt**,
-* alle Schritte als **Artefakte + Events** in Chronik einspeist,
-* und mittelfristig ohne Architekturbruch die Copilot-Engine ersetzen kann.
+Agenten:
+- analysieren
+- planen
+- schlagen vor
 
----
+leitwerk:
+- rahmt
+- sequenziert
+- erzwingt
+- protokolliert
 
-### Unverhandelbare Invarianten
-
-* **metarepo ist Control-Plane** (Fleet-SoT, Policies, interne Contracts).
-* **Contracts-first**: Artefakt ohne Schema = nicht existent.
-* **Events ≠ Commands**: leitwerk nimmt Commands an, emittiert Events.
-* **Durchsetzung vor Vertrauen**: WGX entscheidet, nicht Agent-Selbstauskunft.
-* **Branch-Only-Writes**: niemals `main/master`.
-* **Observability = Audit**: Leitstand zeigt Belege, nicht nur Status.
-* **Unsicherheit ist Artefakt**: sie wird explizit gespeichert, nicht geglättet.
-
----
-
-## 2) Namens- und Begriffsbindung (Etymologie)
-
-* **leitwerk**
-  *leiten* + *Faden* → Führung durch Verbindung
-  → Kein Autopilot, sondern bewusstes Zusammenführen.
-
-* **Agent** (lat. *agere*)
-  → Ausführender, nicht Wahrheitsinstanz.
-
-* **Orchestrieren** (gr. *organon*)
-  → geordnete Vielheit, nicht Zentralherrschaft.
-
-* **Autopoiesis**
-  → Selbsterhalt durch Membran, nicht Selbstoptimierung.
-
-Diese Begriffe sind **nicht dekorativ**, sondern normativ.
+Heimgeist reflektiert.  
+Heimlern lernt.  
+WGX entscheidet.  
+Chronik erinnert.  
+Leitstand macht sichtbar.
 
 ---
 
-## 3) Organismus-Karte (präzisiert)
+## Zielbild
 
-### Bestehende Organe (relevant für leitwerk)
+leitwerk ist ein in **ACS eingebettetes (Sidecar-basiertes)** Koordinationsorgan, das:
 
-* **agent-control-surface (ACS)**
-  UI, sichere Git-Wizards, lokale Betriebsinvarianten.
+- menschliche Prompts **und** systemische Trigger entgegennimmt,
+- externe Agenten (z. B. Jules CLI, Copilot SDK) gezielt aufruft,
+- deren Ergebnisse normalisiert und bewertet,
+- Multi-Repo-Vorhaben zerlegt und sequenziert,
+- Git-Operationen **ausschließlich kontrolliert** ausführt,
+- branch-only Änderungen erzwingt,
+- WGX-Guards kompromisslos durchsetzt,
+- PR-Ketten koordiniert,
+- und jede Entscheidung als **Artefakt + Event** persistiert.
 
-* **metarepo**
-  Fleet-SoT, Policies, interne Contracts, Template-Quelle.
-
-* **wgx**
-  Guard / Smoke / Metrics / Fleet-Motorik (Enforcement).
-
-* **chronik**
-  Event-Backbone, Timeline, Replay-Quelle.
-
-* **leitstand**
-  Beobachtung, Audit-UI, Systemresonanz.
-
-* **semantAH**
-  Semantische Verdichtung, Graph, Drift-Erkennung.
-
-* **heimgeist**
-  Reflexions- und Aktionsartefakte (`insights.*`, `actions.*`).
-
-* **heimlern**
-  Lern- und Policy-Rückkopplung.
-
-* **sichter**
-  Zweitinstanzliche Review-Logik (semantisch/konventionell).
-
-* **tools**
-  u. a. **repoLens** als Kontext-Kondensator.
+leitwerk ist damit **kein Autopilot**, sondern ein **Verantwortungsfilter**.
 
 ---
 
-### Neues Organ
+## Unverhandelbare Invarianten
 
-## **leitwerk**
+- Agent ≠ Git
+- Kein Auto-Apply
+- Kein Auto-Commit
+- Kein Auto-PR
+- Branch-only (niemals `main` / `master`)
+- WGX schlägt Agent
+- Unsicherheit ist ein Artefakt
+- Chronik ist Gedächtnis, nicht Logging
 
-*(Sidecar empfohlen)*
-
-**Rolle:**
-Koordination, Planung, Durchsetzung, Audit – **nicht** direkte UI, **nicht** rohe Agentik.
+Wenn eine dieser Regeln fällt, verliert leitwerk seine Funktion.
 
 ---
 
-## 4) Architektur (Idealform)
+## Rolle im Organismus
 
-### Prozess-Topologie
+### leitwerk
 
-**Client (Pop!_OS / iPad)**
-→ SSH LocalForward
-→ **ACS (127.0.0.1:8099)**
-→ **leitwerk Sidecar (localhost, z. B. :8098)**
-→ Engine (Copilot SDK heute)
-→ Git / PR / WGX
-→ Chronik (Events)
-→ Leitstand / Heimgeist / Heimlern
+**Aufgaben**
+- Koordination
+- Sequenzierung
+- Durchsetzung
+- Audit
+- Konsistenzwahrung über Repos hinweg
+
+**Tut ausdrücklich nicht**
+- denken
+- halluzinieren
+- bewerten
+- optimieren
+- „helfen wollen“
+
+---
+
+### Agenten (extern, austauschbar)
+
+Beispiele:
+- Jules CLI
+- Copilot SDK
+- spätere spezialisierte Agenten
+
+**Aufgaben**
+- Analyse
+- Planungsvorschläge
+- Patch-Vorschläge
+- Begründungen
+
+**Status**
+- fehlbar
+- nicht autoritativ
+- jederzeit austauschbar
+
+---
+
+### Heimgeist
+
+Heimgeist bleibt zuständig für:
+- Reflexion
+- Verdichtung
+- Einsichten
+- Meta-Bewertung
+
+Heimgeist **koordiniert keine Agenten**  
+Heimgeist **führt nichts aus**
+
+---
+
+## Architektur (Idealform)
+
+Client (Desktop / iPad)  
+→ ACS (Control Surface)  
+→ leitwerk (Sidecar, localhost)  
+→ Agenten (Jules, Copilot, …)  
+→ Vorschläge (Plan / Patch / Text)  
+→ leitwerk  
+→ Git (branch-only)  
+→ WGX  
+→ Chronik  
+→ Leitstand / Heimgeist / Heimlern  
 → Rückkopplung an leitwerk
 
-### Warum Sidecar?
-
-* Crash-Isolation (Agentik darf UI nicht reißen)
-* Rechte-Separation (stärkeres Sandboxing)
-* Engine-Austausch ohne ACS-Umbau
-
----
-
-## 5) Die drei geschlossenen Schleifen (Kern)
-
-### Loop A — **Kontext**
-
-**Ziel:** reproduzierbarer, auditierbarer Kontext.
-
-* repoLens erzeugt `context.bundle.v1`
-
-  * betroffene Repos
-  * relevante Pfade
-  * Contracts
-  * letzte Insights
-* Bundle ist versioniert + gehasht.
+**Sidecar-Prinzip**
+- Crash-Isolation
+- Rechte-Separation
+- Engine-Austausch ohne UI-Umbau
 
 ---
 
-### Loop B — **Ausführung**
+## Kernaufgaben von leitwerk
 
-**Ziel:** deterministisch gerahmte Handlung.
+### Agentensteuerung
 
-* Engine erhält nur `context.bundle` + `task.request`
-* Liefert:
+leitwerk verwaltet Agenten über **schmale Adapter**, kein Framework:
 
-  * Plan
-  * Patch-Vorschläge
-  * Tool-Intents
-  * Unsicherheitsbericht
-* leitwerk führt aus **oder verweigert**.
+agents/
+jules.py
+copilot.py
+…
 
----
 
-### Loop C — **Feedback**
+Minimaler Vertrag:
 
-**Ziel:** Lernen, nicht nur Fertigstellen.
+- Session starten
+- Status abfragen
+- Ergebnis abholen
 
-* WGX erzeugt Reports
-* Chronik speichert Events
-* Sichter kommentiert
-* Heimgeist erzeugt Insights
-* Heimlern passt Policies an
+Alles andere ist Agenten-Implementationsdetail.
 
 ---
 
-## 6) Task- und Artefaktmodell (konkret)
+### Kontextbereitstellung
 
-### Task-Zustände
+leitwerk liefert Agenten **explizit begrenzten Kontext**:
 
-```
-CREATED
-→ CONTEXTED
-→ PLANNED
-→ EXECUTING
-→ GUARDED
-→ PR_CREATED
-→ REVIEWED
-→ DONE | FAILED
-```
+- repoLens-Auszüge
+- relevante Pfade
+- relevante Contracts
+- klare Aufgabenstellung
 
-Jeder Übergang = Event + Artefakt.
+Nie:
+- vollständige Repos
+- implizite Freiheiten
+- verdeckte Schreibrechte
 
----
-
-### Kanonische Artefakte (Schemas im metarepo!)
-
-* `context.bundle.v1`
-* `plan.v1`
-* `execution.log.v1`
-* `guard.report.v1`
-* `pr.manifest.v1`
-* `reflection.insights.v1`
-* `policy.delta.v1`
-* `uncertainty.report.v1`
+Kontext ist reproduzierbar, versioniert und gehasht.
 
 ---
 
-### Chronik-Events (Minimalset)
+### Ergebnisnormalisierung
 
-* `leitwerk.task.created`
-* `leitwerk.context.built`
-* `leitwerk.plan.ready`
-* `leitwerk.exec.started`
-* `leitwerk.guard.finished`
-* `leitwerk.pr.created`
-* `leitwerk.task.failed`
-* `leitwerk.task.completed`
+Agenten-Ergebnisse werden **nicht direkt verwendet**.
 
----
+leitwerk übersetzt sie in kanonische Artefakte:
 
-## 7) ACS-Integration (kein Autopilot)
+- `plan.v1`
+- `patch.v1`
+- `rationale.v1`
+- `uncertainty.report.v1`
 
-### UI-Module
-
-1. Fleet-Overview
-2. Task-Console (Prompt + Targets + Policy-Level)
-3. Plan-Preview (inkl. Unsicherheit)
-4. Diff / PR-View
-5. Observability-Timeline
-6. Kill-Switch (kontrolliert)
-
-### ACS-API (Vorschlag)
-
-```
-POST /api/leitwerk/tasks
-GET  /api/leitwerk/tasks/{id}
-POST /api/leitwerk/tasks/{id}/plan
-POST /api/leitwerk/tasks/{id}/exec
-POST /api/leitwerk/tasks/{id}/abort
-GET  /api/leitwerk/fleet
-GET  /api/leitwerk/artifacts/{ref}
-```
+Erst danach sind sie diskutier- und ausführbar.
 
 ---
 
-## 8) Engine-Abstraktion (entscheidend)
+### Ausführung
 
-### Engine-Interface
+- Patch-Anwendung ausschließlich über leitwerk
+- Vorabprüfung (`git apply --check`)
+- eigener Branch
+- Commit nur nach expliziter Freigabe
+- WGX guard ist Pflicht
 
-```python
-Engine.run(
-  task_request,
-  context_bundle,
-  tool_registry
-) -> engine_result
-```
-
-`engine_result` enthält:
-
-* Plan
-* Patches
-* Tool-Calls
-* Rationale
-* Unsicherheit
+Kein Agent schreibt direkt ins Repo.
 
 ---
 
-### Copilot SDK (Phase 1–2)
+### Multi-Repo-Koordination
 
-* CLI server-mode
-* Tools beschnitten:
+leitwerk:
 
-  * kein Web
-  * kein sudo
-  * Git nur über leitwerk
-* Idealfall:
+- erkennt Contract-Owner-Repos
+- zerlegt Vorhaben in Teilaufgaben
+- erzwingt Reihenfolgen
+- koordiniert PR-Ketten
+- verhindert parallelen Drift
 
-  > Agent liefert Patch, leitwerk wendet an.
-
----
-
-### Eigene Engine (Phase 3)
-
-* lokales LLM oder eigener Dienst
-* semantAH + heimgeist als Wissensschicht
-* Tool-Execution bleibt bei leitwerk
+Agenten dürfen diese Logik **nicht** übernehmen.
 
 ---
 
-## 9) Multi-Repo-Logik (USP)
+## Artefakte (kanonisch)
 
-### Zerlegung
+- `context.bundle.v1`
+- `agent.result.raw.v1`
+- `plan.v1`
+- `patch.v1`
+- `rationale.v1`
+- `uncertainty.report.v1`
+- `execution.log.v1`
+- `guard.report.v1`
+- `pr.manifest.v1`
 
-1. Contract-Owner-Repo zuerst
-2. Produzenten
-3. Konsumenten
-4. Observability / Docs
-
-### Regeln
-
-* Pro Repo eigener Branch + PR
-* PR-Chain-Manifest
-* Merge-Reihenfolge vorgeschlagen
-* WGX überall grün → erst dann „chain ready“
-
----
-
-## 10) Membran: Sicherheit & Fehlerprävention
-
-* Path-Allowlists
-* Diff-Schwellen
-* Secrets-Redaction
-* Repo-Locking
-* Kill-Switch jederzeit
+Schemas liegen im **metarepo**.  
+Owner aller Artefakte: **leitwerk**.
 
 ---
 
-## 11) Betrieb
+## Chronik-Events (Minimalset)
 
-### Services
-
-* `agent-control-surface.service`
-* **`leitwerk.service`**
-
-Mit:
-
-* `NoNewPrivileges=true`
-* `ProtectSystem=strict`
-* gezielten `ReadWritePaths`
-
----
-
-## 12) Phasenplan
-
-### Phase 1
-
-Single-Repo, Patch-first
-
-### Phase 2
-
-Multi-Repo-Chains + Leitstand-Timeline
-
-### Phase 3
-
-Engine-Swap ohne Architekturbruch
+- `leitwerk.task.created`
+- `leitwerk.agent.invoked`
+- `leitwerk.agent.result.received`
+- `leitwerk.exec.approved`
+- `leitwerk.guard.passed`
+- `leitwerk.guard.failed`
+- `leitwerk.pr.created`
+- `leitwerk.task.completed`
+- `leitwerk.task.aborted`
 
 ---
 
-## 13) Zwei Alternativpfade
+## ACS-Integration
 
-### A — maximal auditierbar
+ACS ist:
+- UI
+- Statusanzeige
+- Eingriffspunkt
+- Kill-Switch
 
-Agent schreibt nie direkt Dateien.
-
-### B — stärker autopoietisch
-
-Heimgeist / Sichter erzeugen Actions, Agent dient nur noch als Umsetzer.
-
----
-
-## 14) Verdichtete Essenz
-
-**leitwerk ist das Organ, das Geschwindigkeit in Kohärenz übersetzt.
-Der Agent bewegt – leitwerk entscheidet.**
+ACS:
+- entscheidet nichts
+- führt nichts aus
+- besitzt keine Agentenlogik
 
 ---
 
-## 15) Ironische Auslassung
+## Sicherheitsmembran
 
-Ein Agent ohne leitwerk ist wie ein GPS, das jede Abkürzung kennt, aber nicht weiß, ob die Brücke noch steht.
+- Repo-Locking
+- Path-Allowlists
+- Diff-Schwellen
+- Secrets-Redaction
+- Abbruch jederzeit möglich
+
+---
+
+## Entwicklungsphasen
+
+**Phase 1**
+- Jules CLI
+- Single-Repo
+- Patch-first
+- manuelles Apply
+
+**Phase 2**
+- Multi-Repo-Ketten
+- Chronik-Events
+- Leitstand-Visualisierung
+
+**Phase 3**
+- mehrere Agenten
+- Policy-Verfeinerung
+- Heimgeist-Rückkopplung
+
+---
+
+## Verdichtete Essenz
+
+**leitwerk ist die Instanz,  
+an der Vorschläge Wirklichkeit werden dürfen – oder nicht.**
+
+Alles andere ist Beratung.
 
 ---
 
 ## ∴fore — Ungewissheit
 
-**Unsicherheitsgrad:** 0.29
+**Unsicherheitsgrad:** 0.23
 
-**Ursachen:**
+**Ursachen**
+- Agenten sind Blackboxes
+- externe Tools ändern sich
+- nicht alle Contracts finalisiert
 
-* konkrete Chronik-/Artefakt-Schemas nicht vollständig verifiziert
-* ACS-UI-Details nur abstrakt adressiert
-* Copilot-SDK-Tooling versionsabhängig
+**Bewertung**
+- produktive Ungewissheit  
+- Architektur bleibt stabil trotz Agentenwechsel
 
-**Meta:**
-Produktive Ungewissheit – Architektur stabil, Feinschliff contract-getrieben.
+---
+
+*Ironische Randnotiz:*  
+Ein Agent ohne leitwerk ist wie ein GPS, das jede Abkürzung kennt,  
+aber nicht weiß, ob die Brücke noch steht.
