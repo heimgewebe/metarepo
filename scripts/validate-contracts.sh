@@ -141,7 +141,7 @@ else
     filename=$(basename "$example" .example.json)
 
     # Calculate relative dir from contracts/examples
-    # e.g., contracts/examples/webmaschine/state/foo.example.json -> webmaschine/state
+    # e.g., contracts/examples/heim-pc/state/foo.example.json -> heim-pc/state
     example_dir=$(dirname "$example")
     # Using python to get relative path is robust but let's try pure bash text processing
     # Remove prefix contracts/examples/ or contracts/examples

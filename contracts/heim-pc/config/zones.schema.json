@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://heimgewebe/contracts/webmaschine/config/zones.schema.json",
-  "title": "Webmaschine Zones Configuration",
-  "description": "Configuration of zones for Webmaschine.",
+  "$id": "https://heimgewebe/contracts/heim-pc/config/zones.schema.json",
+  "title": "Heim-PC Zones Configuration",
+  "description": "Configuration of zones for Heim-PC.",
   "type": "object",
   "properties": {
     "review_frequency": {

@@ -155,21 +155,21 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
 - `tooling/toolchain.versions.schema.json`
   - Zweck: Canonical schema für `toolchain.versions.yml`, definiert required keys und Versionsformate.
 
-### 1.7 Webmaschine (State & Config)
+### 1.7 Heim-PC (State & Config)
 
-- `webmaschine/state/webmaschine.state.index.schema.json`
-  - Zweck: Index des Webmaschine-Zustands.
-- `webmaschine/state/webmaschine.state.repos.schema.json`
-  - Zweck: Repositories im Webmaschine-Kontext.
-- `webmaschine/state/webmaschine.state.uncertainties.schema.json`
-  - Zweck: Unsicherheits-Tracking der Webmaschine.
-- `webmaschine/state/webmaschine.state.insights.schema.json`
-  - Zweck: Insights/Erkenntnisse aus der Webmaschine.
-- `webmaschine/state/webmaschine.state.drift.schema.json`
-  - Zweck: Drift-Detection innerhalb der Webmaschine.
-- `webmaschine/config/zones.schema.json`
-  - Zweck: Konfiguration der Webmaschine-Zonen.
-- **Ownership:** `metarepo` (Definition) -> `webmaschine` (Konsum/Implementation).
+- `heim-pc/state/heim-pc.state.index.schema.json`
+  - Zweck: Index des Heim-PC-Zustands.
+- `heim-pc/state/heim-pc.state.repos.schema.json`
+  - Zweck: Repositories im Heim-PC-Kontext.
+- `heim-pc/state/heim-pc.state.uncertainties.schema.json`
+  - Zweck: Unsicherheits-Tracking der Heim-PC.
+- `heim-pc/state/heim-pc.state.insights.schema.json`
+  - Zweck: Insights/Erkenntnisse aus der Heim-PC.
+- `heim-pc/state/heim-pc.state.drift.schema.json`
+  - Zweck: Drift-Detection innerhalb der Heim-PC.
+- `heim-pc/config/zones.schema.json`
+  - Zweck: Konfiguration der Heim-PC-Zonen.
+- **Ownership:** `metarepo` (Definition) -> `heim-pc` (Konsum/Implementation).
 
 ### 1.8 Review-Policies
 

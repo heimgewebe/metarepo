@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heimgewebe/contracts/heim-pc/state/heim-pc.state.repos.schema.json",
+  "title": "Heim-PC Repos State",
+  "description": "State of repositories tracked by Heim-PC.",
+  "type": "object",
+  "additionalProperties": true
+}

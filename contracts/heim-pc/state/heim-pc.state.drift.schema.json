@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heimgewebe/contracts/heim-pc/state/heim-pc.state.drift.schema.json",
+  "title": "Heim-PC Drift State",
+  "description": "Detected drift in the Heim-PC domain.",
+  "type": "object",
+  "additionalProperties": true
+}

@@ -24,7 +24,7 @@ Repositories managed by WGX (Contracts, Templates, Policies).
 - **leitstand**
 - **heimgeist**
 - **plexer**
-- **webmaschine**
+- **heim-pc**
 - **vault-gewebe**
 
 ## Related / Static

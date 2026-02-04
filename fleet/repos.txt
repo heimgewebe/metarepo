@@ -13,5 +13,5 @@ sichter
 heimgeist
 plexer
 leitstand
-webmaschine
+heim-pc
 vault-gewebe

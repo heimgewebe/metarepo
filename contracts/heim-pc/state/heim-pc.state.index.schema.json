@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://heimgewebe/contracts/webmaschine/state/webmaschine.state.index.schema.json",
-  "title": "Webmaschine State Index",
-  "description": "Index of the current state of the Webmaschine.",
+  "$id": "https://heimgewebe/contracts/heim-pc/state/heim-pc.state.index.schema.json",
+  "title": "Heim-PC State Index",
+  "description": "Index of the current state of the Heim-PC.",
   "type": "object",
   "properties": {
     "timestamp": {

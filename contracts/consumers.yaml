@@ -187,40 +187,40 @@ policy:
         files: []
         mode: reference-only
 
-webmaschine:
+heim-pc:
   state.index:
-    schema: contracts/webmaschine/state/webmaschine.state.index.schema.json
+    schema: contracts/heim-pc/state/heim-pc.state.index.schema.json
     consumers:
-      - repo: webmaschine
+      - repo: heim-pc
         files: []
         mode: mirror
   state.repos:
-    schema: contracts/webmaschine/state/webmaschine.state.repos.schema.json
+    schema: contracts/heim-pc/state/heim-pc.state.repos.schema.json
     consumers:
-      - repo: webmaschine
+      - repo: heim-pc
         files: []
         mode: mirror
   state.uncertainties:
-    schema: contracts/webmaschine/state/webmaschine.state.uncertainties.schema.json
+    schema: contracts/heim-pc/state/heim-pc.state.uncertainties.schema.json
     consumers:
-      - repo: webmaschine
+      - repo: heim-pc
         files: []
         mode: mirror
   state.insights:
-    schema: contracts/webmaschine/state/webmaschine.state.insights.schema.json
+    schema: contracts/heim-pc/state/heim-pc.state.insights.schema.json
     consumers:
-      - repo: webmaschine
+      - repo: heim-pc
         files: []
         mode: mirror
   state.drift:
-    schema: contracts/webmaschine/state/webmaschine.state.drift.schema.json
+    schema: contracts/heim-pc/state/heim-pc.state.drift.schema.json
     consumers:
-      - repo: webmaschine
+      - repo: heim-pc
         files: []
         mode: mirror
   config.zones:
-    schema: contracts/webmaschine/config/zones.schema.json
+    schema: contracts/heim-pc/config/zones.schema.json
     consumers:
-      - repo: webmaschine
+      - repo: heim-pc
         files: []
         mode: mirror
