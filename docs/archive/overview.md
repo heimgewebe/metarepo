@@ -91,7 +91,7 @@ Meta-Agent für Beobachtung / Orchestrierung.
 
 Routing/Orchestrierungs-Schicht zwischen Agents.
 
-### webmaschine
+### heim-pc
 
 Orientierungssystem für KI-Agenten / lokaler Anker (Tooling).
 

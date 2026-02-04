@@ -78,8 +78,8 @@
       "enabled": true
     },
     {
-      "repo": "heimgewebe/webmaschine",
-      "summary_url": "https://github.com/heimgewebe/webmaschine/releases/download/integrity/summary.json",
+      "repo": "heimgewebe/heim-pc",
+      "summary_url": "https://github.com/heimgewebe/heim-pc/releases/download/integrity/summary.json",
       "enabled": true
     },
     {

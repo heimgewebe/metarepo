@@ -316,7 +316,7 @@ Die Kraft des Systems entsteht aus ihrer Interaktion, nicht aus einer einzelnen 
 | mitschreiber   | C                   | P (os.context.*)    | –                        | –                | Kern      | OS-/App-/Fenster-Kontext → WAL → os.context-Events                        |
 | plexer         | C                   | P/C (Routing)       | –                        | I                | –         | Event-Router zwischen Agenten, Faktenstrom                                |
 | tools          | C                   | P/I                 | –                        | I                | –         | Merger/Snapshots; erzeugen Artefakte, teils Event- oder Metrik-Ausgaben   |
-| webmaschine    | T                   | –                   | –                        | –                | –         | Lokaler Anker, Tooling                                                   |
+| heim-pc    | T                   | –                   | –                        | –                | –         | Lokaler Anker, Tooling                                                   |
 | vault-gewebe   | –                   | –                   | –                        | –                | –         | Privater Vault, Quelle für semantAH (Fleet-Mitglied)                     |
 | weltgewebe     | –                   | –                   | –                        | –                | –         | Nachbarsystem (Web/Doku), nicht Fleet                                     |
 ```
