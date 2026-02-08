@@ -90,7 +90,6 @@ if [ "$ERRORS" -eq 1 ]; then
   exit 1
 fi
 
-
 # 3. Guard against stale repo-identity references to legacy repo name "tools"
 # Allowlist rules:
 # - reports/sync-logs/** may contain historical names by design.
@@ -116,12 +115,12 @@ if has_rg; then
 else
   echo "⚠️  rg not found; falling back to grep -E (ERE mode)."
   if find . \
-      -path './.git' -prune -o \
-      -path './reports/sync-logs' -prune -o \
-      -path './docs/archive' -prune -o \
-      -path './tools' -prune -o \
-      -path './scripts/tools' -prune -o \
-      -type f ! -path './scripts/fleet/check_docs_drift.sh' -print0 | \
+    -path './.git' -prune -o \
+    -path './reports/sync-logs' -prune -o \
+    -path './docs/archive' -prune -o \
+    -path './tools' -prune -o \
+    -path './scripts/tools' -prune -o \
+    -type f ! -path './scripts/fleet/check_docs_drift.sh' -print0 |
     xargs -0 grep -nE "$LEGACY_PATTERN_ERE"; then
     echo "❌ Found stale repo-identity reference(s) to 'tools'. Use 'lenskit' instead."
     exit 1
