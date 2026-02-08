@@ -16,7 +16,7 @@ Diese Repositories bilden den Organismus und unterliegen den Fleet-Policies (CI,
 | semantAH          | Embeddings / Wissensschicht         | yes   |
 | aussensensor      | Außenwelt-Events                    | yes   |
 | chronik           | Persistenz/Audit                    | yes   |
-| tools             | Skripte & Hilfsprogramme            | yes   |
+| lenskit          | Merger & Scanner für Repo-Artefakte | yes   |
 | mitschreiber      | Dialog-/Schreibschicht              | yes   |
 | sichter           | Review-Agent / Semantic Checks      | yes   |
 | heimgeist         | Meta-Agent / Beobachtung            | yes   |

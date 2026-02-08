@@ -9,7 +9,7 @@ autopoetischer KI-Organismus funktioniert:
 - **semantAH** – semantischer Index und Insights
 - **chronik** – Ereignisspeicher (Event-Log, Audit)
 - **leitstand** – UI / Dashboard
-- plus weitere Organe: **aussensensor**, **heimlern**, **vault-gewebe**, **weltgewebe**, **tools**, **sichter**, **mitschreiber**, **heimgeist**, **plexer**.
+- plus weitere Organe: **aussensensor**, **heimlern**, **vault-gewebe**, **weltgewebe**, **lenskit**, **sichter**, **mitschreiber**, **heimgeist**, **plexer**.
 
 Dieses Dokument erklärt:
 
@@ -222,18 +222,18 @@ wird öffentlich sichtbar.
 
 ---
 
-### 2.11 tools – gemeinsame Werkzeuge
+### 2.11 lenskit – Merger & Scanner
 
-**Repo:** `heimgewebe/tools`
+**Repo:** `heimgewebe/lenskit`
 
 - Enthält:
   - Merging-Tools (z. B. repomerger, wc-merger) zur Snapshot-Erstellung.
-  - Hilfsskripte für Fleet-weit wiederkehrende Aufgaben.
+  - Scanner-/Merger-Läufe für Fleet-weite Snapshot- und Report-Bildung.
 - Wird von metarepo/wgx genutzt, um Org-Assets zu generieren (z. B. Tabellen aus `repos.yml`).
 
 **Nutzen:**
-tools ist der **Werkzeugkoffer** – alles, was mehrfach vorkommt, aber kein
-eigenes „Organ“ ist.
+lenskit ist der **Scanner-/Merger-Kern**: es erzeugt konsistente Snapshots
+und mehrstufige Artefakte für Analyse, Reflexion und Agentenbetrieb.
 
 ---
 

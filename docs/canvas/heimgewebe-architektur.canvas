@@ -1,7 +1,7 @@
 {
   "nodes": [
     { "id": "meta",     "type": "text", "text": "metarepo\n(Control · Contracts · CI)",             "x": -400, "y": -120, "width": 260, "height": 120, "color": "1" },
-    { "id": "tools",    "type": "text", "text": "tools\n(Skripte · Utils)",                          "x": -400, "y":   40, "width": 220, "height": 100, "color": "1" },
+    { "id": "lenskit",    "type": "text", "text": "lenskit\n(Merger · Scanner)",                          "x": -400, "y":   40, "width": 220, "height": 100, "color": "1" },
 
     { "id": "wgx",      "type": "text", "text": "wgx\n(System · Backups · Metrics)",                 "x": -100, "y": -160, "width": 260, "height": 120, "color": "5" },
     { "id": "hauski",   "type": "text", "text": "hausKI\n(Orchestrator · State · Events)",           "x":  200, "y": -110, "width": 280, "height": 120, "color": "3" },

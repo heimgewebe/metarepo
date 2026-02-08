@@ -79,9 +79,9 @@ Event-Ingest aus der Außenwelt.
 
 Event-Persistenz, Audit-Log.
 
-### tools
+### lenskit (Merger/Scanner)
 
-Universelle Skripte & Hilfsprogramme.
+Merger- und Scanner-Funktionen zur Artefaktbildung.
 
 ### heimgeist
 

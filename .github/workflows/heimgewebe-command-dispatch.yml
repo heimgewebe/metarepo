@@ -23,7 +23,7 @@ jobs:
     env:
       # Whitelist der Ziel-Repos (kommagetrennt). Kann pro Repo via
       # Repository-Variable HEIMGEWEBE_ALLOWED_REPOS überschrieben werden.
-      ALLOWED_TARGET_REPOS: ${{ vars.HEIMGEWEBE_ALLOWED_REPOS || 'sichter,wgx,heimgeist,metarepo,hausKI,semantAH,heimlern,chronik,leitstand,tools' }}
+      ALLOWED_TARGET_REPOS: ${{ vars.HEIMGEWEBE_ALLOWED_REPOS || 'sichter,wgx,heimgeist,metarepo,hausKI,semantAH,heimlern,chronik,leitstand,lenskit' }}
 
       # Whitelist der erlaubten Kommandos (kommagetrennt). Kann via
       # Repository-Variable HEIMGEWEBE_ALLOWED_COMMANDS überschrieben werden.
@@ -139,6 +139,14 @@ jobs:
             }
 
             // Whitelist-Checks
+            if (targetRepo === "tools") {
+              await reply(
+                "⚠️ Das Ziel-Repo **tools** ist deprecated. Bitte nutze **lenskit**.\n\n" +
+                `Erlaubte Repos: \`${allowedRepos.join(", ")}\`.`
+              );
+              return;
+            }
+
             if (!allowedRepos.includes(targetRepo)) {
               await reply(
                 `👋 Heimgewebe hat deinen Befehl erkannt, aber **${targetRepo}** ist kein erlaubtes Ziel-Repo.\n\n` +
