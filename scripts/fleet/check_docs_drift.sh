@@ -135,6 +135,8 @@ else
          -path './scripts/tools' \) -prune -o \
       -type f ! -path './scripts/fleet/check_docs_drift.sh' -print0 2>"$find_err" \
     | xargs -0 sh -c 'pattern="$1"; shift; grep -I -nE -- "$pattern" "$@" 2>&1 || test $? -eq 1' _ "$LEGACY_PATTERN_ERE" 2>&1
+    # Note: || test $? -eq 1 converts grep's 'no match' (exit 1) to success,
+    # preventing xargs from returning 123, while preserving grep errors (exit 2+)
   )
   rc=$?
   set -e
@@ -154,7 +156,7 @@ else
   else
     # Error: grep exit 2+, xargs error, or find error (via pipefail)
     echo "$FALLBACK_OUT" >&2
-    if [ -s "$find_err" ]; then
+    if [ -f "$find_err" ] && [ -s "$find_err" ]; then
       echo "find stderr:" >&2
       cat "$find_err" >&2
     fi
