@@ -50,12 +50,12 @@ jobs:
           script: |
             const allowedRepos = (process.env.ALLOWED_TARGET_REPOS || "")
               .split(",")
-              .map((s) => s.trim())
+              .map((s) => s.trim().toLowerCase())
               .filter(Boolean);
 
             const allowedCommands = (process.env.ALLOWED_COMMANDS || "")
               .split(",")
-              .map((s) => s.trim())
+              .map((s) => s.trim().toLowerCase())
               .filter(Boolean);
 
             const comment = (context.payload.comment && context.payload.comment.body) || "";
@@ -93,10 +93,10 @@ jobs:
             // @heimgewebe/sichter quick
             // @heimgewebe/sichter    quick
             // @heimgewebe/sichter /quick
-            // @heimgewebe/sichter
-            //     /quick extra
+            // @heimgewebe/sichter /quick extra
             // @HEIMGEWEBE/SICHTER /QUICK
             // @heimgewebe/sichter        / quick foo bar
+            // Hinweis: Ohne Kommando wird nicht dispatched.
             //
             // Strategie:
             // 1. Finde @heimgewebe/<repo>
