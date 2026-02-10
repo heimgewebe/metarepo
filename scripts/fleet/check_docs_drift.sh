@@ -133,31 +133,25 @@ else
          -path './tools' -o \
          -path './scripts/tools' \) -prune -o \
       -type f ! -path './scripts/fleet/check_docs_drift.sh' -print0 \
-    | xargs -0 sh -c 'grep -I -nE -- "$LEGACY_PATTERN_ERE" "$@" 2>&1 || true' sh 2>&1
+    | xargs -0 sh -c 'grep -I -nE -- "$LEGACY_PATTERN_ERE" "$@" 2>&1; test $? -le 1' sh 2>&1
   )
   rc=$?
   set -e
 
   if [ "$rc" -eq 0 ]; then
     if [ -n "$FALLBACK_OUT" ]; then
-      # Check if output contains error messages (heuristic: look for common error patterns)
-      if echo "$FALLBACK_OUT" | grep -qE "(Permission denied|cannot access|No such file)"; then
-        echo "$FALLBACK_OUT" >&2
-        echo "❌ grep encountered errors. Guard cannot be trusted. Failing hard."
-        exit 1
-      else
-        # Non-empty output without errors = matches found
-        echo "$FALLBACK_OUT"
-        echo "❌ Found stale repo-identity reference(s) to 'tools'. Use 'lenskit' instead."
-        exit 1
-      fi
+      # Non-empty output = matches found
+      echo "$FALLBACK_OUT"
+      echo "❌ Found stale repo-identity reference(s) to 'tools'. Use 'lenskit' instead."
+      exit 1
     else
       # Empty output = no matches found
       :
     fi
   else
+    # Grep error (exit code 2+) or xargs error
     echo "$FALLBACK_OUT" >&2
-    echo "❌ grep failed (exit=$rc). Guard cannot be trusted. Failing hard."
+    echo "❌ grep/xargs failed (exit=$rc). Guard cannot be trusted. Failing hard."
     exit 1
   fi
 fi
