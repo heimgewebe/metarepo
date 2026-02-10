@@ -123,36 +123,43 @@ if has_rg; then
   fi
 else
   echo "⚠️  rg not found; falling back to find + xargs + grep -E (ERE mode)."
+  find_err=$(mktemp)
   set +e
-  # shellcheck disable=SC2016  # $LEGACY_PATTERN_ERE expands in sh -c subshell after export
+  # shellcheck disable=SC2016  # $1, $pattern, $@ expand in sh -c subshell, not current shell
   FALLBACK_OUT=$(
-    export LEGACY_PATTERN_ERE
     find . \
       \( -path './.git' -o \
          -path './reports/sync-logs' -o \
          -path './docs/archive' -o \
          -path './tools' -o \
          -path './scripts/tools' \) -prune -o \
-      -type f ! -path './scripts/fleet/check_docs_drift.sh' -print0 \
-    | xargs -0 sh -c 'grep -I -nE -- "$LEGACY_PATTERN_ERE" "$@" 2>&1; test $? -le 1' sh 2>&1
+      -type f ! -path './scripts/fleet/check_docs_drift.sh' -print0 2>"$find_err" \
+    | xargs -0 sh -c 'pattern="$1"; shift; grep -I -nE -- "$pattern" "$@" 2>&1 || test $? -eq 1' _ "$LEGACY_PATTERN_ERE" 2>&1
   )
   rc=$?
   set -e
 
   if [ "$rc" -eq 0 ]; then
     if [ -n "$FALLBACK_OUT" ]; then
-      # Non-empty output = matches found
+      # Matches found
       echo "$FALLBACK_OUT"
       echo "❌ Found stale repo-identity reference(s) to 'tools'. Use 'lenskit' instead."
+      rm -f "$find_err"
       exit 1
     else
-      # Empty output = no matches found
+      # No output but exit 0: no matches found
+      rm -f "$find_err"
       :
     fi
   else
-    # Grep error (exit code 2+) or xargs error
+    # Error: grep exit 2+, xargs error, or find error (via pipefail)
     echo "$FALLBACK_OUT" >&2
-    echo "❌ grep/xargs failed (exit=$rc). Guard cannot be trusted. Failing hard."
+    if [ -s "$find_err" ]; then
+      echo "find stderr:" >&2
+      cat "$find_err" >&2
+    fi
+    echo "❌ find/grep/xargs failed (exit=$rc). Guard cannot be trusted. Failing hard." >&2
+    rm -f "$find_err"
     exit 1
   fi
 fi
