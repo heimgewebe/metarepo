@@ -105,7 +105,7 @@ jobs:
             // 4. Kommando
             // 5. Rest = Args
             const tolerantPattern =
-              /@heimgewebe\/([a-z0-9_.- ]+)\s*(?:\/\s*)?([a-z0-9_.- ]+)\b([\s\S ]*)/i;
+              /@heimgewebe\/([a-z0-9_.-]+)\s*(?:\/\s*)?([a-z0-9_.-]+)\b([\s\S]*)/i;
 
             const match = tolerantPattern.exec(comment);
 

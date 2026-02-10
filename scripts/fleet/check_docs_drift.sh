@@ -123,15 +123,27 @@ if has_rg; then
   fi
 else
   echo "⚠️  rg not found; falling back to grep -E (ERE mode)."
-  if find . \
+  set +e
+  FALLBACK_OUT=$(find . \
     -path './.git' -prune -o \
     -path './reports/sync-logs' -prune -o \
     -path './docs/archive' -prune -o \
     -path './tools' -prune -o \
     -path './scripts/tools' -prune -o \
     -type f ! -path './scripts/fleet/check_docs_drift.sh' \
-    -exec grep -nE -- "$LEGACY_PATTERN_ERE" {} +; then
+    -exec grep -nE -- "$LEGACY_PATTERN_ERE" {} + 2>&1)
+  rc=$?
+  set -e
+
+  if [ "$rc" -eq 0 ]; then
+    echo "$FALLBACK_OUT"
     echo "❌ Found stale repo-identity reference(s) to 'tools'. Use 'lenskit' instead."
+    exit 1
+  elif [ "$rc" -eq 1 ]; then
+    :
+  else
+    echo "$FALLBACK_OUT" >&2
+    echo "❌ grep failed (exit=$rc). Guard cannot be trusted. Failing hard."
     exit 1
   fi
 fi
