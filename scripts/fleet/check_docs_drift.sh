@@ -129,12 +129,12 @@ else
   FALLBACK_OUT=$(
     find . \
       \( -path './.git' -o \
-         -path './reports/sync-logs' -o \
-         -path './docs/archive' -o \
-         -path './tools' -o \
-         -path './scripts/tools' \) -prune -o \
-      -type f ! -path './scripts/fleet/check_docs_drift.sh' -print0 2>"$find_err" \
-    | xargs -0 sh -c 'pattern="$1"; shift; grep -I -nE -- "$pattern" "$@" 2>&1 || test $? -eq 1' _ "$LEGACY_PATTERN_ERE" 2>&1
+      -path './reports/sync-logs' -o \
+      -path './docs/archive' -o \
+      -path './tools' -o \
+      -path './scripts/tools' \) -prune -o \
+      -type f ! -path './scripts/fleet/check_docs_drift.sh' -print0 2> "$find_err" |
+      xargs -0 sh -c 'pattern="$1"; shift; grep -I -nE -- "$pattern" "$@" 2>&1 || test $? -eq 1' _ "$LEGACY_PATTERN_ERE" 2>&1
     # Note: || test $? -eq 1 converts grep's 'no match' (exit 1) to success,
     # preventing xargs from returning 123, while preserving grep errors (exit 2+)
   )
