@@ -114,8 +114,8 @@ jobs:
               return;
             }
 
-            const targetRepo = match[1];
-            const command = match[2];
+            const targetRepo = (match[1] || "").trim().toLowerCase();
+            const command = (match[2] || "").trim().toLowerCase();
             const rawArgs = (match[3] || "").trim();
 
             // Kommentar sanitisieren (eine Zeile, max. 2048 Zeichen)

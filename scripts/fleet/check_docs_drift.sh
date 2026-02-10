@@ -102,14 +102,23 @@ echo "Scanning for stale repo-identity references (tools -> lenskit)..."
 LEGACY_PATTERN_PCRE='(github\.com/heimgewebe/tools|heimgewebe/tools|^\s*-\s*name:\s*tools\s*$|ALLOWED_TARGET_REPOS:.*\btools\b)'
 LEGACY_PATTERN_ERE='(github\.com/heimgewebe/tools|heimgewebe/tools|^[[:space:]]*-[[:space:]]*name:[[:space:]]*tools[[:space:]]*$|ALLOWED_TARGET_REPOS:.*(^|[^[:alnum:]_])tools([^[:alnum:]_]|$))'
 if has_rg; then
-  if rg -n --pcre2 \
+  set +e
+  rg -n --pcre2 \
     --glob '!reports/sync-logs/**' \
     --glob '!docs/archive/**' \
     --glob '!tools/**' \
     --glob '!scripts/tools/**' \
     --glob '!scripts/fleet/check_docs_drift.sh' \
-    "$LEGACY_PATTERN_PCRE" .; then
+    "$LEGACY_PATTERN_PCRE" .
+  rc=$?
+  set -e
+  if [ "$rc" -eq 0 ]; then
     echo "❌ Found stale repo-identity reference(s) to 'tools'. Use 'lenskit' instead."
+    exit 1
+  elif [ "$rc" -eq 1 ]; then
+    :
+  else
+    echo "❌ rg failed (exit=$rc). Guard cannot be trusted. Failing hard."
     exit 1
   fi
 else
@@ -120,8 +129,8 @@ else
     -path './docs/archive' -prune -o \
     -path './tools' -prune -o \
     -path './scripts/tools' -prune -o \
-    -type f ! -path './scripts/fleet/check_docs_drift.sh' -print0 |
-    xargs -0 grep -nE "$LEGACY_PATTERN_ERE"; then
+    -type f ! -path './scripts/fleet/check_docs_drift.sh' \
+    -exec grep -nE -- "$LEGACY_PATTERN_ERE" {} +; then
     echo "❌ Found stale repo-identity reference(s) to 'tools'. Use 'lenskit' instead."
     exit 1
   fi
