@@ -124,6 +124,7 @@ if has_rg; then
 else
   echo "⚠️  rg not found; falling back to find + xargs + grep -E (ERE mode)."
   set +e
+  # shellcheck disable=SC2016  # $LEGACY_PATTERN_ERE expands in sh -c subshell after export
   FALLBACK_OUT=$(
     export LEGACY_PATTERN_ERE
     find . \
