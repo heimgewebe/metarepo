@@ -62,6 +62,11 @@ echo "Scanning for forbidden repo name usage..."
 
 ERRORS=0
 
+# Optional dependency: prefer ripgrep when available, but keep guard portable.
+has_rg() {
+  command -v rg > /dev/null 2>&1
+}
+
 # Find files excluding archive and generated
 FILES=$(find docs -name "*.md" -not -path "docs/archive/*" -not -path "docs/_generated/*")
 
@@ -84,6 +89,66 @@ if [ "$ERRORS" -eq 1 ]; then
   echo "❌ Drift check failed."
   exit 1
 fi
+
+# 3. Guard against stale repo-identity references to legacy repo name "tools"
+# Allowlist rules:
+# - reports/sync-logs/** may contain historical names by design.
+# - docs/archive/** is historical reference material and may mention legacy names.
+# - tools/** is a local toolchain tree, not repo identity.
+# - scripts/tools/** contains local helper scripts, not repo identity.
+
+echo "Scanning for stale repo-identity references (tools -> lenskit)..."
+
+LEGACY_PATTERN_PCRE='(github\.com/heimgewebe/tools|heimgewebe/tools|^\s*-\s*name:\s*tools\s*$|ALLOWED_TARGET_REPOS:.*\btools\b)'
+LEGACY_PATTERN_ERE='(github\.com/heimgewebe/tools|heimgewebe/tools|^[[:space:]]*-[[:space:]]*name:[[:space:]]*tools[[:space:]]*$|ALLOWED_TARGET_REPOS:.*(^|[^[:alnum:]_])tools([^[:alnum:]_]|$))'
+if has_rg; then
+  set +e
+  rg -n --pcre2 \
+    --glob '!reports/sync-logs/**' \
+    --glob '!docs/archive/**' \
+    --glob '!tools/**' \
+    --glob '!scripts/tools/**' \
+    --glob '!scripts/fleet/check_docs_drift.sh' \
+    "$LEGACY_PATTERN_PCRE" .
+  rc=$?
+  set -e
+  if [ "$rc" -eq 0 ]; then
+    echo "❌ Found stale repo-identity reference(s) to 'tools'. Use 'lenskit' instead."
+    exit 1
+  elif [ "$rc" -eq 1 ]; then
+    :
+  else
+    echo "❌ rg failed (exit=$rc). Guard cannot be trusted. Failing hard."
+    exit 1
+  fi
+else
+  echo "⚠️  rg not found; falling back to grep -E (ERE mode)."
+  set +e
+  FALLBACK_OUT=$(find . \
+    -path './.git' -prune -o \
+    -path './reports/sync-logs' -prune -o \
+    -path './docs/archive' -prune -o \
+    -path './tools' -prune -o \
+    -path './scripts/tools' -prune -o \
+    -type f ! -path './scripts/fleet/check_docs_drift.sh' \
+    -exec grep -nE -- "$LEGACY_PATTERN_ERE" {} + 2>&1)
+  rc=$?
+  set -e
+
+  if [ "$rc" -eq 0 ]; then
+    echo "$FALLBACK_OUT"
+    echo "❌ Found stale repo-identity reference(s) to 'tools'. Use 'lenskit' instead."
+    exit 1
+  elif [ "$rc" -eq 1 ]; then
+    :
+  else
+    echo "$FALLBACK_OUT" >&2
+    echo "❌ grep failed (exit=$rc). Guard cannot be trusted. Failing hard."
+    exit 1
+  fi
+fi
+
+echo "✅ Legacy repo-identity guard passed."
 
 echo "✅ Document Drift Check passed."
 exit 0

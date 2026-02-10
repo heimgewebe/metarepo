@@ -1,0 +1,69 @@
+---
+ai_context_version: 1.1
+
+project:
+  name: lenskit
+  summary: Scanner- und Merger-Kern für Repo-Snapshots und epistemische Artefakte.
+  role: epistemic_scanner_merger_core
+  primary_language: mixed
+  visibility: public
+
+heimgewebe:
+  axis: [Motorik]
+  fleet:
+    enabled: true
+  wgx:
+    profile_expected: false
+    guard_smoke_expected: false
+
+interfaces:
+  consumes:
+    - "Fleet repository trees and metadata"
+    - "Commit history and file snapshots"
+  produces:
+    - "merge artifacts"
+    - "fleet snapshots"
+    - "scanner reports"
+    - "agent-readable epistemic bundles"
+
+boundaries:
+  responsible_for:
+    - "Representations-Treue: Snapshots sind korrekt, deterministisch und reproduzierbar."
+  not_responsible_for:
+    - "Owning domain business logic of member repositories."
+
+dependencies:
+  internal: []
+  external: []
+
+architecture:
+  entrypoints:
+    - "scanner/* (konzeptionell; reale Pfade verifizieren)"
+    - "merger/* (konzeptionell; reale Pfade verifizieren)"
+    - "scripts/* (falls vorhanden)"
+  key_paths:
+    - path: "reports/"
+      purpose: "Generated outputs (if present)"
+    - path: "artifacts/"
+      purpose: "Generated outputs (if present)"
+  note: "Historische Pfade wie tools/bin/* nur bei bestätigter Existenz verwenden; nicht automatisch umbenennen."
+  data_flow:
+    input: "Fleet state and repository trees"
+    processing: "Scan + Merge + Snapshot + Report"
+    output: "Epistemic artifacts and machine-readable reports"
+
+conventions:
+  branching: "main, feature/*"
+  commit_prefix: "lenskit"
+  ci_platform: github_actions
+
+documentation:
+  runbook: docs/runbook.md
+
+ai_guidance:
+  do:
+    - keep scanner and merger outputs deterministic
+    - preserve reproducibility of generated artifacts
+    - verify concrete filesystem paths before path-specific assumptions
+  dont:
+    - introduce repo-local utility assumptions into lenskit identity

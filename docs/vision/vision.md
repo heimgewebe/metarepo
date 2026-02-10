@@ -31,7 +31,7 @@ Es besteht aus vernetzten Repositories, die gemeinsam ein lernfähiges Ökosyste
 | **Persistenz / Audit** | **chronik** | Event-Ingest, Persistenz und Audit-Trails. Das „Gedächtnis" des Systems. |
 | **Visualisierung / UI** | **leitstand** | Panels für Systemzustände, Lernfortschritt, Audioaktivität, Außenfeeds. Der „Kontrollraum". |
 | **Außenwahrnehmung** | **aussensensor** | Aggregiert externe Quellen (News, Projekte, Sensorik) zu kuratiertem Feed (`export/feed.jsonl`). |
-| **Werkzeuge** | **tools** | Gemeinsame Skripte und Utilities für die gesamte Flotte. |
+| **Epistemische Aufbereitung** | **lenskit** | Scanner/Merger für Repo-Snapshots und KI-lesbare Artefakte. |
 
 ---
 
