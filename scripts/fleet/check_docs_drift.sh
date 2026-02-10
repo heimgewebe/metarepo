@@ -149,7 +149,7 @@ else
       rm -f "$find_err"
       exit 1
     else
-      # No output but exit 0: no matches found
+      # No matches found
       rm -f "$find_err"
       :
     fi
