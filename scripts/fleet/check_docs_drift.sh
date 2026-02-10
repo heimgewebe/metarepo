@@ -122,24 +122,28 @@ if has_rg; then
     exit 1
   fi
 else
-  echo "⚠️  rg not found; falling back to grep -E (ERE mode)."
+  echo "⚠️  rg not found; falling back to find + xargs + grep -E (ERE mode)."
   set +e
-  FALLBACK_OUT=$(find . \
-    -path './.git' -prune -o \
-    -path './reports/sync-logs' -prune -o \
-    -path './docs/archive' -prune -o \
-    -path './tools' -prune -o \
-    -path './scripts/tools' -prune -o \
-    -type f ! -path './scripts/fleet/check_docs_drift.sh' \
-    -exec grep -nE -- "$LEGACY_PATTERN_ERE" {} + 2>&1)
+  FALLBACK_OUT=$(
+    export LEGACY_PATTERN_ERE
+    find . \
+      \( -path './.git' -o \
+         -path './reports/sync-logs' -o \
+         -path './docs/archive' -o \
+         -path './tools' -o \
+         -path './scripts/tools' -o \
+         -path './scripts/fleet/check_docs_drift.sh' \) -prune -o \
+      -type f -print0 \
+    | xargs -0 sh -c 'grep -I -nE -- "$LEGACY_PATTERN_ERE" "$@" 2>&1 || test $? = 1' sh 2>&1
+  )
   rc=$?
   set -e
 
-  if [ "$rc" -eq 0 ]; then
+  if [ "$rc" -eq 0 ] && [ -n "$FALLBACK_OUT" ]; then
     echo "$FALLBACK_OUT"
     echo "❌ Found stale repo-identity reference(s) to 'tools'. Use 'lenskit' instead."
     exit 1
-  elif [ "$rc" -eq 1 ]; then
+  elif [ "$rc" -eq 0 ] && [ -z "$FALLBACK_OUT" ]; then
     :
   else
     echo "$FALLBACK_OUT" >&2
