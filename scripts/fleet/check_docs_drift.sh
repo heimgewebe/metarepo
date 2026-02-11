@@ -91,11 +91,18 @@ if [ "$ERRORS" -eq 1 ]; then
 fi
 
 # 3. Guard against stale repo-identity references to legacy repo name "tools"
-# Allowlist rules:
+# Allowlist rules (exclusion semantics vary by implementation):
 # - reports/sync-logs/** may contain historical names by design.
+#   (rg: path-scoped glob; grep fallback: basename "sync-logs")
 # - tools/** is a local toolchain tree, not repo identity.
+#   (rg: path-scoped glob; grep fallback: basename "tools" matches all tools dirs)
 # - scripts/tools/** contains local helper scripts, not repo identity.
+#   (rg: path-scoped glob; grep fallback: covered by basename "tools")
+# - scripts/fleet/check_docs_drift.sh contains the guard patterns itself.
+#   (rg: path-scoped glob; grep fallback: basename "check_docs_drift.sh")
 # Note: docs/archive/** was migrated (tools→lenskit) in commit 7038fdd, so no exclusion needed.
+# Implementation note: rg globs are path-scoped and precise; grep fallback uses basename
+# exclusions for portability across GNU/BSD/busybox variants.
 
 echo "Scanning for stale repo-identity references (tools -> lenskit)..."
 
