@@ -93,9 +93,9 @@ fi
 # 3. Guard against stale repo-identity references to legacy repo name "tools"
 # Allowlist rules:
 # - reports/sync-logs/** may contain historical names by design.
-# - docs/archive/** is historical reference material and may mention legacy names.
 # - tools/** is a local toolchain tree, not repo identity.
 # - scripts/tools/** contains local helper scripts, not repo identity.
+# Note: docs/archive/** was migrated (tools→lenskit) in commit 7038fdd, so no exclusion needed.
 
 echo "Scanning for stale repo-identity references (tools -> lenskit)..."
 
@@ -105,7 +105,6 @@ if has_rg; then
   set +e
   rg -n --pcre2 \
     --glob '!reports/sync-logs/**' \
-    --glob '!docs/archive/**' \
     --glob '!tools/**' \
     --glob '!scripts/tools/**' \
     --glob '!scripts/fleet/check_docs_drift.sh' \
@@ -122,59 +121,35 @@ if has_rg; then
     exit 1
   fi
 else
-  echo "⚠️  rg not found; falling back to find + xargs + grep -E (ERE mode)."
-  find_err=$(mktemp)
+  echo "⚠️  rg not found; falling back to grep -r with ERE mode."
   set +e
-  FALLBACK_OUT=$(
-    find . \
-      \( -path './.git' -o \
-         -path './reports/sync-logs' -o \
-         -path './docs/archive' -o \
-         -path './tools' -o \
-         -path './scripts/tools' \) -prune -o \
-      -path './scripts/fleet/check_docs_drift.sh' -prune -o \
-      -type f -print0 2>"$find_err" \
-    | xargs -0 grep -I -nE -- "$LEGACY_PATTERN_ERE" 2>&1
+  GREP_OUT=$(
+    grep -r -I -n -E \
+      --exclude-dir='.git' \
+      --exclude-dir='reports' \
+      --exclude-dir='tools' \
+      --exclude='check_docs_drift.sh' \
+      -e "$LEGACY_PATTERN_ERE" \
+      . \
+      2>&1
   )
   rc=$?
   set -e
 
   if [ "$rc" -eq 0 ]; then
     # Matches found
-    echo "$FALLBACK_OUT"
+    echo "$GREP_OUT"
     echo "❌ Found stale repo-identity reference(s) to 'tools'. Use 'lenskit' instead."
-    rm -f "$find_err"
     exit 1
-  elif [ "$rc" -eq 123 ]; then
-    # xargs exit 123 means grep returned non-zero for some files
-    # This typically means "no matches" (grep exit 1) but could also be errors
-    # Check output to distinguish
-    if [ -z "$FALLBACK_OUT" ]; then
-      # No output means clean "no matches"
-      rm -f "$find_err"
-      :
-    else
-      # Output present with xargs 123 - could be grep errors (exit 2+)
-      echo "$FALLBACK_OUT" >&2
-      if [ -s "$find_err" ]; then
-        echo "find stderr:" >&2
-        cat "$find_err" >&2
-      fi
-      echo "❌ grep reported errors. Guard cannot be trusted. Failing hard." >&2
-      rm -f "$find_err"
-      exit 1
-    fi
+  elif [ "$rc" -eq 1 ]; then
+    # No matches - clean
+    :
   else
-    # Other non-zero: find errors, xargs errors, or grep errors
-    if [ -n "$FALLBACK_OUT" ]; then
-      echo "$FALLBACK_OUT" >&2
+    # grep error (exit 2+)
+    if [ -n "$GREP_OUT" ]; then
+      echo "$GREP_OUT" >&2
     fi
-    if [ -s "$find_err" ]; then
-      echo "find stderr:" >&2
-      cat "$find_err" >&2
-    fi
-    echo "❌ find/grep/xargs failed (exit=$rc). Guard cannot be trusted. Failing hard." >&2
-    rm -f "$find_err"
+    echo "❌ grep failed (exit=$rc). Guard cannot be trusted. Failing hard." >&2
     exit 1
   fi
 fi
