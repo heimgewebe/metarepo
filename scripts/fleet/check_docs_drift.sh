@@ -126,7 +126,7 @@ else
   GREP_OUT=$(
     grep -r -I -n -E \
       --exclude-dir='.git' \
-      --exclude-dir='reports' \
+      --exclude-dir='sync-logs' \
       --exclude-dir='tools' \
       --exclude='check_docs_drift.sh' \
       -e "$LEGACY_PATTERN_ERE" \
