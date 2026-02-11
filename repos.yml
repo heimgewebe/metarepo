@@ -49,11 +49,11 @@ repos:
     scope: metrics
     metrics:
       enable: true
-  - name: tools
-    url: https://github.com/heimgewebe/tools
+  - name: lenskit
+    url: https://github.com/heimgewebe/lenskit
     default_branch: main
-    domain: tooling
-    scope: shared
+    domain: epistemic
+    scope: scanner-merger
     metrics:
       enable: false
   - name: chronik

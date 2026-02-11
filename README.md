@@ -44,7 +44,7 @@ Die Fleet umfasst Core-Repos wie:
 - **chronik** – Event-Ingest und Persistenz
 - **aussensensor** – Außen-Signalgeber
 - **heimlern** – Lern- und Policy-Engine
-- **tools** – Gemeinsame Utilities
+- **lenskit** – Merger- und Scanner-Kern für Repo-Snapshots und epistemische Artefakte
 - **contracts-mirror** – Spiegel für externe API-Contracts
 
 (Siehe `docs/_generated/fleet.md` für die vollständige, kanonische Liste.)

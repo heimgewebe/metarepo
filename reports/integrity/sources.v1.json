@@ -68,8 +68,8 @@
       "enabled": true
     },
     {
-      "repo": "heimgewebe/tools",
-      "summary_url": "https://github.com/heimgewebe/tools/releases/download/integrity/summary.json",
+      "repo": "heimgewebe/lenskit",
+      "summary_url": "https://github.com/heimgewebe/lenskit/releases/download/integrity/summary.json",
       "enabled": true
     },
     {

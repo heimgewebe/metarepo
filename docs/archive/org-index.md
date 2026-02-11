@@ -12,6 +12,6 @@ Quelle: [`repos.yml`](../../repos.yml).
 | [hausKI-audio](https://github.com/heimgewebe/hausKI-audio) | main | audio | events | – | hausKI |
 | [heimlern](https://github.com/heimgewebe/heimlern) | main | policy | library | – | – |
 | [semantAH](https://github.com/heimgewebe/semantAH) | main | insights | export | – | – |
-| [tools](https://github.com/heimgewebe/tools) | main | tooling | shared | – | – |
+| [lenskit](https://github.com/heimgewebe/lenskit) | main | epistemic | scanner-merger | – | – |
 | [weltgewebe](https://github.com/heimgewebe/weltgewebe) | main | aussen | events | – | – |
 | [wgx](https://github.com/heimgewebe/wgx) | main | platform | metrics | ✅ | – |

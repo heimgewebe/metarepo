@@ -23,7 +23,7 @@ jobs:
     env:
       # Whitelist der Ziel-Repos (kommagetrennt). Kann pro Repo via
       # Repository-Variable HEIMGEWEBE_ALLOWED_REPOS überschrieben werden.
-      ALLOWED_TARGET_REPOS: ${{ vars.HEIMGEWEBE_ALLOWED_REPOS || 'sichter,wgx,heimgeist,metarepo,hausKI,semantAH,heimlern,chronik,leitstand,tools' }}
+      ALLOWED_TARGET_REPOS: ${{ vars.HEIMGEWEBE_ALLOWED_REPOS || 'sichter,wgx,heimgeist,metarepo,hausKI,semantAH,heimlern,chronik,leitstand,lenskit' }}
 
       # Whitelist der erlaubten Kommandos (kommagetrennt). Kann via
       # Repository-Variable HEIMGEWEBE_ALLOWED_COMMANDS überschrieben werden.
@@ -50,12 +50,12 @@ jobs:
           script: |
             const allowedRepos = (process.env.ALLOWED_TARGET_REPOS || "")
               .split(",")
-              .map((s) => s.trim())
+              .map((s) => s.trim().toLowerCase())
               .filter(Boolean);
 
             const allowedCommands = (process.env.ALLOWED_COMMANDS || "")
               .split(",")
-              .map((s) => s.trim())
+              .map((s) => s.trim().toLowerCase())
               .filter(Boolean);
 
             const comment = (context.payload.comment && context.payload.comment.body) || "";
@@ -93,10 +93,10 @@ jobs:
             // @heimgewebe/sichter quick
             // @heimgewebe/sichter    quick
             // @heimgewebe/sichter /quick
-            // @heimgewebe/sichter
-            //     /quick extra
+            // @heimgewebe/sichter /quick extra
             // @HEIMGEWEBE/SICHTER /QUICK
             // @heimgewebe/sichter        / quick foo bar
+            // Hinweis: Ohne Kommando wird nicht dispatched.
             //
             // Strategie:
             // 1. Finde @heimgewebe/<repo>
@@ -105,7 +105,7 @@ jobs:
             // 4. Kommando
             // 5. Rest = Args
             const tolerantPattern =
-              /@heimgewebe\/([a-z0-9_.- ]+)\s*(?:\/\s*)?([a-z0-9_.- ]+)\b([\s\S ]*)/i;
+              /@heimgewebe\/([a-z0-9_.-]+)\s*(?:\/\s*)?([a-z0-9_.-]+)\b([\s\S]*)/i;
 
             const match = tolerantPattern.exec(comment);
 
@@ -114,8 +114,8 @@ jobs:
               return;
             }
 
-            const targetRepo = match[1];
-            const command = match[2];
+            const targetRepo = (match[1] || "").trim().toLowerCase();
+            const command = (match[2] || "").trim().toLowerCase();
             const rawArgs = (match[3] || "").trim();
 
             // Kommentar sanitisieren (eine Zeile, max. 2048 Zeichen)
@@ -139,6 +139,14 @@ jobs:
             }
 
             // Whitelist-Checks
+            if (targetRepo === "tools") {
+              await reply(
+                "⚠️ Das Ziel-Repo **tools** ist deprecated. Bitte nutze **lenskit**.\n\n" +
+                `Erlaubte Repos: \`${allowedRepos.join(", ")}\`.`
+              );
+              return;
+            }
+
             if (!allowedRepos.includes(targetRepo)) {
               await reply(
                 `👋 Heimgewebe hat deinen Befehl erkannt, aber **${targetRepo}** ist kein erlaubtes Ziel-Repo.\n\n` +

@@ -62,6 +62,11 @@ echo "Scanning for forbidden repo name usage..."
 
 ERRORS=0
 
+# Optional dependency: prefer ripgrep when available, but keep guard portable.
+has_rg() {
+  command -v rg > /dev/null 2>&1
+}
+
 # Find files excluding archive and generated
 FILES=$(find docs -name "*.md" -not -path "docs/archive/*" -not -path "docs/_generated/*")
 
@@ -84,6 +89,79 @@ if [ "$ERRORS" -eq 1 ]; then
   echo "❌ Drift check failed."
   exit 1
 fi
+
+# 3. Guard against stale repo-identity references to legacy repo name "tools"
+# Allowlist rules (exclusion semantics vary by implementation):
+# - reports/sync-logs/** may contain historical names by design.
+#   (rg: path-scoped glob; grep fallback: basename "sync-logs")
+# - tools/** is a local toolchain tree, not repo identity.
+#   (rg: path-scoped glob; grep fallback: basename "tools" matches all tools dirs)
+# - scripts/tools/** contains local helper scripts, not repo identity.
+#   (rg: path-scoped glob; grep fallback: covered by basename "tools")
+# - scripts/fleet/check_docs_drift.sh contains the guard patterns itself.
+#   (rg: path-scoped glob; grep fallback: basename "check_docs_drift.sh")
+# Note: docs/archive/** was migrated (tools→lenskit) in commit 7038fdd, so no exclusion needed.
+# Implementation note: rg globs are path-scoped and precise; grep fallback uses basename
+# exclusions for portability across GNU/BSD/busybox variants.
+
+echo "Scanning for stale repo-identity references (tools -> lenskit)..."
+
+LEGACY_PATTERN_PCRE='(github\.com/heimgewebe/tools|heimgewebe/tools|^\s*-\s*name:\s*tools\s*$|ALLOWED_TARGET_REPOS:.*\btools\b)'
+LEGACY_PATTERN_ERE='(github\.com/heimgewebe/tools|heimgewebe/tools|^[[:space:]]*-[[:space:]]*name:[[:space:]]*tools[[:space:]]*$|ALLOWED_TARGET_REPOS:.*(^|[^[:alnum:]_])tools([^[:alnum:]_]|$))'
+if has_rg; then
+  set +e
+  rg -n --pcre2 \
+    --glob '!reports/sync-logs/**' \
+    --glob '!tools/**' \
+    --glob '!scripts/tools/**' \
+    --glob '!scripts/fleet/check_docs_drift.sh' \
+    "$LEGACY_PATTERN_PCRE" .
+  rc=$?
+  set -e
+  if [ "$rc" -eq 0 ]; then
+    echo "❌ Found stale repo-identity reference(s) to 'tools'. Use 'lenskit' instead."
+    exit 1
+  elif [ "$rc" -eq 1 ]; then
+    :
+  else
+    echo "❌ rg failed (exit=$rc). Guard cannot be trusted. Failing hard."
+    exit 1
+  fi
+else
+  echo "⚠️  rg not found; falling back to grep -r with ERE mode."
+  set +e
+  GREP_OUT=$(
+    grep -r -I -n -E \
+      --exclude-dir='.git' \
+      --exclude-dir='sync-logs' \
+      --exclude-dir='tools' \
+      --exclude='check_docs_drift.sh' \
+      -e "$LEGACY_PATTERN_ERE" \
+      . \
+      2>&1
+  )
+  rc=$?
+  set -e
+
+  if [ "$rc" -eq 0 ]; then
+    # Matches found
+    echo "$GREP_OUT"
+    echo "❌ Found stale repo-identity reference(s) to 'tools'. Use 'lenskit' instead."
+    exit 1
+  elif [ "$rc" -eq 1 ]; then
+    # No matches - clean
+    :
+  else
+    # grep error (exit 2+)
+    if [ -n "$GREP_OUT" ]; then
+      echo "$GREP_OUT" >&2
+    fi
+    echo "❌ grep failed (exit=$rc). Guard cannot be trusted. Failing hard." >&2
+    exit 1
+  fi
+fi
+
+echo "✅ Legacy repo-identity guard passed."
 
 echo "✅ Document Drift Check passed."
 exit 0

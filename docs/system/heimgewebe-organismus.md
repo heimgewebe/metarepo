@@ -237,12 +237,12 @@ Jede Komponente ist mit einem der drei Labels markiert:
 
 ---
 
-## 2.15 tools – Hilfssystem für KI-Sichtbarkeit
+## 2.15 lenskit – Hilfssystem für KI-Sichtbarkeit
 
 - (IST) enthält Merger, Extraktoren, Snapshot-Generatoren.
 - (IST) erzeugt KI-freundliche, mehrstufige Repräsentationen der Repos.
 - (ZIEL) vollständige, wählbare Detailstufen (dev, max) für den gesamten Fleet-Bestand.
-- (POLICY) Tools erzeugen keine eigenen Wahrheiten; sie spiegeln die Repos.
+- (POLICY) lenskit erzeugt keine eigenen Wahrheiten; es spiegelt die Repos.
 
 **Kommunikation:** liest alle Repos → erzeugt Artefakte für KI/Agenten.
 
@@ -315,7 +315,7 @@ Die Kraft des Systems entsteht aus ihrer Interaktion, nicht aus einer einzelnen 
 | sichter        | C                   | P/I                 | C/P (PR-Kommandos)       | I                | –         | Review-Agent, getriggert über CI/PR; kann Events/Metriken erzeugen        |
 | mitschreiber   | C                   | P (os.context.*)    | –                        | –                | Kern      | OS-/App-/Fenster-Kontext → WAL → os.context-Events                        |
 | plexer         | C                   | P/C (Routing)       | –                        | I                | –         | Event-Router zwischen Agenten, Faktenstrom                                |
-| tools          | C                   | P/I                 | –                        | I                | –         | Merger/Snapshots; erzeugen Artefakte, teils Event- oder Metrik-Ausgaben   |
+| lenskit       | C                   | P/I                 | –                        | I                | –         | Merger/Snapshots; erzeugen Artefakte, teils Event- oder Metrik-Ausgaben   |
 | heim-pc    | T                   | –                   | –                        | –                | –         | Lokaler Anker, Tooling                                                   |
 | vault-gewebe   | –                   | –                   | –                        | –                | –         | Privater Vault, Quelle für semantAH (Fleet-Mitglied)                     |
 | weltgewebe     | –                   | –                   | –                        | –                | –         | Nachbarsystem (Web/Doku), nicht Fleet                                     |

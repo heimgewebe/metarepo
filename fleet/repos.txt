@@ -7,7 +7,7 @@ heimlern
 semantAH
 aussensensor
 chronik
-tools
+lenskit
 mitschreiber
 sichter
 heimgeist

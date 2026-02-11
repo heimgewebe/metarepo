@@ -1,6 +1,6 @@
 <!-- GENERATED FILE - DO NOT EDIT -->
 <!-- Source: fleet/repos.yml -->
-<!-- Generated at: 2025-12-21 07:36:32 (Commit: d0620e0) -->
+<!-- Generated at: 2026-02-11 07:14:56 (Commit: 43ac048) -->
 
 # Heimgewebe Fleet Overview
 
@@ -18,7 +18,7 @@ Repositories managed by WGX (Contracts, Templates, Policies).
 - **semantAH**
 - **aussensensor**
 - **chronik**
-- **tools**
+- **lenskit**
 - **mitschreiber**
 - **sichter**
 - **leitstand**

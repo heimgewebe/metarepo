@@ -31,7 +31,7 @@
 | **leitstand** | UI/Dashboard (Kontrollraum) | Panels „Heute/Wissen/PC/Musik/Außen“, Tages-Digest | Daten aus chronik, semantAH, hausKI | Visualisierung, Benachrichtigung |
 | **aussensensor** | Außen-Signalgeber | Feeds/Sensoren/Webhooks → kuratierter **`feed.jsonl`** | Web/APIs/Sensorik/Weltgewebe | Außen-Events |
 | **weltgewebe** | Karten-Interface (Außensphäre) | Gemeingüter/Neighborhood, Karten/Projekte/Beiträge | Nutzer/Web | Freigegebene Außen-Ergebnisse (→ aussensensor/chronik) |
-| **tools** | Skript-Bausteine | kleine Utilities (backup, health, diffs, exports) | — | von wgx/hausKI/semantAH genutzt |
+| **lenskit** | Epistemische Aufbereitung | Merger/Scanner, Snapshots und KI-lesbare Artefakte | — | von wgx/hausKI/semantAH genutzt |
 | **mitschreiber** | Intent-/Kontext-Sensor | UI/Editor/OS-Kontext → **Intents** | Nutzer/OS/App | `os.context.intent.jsonl` |
 
 ---
