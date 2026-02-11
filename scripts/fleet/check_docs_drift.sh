@@ -122,28 +122,46 @@ if has_rg; then
     exit 1
   fi
 else
-  echo "⚠️  rg not found; falling back to grep -E (ERE mode)."
+  echo "⚠️  rg not found; falling back to find + xargs + grep -E (ERE mode)."
+  find_err=$(mktemp)
   set +e
-  FALLBACK_OUT=$(find . \
-    -path './.git' -prune -o \
-    -path './reports/sync-logs' -prune -o \
-    -path './docs/archive' -prune -o \
-    -path './tools' -prune -o \
-    -path './scripts/tools' -prune -o \
-    -type f ! -path './scripts/fleet/check_docs_drift.sh' \
-    -exec grep -nE -- "$LEGACY_PATTERN_ERE" {} + 2>&1)
+  # shellcheck disable=SC2016  # $1, $pattern, $@ expand in sh -c subshell, not current shell
+  FALLBACK_OUT=$(
+    find . \
+      \( -path './.git' -o \
+      -path './reports/sync-logs' -o \
+      -path './docs/archive' -o \
+      -path './tools' -o \
+      -path './scripts/tools' \) -prune -o \
+      -type f ! -path './scripts/fleet/check_docs_drift.sh' -print0 2> "$find_err" |
+      xargs -0 sh -c 'pattern="$1"; shift; grep -I -nE -- "$pattern" "$@" 2>&1 || test $? -eq 1' _ "$LEGACY_PATTERN_ERE" 2>&1
+    # Note: || test $? -eq 1 converts grep's 'no match' (exit 1) to success,
+    # preventing xargs from returning 123, while preserving grep errors (exit 2+)
+  )
   rc=$?
   set -e
 
   if [ "$rc" -eq 0 ]; then
-    echo "$FALLBACK_OUT"
-    echo "❌ Found stale repo-identity reference(s) to 'tools'. Use 'lenskit' instead."
-    exit 1
-  elif [ "$rc" -eq 1 ]; then
-    :
+    if [ -n "$FALLBACK_OUT" ]; then
+      # Matches found
+      echo "$FALLBACK_OUT"
+      echo "❌ Found stale repo-identity reference(s) to 'tools'. Use 'lenskit' instead."
+      rm -f "$find_err"
+      exit 1
+    else
+      # No matches found
+      rm -f "$find_err"
+      :
+    fi
   else
+    # Error: grep exit 2+, xargs error, or find error (via pipefail)
     echo "$FALLBACK_OUT" >&2
-    echo "❌ grep failed (exit=$rc). Guard cannot be trusted. Failing hard."
+    if [ -f "$find_err" ] && [ -s "$find_err" ]; then
+      echo "find stderr:" >&2
+      cat "$find_err" >&2
+    fi
+    echo "❌ find/grep/xargs failed (exit=$rc). Guard cannot be trusted. Failing hard." >&2
+    rm -f "$find_err"
     exit 1
   fi
 fi
