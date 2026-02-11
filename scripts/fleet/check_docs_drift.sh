@@ -125,38 +125,51 @@ else
   echo "⚠️  rg not found; falling back to find + xargs + grep -E (ERE mode)."
   find_err=$(mktemp)
   set +e
-  # shellcheck disable=SC2016  # $1, $pattern, $@ expand in sh -c subshell, not current shell
   FALLBACK_OUT=$(
     find . \
       \( -path './.git' -o \
-      -path './reports/sync-logs' -o \
-      -path './docs/archive' -o \
-      -path './tools' -o \
-      -path './scripts/tools' \) -prune -o \
-      -type f ! -path './scripts/fleet/check_docs_drift.sh' -print0 2> "$find_err" |
-      xargs -0 sh -c 'pattern="$1"; shift; grep -I -nE -- "$pattern" "$@" 2>&1 || test $? -eq 1' _ "$LEGACY_PATTERN_ERE" 2>&1
-    # Note: || test $? -eq 1 converts grep's 'no match' (exit 1) to success,
-    # preventing xargs from returning 123, while preserving grep errors (exit 2+)
+         -path './reports/sync-logs' -o \
+         -path './docs/archive' -o \
+         -path './tools' -o \
+         -path './scripts/tools' \) -prune -o \
+      -path './scripts/fleet/check_docs_drift.sh' -prune -o \
+      -type f -print0 2>"$find_err" \
+    | xargs -0 grep -I -nE -- "$LEGACY_PATTERN_ERE" 2>&1
   )
   rc=$?
   set -e
 
   if [ "$rc" -eq 0 ]; then
-    if [ -n "$FALLBACK_OUT" ]; then
-      # Matches found
-      echo "$FALLBACK_OUT"
-      echo "❌ Found stale repo-identity reference(s) to 'tools'. Use 'lenskit' instead."
-      rm -f "$find_err"
-      exit 1
-    else
-      # No matches found
+    # Matches found
+    echo "$FALLBACK_OUT"
+    echo "❌ Found stale repo-identity reference(s) to 'tools'. Use 'lenskit' instead."
+    rm -f "$find_err"
+    exit 1
+  elif [ "$rc" -eq 123 ]; then
+    # xargs exit 123 means grep returned non-zero for some files
+    # This typically means "no matches" (grep exit 1) but could also be errors
+    # Check output to distinguish
+    if [ -z "$FALLBACK_OUT" ]; then
+      # No output means clean "no matches"
       rm -f "$find_err"
       :
+    else
+      # Output present with xargs 123 - could be grep errors (exit 2+)
+      echo "$FALLBACK_OUT" >&2
+      if [ -s "$find_err" ]; then
+        echo "find stderr:" >&2
+        cat "$find_err" >&2
+      fi
+      echo "❌ grep reported errors. Guard cannot be trusted. Failing hard." >&2
+      rm -f "$find_err"
+      exit 1
     fi
   else
-    # Error: grep exit 2+, xargs error, or find error (via pipefail)
-    echo "$FALLBACK_OUT" >&2
-    if [ -f "$find_err" ] && [ -s "$find_err" ]; then
+    # Other non-zero: find errors, xargs errors, or grep errors
+    if [ -n "$FALLBACK_OUT" ]; then
+      echo "$FALLBACK_OUT" >&2
+    fi
+    if [ -s "$find_err" ]; then
       echo "find stderr:" >&2
       cat "$find_err" >&2
     fi
