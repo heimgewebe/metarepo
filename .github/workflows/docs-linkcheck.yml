@@ -30,7 +30,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-lychee-
       - name: Check documentation links (uses .lychee.toml)
-        uses: lycheeverse/lychee-action@v2.7.0
+        uses: lycheeverse/lychee-action@v2.8.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           LYCHEE_CACHE_DIR: ~/.cache/lychee
