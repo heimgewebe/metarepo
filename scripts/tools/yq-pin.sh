@@ -205,10 +205,13 @@ cmd_ensure() {
     version_ok "${v}" "${pinned_version}" || inst_die "Heruntergeladenes yq hat falsche Version: ${v} (erwartet: ${pinned_version})"
   fi
 
-  if [[ "${yq_bin}" != "${YQ_LOCAL}" && ! -e "${YQ_LOCAL}" ]]; then
-    ln -s -- "${yq_bin}" "${YQ_LOCAL}" || true
+  # Always normalize to tools/bin/yq so the workflow can rely on a single location.
+  if [[ "${yq_bin}" != "${YQ_LOCAL}" ]]; then
+    rm -f -- "${YQ_LOCAL}"
+    cp -f -- "${yq_bin}" "${YQ_LOCAL}"
+    chmod +x "${YQ_LOCAL}"
   fi
-  inst_log "OK: yq ${v} verfügbar"
+  inst_log "OK: yq ${v} verfügbar unter ${YQ_LOCAL}"
 }
 
 case "${1:-ensure}" in
