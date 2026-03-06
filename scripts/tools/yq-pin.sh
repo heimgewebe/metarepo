@@ -210,6 +210,12 @@ cmd_ensure() {
     rm -f -- "${YQ_LOCAL}"
     cp -f -- "${yq_bin}" "${YQ_LOCAL}"
     chmod +x "${YQ_LOCAL}"
+  elif [[ -L "${YQ_LOCAL}" ]]; then
+    # resolved_yq returned YQ_LOCAL, but it's a symlink; normalize by copying the target.
+    tmp_yq="${YQ_LOCAL}.tmp.$$"
+    cp -fL -- "${YQ_LOCAL}" "${tmp_yq}"
+    chmod +x "${tmp_yq}"
+    mv -f -- "${tmp_yq}" "${YQ_LOCAL}"
   fi
   inst_log "OK: yq ${v} verfügbar unter ${YQ_LOCAL}"
 }
