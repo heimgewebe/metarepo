@@ -599,6 +599,7 @@ jobs:
             ./**/*.log
             .runtime/**/*
             !**/node_modules/**
+          if-no-files-found: ignore
           retention-days: 7
 
   check-action-refs:
