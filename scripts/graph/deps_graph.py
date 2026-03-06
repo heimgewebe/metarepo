@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import functools
 import json
 import os
 import sys
@@ -37,6 +38,7 @@ class Repo:
         return self.path is not None and self.path.exists()
 
 
+@functools.lru_cache(maxsize=None)
 def normalize(name: str) -> str:
     """Normalise dependency identifiers to compare with repo names."""
 
