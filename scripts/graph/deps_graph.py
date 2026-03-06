@@ -40,7 +40,11 @@ class Repo:
 
 @functools.lru_cache(maxsize=None)
 def normalize(name: str) -> str:
-    """Normalise dependency identifiers to compare with repo names."""
+    """Normalise dependency identifiers to compare with repo names.
+
+    Unbounded cache is acceptable here because this is a short-lived CLI script
+    operating on a finite dependency/repository set.
+    """
 
     return name.lower().replace("-", "").replace("_", "")
 
