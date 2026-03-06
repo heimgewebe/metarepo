@@ -21,7 +21,7 @@ uv: "0.4.20"
 
 # yq wird in den Workflows ueber YQ_VERSION bzw. diese Datei gepinnt und
 # per GitHub-Releases geladen.
-yq: "v4.49.2"
+yq: "v4.52.4"
 
 # just-Version fuer scripts/tools/just-pin.sh:
 # Das Skript erwartet hier einen Tag im Format "vX.Y.Z" und leitet
