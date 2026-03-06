@@ -4,6 +4,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 import { execSync } from "child_process";
 import { readFileSync, writeFileSync } from "fs";
+import path from "path";
 
 const server = new McpServer({
   name: "heimgewebe-local",
@@ -50,11 +51,27 @@ server.tool(
   }
 );
 
+const validatePath = (requestedPath) => {
+  const root = process.cwd();
+  const absolute = path.resolve(root, requestedPath);
+
+  // Check if it's the root or starts with the root followed by a directory separator
+  // to avoid sibling directory bypass (e.g., /app vs /app-secrets)
+  const isWithin = absolute === root || absolute.startsWith(root + path.sep);
+  if (!isWithin) {
+    throw new Error(`Access denied: ${requestedPath} is outside of ${root}`);
+  }
+  return absolute;
+};
+
 // fs read
 server.tool(
   "fs_read",
   { path: z.string() },
-  async ({ path }) => ({ content: readFileSync(path, "utf8") })
+  async ({ path: requestedPath }) => {
+    const safePath = validatePath(requestedPath);
+    return { content: readFileSync(safePath, "utf8") };
+  }
 );
 
 // fs write
@@ -64,8 +81,9 @@ server.tool(
     path: z.string(),
     content: z.string()
   },
-  async ({ path, content }) => {
-    writeFileSync(path, content);
+  async ({ path: requestedPath, content }) => {
+    const safePath = validatePath(requestedPath);
+    writeFileSync(safePath, content);
     return { ok: true };
   }
 );
