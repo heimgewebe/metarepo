@@ -44,7 +44,7 @@ Alternatively actionlint is also available on [AUR][aur]. The packages can be in
 - [actionlint-bin](https://aur.archlinux.org/packages/actionlint-bin)
 - [actionlint-git](https://aur.archlinux.org/packages/actionlint-git)
 
-### [Nix](https://nixos.wiki/)
+### [Nix](https://nixos.org/)
 
 [`actionlint` package][nixpkgs] is available in the Nix ecosystem:
 

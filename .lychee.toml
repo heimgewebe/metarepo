@@ -23,6 +23,7 @@ exclude = [
   "https://search.nixos.org/*",
   "https://github.com/microsoft/winget-pkgs/tree/master/manifests/r/rhysd/actionlint",
   "https://community.chocolatey.org/*"
+  "https://aur.archlinux.org/packages/*"
 ]
 
 # Optional: Domains lassen sich hier ausschließen, falls einzelne Ziele drosseln oder 429 liefern.
