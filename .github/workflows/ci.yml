@@ -369,7 +369,7 @@ jobs:
 
       - name: Link check with Lychee (Linux)
         if: runner.os == 'Linux' && hashFiles('.lychee.toml') != ''
-        uses: lycheeverse/lychee-action@v2.7.0
+        uses: lycheeverse/lychee-action@v2.8.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           LYCHEE_CACHE_DIR: ~/.cache/lychee

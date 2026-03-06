@@ -15,6 +15,8 @@ exclude = [
   "http://127.0.0.1:*",
   "https://img.shields.io/*",
   "https://archlinux.org/*",
+  "https://aur.archlinux.org/*",
+  "https://nixos.wiki/*",
   "https://www.gnu.org/software/emacs/manual/html_node/flymake/",
   "https://docs.oasis-open.org/sarif/sarif/v2.1.0/sarif-v2.1.0.html",
   "https://go.dev/doc/install",
