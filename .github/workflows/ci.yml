@@ -130,27 +130,27 @@ jobs:
 
           "$YQ" eval '.' "$TOOLCHAIN_FILE" >/dev/null 2>&1 || { echo "::error::yq failed to parse toolchain.versions.yml"; exit 1; }
 
-          RUST=$("$YQ" -r '.rust' "$TOOLCHAIN_FILE")
+          RUST=$("$YQ" -r '.rust // ""' "$TOOLCHAIN_FILE")
           test -n "${RUST}" || { echo "rust version missing in toolchain.versions.yml"; exit 1; }
           echo "RUST_VERSION=${RUST}" >> "$GITHUB_ENV"
 
-          PY=$("$YQ" -r '.python' "$TOOLCHAIN_FILE")
+          PY=$("$YQ" -r '.python // ""' "$TOOLCHAIN_FILE")
           test -n "${PY}" || { echo "python version missing in toolchain.versions.yml"; exit 1; }
           echo "PYTHON_VERSION=${PY}" >> "$GITHUB_ENV"
 
-          UV=$("$YQ" -r '.uv' "$TOOLCHAIN_FILE")
+          UV=$("$YQ" -r '.uv // ""' "$TOOLCHAIN_FILE")
           test -n "${UV}" || { echo "uv version missing in toolchain.versions.yml"; exit 1; }
           echo "UV_VERSION=${UV}" >> "$GITHUB_ENV"
 
-          JUST=$("$YQ" -r '.just' "$TOOLCHAIN_FILE")
+          JUST=$("$YQ" -r '.just // ""' "$TOOLCHAIN_FILE")
           test -n "${JUST}" || { echo "just version missing in toolchain.versions.yml"; exit 1; }
           echo "JUST_VERSION=${JUST}" >> "$GITHUB_ENV"
 
-          SCCACHE=$("$YQ" -r '.sccache' "$TOOLCHAIN_FILE")
+          SCCACHE=$("$YQ" -r '.sccache // ""' "$TOOLCHAIN_FILE")
           test -n "${SCCACHE}" || { echo "sccache version missing in toolchain.versions.yml"; exit 1; }
           echo "SCCACHE_VERSION=${SCCACHE}" >> "$GITHUB_ENV"
 
-          ACTIONLINT=$("$YQ" -r '.actionlint' "$TOOLCHAIN_FILE")
+          ACTIONLINT=$("$YQ" -r '.actionlint // ""' "$TOOLCHAIN_FILE")
           test -n "${ACTIONLINT}" || { echo "actionlint version missing in toolchain.versions.yml"; exit 1; }
           echo "ACTIONLINT_VERSION=${ACTIONLINT}" >> "$GITHUB_ENV"
 
