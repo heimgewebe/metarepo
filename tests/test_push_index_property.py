@@ -302,3 +302,13 @@ def test_normalise_doc_id_rejects_sentinel_strings(value: str) -> None:
 )
 def test_normalise_doc_id_valid_values(value: Any, expected: str) -> None:
     assert push_index_property._normalise_doc_id(value) == expected
+
+
+@pytest.mark.parametrize(
+    "value",
+    ["string", [1, 2], {"a": 1}, None],
+    ids=["string", "list", "dict", "None"],
+)
+def test_is_nan_handles_non_numeric_types(value: Any) -> None:
+    """_is_nan handles non-numeric types by catching TypeError and returning False."""
+    assert push_index_property._is_nan(value) is False
