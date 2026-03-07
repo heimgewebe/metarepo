@@ -22,6 +22,7 @@ exclude = [
   "https://go.dev/doc/install",
   "https://search.nixos.org/*",
   "https://github.com/microsoft/winget-pkgs/tree/master/manifests/r/rhysd/actionlint",
+  "https://community.chocolatey.org/*",
   "https://aur.archlinux.org/packages/*"
 ]
 
