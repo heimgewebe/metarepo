@@ -205,10 +205,20 @@ cmd_ensure() {
     version_ok "${v}" "${pinned_version}" || inst_die "Heruntergeladenes yq hat falsche Version: ${v} (erwartet: ${pinned_version})"
   fi
 
-  if [[ "${yq_bin}" != "${YQ_LOCAL}" && ! -e "${YQ_LOCAL}" ]]; then
-    ln -s -- "${yq_bin}" "${YQ_LOCAL}" || true
+  # Always normalize to tools/bin/yq so the workflow can rely on a single location.
+  if [[ "${yq_bin}" != "${YQ_LOCAL}" ]]; then
+    local tmp_yq="${YQ_LOCAL}.tmp.$$"
+    cp -f -- "${yq_bin}" "${tmp_yq}"
+    chmod +x "${tmp_yq}"
+    mv -f -- "${tmp_yq}" "${YQ_LOCAL}"
+  elif [[ -L "${YQ_LOCAL}" ]]; then
+    # resolved_yq returned YQ_LOCAL, but it's a symlink; normalize by copying the target.
+    local tmp_yq="${YQ_LOCAL}.tmp.$$"
+    cp -fL -- "${YQ_LOCAL}" "${tmp_yq}"
+    chmod +x "${tmp_yq}"
+    mv -f -- "${tmp_yq}" "${YQ_LOCAL}"
   fi
-  inst_log "OK: yq ${v} verfügbar"
+  inst_log "OK: yq ${v} verfügbar unter ${YQ_LOCAL}"
 }
 
 case "${1:-ensure}" in

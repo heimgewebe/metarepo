@@ -22,7 +22,12 @@ exclude = [
   "https://go.dev/doc/install",
   "https://search.nixos.org/*",
   "https://github.com/microsoft/winget-pkgs/tree/master/manifests/r/rhysd/actionlint",
-  "https://aur.archlinux.org/packages/*"
+  "https://community.chocolatey.org/*",
+  "https://aur.archlinux.org/packages/*",
+  "https://github.com/rhysd/actionlint/blob/main/*",
+  "https://github.com/rhysd/ss/*",
+  "https://github.com/actions/toolkit/blob/main/docs/problem-matchers.md",
+  "https://github.com/ScoopInstaller/Main/blob/master/bucket/actionlint.json"
 ]
 
 # Optional: Domains lassen sich hier ausschließen, falls einzelne Ziele drosseln oder 429 liefern.
