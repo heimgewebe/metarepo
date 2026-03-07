@@ -207,13 +207,13 @@ cmd_ensure() {
 
   # Always normalize to tools/bin/yq so the workflow can rely on a single location.
   if [[ "${yq_bin}" != "${YQ_LOCAL}" ]]; then
-    tmp_yq="${YQ_LOCAL}.tmp.$$"
+    local tmp_yq="${YQ_LOCAL}.tmp.$$"
     cp -f -- "${yq_bin}" "${tmp_yq}"
     chmod +x "${tmp_yq}"
     mv -f -- "${tmp_yq}" "${YQ_LOCAL}"
   elif [[ -L "${YQ_LOCAL}" ]]; then
     # resolved_yq returned YQ_LOCAL, but it's a symlink; normalize by copying the target.
-    tmp_yq="${YQ_LOCAL}.tmp.$$"
+    local tmp_yq="${YQ_LOCAL}.tmp.$$"
     cp -fL -- "${YQ_LOCAL}" "${tmp_yq}"
     chmod +x "${tmp_yq}"
     mv -f -- "${tmp_yq}" "${YQ_LOCAL}"
