@@ -71,13 +71,13 @@ jobs:
             }' > chronik-event.json
 
       - name: Persist chronik event artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: chronik-event
           path: chronik-event.json
 
       - name: Persist analysis artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: jules-analysis
           path: jules-output.json
