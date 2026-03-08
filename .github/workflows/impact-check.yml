@@ -72,7 +72,7 @@ jobs:
             cmd_base=("python" "metarepo_tools/impact_guard.py")
           fi
 
-          readarray -t changed_files < <(printf '%s\n' "${{ steps.changed.outputs.all_changed_files }}")
+          read -r -a changed_files <<< "${{ steps.changed.outputs.all_changed_files }}"
 
           # Filter out empty strings from the array.
           args=()
