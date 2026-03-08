@@ -8,6 +8,7 @@ dependencies = [
   # exact resolution while keeping the template lightweight.
   "langgraph==0.2.32",
   "langchain==0.3.7",
+  "langchain-core<0.4.0",
   "pydantic>=2.6,<3",
 ]
 
