@@ -1,6 +1,7 @@
 """Test helpers to make the template self-contained during repository-wide runs."""
 from __future__ import annotations
 
+import importlib.util
 import sys
 from pathlib import Path
 from types import ModuleType
@@ -34,9 +35,7 @@ def _validate(instance: dict, schema: dict) -> None:
 
 
 # Only register the stub if jsonschema is missing.
-try:
-    import jsonschema as _jsonschema  # type: ignore
-except ModuleNotFoundError:  # pragma: no cover - exercised in repo-level test runs
+if importlib.util.find_spec("jsonschema") is None:  # pragma: no cover - exercised in repo-level test runs
     stub = ModuleType("jsonschema")
     stub.ValidationError = _ValidationError
     stub.validate = _validate
