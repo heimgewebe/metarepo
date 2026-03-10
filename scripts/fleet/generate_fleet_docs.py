@@ -67,16 +67,16 @@ def simple_yaml_load(filepath):
                         # Given the environment constraints, let's try to parse block items.
                         data["static"]["include"].append({"name": name})
                     elif stripped.startswith("status:") or stripped.startswith("fleet:") or stripped.startswith("url:"):
-                         # Add property to last item
-                         if data["static"]["include"]:
-                             key, val = stripped.split(":", 1)
-                             val = val.strip().strip('"')
-                             lower_val = val.lower()
-                             if lower_val == "true":
-                                 val = True
-                             elif lower_val == "false":
-                                 val = False
-                             data["static"]["include"][-1][key] = val
+                        # Add property to last item
+                        if data["static"]["include"]:
+                            key, val = stripped.split(":", 1)
+                            val = val.strip().strip('"')
+                            lower_val = val.lower()
+                            if lower_val == "true":
+                                val = True
+                            elif lower_val == "false":
+                                val = False
+                            data["static"]["include"][-1][key] = val
 
     return data
 
