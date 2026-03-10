@@ -27,55 +27,56 @@ def simple_yaml_load(filepath):
     Very basic YAML parser for fleet/repos.yml structure.
     Returns a dict with 'repos' (list of dicts) and 'static' (dict with 'include' list).
     """
-    with open(filepath, 'r') as f:
-        lines = f.readlines()
-
     data = {"repos": [], "static": {"include": []}}
     current_section = None
     current_subsection = None
 
-    for line in lines:
-        line = line.rstrip()
-        if not line or line.startswith("#") or line == "---":
-            continue
-
-        stripped = line.lstrip()
-        indent = len(line) - len(stripped)
-
-        if stripped.startswith("static:"):
-            current_section = "static"
-            continue
-        elif stripped.startswith("repos:"):
-            current_section = "repos"
-            continue
-
-        if current_section == "repos":
-            if stripped.startswith("- name:"):
-                name = stripped.replace("- name:", "").strip()
-                data["repos"].append({"name": name})
-
-        elif current_section == "static":
-            if stripped.startswith("include:"):
-                current_subsection = "include"
+    with open(filepath, 'r') as f:
+        for line in f:
+            line = line.rstrip()
+            if not line or line.startswith("#") or line == "---":
                 continue
 
-            if current_subsection == "include":
+            stripped = line.lstrip()
+            # indent = len(line) - len(stripped) # Unused
+
+            if stripped.startswith("static:"):
+                current_section = "static"
+                continue
+            elif stripped.startswith("repos:"):
+                current_section = "repos"
+                continue
+
+            if current_section == "repos":
                 if stripped.startswith("- name:"):
-                    # Start of a new item
                     name = stripped.replace("- name:", "").strip()
-                    # Look ahead/behind logic is hard in single pass line loop without state object
-                    # Simplified: We just grab the name.
-                    # If we need status/fleet props, we need a better parser.
-                    # Given the environment constraints, let's try to parse block items.
-                    data["static"]["include"].append({"name": name})
-                elif stripped.startswith("status:") or stripped.startswith("fleet:") or stripped.startswith("url:"):
-                     # Add property to last item
-                     if data["static"]["include"]:
-                         key, val = stripped.split(":", 1)
-                         val = val.strip().strip('"')
-                         if val.lower() == "true": val = True
-                         if val.lower() == "false": val = False
-                         data["static"]["include"][-1][key] = val
+                    data["repos"].append({"name": name})
+
+            elif current_section == "static":
+                if stripped.startswith("include:"):
+                    current_subsection = "include"
+                    continue
+
+                if current_subsection == "include":
+                    if stripped.startswith("- name:"):
+                        # Start of a new item
+                        name = stripped.replace("- name:", "").strip()
+                        # Look ahead/behind logic is hard in single pass line loop without state object
+                        # Simplified: We just grab the name.
+                        # If we need status/fleet props, we need a better parser.
+                        # Given the environment constraints, let's try to parse block items.
+                        data["static"]["include"].append({"name": name})
+                    elif stripped.startswith("status:") or stripped.startswith("fleet:") or stripped.startswith("url:"):
+                        # Add property to last item
+                        if data["static"]["include"]:
+                            key, val = stripped.split(":", 1)
+                            val = val.strip().strip('"')
+                            lower_val = val.lower()
+                            if lower_val == "true":
+                                val = True
+                            elif lower_val == "false":
+                                val = False
+                            data["static"]["include"][-1][key] = val
 
     return data
 
