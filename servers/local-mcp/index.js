@@ -2,9 +2,11 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-import { execSync } from "child_process";
+import { execFileSync } from "child_process";
 import { readFileSync, writeFileSync } from "fs";
 import path from "path";
+
+const splitArgs = (args) => args.split(/\s+/).filter(Boolean);
 
 const server = new McpServer({
   name: "heimgewebe-local",
@@ -16,7 +18,7 @@ server.tool(
   "git",
   { args: z.string() },
   async ({ args }) => {
-    const out = execSync(`git ${args}`, { encoding: "utf8" });
+    const out = execFileSync("git", splitArgs(args), { encoding: "utf8" });
     return { output: out };
   }
 );
@@ -26,7 +28,7 @@ server.tool(
   "wgx",
   { args: z.string() },
   async ({ args }) => {
-    const out = execSync(`scripts/wgx ${args}`, { encoding: "utf8" });
+    const out = execFileSync("scripts/wgx", splitArgs(args), { encoding: "utf8" });
     return { output: out };
   }
 );
@@ -36,7 +38,7 @@ server.tool(
   "wgx_guard",
   { args: z.string().optional() },
   async ({ args = "" }) => {
-    const out = execSync(`scripts/wgx guard ${args}`, { encoding: "utf8" });
+    const out = execFileSync("scripts/wgx", ["guard", ...splitArgs(args)], { encoding: "utf8" });
     return { output: out };
   }
 );
@@ -46,7 +48,7 @@ server.tool(
   "wgx_smoke",
   { args: z.string().optional() },
   async ({ args = "" }) => {
-    const out = execSync(`scripts/wgx smoke ${args}`, { encoding: "utf8" });
+    const out = execFileSync("scripts/wgx", ["smoke", ...splitArgs(args)], { encoding: "utf8" });
     return { output: out };
   }
 );
