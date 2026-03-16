@@ -28,15 +28,18 @@ server.tool(
       GIT_ASKPASS, GIT_CONFIG_COUNT,
       ...safeEnv
     } = process.env;
+    const gitEnv = {
+      ...safeEnv,
+      GIT_CONFIG_GLOBAL: devNull,
+      GIT_CONFIG_SYSTEM: devNull,
+      // Empty string disables the pager entirely on all platforms.
+      GIT_PAGER: "",
+      // Use a platform-guaranteed no-op for the editor.
+      GIT_EDITOR: process.platform === "win32" ? "cmd.exe /c exit 0" : "true"
+    };
     const out = execFileSync("git", splitArgs(args), {
       encoding: "utf8",
-      env: {
-        ...safeEnv,
-        GIT_CONFIG_GLOBAL: devNull,
-        GIT_CONFIG_SYSTEM: devNull,
-        GIT_PAGER: "cat",
-        GIT_EDITOR: "true"
-      }
+      env: gitEnv
     });
     return { output: out };
   }
