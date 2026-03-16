@@ -2,9 +2,13 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-import { execSync } from "child_process";
+import { execFileSync } from "child_process";
 import { readFileSync, writeFileSync } from "fs";
+import { devNull } from "os";
 import path from "path";
+import { parseArgsStringToArgv } from "string-argv";
+
+const splitArgs = (args) => parseArgsStringToArgv(args);
 
 const server = new McpServer({
   name: "heimgewebe-local",
@@ -16,7 +20,27 @@ server.tool(
   "git",
   { args: z.string() },
   async ({ args }) => {
-    const out = execSync(`git ${args}`, { encoding: "utf8" });
+    // Strip dangerous git-related env vars before spawning; spread the rest so
+    // PATH, HOME and similar essentials remain available.
+    const {
+      GIT_TRACE, GIT_TRACE_PACKET, GIT_TRACE2, GIT_TRACE2_EVENT,
+      GIT_SSH_COMMAND, GIT_SSH, GIT_EXEC_PATH, GIT_PROXY_COMMAND,
+      GIT_ASKPASS, GIT_CONFIG_COUNT,
+      ...safeEnv
+    } = process.env;
+    const gitEnv = {
+      ...safeEnv,
+      GIT_CONFIG_GLOBAL: devNull,
+      GIT_CONFIG_SYSTEM: devNull,
+      // Empty string disables the pager entirely on all platforms.
+      GIT_PAGER: "",
+      // Use a platform-guaranteed no-op for the editor.
+      GIT_EDITOR: process.platform === "win32" ? "cmd.exe /c exit 0" : "true"
+    };
+    const out = execFileSync("git", splitArgs(args), {
+      encoding: "utf8",
+      env: gitEnv
+    });
     return { output: out };
   }
 );
@@ -26,7 +50,7 @@ server.tool(
   "wgx",
   { args: z.string() },
   async ({ args }) => {
-    const out = execSync(`scripts/wgx ${args}`, { encoding: "utf8" });
+    const out = execFileSync("scripts/wgx", splitArgs(args), { encoding: "utf8" });
     return { output: out };
   }
 );
@@ -36,7 +60,7 @@ server.tool(
   "wgx_guard",
   { args: z.string().optional() },
   async ({ args = "" }) => {
-    const out = execSync(`scripts/wgx guard ${args}`, { encoding: "utf8" });
+    const out = execFileSync("scripts/wgx", ["guard", ...splitArgs(args)], { encoding: "utf8" });
     return { output: out };
   }
 );
@@ -46,7 +70,7 @@ server.tool(
   "wgx_smoke",
   { args: z.string().optional() },
   async ({ args = "" }) => {
-    const out = execSync(`scripts/wgx smoke ${args}`, { encoding: "utf8" });
+    const out = execFileSync("scripts/wgx", ["smoke", ...splitArgs(args)], { encoding: "utf8" });
     return { output: out };
   }
 );
