@@ -4,9 +4,11 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 import { execFileSync } from "child_process";
 import { readFileSync, writeFileSync } from "fs";
+import { devNull } from "os";
 import path from "path";
+import { parseArgsStringToArgv } from "string-argv";
 
-const splitArgs = (args) => args.split(/\s+/).filter(Boolean);
+const splitArgs = (args) => parseArgsStringToArgv(args);
 
 const server = new McpServer({
   name: "heimgewebe-local",
@@ -18,7 +20,24 @@ server.tool(
   "git",
   { args: z.string() },
   async ({ args }) => {
-    const out = execFileSync("git", splitArgs(args), { encoding: "utf8" });
+    // Strip dangerous git-related env vars before spawning; spread the rest so
+    // PATH, HOME and similar essentials remain available.
+    const {
+      GIT_TRACE, GIT_TRACE_PACKET, GIT_TRACE2, GIT_TRACE2_EVENT,
+      GIT_SSH_COMMAND, GIT_SSH, GIT_EXEC_PATH, GIT_PROXY_COMMAND,
+      GIT_ASKPASS, GIT_CONFIG_COUNT,
+      ...safeEnv
+    } = process.env;
+    const out = execFileSync("git", splitArgs(args), {
+      encoding: "utf8",
+      env: {
+        ...safeEnv,
+        GIT_CONFIG_GLOBAL: devNull,
+        GIT_CONFIG_SYSTEM: devNull,
+        GIT_PAGER: "cat",
+        GIT_EDITOR: "true"
+      }
+    });
     return { output: out };
   }
 );
