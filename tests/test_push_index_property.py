@@ -2,14 +2,13 @@
 
 from __future__ import annotations
 
-import importlib
 import math
 from typing import Any
 
 import pytest
 
-try:  # Prefer real pandas when available.
-    import pandas as pd  # type: ignore[no-redef]
+try:  # Prefer real pandas when available; used via 'pd' alias in tests.
+    import pandas as pd  # noqa: F401  # type: ignore[no-redef]
 except ModuleNotFoundError:  # pragma: no cover - exercised in minimal envs
     from metarepo_tools import pdmini as pd
 
@@ -30,6 +29,7 @@ _CANDIDATE_MODULES = (
 
 def _load_push_index_module() -> Any:
     """Load the push_index_property module from one of several candidate paths."""
+    import importlib
 
     for module_name in _CANDIDATE_MODULES:
         try:
