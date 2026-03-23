@@ -1,4 +1,9 @@
 ---
+# Canonical metrics validation workflow (reusable).
+# Contract ownership: metarepo/contracts/metrics.snapshot.schema.json (ADR-0007).
+# Consumer repos call this via workflow_call so they never need their own
+# fetch/normalize/validate logic.
+
 name: wgx metrics (reusable)
 
 permissions:
@@ -18,9 +23,22 @@ defaults:
         required: false
         type: string
       schema_ref:
+        description: >
+          DEPRECATED – ignored. Use metarepo_ref instead.
+          Kept for backward compatibility with existing callers.
         required: false
         type: string
-        default: "contracts-v1"
+        default: ""
+      metarepo_ref:
+        description: >
+          Explicit metarepo ref (tag, branch, or SHA) used to fetch the
+          canonical schema when running outside metarepo.  Consumers should
+          set this to the same ref they pin the workflow to so that
+          workflow logic and contract version stay in sync.
+          Falls back to "main" when empty.
+        required: false
+        type: string
+        default: ""
 
 jobs:
   metrics:
@@ -71,28 +89,46 @@ jobs:
           fi
           jq . "$OUTPUT_PATH"
 
-      - name: Validate metrics payload
+      - name: Fetch canonical metrics schema
+        id: schema
         env:
-          SCHEMA_TAG: ${{ inputs.schema_ref }}
+          # Explicit metarepo ref provided by the caller.  Consumers should
+          # set this to the same ref they pin the workflow to (tag / SHA)
+          # so that workflow logic and contract version stay in sync.
+          # Falls back to "main" when empty.
+          METAREPO_REF: ${{ inputs.metarepo_ref }}
         run: |
           set -euo pipefail
 
-          # Agent-Mode: use local schema
-          if [[ "${AGENT_MODE:-}" != "" ]]; then
-            echo "Agent-Mode: using local schema instead of downloading"
-            if [ -f contracts/metrics.snapshot.schema.json ]; then
-              cp contracts/metrics.snapshot.schema.json metrics.schema.json
-            else
-              echo "::warning::Local metrics schema not found in Agent-Mode, skipping validation"
-              exit 0
-            fi
+          # Canonical schema: metarepo/contracts/metrics.snapshot.schema.json
+          # Contract ownership stays in metarepo (ADR-0007).
+          # When running inside metarepo the file is already present after
+          # checkout.  Consumer repos fetch it from the explicitly provided
+          # metarepo ref (or main as fallback).
+          if [ -f contracts/metrics.snapshot.schema.json ]; then
+            echo "Using local canonical schema"
+            cp contracts/metrics.snapshot.schema.json metrics.schema.json
+          elif [[ "${AGENT_MODE:-}" != "" ]]; then
+            echo "::warning::Agent-Mode: canonical metrics schema not available locally, skipping validation"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
           else
-            SCHEMA_URL="https://raw.githubusercontent.com/heimgewebe/metarepo/${SCHEMA_TAG}/contracts/metrics.snapshot.schema.json"
-            echo "Fetching schema from $SCHEMA_URL"
+            REF="${METAREPO_REF:-main}"
+            SCHEMA_URL="https://raw.githubusercontent.com/heimgewebe/metarepo/${REF}/contracts/metrics.snapshot.schema.json"
+            echo "Fetching canonical schema from $SCHEMA_URL (ref: ${REF})"
             curl -fsSL "$SCHEMA_URL" -o metrics.schema.json
           fi
 
-          ajv validate -s metrics.schema.json -d metrics.json
+      - name: Validate metrics payload
+        if: steps.schema.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          # --spec=draft2020: canonical schema declares $schema 2020-12.
+          # --strict=log: canonical schema uses x-producers/x-consumers
+          #   metadata keywords – log them, do not reject.
+          # The schema itself uses no 2020-12-only features, so these are
+          # validator-compat flags, not a contract fork.
+          ajv validate --spec=draft2020 --strict=log \
+            -s metrics.schema.json -d metrics.json
 
       - name: Optional POST to ingest endpoint
         if: ${{ inputs.post_url != '' && env.AGENT_MODE == '' }}

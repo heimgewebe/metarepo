@@ -1,4 +1,9 @@
 ---
+# Repo-local metrics workflow for metarepo itself.
+# Uses the same canonical validation logic as the reusable
+# wgx-metrics.yml so the two cannot drift apart.
+# Canonical schema: contracts/metrics.snapshot.schema.json (ADR-0007).
+
 name: "📊 Metrics Snapshot & Validation"
 permissions:
   contents: read          # Repo lesen, um Skripte auszuführen
@@ -9,8 +14,11 @@ permissions:
   schedule:
     - cron: "0 * * * *"
 
+defaults:
+  run:
+    shell: bash --noprofile --norc -euo pipefail {0}
+
 env:
-  METRICS_SCHEMA_URL: https://raw.githubusercontent.com/heimgewebe/metarepo/contracts-v1/contracts/wgx/metrics.json
   HAUSKI_POST_URL: ${{ secrets.HAUSKI_METRICS_URL }}
 
 jobs:
@@ -28,27 +36,18 @@ jobs:
 
       - name: Snapshot metrics
         run: bash scripts/wgx-metrics-snapshot.sh --json
-      - name: Fetch AJV schema (local file)
-        if: ${{ env.AGENT_MODE == '' }}
-        run: |
-          mkdir -p .ci
-          curl -fsSL "$METRICS_SCHEMA_URL" -o .ci/metrics.schema.json
-
-      - name: Use local schema (Agent-Mode)
-        if: ${{ env.AGENT_MODE != '' }}
-        run: |
-          echo "Agent-Mode: attempting to use local schema instead of curl"
-          mkdir -p .ci
-          # Try to use a local copy of the schema if available
-          if [ -f contracts/metrics.snapshot.schema.json ]; then
-            cp contracts/metrics.snapshot.schema.json .ci/metrics.schema.json
-          else
-            echo "::error::No local metrics schema found for Agent-Mode"
-            exit 1
-          fi
 
       - name: Validate metrics contract
-        run: npx --yes ajv-cli@5 validate -s .ci/metrics.schema.json -d metrics.json
+        run: |
+          # Canonical schema from metarepo/contracts/ (ADR-0007).
+          # This workflow runs inside metarepo, so the schema is always
+          # local after checkout – no fetch needed.
+          # --spec=draft2020: canonical schema declares $schema 2020-12.
+          # --strict=log: canonical schema uses x-producers/x-consumers
+          #   metadata keywords – log them, do not reject.
+          npx --yes ajv-cli@5 validate --spec=draft2020 --strict=log \
+            -s contracts/metrics.snapshot.schema.json \
+            -d metrics.json
 
       - name: Optional POST to hausKI
         if: ${{ env.HAUSKI_POST_URL && env.HAUSKI_POST_URL != '' && env.AGENT_MODE == '' }}
