@@ -82,13 +82,20 @@ jobs:
 
       - name: Fetch canonical metrics schema
         id: schema
+        env:
+          # github.workflow_sha is the commit SHA of this reusable workflow
+          # file.  Using it as the fetch ref guarantees that the schema
+          # version always matches the workflow logic version, even when a
+          # consumer pins to a tag or SHA.
+          WORKFLOW_SHA: ${{ github.workflow_sha }}
         run: |
           set -euo pipefail
 
           # Canonical schema: metarepo/contracts/metrics.snapshot.schema.json
           # Contract ownership stays in metarepo (ADR-0007).
           # When running inside metarepo the file is already present after
-          # checkout.  Consumer repos fetch it from the metarepo main branch.
+          # checkout.  Consumer repos fetch it at the same commit as this
+          # workflow was called at (WORKFLOW_SHA).
           if [ -f contracts/metrics.snapshot.schema.json ]; then
             echo "Using local canonical schema"
             cp contracts/metrics.snapshot.schema.json metrics.schema.json
@@ -96,7 +103,8 @@ jobs:
             echo "::warning::Agent-Mode: canonical metrics schema not available locally, skipping validation"
             echo "skip=true" >> "$GITHUB_OUTPUT"
           else
-            SCHEMA_URL="https://raw.githubusercontent.com/heimgewebe/metarepo/main/contracts/metrics.snapshot.schema.json"
+            REF="${WORKFLOW_SHA:-main}"
+            SCHEMA_URL="https://raw.githubusercontent.com/heimgewebe/metarepo/${REF}/contracts/metrics.snapshot.schema.json"
             echo "Fetching canonical schema from $SCHEMA_URL"
             curl -fsSL "$SCHEMA_URL" -o metrics.schema.json
           fi
