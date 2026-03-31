@@ -46,6 +46,11 @@ fi
 
 mkdir -p "$OUTDIR"
 
+# Collect temp directories for cleanup (avoids trap overwrite in loops)
+_render_tmpdirs=()
+_render_cleanup() { for d in "${_render_tmpdirs[@]}"; do rm -rf -- "$d"; done; }
+trap _render_cleanup EXIT
+
 have_npx() { command -v npx > /dev/null 2>&1; }
 have_npx || {
   echo "npx nicht gefunden (Node). Bitte Node/npm installieren." >&2
@@ -97,7 +102,7 @@ for f in "${ARGS[@]}"; do
   elif [[ "$ext" == "md" ]]; then
     # Extrahiere mermaid-Blöcke in temp Dateien und rendere nummeriert
     tmpdir="$(mktemp -d)"
-    trap 'rm -rf "$tmpdir"' EXIT
+    _render_tmpdirs+=("$tmpdir")
     mapfile -t blocks < <(grep -n '```[[:space:]]*mermaid' -n "$f" | cut -d: -f1)
     if ((${#blocks[@]} == 0)); then
       echo "Hinweis: keine \`\`\`mermaid Codeblöcke in $f gefunden – übersprungen."

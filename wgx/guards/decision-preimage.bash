@@ -40,7 +40,7 @@ files=()
 if [[ -n "${GITHUB_BASE_REF:-}" ]] && git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
   # Best-effort diff against base
   base="origin/${GITHUB_BASE_REF}"
-  if git show-ref --verify --quiet "refs/remotes/${base#origin/}"; then
+  if git show-ref --verify --quiet "refs/remotes/${base}"; then
     mapfile -t files < <(git diff --name-only "$base"...HEAD -- '*.json' 2> /dev/null || true)
   else
     # Fallback: try without remote ref presence

@@ -10,8 +10,7 @@ cmd_list() {
       [[ -n "$branch" ]] && line+=" [branch: ${branch}]"
       [[ -n "$url" ]] && line+=" → ${url}"
       if [[ -n "$deps" ]]; then
-        local d="${deps//,/ , }"
-        d="${d// , /, }"
+        local d="${deps//,/, }"
         line+=" (depends_on: ${d})"
       fi
       echo "$line"
