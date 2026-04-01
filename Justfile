@@ -151,6 +151,10 @@ validate: yq_ensure lint
     just fleet-check
     scripts/ci/validate-local.sh
     @if [ -d tests ] && [ -f pyproject.toml ] && grep -q "pytest" pyproject.toml; then echo "Running python tests..."; uv run pytest tests/; fi
+    @printf "Running shell regression tests...\n"
+    @for t in tests/test_decision_preimage_ref.sh tests/test_render_diagram_cleanup.sh; do \
+      if [ -x "$$t" ]; then bash "$$t"; else echo "SKIP: $$t (not executable)"; fi; \
+    done
     @printf "Running actionlint...\n"
     @scripts/tools/actionlint-pin.sh ensure
     @actionlint -color || (echo "::error::actionlint failed" && exit 1)
