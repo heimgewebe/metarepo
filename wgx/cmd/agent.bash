@@ -53,6 +53,7 @@ cmd_agent() {
       [[ -n "$manifest" ]] || die "wgx agent validate <manifest.yaml>"
       # naive yaml->json (nur sehr einfacher Fall) – für echte Nutzung: yq
       if command -v yq > /dev/null 2>&1 && command -v npx > /dev/null 2>&1; then
+        local tmp
         tmp="$(mktemp)"
         _tmp_dirs+=("$tmp")
         yq -o=json '.' "$manifest" > "$tmp"

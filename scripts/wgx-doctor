@@ -53,9 +53,9 @@ for g in "${GLOBS[@]}"; do
     if [[ -f "$f" && -f "$TARGET" ]]; then
       if ! diff -u "$f" "$TARGET" > "$TMPDIR/diff.patch" 2>/dev/null; then
         echo "## $REL_PATH" >> "$REPORT"
-        echo -e "\n\`\`\`diff" >> "$REPORT"
+        printf '\n```diff\n' >> "$REPORT"
         cat "$TMPDIR/diff.patch" >> "$REPORT"
-        echo -e "\n\`\`\`\n" >> "$REPORT"
+        printf '\n```\n\n' >> "$REPORT"
         if adr_exception "${REL_PATH}"; then
           echo "- Entscheidung: **Feldversion prüfen** (ADR-Ausnahme)." >> "$REPORT"
         else
