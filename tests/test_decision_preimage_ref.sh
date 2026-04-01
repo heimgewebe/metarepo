@@ -45,7 +45,7 @@ chmod +x "${tmpdir}/jq"
 # Run guard; it always exits 0 (warn-only), so failures come from assertions.
 GITHUB_BASE_REF=main \
   PATH="${tmpdir}:${PATH}" \
-  bash "${GUARD}" 2>/dev/null || true
+  bash "${GUARD}" 2> /dev/null || true
 
 # ---------------------------------------------------------------------------
 # Assertions
@@ -65,7 +65,7 @@ fi
 # 2) The old broken form must NOT be present (refs/remotes/main without origin).
 #    Use a word-boundary pattern: the line must end after 'main' – i.e. there is
 #    no 'origin' segment between 'refs/remotes/' and 'main'.
-if grep -qE "show-ref.*refs/remotes/main( |$)" "${GIT_CALL_LOG}" 2>/dev/null; then
+if grep -qE "show-ref.*refs/remotes/main( |$)" "${GIT_CALL_LOG}" 2> /dev/null; then
   echo "FAIL: old broken ref 'refs/remotes/main' found – regression!"
   echo "--- actual git calls ---"
   cat "${GIT_CALL_LOG}"

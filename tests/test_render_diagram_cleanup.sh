@@ -40,7 +40,10 @@ _render_tmpdirs+=("$d3")
 
 # Verify all three exist before cleanup
 for d in "$d1" "$d2" "$d3"; do
-  [[ -d "$d" ]] || { echo "FAIL: tmpdir $d was not created"; exit 1; }
+  [[ -d "$d" ]] || {
+    echo "FAIL: tmpdir $d was not created"
+    exit 1
+  }
 done
 
 # Run cleanup
