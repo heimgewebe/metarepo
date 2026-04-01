@@ -73,7 +73,7 @@ jobs:
         run: scripts/tools/just-pin.sh
 
       - name: Lint GitHub workflows (actionlint)
-        uses: rhysd/actionlint@v1.7.11
+        uses: rhysd/actionlint@v1.7.12
         with:
           args: -color
 
