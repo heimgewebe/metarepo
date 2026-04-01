@@ -48,7 +48,12 @@ mkdir -p "$OUTDIR"
 
 # Collect temp directories for cleanup (avoids trap overwrite in loops)
 _render_tmpdirs=()
-_render_cleanup() { for d in "${_render_tmpdirs[@]}"; do rm -rf -- "$d"; done; }
+_render_cleanup() {
+  local d
+  for d in "${_render_tmpdirs[@]}"; do
+    rm -rf -- "$d"
+  done
+}
 trap _render_cleanup EXIT
 
 have_npx() { command -v npx > /dev/null 2>&1; }

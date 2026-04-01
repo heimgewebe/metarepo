@@ -29,6 +29,11 @@ d1="$(mktemp -d)"
 d2="$(mktemp -d)"
 d3="$(mktemp -d)"
 
+cleanup() {
+  rm -rf -- "${d1:-}" "${d2:-}" "${d3:-}"
+}
+trap cleanup EXIT
+
 _render_tmpdirs+=("$d1")
 _render_tmpdirs+=("$d2")
 _render_tmpdirs+=("$d3")

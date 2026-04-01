@@ -21,6 +21,7 @@ trap cleanup EXIT
 # ---------------------------------------------------------------------------
 GIT_CALL_LOG="${tmpdir}/git-calls.log"
 export GIT_CALL_LOG
+: > "${GIT_CALL_LOG}"
 
 cat > "${tmpdir}/git" << 'GITEOF'
 #!/usr/bin/env bash
