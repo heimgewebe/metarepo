@@ -191,7 +191,7 @@ jobs:
 
       - name: Cache Cargo artifacts
         if: ${{ hashFiles('**/Cargo.toml') != '' }}
-        uses: actions/cache@v5  # v4 (major tag)
+        uses: actions/cache@v6  # v4 (major tag)
         with:
           path: |
             ~/.cargo/registry
@@ -217,7 +217,7 @@ jobs:
 
       - name: Cache uv package cache
         if: ${{ hashFiles('**/pyproject.toml') != '' }}
-        uses: actions/cache@v5  # v4 (major tag)
+        uses: actions/cache@v6  # v4 (major tag)
         with:
           # OS-spezifische uv-Cachepfade
           path: |
@@ -234,7 +234,7 @@ jobs:
 
       - name: Cache uv virtual environment (requirements)
         if: ${{ hashFiles('**/requirements*.txt') != '' }}
-        uses: actions/cache@v5  # v4 (major tag)
+        uses: actions/cache@v6  # v4 (major tag)
         with:
           path: .venv
           key: ${{ runner.os }}-${{ runner.arch }}-uv-venv-${{ env.UV_VERSION }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('**/requirements*.txt') }}
@@ -246,7 +246,7 @@ jobs:
 
       - name: Cache uv virtual environment (pyproject)
         if: ${{ hashFiles('**/pyproject.toml') != '' && hashFiles('**/requirements*.txt') == '' }}
-        uses: actions/cache@v5  # v4 (major tag)
+        uses: actions/cache@v6  # v4 (major tag)
         with:
           path: .venv
           key: ${{ runner.os }}-${{ runner.arch }}-uv-venv-${{ env.UV_VERSION }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('**/pyproject.toml', '**/uv.lock', '**/poetry.lock') }}
@@ -350,7 +350,7 @@ jobs:
 
       - name: Cache lychee URL state
         if: runner.os == 'Linux' && hashFiles('.lychee.toml') != ''
-        uses: actions/cache@v5  # v4 (major tag)
+        uses: actions/cache@v6  # v4 (major tag)
         with:
           path: ~/.cache/lychee
           key: ${{ runner.os }}-lychee-${{ hashFiles('.lychee.toml', 'README.md', 'docs/**/*.md') }}
@@ -487,7 +487,7 @@ jobs:
 
       - name: (web) Cache Playwright browsers
         if: ${{ steps.webvars.outputs.enabled == 'true' }}
-        uses: actions/cache@v5  # v4 (major tag)
+        uses: actions/cache@v6  # v4 (major tag)
         with:
           path: ~/.cache/ms-playwright
           # Version ist in devDependency gepinnt (@playwright/test 1.55.1)
