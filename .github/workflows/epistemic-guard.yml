@@ -9,7 +9,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Run WGX epistemic guard
         uses: heimgewebe/wgx/.github/workflows/wgx-guard.yml@52a12ff97c402d1aa718d534a84b0225e7718c82
         with:
