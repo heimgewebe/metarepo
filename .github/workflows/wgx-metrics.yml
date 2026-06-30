@@ -20,8 +20,12 @@ defaults:
   workflow_call:
     inputs:
       post_url:
+        description: >
+          DEPRECATED non-secret endpoint input. Secret-backed callers must use
+          the post_url workflow secret instead.
         required: false
         type: string
+        default: ""
       schema_ref:
         description: >
           DEPRECATED – ignored. Use metarepo_ref instead.
@@ -39,11 +43,18 @@ defaults:
         required: false
         type: string
         default: ""
+    secrets:
+      post_url:
+        description: >
+          Optional secret-backed ingest endpoint URL for metrics snapshots.
+        required: false
 
 jobs:
   metrics:
     runs-on: ubuntu-latest
     timeout-minutes: 40
+    env:
+      METRICS_POST_URL: ${{ secrets.post_url || inputs.post_url }}
     steps:
       - uses: actions/checkout@v6
 
@@ -131,15 +142,15 @@ jobs:
             -s metrics.schema.json -d metrics.json
 
       - name: Optional POST to ingest endpoint
-        if: ${{ inputs.post_url != '' && env.AGENT_MODE == '' }}
+        if: ${{ env.METRICS_POST_URL != '' && env.AGENT_MODE == '' }}
         env:
-          POST_URL: ${{ inputs.post_url }}
+          POST_URL: ${{ env.METRICS_POST_URL }}
         run: |
           set -euo pipefail
-          echo "POSTing metrics snapshot to $POST_URL"
+          echo "POSTing metrics snapshot to configured ingest endpoint"
           curl -fsS --data-binary @metrics.json "$POST_URL"
 
       - name: Skip POST to ingest (Agent-Mode)
-        if: ${{ inputs.post_url != '' && env.AGENT_MODE != '' }}
+        if: ${{ env.METRICS_POST_URL != '' && env.AGENT_MODE != '' }}
         run: |
           echo "Agent-Mode: skipping external POST to ingest endpoint"
