@@ -155,7 +155,7 @@ jobs:
         run: |
           set -euo pipefail
           echo "POSTing metrics snapshot to configured ingest endpoint"
-          args=(-fsS --data-binary @metrics.json)
+          args=(-fsS -H "Content-Type: application/json" --data-binary @metrics.json)
           if [[ -n "${POST_TOKEN:-}" ]]; then
             args+=(-H "X-Auth: ${POST_TOKEN}")
           fi
