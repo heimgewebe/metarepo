@@ -48,6 +48,11 @@ defaults:
         description: >
           Optional secret-backed ingest endpoint URL for metrics snapshots.
         required: false
+      post_token:
+        description: >
+          Optional secret-backed ingest token sent as X-Auth when posting
+          metrics snapshots to authenticated ingest endpoints.
+        required: false
 
 jobs:
   metrics:
@@ -55,6 +60,7 @@ jobs:
     timeout-minutes: 40
     env:
       METRICS_POST_URL: ${{ secrets.post_url || inputs.post_url }}
+      METRICS_POST_TOKEN: ${{ secrets.post_token }}
     steps:
       - uses: actions/checkout@v6
 
@@ -145,10 +151,15 @@ jobs:
         if: ${{ env.METRICS_POST_URL != '' && env.AGENT_MODE == '' }}
         env:
           POST_URL: ${{ env.METRICS_POST_URL }}
+          POST_TOKEN: ${{ env.METRICS_POST_TOKEN }}
         run: |
           set -euo pipefail
           echo "POSTing metrics snapshot to configured ingest endpoint"
-          curl -fsS --data-binary @metrics.json "$POST_URL"
+          args=(-fsS --data-binary @metrics.json)
+          if [[ -n "${POST_TOKEN:-}" ]]; then
+            args+=(-H "X-Auth: ${POST_TOKEN}")
+          fi
+          curl "${args[@]}" "$POST_URL"
 
       - name: Skip POST to ingest (Agent-Mode)
         if: ${{ env.METRICS_POST_URL != '' && env.AGENT_MODE != '' }}
