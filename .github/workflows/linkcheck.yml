@@ -30,7 +30,7 @@ jobs:
     timeout-minutes: 20
     steps:
       # Für Core-Actions nutzen wir stabile Major-Tags statt SHAs, um 404-Risiken zu vermeiden.
-      - uses: actions/checkout@v6  # v4 (major tag)
+      - uses: actions/checkout@v7  # v4 (major tag)
       - name: Install lychee
         run: |
           chmod +x scripts/tools/lychee-pin.sh

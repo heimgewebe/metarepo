@@ -62,7 +62,7 @@ jobs:
       METRICS_POST_URL: ${{ secrets.post_url || inputs.post_url }}
       METRICS_POST_TOKEN: ${{ secrets.post_token }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Setup Node
         uses: actions/setup-node@v6
