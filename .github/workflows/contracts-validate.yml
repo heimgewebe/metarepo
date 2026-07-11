@@ -12,11 +12,15 @@ concurrency:
   workflow_dispatch: {}
   push:
     paths:
+      - "scripts/check-contract-json.py"
+      - "scripts/validate-contracts.sh"
       - "contracts/**"
       - "fixtures/**"
       - ".github/workflows/contracts-validate.yml"
   pull_request:
     paths:
+      - "scripts/check-contract-json.py"
+      - "scripts/validate-contracts.sh"
       - "contracts/**"
       - "fixtures/**"
       - ".github/workflows/contracts-validate.yml"
@@ -118,6 +122,9 @@ jobs:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
+
+      - name: Reject duplicate JSON keys and non-finite numbers
+        run: python3 scripts/check-contract-json.py contracts
 
       - name: Ensure Node available
         uses: actions/setup-node@v6
