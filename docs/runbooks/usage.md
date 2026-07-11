@@ -481,6 +481,6 @@ You can also see actionlint issues inline in VS Code via the [Trunk VS Code exte
 [pulsar-linter]: https://web.pulsar-edit.dev/packages/linter-github-actions
 [nova-extension]: https://extensions.panic.com/extensions/org.netwrk/org.netwrk.actionlint/
 [nova]: https://nova.app
-[trunk-io]: https://docs.trunk.io/docs
+[trunk-io]: https://docs.trunk.io/docs/check
 [trunk-docs]: https://docs.trunk.io/docs/check
 [trunk-vscode]: https://marketplace.visualstudio.com/items?itemName=trunk.io
