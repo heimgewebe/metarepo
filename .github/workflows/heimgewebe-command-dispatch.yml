@@ -36,14 +36,14 @@ jobs:
     steps:
       - name: Create GitHub App token
         id: app-token
-        uses: actions/create-github-app-token@v3
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1  # v3
         with:
           app-id: ${{ secrets.HEIMGEWEBE_APP_ID }}
           private-key: ${{ secrets.HEIMGEWEBE_APP_PRIVATE_KEY }}
           owner: heimgewebe
 
       - name: Parse and dispatch command
-        uses: actions/github-script@v8
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3  # v9
         with:
           # Lesen, Antworten und Dispatch mit dem App-Installationstoken
           github-token: ${{ steps.app-token.outputs.token }}
