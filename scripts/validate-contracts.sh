@@ -10,6 +10,12 @@ if ! command -v npm > /dev/null 2>&1; then
   exit 1
 fi
 
+if ! command -v python3 > /dev/null 2>&1; then
+  echo "::error::python3 is required to strictly parse contract JSON"
+  exit 1
+fi
+python3 scripts/check-contract-json.py contracts
+
 # --- Optimization: Setup local AJV ---
 echo "::group::Setup Validator"
 # Robust mktemp for Linux/macOS/BSD

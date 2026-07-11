@@ -6,6 +6,8 @@ their fixtures, ensuring semantic rules are enforced.
 import json
 import pytest
 import math
+import subprocess
+import sys
 from pathlib import Path
 from jsonschema import validate, ValidationError
 
@@ -118,3 +120,47 @@ def test_policy_weight_adjustment_rejects_non_finite_delta_value(non_finite_valu
     
     with pytest.raises(ValidationError, match=r".*non-finite.*"):
         validate_finite_numbers(instance)
+
+
+def test_policy_weight_adjustment_requires_all_top_level_fields():
+    schema = load_schema(SCHEMA_MAP["policy.weight_adjustment"])
+    valid = {
+        "version": "v1",
+        "basis_policy": "grabowski-routing-v0",
+        "ts": "2026-07-11T00:00:00Z",
+        "deltas": {
+            "route.direct_patch.weight": {
+                "kind": "relative",
+                "value": -0.1,
+                "unit": "factor",
+            }
+        },
+        "confidence": 0.7,
+        "evidence": {"decisions_analyzed": 10},
+    }
+    validate(instance=valid, schema=schema)
+    for required_field in (
+        "version",
+        "basis_policy",
+        "ts",
+        "deltas",
+        "confidence",
+        "evidence",
+    ):
+        invalid = dict(valid)
+        invalid.pop(required_field)
+        with pytest.raises(ValidationError):
+            validate(instance=invalid, schema=schema)
+
+
+def test_contract_json_guard_rejects_duplicate_keys(tmp_path):
+    duplicate = tmp_path / "duplicate.json"
+    duplicate.write_text('{"required":["a"],"required":["b"]}', encoding="utf-8")
+    completed = subprocess.run(
+        [sys.executable, "scripts/check-contract-json.py", str(duplicate)],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 1
+    assert "duplicate JSON key 'required'" in completed.stdout
