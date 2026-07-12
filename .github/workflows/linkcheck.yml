@@ -30,7 +30,7 @@ jobs:
     timeout-minutes: 20
     steps:
       # Für Core-Actions nutzen wir stabile Major-Tags statt SHAs, um 404-Risiken zu vermeiden.
-      - uses: actions/checkout@v6  # v4 (major tag)
+      - uses: actions/checkout@v7  # v7 (major tag)
       - name: Install lychee
         run: |
           chmod +x scripts/tools/lychee-pin.sh
@@ -39,7 +39,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Cache lychee URL state
-        uses: actions/cache@v5  # v4 (major tag)
+        uses: actions/cache@v6  # v6 (major tag)
         with:
           path: ~/.cache/lychee
           key: ${{ runner.os }}-lychee-${{ hashFiles('.lychee.toml', 'README.md', 'docs/**/*.md', 'contracts/**/*.md') }}
