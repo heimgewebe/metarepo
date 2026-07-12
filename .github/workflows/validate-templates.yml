@@ -36,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@0c366fd6a839edf440554fa01a7085ccba70ac98  # v6.0.1
+      - uses: actions/checkout@e8d4307400f9427dba7cb98e488d6ab85f1cec5f  # v6.0.1
 
       - name: Require immutable refs in command dispatch
         run: python3 scripts/ci/check_command_dispatch_action_pins.py
