@@ -16,6 +16,6 @@ jobs:
     # auch Smoke für das metarepo selbst wird über heimgewebe/wgx
     # zentral definiert.
     # Gepinnt auf Commit SHA für Sicherheit und Reproduzierbarkeit.
-    # This is the last WGX commit where wgx-smoke declares workflow_call.
-    # Newer WGX smoke migration remains a separate upstream contract task.
-    uses: heimgewebe/wgx/.github/workflows/wgx-smoke.yml@52a12ff97c402d1aa718d534a84b0225e7718c82
+    # Gepinnt auf den verifizierten WGX-Merge mit wiederverwendbarem Smoke
+    # und dauerhaft gebundenem Parser-/Security-Prerequisite.
+    uses: heimgewebe/wgx/.github/workflows/wgx-smoke.yml@b3b358f5bb8d26f087fcdaf25d308d439b22f583
