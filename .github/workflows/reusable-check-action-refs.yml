@@ -25,3 +25,6 @@ jobs:
 
       - name: Require immutable refs in command dispatch
         run: python3 scripts/ci/check_command_dispatch_action_pins.py
+
+      - name: Require immutable refs in reusable observatory validation
+        run: python3 scripts/ci/check_command_dispatch_action_pins.py .github/workflows/reusable-validate-observatory.yml
