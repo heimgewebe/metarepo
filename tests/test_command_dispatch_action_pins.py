@@ -11,6 +11,12 @@ def test_repository_command_dispatch_uses_full_commit_pins() -> None:
     ) == []
 
 
+def test_repository_observatory_reusable_uses_full_commit_pins() -> None:
+    assert check_workflow(
+        ROOT / ".github" / "workflows" / "reusable-validate-observatory.yml"
+    ) == []
+
+
 def test_mutable_major_tag_is_rejected(tmp_path: Path) -> None:
     workflow = tmp_path / "workflow.yml"
     workflow.write_text("steps:\n  - uses: actions/github-script@v8\n", encoding="utf-8")
