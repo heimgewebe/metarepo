@@ -22,3 +22,6 @@ jobs:
             fi
           done < <(find .github/workflows -type f -name '*.yml' -print0)
           exit $failed
+
+      - name: Require immutable refs in command dispatch
+        run: python3 scripts/ci/check_command_dispatch_action_pins.py

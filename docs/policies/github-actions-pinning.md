@@ -7,9 +7,16 @@ To ensure security, stability, and reproducibility of our CI/CD pipelines, we en
 1.  **Pin by Tag or Commit SHA**: All `uses:` directives in workflow files must reference a specific version tag (e.g., `@v2`, `@v1.2.3`) or a full commit SHA.
 2.  **No `@main` or `@master`**: References to mutable branch names like `@main` or `@master` are prohibited. This prevents upstream changes from breaking our builds unexpectedly or introducing malicious code.
 
+## Critical reusable workflows
+
+The reusable `heimgewebe-command-dispatch.yml` workflow is a privileged
+organization-wide control path. Every external `uses:` reference inside that
+workflow must use a full 40-character commit SHA. Major tags remain acceptable
+elsewhere under the general policy, but not inside the command dispatcher.
+
 ## Verification
 
-This policy is enforced by the `check-action-refs` job in our CI pipeline, which scans all workflow files for prohibited references.
+The `check-action-refs` job enforces both layers: the repository-wide prohibition on branch refs and the commit-only rule for the command dispatcher.
 
 ## Exceptions
 

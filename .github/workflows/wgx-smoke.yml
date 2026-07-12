@@ -16,6 +16,6 @@ jobs:
     # auch Smoke für das metarepo selbst wird über heimgewebe/wgx
     # zentral definiert.
     # Gepinnt auf Commit SHA für Sicherheit und Reproduzierbarkeit.
-    uses: heimgewebe/wgx/.github/workflows/wgx-smoke.yml@52a12ff97c402d1aa718d534a84b0225e7718c82
-    with:
-      toolchain: stable
+    # Gepinnt auf den verifizierten WGX-Merge mit wiederverwendbarem Smoke
+    # und dauerhaft gebundenem Parser-/Security-Prerequisite.
+    uses: heimgewebe/wgx/.github/workflows/wgx-smoke.yml@b3b358f5bb8d26f087fcdaf25d308d439b22f583

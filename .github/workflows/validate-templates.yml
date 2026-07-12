@@ -14,12 +14,20 @@ defaults:
     paths:
       - 'templates/**'
       - 'scripts/**'
+      - '.github/workflows/heimgewebe-command-dispatch.yml'
+      - '.github/workflows/reusable-check-action-refs.yml'
+      - '.github/workflows/wgx-guard.yml'
+      - '.github/workflows/wgx-smoke.yml'
       - 'repos.yml'
       - '.github/workflows/validate-templates.yml'
   pull_request:
     paths:
       - 'templates/**'
       - 'scripts/**'
+      - '.github/workflows/heimgewebe-command-dispatch.yml'
+      - '.github/workflows/reusable-check-action-refs.yml'
+      - '.github/workflows/wgx-guard.yml'
+      - '.github/workflows/wgx-smoke.yml'
       - 'repos.yml'
       - '.github/workflows/validate-templates.yml'
 
@@ -29,6 +37,12 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@0c366fd6a839edf440554fa01a7085ccba70ac98  # v6.0.1
+
+      - name: Require immutable refs in command dispatch
+        run: python3 scripts/ci/check_command_dispatch_action_pins.py
+
+      - name: Validate reusable WGX callers
+        run: python3 scripts/ci/check_wgx_reusable_callers.py
 
       - name: "Toolchain: setup yq (deterministic)"
         shell: bash
