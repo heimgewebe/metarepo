@@ -1,0 +1,1876 @@
+{
+  "schemaVersion": 1,
+  "kind": "metarepo_contract_consumer_evidence",
+  "observedAt": "2026-07-14T21:35:14+02:00",
+  "source": {
+    "repository": "heimgewebe/metarepo",
+    "commit": "894657cef6734ecaf64813e83fc0433212d8fd5d",
+    "auditJob": "grabowski-job-f8d92a1aa443",
+    "auditFinalizationReceiptSha256": "b4543d1156de83b0e97c48aca780bb2e55085316e05c35f997ae91d6eaa9fd64",
+    "method": "shallow_default_branch_clone_plus_fixed_string_repository_scan"
+  },
+  "scope": {
+    "repositories": [
+      {
+        "repository": "heimgewebe/aussensensor",
+        "commit": "f9c75995b61ee841321420789e8e6b6374384a2a",
+        "defaultBranch": "main"
+      },
+      {
+        "repository": "heimgewebe/chronik",
+        "commit": "2fc65efe06cd23baa2a2bdef39f5f099c8a5540b",
+        "defaultBranch": "main"
+      },
+      {
+        "repository": "heimgewebe/hausKI",
+        "commit": "2b2e4496613c856993e028e360e76abea70c7028",
+        "defaultBranch": "main"
+      },
+      {
+        "repository": "heimgewebe/heim-pc",
+        "commit": "140e84bc28d3b208a51e2edb1cb27c5946c38d49",
+        "defaultBranch": "main"
+      },
+      {
+        "repository": "heimgewebe/heimgeist",
+        "commit": "2d657297e9875cf0ec12932b3391fc4c0d8a246a",
+        "defaultBranch": "main"
+      },
+      {
+        "repository": "heimgewebe/heimlern",
+        "commit": "8dbebea6b253f9d2f41514a15d34e5166602e792",
+        "defaultBranch": "main"
+      },
+      {
+        "repository": "heimgewebe/leitstand",
+        "commit": "a5df64b478f998973be7ba4ac2936d1d12ba3ed1",
+        "defaultBranch": "main"
+      },
+      {
+        "repository": "heimgewebe/mitschreiber",
+        "commit": "3680bb7e14079c4b8ec3d0758605f7023ee11097",
+        "defaultBranch": "main"
+      },
+      {
+        "repository": "heimgewebe/plexer",
+        "commit": "e1099df6ccf1763c7e235d844ff09b2728b24601",
+        "defaultBranch": "main"
+      },
+      {
+        "repository": "heimgewebe/semantAH",
+        "commit": "c306e89105605778a382aa12c231f727c221cc74",
+        "defaultBranch": "main"
+      },
+      {
+        "repository": "heimgewebe/wgx",
+        "commit": "2f2aa2225838be1d029697348d9aa989ce7e62f9",
+        "defaultBranch": "main"
+      }
+    ],
+    "completeForDeclaredRepositories": true,
+    "completeForOrganization": false,
+    "githubCodeSearchComplete": false,
+    "githubCodeSearchLimitation": "The separate code-search quota was exhausted after ten exploratory queries; final evidence comes from eleven exact shallow main clones."
+  },
+  "contracts": [
+    {
+      "id": "event_backbone/aussen.event",
+      "schema": "contracts/aussen.event.schema.json",
+      "schemaExists": true,
+      "schemaSha256": "2410e7ccd2a94271d6b292d4e8df5a4190a111376f26ae509901c8995a888f37",
+      "lifecycle": "active",
+      "replacement": null
+    },
+    {
+      "id": "event_backbone/event.line",
+      "schema": "contracts/event.line.schema.json",
+      "schemaExists": true,
+      "schemaSha256": "9e26e15ed569383edfd743b5f3fab81fd389f7fea4ea1b423c6be16b1423b891",
+      "lifecycle": "active",
+      "replacement": null
+    },
+    {
+      "id": "event_backbone/heimgeist.insight",
+      "schema": "contracts/events/heimgeist.insight.v1.schema.json",
+      "schemaExists": true,
+      "schemaSha256": "2281ad813f4638c9a1db15dfd1fc92037c0650d968b240ad1a1dbf8885af5b39",
+      "lifecycle": "active",
+      "replacement": null
+    },
+    {
+      "id": "fixtures/chronik-fixtures",
+      "schema": "contracts/chronik-fixtures.schema.json",
+      "schemaExists": false,
+      "schemaSha256": null,
+      "lifecycle": "historical",
+      "replacement": null
+    },
+    {
+      "id": "metrics/fleet.health",
+      "schema": "contracts/fleet.health.schema.json",
+      "schemaExists": true,
+      "schemaSha256": "e743c67d043a7729ad6ca8887d80be033c444a4e67b56dced03826a0bb0869d5",
+      "lifecycle": "active",
+      "replacement": null
+    },
+    {
+      "id": "integrity/summary",
+      "schema": "contracts/integrity.summary.schema.json",
+      "schemaExists": true,
+      "schemaSha256": "4a347da189ada968f102b484bf69ce34fef4a492c6866b1e2dbeb0d80ebeb842",
+      "lifecycle": "active",
+      "replacement": null
+    },
+    {
+      "id": "knowledge/insights.daily",
+      "schema": "contracts/insights.daily.schema.json",
+      "schemaExists": true,
+      "schemaSha256": "f3610f837a16b26ba74141fe2701bde2875e178bf81259c98583e12fc53e449c",
+      "lifecycle": "active",
+      "replacement": null
+    },
+    {
+      "id": "knowledge/insights.daily.published",
+      "schema": "contracts/events/insights.daily.published.v1.schema.json",
+      "schemaExists": true,
+      "schemaSha256": "72dcb6515b1c74d6951e8794fa3cdaaf192eb142082acbf466109c1b37a0d635",
+      "lifecycle": "compatibility",
+      "replacement": "knowledge/insights.daily.published.v1"
+    },
+    {
+      "id": "knowledge/insights.daily.published.v1",
+      "schema": "contracts/events/insights.daily.published.v1.schema.json",
+      "schemaExists": true,
+      "schemaSha256": "72dcb6515b1c74d6951e8794fa3cdaaf192eb142082acbf466109c1b37a0d635",
+      "lifecycle": "active",
+      "replacement": null
+    },
+    {
+      "id": "knowledge/observatory",
+      "schema": "contracts/knowledge.observatory.schema.json",
+      "schemaExists": true,
+      "schemaSha256": "8da4fe8f04a010f957f9ba1769d444991eaf2ddb378c8f696cd6d026e7c9d153",
+      "lifecycle": "active",
+      "replacement": null
+    },
+    {
+      "id": "knowledge/knowledge.observatory.published.v1",
+      "schema": "contracts/events/knowledge.observatory.published.v1.schema.json",
+      "schemaExists": true,
+      "schemaSha256": "ff70e502fc9b1488d96ee68918f01db7e77447315f9eb535ea8c004b23d194ff",
+      "lifecycle": "active",
+      "replacement": null
+    },
+    {
+      "id": "os_context/state",
+      "schema": "contracts/os.context.state.schema.json",
+      "schemaExists": true,
+      "schemaSha256": "4eaf7bef863aeee699f6c2688da56c472945f8a9fdce7639852bc9f9127217e5",
+      "lifecycle": "active",
+      "replacement": null
+    },
+    {
+      "id": "os_context/text.embed",
+      "schema": "contracts/os.context.text.embed.schema.json",
+      "schemaExists": true,
+      "schemaSha256": "a38400d04ab1428905743c15a966acaa7aec8072e66cb9df8133e1b6a0889ff3",
+      "lifecycle": "active",
+      "replacement": null
+    },
+    {
+      "id": "policy/decision",
+      "schema": "contracts/policy.decision.schema.json",
+      "schemaExists": true,
+      "schemaSha256": "2de890b578285100f57839d6fe7f8dd43326fa9c1c7c84759dd5a3604c025bce",
+      "lifecycle": "historical",
+      "replacement": null
+    },
+    {
+      "id": "policy/feedback",
+      "schema": "contracts/policy.feedback.schema.json",
+      "schemaExists": true,
+      "schemaSha256": "b718aedfb33d00330602cdb5fe1168693c0137df87f6afcf4e0bf33d8b0821b3",
+      "lifecycle": "historical",
+      "replacement": null
+    },
+    {
+      "id": "policy/snapshot",
+      "schema": "contracts/policy.snapshot.schema.json",
+      "schemaExists": true,
+      "schemaSha256": "6a51ba574f9d0575b8c6298eda4b08a6f483035502a2d5511f5f8fb831e5fbe7",
+      "lifecycle": "historical",
+      "replacement": null
+    },
+    {
+      "id": "policy/heimlern.ingest.state.v1",
+      "schema": "contracts/heimlern.ingest.state.schema.json",
+      "schemaExists": true,
+      "schemaSha256": "accd33e387f954d2dfc2e96b96e2941847e275830c01fe8142fc44618b2c089f",
+      "lifecycle": "historical",
+      "replacement": null
+    },
+    {
+      "id": "heim-pc/state.index",
+      "schema": "contracts/heim-pc/state/heim-pc.state.index.schema.json",
+      "schemaExists": true,
+      "schemaSha256": "69eeb45661c9f1a893ad4fa655b4fa997ea59e2655c623e5b9b7464bf15a4193",
+      "lifecycle": "historical",
+      "replacement": null
+    },
+    {
+      "id": "heim-pc/state.repos",
+      "schema": "contracts/heim-pc/state/heim-pc.state.repos.schema.json",
+      "schemaExists": true,
+      "schemaSha256": "c7b72cdb428335fdb9bf5ee7ca36ec1a012fb01685cf5ff6d8175ab7198989b7",
+      "lifecycle": "historical",
+      "replacement": null
+    },
+    {
+      "id": "heim-pc/state.uncertainties",
+      "schema": "contracts/heim-pc/state/heim-pc.state.uncertainties.schema.json",
+      "schemaExists": true,
+      "schemaSha256": "d27806094c53d725f77f994d4cb8d95cef30b57e43753501aa664573b6a6cd68",
+      "lifecycle": "historical",
+      "replacement": null
+    },
+    {
+      "id": "heim-pc/state.insights",
+      "schema": "contracts/heim-pc/state/heim-pc.state.insights.schema.json",
+      "schemaExists": true,
+      "schemaSha256": "69776f3d636b1ba367835231f492453e0bf76a9c39d6a62799f25c6dd05d42d3",
+      "lifecycle": "historical",
+      "replacement": null
+    },
+    {
+      "id": "heim-pc/state.drift",
+      "schema": "contracts/heim-pc/state/heim-pc.state.drift.schema.json",
+      "schemaExists": true,
+      "schemaSha256": "9f0cdb52bf886ec84cf022a4759076d6f2c8ba829b47e1de9def0276f0efd2fd",
+      "lifecycle": "historical",
+      "replacement": null
+    },
+    {
+      "id": "heim-pc/config.zones",
+      "schema": "contracts/heim-pc/config/zones.schema.json",
+      "schemaExists": true,
+      "schemaSha256": "8eb66dc4a82d863fb62d1b4023e7216ffd5ad584445016f8567e3e767797fcd8",
+      "lifecycle": "compatibility",
+      "replacement": null
+    }
+  ],
+  "claims": [
+    {
+      "id": "event_backbone/aussen.event::producer::aussensensor",
+      "contract": "event_backbone/aussen.event",
+      "role": "producer",
+      "repository": "heimgewebe/aussensensor",
+      "commit": "f9c75995b61ee841321420789e8e6b6374384a2a",
+      "status": "verified",
+      "mode": null,
+      "files": [
+        ".github/workflows/contracts-drift.yml",
+        ".github/workflows/fixtures-validate.yml",
+        ".github/workflows/validate-aussen-fixtures.yml",
+        ".github/workflows/validate-aussen.yml"
+      ],
+      "evidence": [
+        {
+          "path": ".github/workflows/contracts-drift.yml",
+          "line": 21,
+          "kind": "ci_reference"
+        },
+        {
+          "path": ".github/workflows/fixtures-validate.yml",
+          "line": 31,
+          "kind": "ci_reference"
+        },
+        {
+          "path": ".github/workflows/validate-aussen-fixtures.yml",
+          "line": 64,
+          "kind": "ci_reference"
+        },
+        {
+          "path": ".github/workflows/validate-aussen.yml",
+          "line": 23,
+          "kind": "ci_reference"
+        }
+      ],
+      "note": "Current default-branch files reference the exact schema basename; this proves repository coupling, not live production.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "event_backbone/aussen.event::consumer::aussensensor",
+      "contract": "event_backbone/aussen.event",
+      "role": "consumer",
+      "repository": "heimgewebe/aussensensor",
+      "commit": "f9c75995b61ee841321420789e8e6b6374384a2a",
+      "status": "verified",
+      "mode": "mirror",
+      "files": [
+        "contracts/aussen.event.schema.json"
+      ],
+      "evidence": [
+        {
+          "path": ".github/workflows/contracts-drift.yml",
+          "line": 21,
+          "kind": "ci_reference"
+        },
+        {
+          "path": ".github/workflows/fixtures-validate.yml",
+          "line": 31,
+          "kind": "ci_reference"
+        },
+        {
+          "path": ".github/workflows/validate-aussen-fixtures.yml",
+          "line": 64,
+          "kind": "ci_reference"
+        },
+        {
+          "path": ".github/workflows/validate-aussen.yml",
+          "line": 23,
+          "kind": "ci_reference"
+        }
+      ],
+      "note": "Current default-branch files reference the exact schema basename; this proves repository coupling, not runtime use.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ],
+      "mirrorChecks": [
+        {
+          "path": "contracts/aussen.event.schema.json",
+          "exists": true,
+          "sha256": "2410e7ccd2a94271d6b292d4e8df5a4190a111376f26ae509901c8995a888f37",
+          "matches_canonical": true
+        }
+      ]
+    },
+    {
+      "id": "event_backbone/aussen.event::consumer::chronik",
+      "contract": "event_backbone/aussen.event",
+      "role": "consumer",
+      "repository": "heimgewebe/chronik",
+      "commit": "2fc65efe06cd23baa2a2bdef39f5f099c8a5540b",
+      "status": "verified",
+      "mode": "reference-only",
+      "files": [
+        ".github/workflows/validate-aussen-fixtures.yml",
+        ".github/workflows/validate-aussen.yml",
+        ".ai-context.yml",
+        "README.md"
+      ],
+      "evidence": [
+        {
+          "path": ".github/workflows/validate-aussen-fixtures.yml",
+          "line": 18,
+          "kind": "ci_reference"
+        },
+        {
+          "path": ".github/workflows/validate-aussen.yml",
+          "line": 23,
+          "kind": "ci_reference"
+        },
+        {
+          "path": ".ai-context.yml",
+          "line": 54,
+          "kind": "documentation_or_data_reference"
+        },
+        {
+          "path": "README.md",
+          "line": 21,
+          "kind": "documentation_or_data_reference"
+        }
+      ],
+      "note": "Current default-branch files reference the exact schema basename; this proves repository coupling, not runtime use.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "event_backbone/event.line::producer::chronik",
+      "contract": "event_backbone/event.line",
+      "role": "producer",
+      "repository": "heimgewebe/chronik",
+      "commit": "2fc65efe06cd23baa2a2bdef39f5f099c8a5540b",
+      "status": "unverified",
+      "mode": null,
+      "files": [
+        "README.md",
+        "docs/event-contracts.md"
+      ],
+      "evidence": [
+        {
+          "path": "README.md",
+          "line": 22,
+          "kind": "documentation_or_data_reference"
+        },
+        {
+          "path": "docs/event-contracts.md",
+          "line": 11,
+          "kind": "documentation_or_data_reference"
+        }
+      ],
+      "note": "The producer relationship remains a review target and is not established by current repository evidence.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "event_backbone/event.line::consumer::chronik",
+      "contract": "event_backbone/event.line",
+      "role": "consumer",
+      "repository": "heimgewebe/chronik",
+      "commit": "2fc65efe06cd23baa2a2bdef39f5f099c8a5540b",
+      "status": "verified",
+      "mode": "reference-only",
+      "files": [
+        "README.md",
+        "docs/event-contracts.md"
+      ],
+      "evidence": [
+        {
+          "path": "README.md",
+          "line": 22,
+          "kind": "documentation_or_data_reference"
+        },
+        {
+          "path": "docs/event-contracts.md",
+          "line": 11,
+          "kind": "documentation_or_data_reference"
+        }
+      ],
+      "note": "Current default-branch files reference the exact schema basename; this proves repository coupling, not runtime use.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "event_backbone/heimgeist.insight::producer::heimgeist",
+      "contract": "event_backbone/heimgeist.insight",
+      "role": "producer",
+      "repository": "heimgewebe/heimgeist",
+      "commit": "2d657297e9875cf0ec12932b3391fc4c0d8a246a",
+      "status": "unverified",
+      "mode": null,
+      "files": [
+        "docs/specs/heimgeist-insight-v1.md"
+      ],
+      "evidence": [
+        {
+          "path": "docs/specs/heimgeist-insight-v1.md",
+          "line": 3,
+          "kind": "documentation_or_data_reference"
+        }
+      ],
+      "note": "The producer relationship remains a review target and is not established by current repository evidence.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "event_backbone/heimgeist.insight::consumer::chronik",
+      "contract": "event_backbone/heimgeist.insight",
+      "role": "consumer",
+      "repository": "heimgewebe/chronik",
+      "commit": "2fc65efe06cd23baa2a2bdef39f5f099c8a5540b",
+      "status": "verified",
+      "mode": "reference-only",
+      "files": [
+        "validation.py",
+        "docs/heimgeist_spec.md"
+      ],
+      "evidence": [
+        {
+          "path": "validation.py",
+          "line": 94,
+          "kind": "executable_or_test_reference"
+        },
+        {
+          "path": "docs/heimgeist_spec.md",
+          "line": 3,
+          "kind": "documentation_or_data_reference"
+        }
+      ],
+      "note": "Current default-branch files reference the exact schema basename; this proves repository coupling, not runtime use.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "event_backbone/heimgeist.insight::consumer::semantAH",
+      "contract": "event_backbone/heimgeist.insight",
+      "role": "consumer",
+      "repository": "heimgewebe/semantAH",
+      "commit": "c306e89105605778a382aa12c231f727c221cc74",
+      "status": "unverified",
+      "mode": "reference-only",
+      "files": [],
+      "evidence": [],
+      "note": "No exact reference to the schema basename was found in the audited default-branch commit.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "event_backbone/heimgeist.insight::consumer::leitstand",
+      "contract": "event_backbone/heimgeist.insight",
+      "role": "consumer",
+      "repository": "heimgewebe/leitstand",
+      "commit": "a5df64b478f998973be7ba4ac2936d1d12ba3ed1",
+      "status": "unverified",
+      "mode": "reference-only",
+      "files": [],
+      "evidence": [],
+      "note": "No exact reference to the schema basename was found in the audited default-branch commit.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "fixtures/chronik-fixtures::consumer::chronik",
+      "contract": "fixtures/chronik-fixtures",
+      "role": "consumer",
+      "repository": "heimgewebe/chronik",
+      "commit": "2fc65efe06cd23baa2a2bdef39f5f099c8a5540b",
+      "status": "historical",
+      "mode": "reference-only",
+      "files": [
+        "README.md",
+        "docs/event-contracts.md"
+      ],
+      "evidence": [
+        {
+          "path": "README.md",
+          "line": 23,
+          "kind": "documentation_or_data_reference"
+        },
+        {
+          "path": "docs/event-contracts.md",
+          "line": 12,
+          "kind": "documentation_or_data_reference"
+        }
+      ],
+      "note": "The contract or its only implementation is historical; this claim is retained for audit, not active routing.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "metrics/fleet.health::producer::wgx",
+      "contract": "metrics/fleet.health",
+      "role": "producer",
+      "repository": "heimgewebe/wgx",
+      "commit": "2f2aa2225838be1d029697348d9aa989ce7e62f9",
+      "status": "unverified",
+      "mode": null,
+      "files": [],
+      "evidence": [],
+      "note": "The producer relationship remains a review target and is not established by current repository evidence.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "metrics/fleet.health::consumer::wgx",
+      "contract": "metrics/fleet.health",
+      "role": "consumer",
+      "repository": "heimgewebe/wgx",
+      "commit": "2f2aa2225838be1d029697348d9aa989ce7e62f9",
+      "status": "unverified",
+      "mode": "reference-only",
+      "files": [],
+      "evidence": [],
+      "note": "No exact reference to the schema basename was found in the audited default-branch commit.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "metrics/fleet.health::consumer::leitstand",
+      "contract": "metrics/fleet.health",
+      "role": "consumer",
+      "repository": "heimgewebe/leitstand",
+      "commit": "a5df64b478f998973be7ba4ac2936d1d12ba3ed1",
+      "status": "verified",
+      "mode": "reference-only",
+      "files": [
+        "README.md",
+        "docs/blueprints/leitstand_visualization.md",
+        "docs/data-flow.md"
+      ],
+      "evidence": [
+        {
+          "path": "README.md",
+          "line": 246,
+          "kind": "documentation_or_data_reference"
+        },
+        {
+          "path": "docs/blueprints/leitstand_visualization.md",
+          "line": 219,
+          "kind": "documentation_or_data_reference"
+        },
+        {
+          "path": "docs/data-flow.md",
+          "line": 32,
+          "kind": "documentation_or_data_reference"
+        }
+      ],
+      "note": "Current default-branch files reference the exact schema basename; this proves repository coupling, not runtime use.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "integrity/summary::producer::semantAH",
+      "contract": "integrity/summary",
+      "role": "producer",
+      "repository": "heimgewebe/semantAH",
+      "commit": "c306e89105605778a382aa12c231f727c221cc74",
+      "status": "unverified",
+      "mode": null,
+      "files": [],
+      "evidence": [],
+      "note": "The producer relationship remains a review target and is not established by current repository evidence.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "integrity/summary::consumer::leitstand",
+      "contract": "integrity/summary",
+      "role": "consumer",
+      "repository": "heimgewebe/leitstand",
+      "commit": "a5df64b478f998973be7ba4ac2936d1d12ba3ed1",
+      "status": "unverified",
+      "mode": "reference-only",
+      "files": [],
+      "evidence": [],
+      "note": "No exact reference to the schema basename was found in the audited default-branch commit.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "integrity/summary::consumer::wgx",
+      "contract": "integrity/summary",
+      "role": "consumer",
+      "repository": "heimgewebe/wgx",
+      "commit": "2f2aa2225838be1d029697348d9aa989ce7e62f9",
+      "status": "unverified",
+      "mode": "reference-only",
+      "files": [],
+      "evidence": [],
+      "note": "No exact reference to the schema basename was found in the audited default-branch commit.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "knowledge/insights.daily::producer::semantAH",
+      "contract": "knowledge/insights.daily",
+      "role": "producer",
+      "repository": "heimgewebe/semantAH",
+      "commit": "c306e89105605778a382aa12c231f727c221cc74",
+      "status": "verified",
+      "mode": null,
+      "files": [
+        ".github/workflows/insights-daily-drift.yml",
+        ".github/workflows/publish-insights-daily.yml",
+        "scripts/diff_daily_insights.py",
+        "scripts/export_daily_insights.py"
+      ],
+      "evidence": [
+        {
+          "path": ".github/workflows/insights-daily-drift.yml",
+          "line": 61,
+          "kind": "ci_reference"
+        },
+        {
+          "path": ".github/workflows/publish-insights-daily.yml",
+          "line": 11,
+          "kind": "ci_reference"
+        },
+        {
+          "path": "scripts/diff_daily_insights.py",
+          "line": 47,
+          "kind": "executable_or_test_reference"
+        },
+        {
+          "path": "scripts/export_daily_insights.py",
+          "line": 9,
+          "kind": "executable_or_test_reference"
+        }
+      ],
+      "note": "Current default-branch files reference the exact schema basename; this proves repository coupling, not live production.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "knowledge/insights.daily::consumer::semantAH",
+      "contract": "knowledge/insights.daily",
+      "role": "consumer",
+      "repository": "heimgewebe/semantAH",
+      "commit": "c306e89105605778a382aa12c231f727c221cc74",
+      "status": "verified",
+      "mode": "reference-only",
+      "files": [
+        ".github/workflows/insights-daily-drift.yml",
+        ".github/workflows/publish-insights-daily.yml",
+        "scripts/diff_daily_insights.py",
+        "scripts/export_daily_insights.py"
+      ],
+      "evidence": [
+        {
+          "path": ".github/workflows/insights-daily-drift.yml",
+          "line": 61,
+          "kind": "ci_reference"
+        },
+        {
+          "path": ".github/workflows/publish-insights-daily.yml",
+          "line": 11,
+          "kind": "ci_reference"
+        },
+        {
+          "path": "scripts/diff_daily_insights.py",
+          "line": 47,
+          "kind": "executable_or_test_reference"
+        },
+        {
+          "path": "scripts/export_daily_insights.py",
+          "line": 9,
+          "kind": "executable_or_test_reference"
+        }
+      ],
+      "note": "Current default-branch files reference the exact schema basename; this proves repository coupling, not runtime use.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "knowledge/insights.daily::consumer::chronik",
+      "contract": "knowledge/insights.daily",
+      "role": "consumer",
+      "repository": "heimgewebe/chronik",
+      "commit": "2fc65efe06cd23baa2a2bdef39f5f099c8a5540b",
+      "status": "verified",
+      "mode": "reference-only",
+      "files": [
+        "validation.py",
+        "docs/insights.daily.schema.json"
+      ],
+      "evidence": [
+        {
+          "path": "validation.py",
+          "line": 83,
+          "kind": "executable_or_test_reference"
+        },
+        {
+          "path": "docs/insights.daily.schema.json",
+          "line": 3,
+          "kind": "documentation_or_data_reference"
+        }
+      ],
+      "note": "Current default-branch files reference the exact schema basename; this proves repository coupling, not runtime use.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "knowledge/insights.daily::consumer::leitstand",
+      "contract": "knowledge/insights.daily",
+      "role": "consumer",
+      "repository": "heimgewebe/leitstand",
+      "commit": "a5df64b478f998973be7ba4ac2936d1d12ba3ed1",
+      "status": "verified",
+      "mode": "reference-only",
+      "files": [
+        "README.md",
+        "docs/blueprints/leitstand_visualization.md",
+        "docs/data-flow.md"
+      ],
+      "evidence": [
+        {
+          "path": "README.md",
+          "line": 247,
+          "kind": "documentation_or_data_reference"
+        },
+        {
+          "path": "docs/blueprints/leitstand_visualization.md",
+          "line": 282,
+          "kind": "documentation_or_data_reference"
+        },
+        {
+          "path": "docs/data-flow.md",
+          "line": 46,
+          "kind": "documentation_or_data_reference"
+        }
+      ],
+      "note": "Current default-branch files reference the exact schema basename; this proves repository coupling, not runtime use.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "knowledge/insights.daily.published::producer::semantAH",
+      "contract": "knowledge/insights.daily.published",
+      "role": "producer",
+      "repository": "heimgewebe/semantAH",
+      "commit": "c306e89105605778a382aa12c231f727c221cc74",
+      "status": "compatibility",
+      "mode": null,
+      "files": [],
+      "evidence": [],
+      "note": "The repository retains a compatibility or migration reference; active production is not established.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "knowledge/insights.daily.published.v1::producer::semantAH",
+      "contract": "knowledge/insights.daily.published.v1",
+      "role": "producer",
+      "repository": "heimgewebe/semantAH",
+      "commit": "c306e89105605778a382aa12c231f727c221cc74",
+      "status": "unverified",
+      "mode": null,
+      "files": [],
+      "evidence": [],
+      "note": "The producer relationship remains a review target and is not established by current repository evidence.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "knowledge/insights.daily.published.v1::consumer::plexer",
+      "contract": "knowledge/insights.daily.published.v1",
+      "role": "consumer",
+      "repository": "heimgewebe/plexer",
+      "commit": "e1099df6ccf1763c7e235d844ff09b2728b24601",
+      "status": "unverified",
+      "mode": "notification-only",
+      "files": [],
+      "evidence": [],
+      "note": "No exact reference to the schema basename was found in the audited default-branch commit.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "knowledge/insights.daily.published.v1::consumer::chronik",
+      "contract": "knowledge/insights.daily.published.v1",
+      "role": "consumer",
+      "repository": "heimgewebe/chronik",
+      "commit": "2fc65efe06cd23baa2a2bdef39f5f099c8a5540b",
+      "status": "unverified",
+      "mode": "reference-only",
+      "files": [],
+      "evidence": [],
+      "note": "No exact reference to the schema basename was found in the audited default-branch commit.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "knowledge/insights.daily.published.v1::consumer::leitstand",
+      "contract": "knowledge/insights.daily.published.v1",
+      "role": "consumer",
+      "repository": "heimgewebe/leitstand",
+      "commit": "a5df64b478f998973be7ba4ac2936d1d12ba3ed1",
+      "status": "unverified",
+      "mode": "reference-only",
+      "files": [],
+      "evidence": [],
+      "note": "No exact reference to the schema basename was found in the audited default-branch commit.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "knowledge/insights.daily.published.v1::consumer::hausKI",
+      "contract": "knowledge/insights.daily.published.v1",
+      "role": "consumer",
+      "repository": "heimgewebe/hausKI",
+      "commit": "2b2e4496613c856993e028e360e76abea70c7028",
+      "status": "unverified",
+      "mode": "reference-only",
+      "files": [],
+      "evidence": [],
+      "note": "No exact reference to the schema basename was found in the audited default-branch commit.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "knowledge/observatory::producer::semantAH",
+      "contract": "knowledge/observatory",
+      "role": "producer",
+      "repository": "heimgewebe/semantAH",
+      "commit": "c306e89105605778a382aa12c231f727c221cc74",
+      "status": "verified",
+      "mode": null,
+      "files": [
+        ".github/workflows/contracts-sync-guard.yml",
+        ".github/workflows/knowledge-observatory-drift.yml",
+        ".github/workflows/publish-knowledge-observatory.yml",
+        "scripts/observatory_diff.py"
+      ],
+      "evidence": [
+        {
+          "path": ".github/workflows/contracts-sync-guard.yml",
+          "line": 44,
+          "kind": "ci_reference"
+        },
+        {
+          "path": ".github/workflows/knowledge-observatory-drift.yml",
+          "line": 123,
+          "kind": "ci_reference"
+        },
+        {
+          "path": ".github/workflows/publish-knowledge-observatory.yml",
+          "line": 11,
+          "kind": "ci_reference"
+        },
+        {
+          "path": "scripts/observatory_diff.py",
+          "line": 51,
+          "kind": "executable_or_test_reference"
+        }
+      ],
+      "note": "Current default-branch files reference the exact schema basename; this proves repository coupling, not live production.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "knowledge/observatory::consumer::leitstand",
+      "contract": "knowledge/observatory",
+      "role": "consumer",
+      "repository": "heimgewebe/leitstand",
+      "commit": "a5df64b478f998973be7ba4ac2936d1d12ba3ed1",
+      "status": "verified",
+      "mode": "reference-only",
+      "files": [
+        "scripts/vendor-contracts.mjs",
+        "vendor/contracts/_pin.json",
+        "vendor/contracts/knowledge/observatory.schema.json"
+      ],
+      "evidence": [
+        {
+          "path": "scripts/vendor-contracts.mjs",
+          "line": 14,
+          "kind": "executable_or_test_reference"
+        },
+        {
+          "path": "vendor/contracts/_pin.json",
+          "line": 5,
+          "kind": "documentation_or_data_reference"
+        },
+        {
+          "path": "vendor/contracts/knowledge/observatory.schema.json",
+          "line": 3,
+          "kind": "documentation_or_data_reference"
+        }
+      ],
+      "note": "Current default-branch files reference the exact schema basename; this proves repository coupling, not runtime use.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "knowledge/observatory::consumer::hausKI",
+      "contract": "knowledge/observatory",
+      "role": "consumer",
+      "repository": "heimgewebe/hausKI",
+      "commit": "2b2e4496613c856993e028e360e76abea70c7028",
+      "status": "unverified",
+      "mode": "reference-only",
+      "files": [],
+      "evidence": [],
+      "note": "No exact reference to the schema basename was found in the audited default-branch commit.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "knowledge/observatory::consumer::heimlern",
+      "contract": "knowledge/observatory",
+      "role": "consumer",
+      "repository": "heimgewebe/heimlern",
+      "commit": "8dbebea6b253f9d2f41514a15d34e5166602e792",
+      "status": "unverified",
+      "mode": "reference-only",
+      "files": [],
+      "evidence": [],
+      "note": "No exact reference to the schema basename was found in the audited default-branch commit.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "knowledge/knowledge.observatory.published.v1::producer::semantAH",
+      "contract": "knowledge/knowledge.observatory.published.v1",
+      "role": "producer",
+      "repository": "heimgewebe/semantAH",
+      "commit": "c306e89105605778a382aa12c231f727c221cc74",
+      "status": "unverified",
+      "mode": null,
+      "files": [],
+      "evidence": [],
+      "note": "The producer relationship remains a review target and is not established by current repository evidence.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "knowledge/knowledge.observatory.published.v1::consumer::leitstand",
+      "contract": "knowledge/knowledge.observatory.published.v1",
+      "role": "consumer",
+      "repository": "heimgewebe/leitstand",
+      "commit": "a5df64b478f998973be7ba4ac2936d1d12ba3ed1",
+      "status": "unverified",
+      "mode": "reference-only",
+      "files": [],
+      "evidence": [],
+      "note": "No exact reference to the schema basename was found in the audited default-branch commit.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "knowledge/knowledge.observatory.published.v1::consumer::hausKI",
+      "contract": "knowledge/knowledge.observatory.published.v1",
+      "role": "consumer",
+      "repository": "heimgewebe/hausKI",
+      "commit": "2b2e4496613c856993e028e360e76abea70c7028",
+      "status": "verified",
+      "mode": "reference-only",
+      "files": [
+        "crates/core/src/events.rs",
+        "crates/core/src/events_tests.rs"
+      ],
+      "evidence": [
+        {
+          "path": "crates/core/src/events.rs",
+          "line": 297,
+          "kind": "executable_or_test_reference"
+        },
+        {
+          "path": "crates/core/src/events_tests.rs",
+          "line": 312,
+          "kind": "executable_or_test_reference"
+        }
+      ],
+      "note": "Current default-branch files reference the exact schema basename; this proves repository coupling, not runtime use.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "knowledge/knowledge.observatory.published.v1::consumer::plexer",
+      "contract": "knowledge/knowledge.observatory.published.v1",
+      "role": "consumer",
+      "repository": "heimgewebe/plexer",
+      "commit": "e1099df6ccf1763c7e235d844ff09b2728b24601",
+      "status": "unverified",
+      "mode": "notification-only",
+      "files": [],
+      "evidence": [],
+      "note": "No exact reference to the schema basename was found in the audited default-branch commit.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "os_context/state::consumer::mitschreiber",
+      "contract": "os_context/state",
+      "role": "consumer",
+      "repository": "heimgewebe/mitschreiber",
+      "commit": "3680bb7e14079c4b8ec3d0758605f7023ee11097",
+      "status": "verified",
+      "mode": "reference-only",
+      "files": [
+        ".github/workflows/validate.yml",
+        "docs/ci.md",
+        "docs/contracts.md",
+        "renovate.json"
+      ],
+      "evidence": [
+        {
+          "path": ".github/workflows/validate.yml",
+          "line": 38,
+          "kind": "ci_reference"
+        },
+        {
+          "path": "docs/ci.md",
+          "line": 29,
+          "kind": "documentation_or_data_reference"
+        },
+        {
+          "path": "docs/contracts.md",
+          "line": 7,
+          "kind": "documentation_or_data_reference"
+        },
+        {
+          "path": "renovate.json",
+          "line": 132,
+          "kind": "documentation_or_data_reference"
+        }
+      ],
+      "note": "Current default-branch files reference the exact schema basename; this proves repository coupling, not runtime use.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "os_context/text.embed::consumer::semantAH",
+      "contract": "os_context/text.embed",
+      "role": "consumer",
+      "repository": "heimgewebe/semantAH",
+      "commit": "c306e89105605778a382aa12c231f727c221cc74",
+      "status": "verified",
+      "mode": "reference-only",
+      "files": [
+        "crates/indexd/src/api.rs",
+        "scripts/observatory_mvp.py",
+        "IMPLEMENTATION_SUMMARY.md",
+        "contracts/os.context.text.embed.schema.json"
+      ],
+      "evidence": [
+        {
+          "path": "crates/indexd/src/api.rs",
+          "line": 290,
+          "kind": "executable_or_test_reference"
+        },
+        {
+          "path": "scripts/observatory_mvp.py",
+          "line": 155,
+          "kind": "executable_or_test_reference"
+        },
+        {
+          "path": "IMPLEMENTATION_SUMMARY.md",
+          "line": 12,
+          "kind": "documentation_or_data_reference"
+        },
+        {
+          "path": "contracts/os.context.text.embed.schema.json",
+          "line": 3,
+          "kind": "documentation_or_data_reference"
+        }
+      ],
+      "note": "Current default-branch files reference the exact schema basename; this proves repository coupling, not runtime use.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "policy/decision::producer::heimlern",
+      "contract": "policy/decision",
+      "role": "producer",
+      "repository": "heimgewebe/heimlern",
+      "commit": "8dbebea6b253f9d2f41514a15d34e5166602e792",
+      "status": "historical",
+      "mode": null,
+      "files": [
+        ".github/workflows/validate-policy-decisions.yml",
+        "scripts/validate_json.py",
+        "README.md",
+        "contracts/README.md"
+      ],
+      "evidence": [
+        {
+          "path": ".github/workflows/validate-policy-decisions.yml",
+          "line": 29,
+          "kind": "ci_reference"
+        },
+        {
+          "path": "scripts/validate_json.py",
+          "line": 75,
+          "kind": "executable_or_test_reference"
+        },
+        {
+          "path": "README.md",
+          "line": 94,
+          "kind": "documentation_or_data_reference"
+        },
+        {
+          "path": "contracts/README.md",
+          "line": 19,
+          "kind": "documentation_or_data_reference"
+        }
+      ],
+      "note": "The repository explicitly declares a historical-only role.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "policy/decision::consumer::heimlern",
+      "contract": "policy/decision",
+      "role": "consumer",
+      "repository": "heimgewebe/heimlern",
+      "commit": "8dbebea6b253f9d2f41514a15d34e5166602e792",
+      "status": "historical",
+      "mode": "reference-only",
+      "files": [
+        ".github/workflows/validate-policy-decisions.yml",
+        "scripts/validate_json.py",
+        "README.md",
+        "contracts/README.md"
+      ],
+      "evidence": [
+        {
+          "path": ".github/workflows/validate-policy-decisions.yml",
+          "line": 29,
+          "kind": "ci_reference"
+        },
+        {
+          "path": "scripts/validate_json.py",
+          "line": 75,
+          "kind": "executable_or_test_reference"
+        },
+        {
+          "path": "README.md",
+          "line": 94,
+          "kind": "documentation_or_data_reference"
+        },
+        {
+          "path": "contracts/README.md",
+          "line": 19,
+          "kind": "documentation_or_data_reference"
+        }
+      ],
+      "note": "The contract or its only implementation is historical; this claim is retained for audit, not active routing.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "policy/decision::consumer::hausKI",
+      "contract": "policy/decision",
+      "role": "consumer",
+      "repository": "heimgewebe/hausKI",
+      "commit": "2b2e4496613c856993e028e360e76abea70c7028",
+      "status": "historical",
+      "mode": "reference-only",
+      "files": [],
+      "evidence": [],
+      "note": "The contract or its only implementation is historical; this claim is retained for audit, not active routing.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "policy/feedback::producer::heimlern",
+      "contract": "policy/feedback",
+      "role": "producer",
+      "repository": "heimgewebe/heimlern",
+      "commit": "8dbebea6b253f9d2f41514a15d34e5166602e792",
+      "status": "historical",
+      "mode": null,
+      "files": [
+        ".github/workflows/rust.yml",
+        ".github/workflows/validate-feedback-schema.yml",
+        "scripts/validate_json.py",
+        "tests/validate_feedback_schema.py"
+      ],
+      "evidence": [
+        {
+          "path": ".github/workflows/rust.yml",
+          "line": 64,
+          "kind": "ci_reference"
+        },
+        {
+          "path": ".github/workflows/validate-feedback-schema.yml",
+          "line": 7,
+          "kind": "ci_reference"
+        },
+        {
+          "path": "scripts/validate_json.py",
+          "line": 77,
+          "kind": "executable_or_test_reference"
+        },
+        {
+          "path": "tests/validate_feedback_schema.py",
+          "line": 14,
+          "kind": "executable_or_test_reference"
+        }
+      ],
+      "note": "The repository explicitly declares a historical-only role.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "policy/feedback::consumer::heimlern",
+      "contract": "policy/feedback",
+      "role": "consumer",
+      "repository": "heimgewebe/heimlern",
+      "commit": "8dbebea6b253f9d2f41514a15d34e5166602e792",
+      "status": "historical",
+      "mode": "reference-only",
+      "files": [
+        ".github/workflows/rust.yml",
+        ".github/workflows/validate-feedback-schema.yml",
+        "scripts/validate_json.py",
+        "tests/validate_feedback_schema.py"
+      ],
+      "evidence": [
+        {
+          "path": ".github/workflows/rust.yml",
+          "line": 64,
+          "kind": "ci_reference"
+        },
+        {
+          "path": ".github/workflows/validate-feedback-schema.yml",
+          "line": 7,
+          "kind": "ci_reference"
+        },
+        {
+          "path": "scripts/validate_json.py",
+          "line": 77,
+          "kind": "executable_or_test_reference"
+        },
+        {
+          "path": "tests/validate_feedback_schema.py",
+          "line": 14,
+          "kind": "executable_or_test_reference"
+        }
+      ],
+      "note": "The contract or its only implementation is historical; this claim is retained for audit, not active routing.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "policy/snapshot::producer::heimlern",
+      "contract": "policy/snapshot",
+      "role": "producer",
+      "repository": "heimgewebe/heimlern",
+      "commit": "8dbebea6b253f9d2f41514a15d34e5166602e792",
+      "status": "historical",
+      "mode": null,
+      "files": [
+        "crates/heimlern-bandits/README.md",
+        "crates/heimlern-bandits/src/lib.rs",
+        "scripts/validate_json.py",
+        "Justfile"
+      ],
+      "evidence": [
+        {
+          "path": "crates/heimlern-bandits/README.md",
+          "line": 5,
+          "kind": "executable_or_test_reference"
+        },
+        {
+          "path": "crates/heimlern-bandits/src/lib.rs",
+          "line": 53,
+          "kind": "executable_or_test_reference"
+        },
+        {
+          "path": "scripts/validate_json.py",
+          "line": 6,
+          "kind": "executable_or_test_reference"
+        },
+        {
+          "path": "Justfile",
+          "line": 25,
+          "kind": "documentation_or_data_reference"
+        }
+      ],
+      "note": "The repository explicitly declares a historical-only role.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "policy/snapshot::consumer::heimlern",
+      "contract": "policy/snapshot",
+      "role": "consumer",
+      "repository": "heimgewebe/heimlern",
+      "commit": "8dbebea6b253f9d2f41514a15d34e5166602e792",
+      "status": "historical",
+      "mode": "reference-only",
+      "files": [
+        "crates/heimlern-bandits/README.md",
+        "crates/heimlern-bandits/src/lib.rs",
+        "scripts/validate_json.py",
+        "Justfile"
+      ],
+      "evidence": [
+        {
+          "path": "crates/heimlern-bandits/README.md",
+          "line": 5,
+          "kind": "executable_or_test_reference"
+        },
+        {
+          "path": "crates/heimlern-bandits/src/lib.rs",
+          "line": 53,
+          "kind": "executable_or_test_reference"
+        },
+        {
+          "path": "scripts/validate_json.py",
+          "line": 6,
+          "kind": "executable_or_test_reference"
+        },
+        {
+          "path": "Justfile",
+          "line": 25,
+          "kind": "documentation_or_data_reference"
+        }
+      ],
+      "note": "The contract or its only implementation is historical; this claim is retained for audit, not active routing.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "policy/heimlern.ingest.state.v1::producer::heimlern",
+      "contract": "policy/heimlern.ingest.state.v1",
+      "role": "producer",
+      "repository": "heimgewebe/heimlern",
+      "commit": "8dbebea6b253f9d2f41514a15d34e5166602e792",
+      "status": "historical",
+      "mode": null,
+      "files": [],
+      "evidence": [],
+      "note": "The repository explicitly declares a historical-only role.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "policy/heimlern.ingest.state.v1::consumer::heimlern",
+      "contract": "policy/heimlern.ingest.state.v1",
+      "role": "consumer",
+      "repository": "heimgewebe/heimlern",
+      "commit": "8dbebea6b253f9d2f41514a15d34e5166602e792",
+      "status": "historical",
+      "mode": "mirror",
+      "files": [],
+      "evidence": [],
+      "note": "The contract or its only implementation is historical; this claim is retained for audit, not active routing.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ],
+      "mirrorChecks": []
+    },
+    {
+      "id": "policy/heimlern.ingest.state.v1::consumer::leitstand",
+      "contract": "policy/heimlern.ingest.state.v1",
+      "role": "consumer",
+      "repository": "heimgewebe/leitstand",
+      "commit": "a5df64b478f998973be7ba4ac2936d1d12ba3ed1",
+      "status": "historical",
+      "mode": "reference-only",
+      "files": [],
+      "evidence": [],
+      "note": "The contract or its only implementation is historical; this claim is retained for audit, not active routing.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "policy/heimlern.ingest.state.v1::consumer::heimgeist",
+      "contract": "policy/heimlern.ingest.state.v1",
+      "role": "consumer",
+      "repository": "heimgewebe/heimgeist",
+      "commit": "2d657297e9875cf0ec12932b3391fc4c0d8a246a",
+      "status": "historical",
+      "mode": "reference-only",
+      "files": [],
+      "evidence": [],
+      "note": "The contract or its only implementation is historical; this claim is retained for audit, not active routing.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "heim-pc/state.index::producer::heim-pc",
+      "contract": "heim-pc/state.index",
+      "role": "producer",
+      "repository": "heimgewebe/heim-pc",
+      "commit": "140e84bc28d3b208a51e2edb1cb27c5946c38d49",
+      "status": "historical",
+      "mode": null,
+      "files": [],
+      "evidence": [],
+      "note": "The repository explicitly declares a historical-only role.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "heim-pc/state.index::consumer::heim-pc",
+      "contract": "heim-pc/state.index",
+      "role": "consumer",
+      "repository": "heimgewebe/heim-pc",
+      "commit": "140e84bc28d3b208a51e2edb1cb27c5946c38d49",
+      "status": "historical",
+      "mode": "mirror",
+      "files": [],
+      "evidence": [],
+      "note": "The contract or its only implementation is historical; this claim is retained for audit, not active routing.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ],
+      "mirrorChecks": []
+    },
+    {
+      "id": "heim-pc/state.repos::producer::heim-pc",
+      "contract": "heim-pc/state.repos",
+      "role": "producer",
+      "repository": "heimgewebe/heim-pc",
+      "commit": "140e84bc28d3b208a51e2edb1cb27c5946c38d49",
+      "status": "historical",
+      "mode": null,
+      "files": [],
+      "evidence": [],
+      "note": "The repository explicitly declares a historical-only role.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "heim-pc/state.repos::consumer::heim-pc",
+      "contract": "heim-pc/state.repos",
+      "role": "consumer",
+      "repository": "heimgewebe/heim-pc",
+      "commit": "140e84bc28d3b208a51e2edb1cb27c5946c38d49",
+      "status": "historical",
+      "mode": "mirror",
+      "files": [],
+      "evidence": [],
+      "note": "The contract or its only implementation is historical; this claim is retained for audit, not active routing.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ],
+      "mirrorChecks": []
+    },
+    {
+      "id": "heim-pc/state.uncertainties::producer::heim-pc",
+      "contract": "heim-pc/state.uncertainties",
+      "role": "producer",
+      "repository": "heimgewebe/heim-pc",
+      "commit": "140e84bc28d3b208a51e2edb1cb27c5946c38d49",
+      "status": "historical",
+      "mode": null,
+      "files": [],
+      "evidence": [],
+      "note": "The repository explicitly declares a historical-only role.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "heim-pc/state.uncertainties::consumer::heim-pc",
+      "contract": "heim-pc/state.uncertainties",
+      "role": "consumer",
+      "repository": "heimgewebe/heim-pc",
+      "commit": "140e84bc28d3b208a51e2edb1cb27c5946c38d49",
+      "status": "historical",
+      "mode": "mirror",
+      "files": [],
+      "evidence": [],
+      "note": "The contract or its only implementation is historical; this claim is retained for audit, not active routing.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ],
+      "mirrorChecks": []
+    },
+    {
+      "id": "heim-pc/state.insights::producer::heim-pc",
+      "contract": "heim-pc/state.insights",
+      "role": "producer",
+      "repository": "heimgewebe/heim-pc",
+      "commit": "140e84bc28d3b208a51e2edb1cb27c5946c38d49",
+      "status": "historical",
+      "mode": null,
+      "files": [],
+      "evidence": [],
+      "note": "The repository explicitly declares a historical-only role.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "heim-pc/state.insights::consumer::heim-pc",
+      "contract": "heim-pc/state.insights",
+      "role": "consumer",
+      "repository": "heimgewebe/heim-pc",
+      "commit": "140e84bc28d3b208a51e2edb1cb27c5946c38d49",
+      "status": "historical",
+      "mode": "mirror",
+      "files": [],
+      "evidence": [],
+      "note": "The contract or its only implementation is historical; this claim is retained for audit, not active routing.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ],
+      "mirrorChecks": []
+    },
+    {
+      "id": "heim-pc/state.drift::producer::heim-pc",
+      "contract": "heim-pc/state.drift",
+      "role": "producer",
+      "repository": "heimgewebe/heim-pc",
+      "commit": "140e84bc28d3b208a51e2edb1cb27c5946c38d49",
+      "status": "historical",
+      "mode": null,
+      "files": [],
+      "evidence": [],
+      "note": "The repository explicitly declares a historical-only role.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "heim-pc/state.drift::consumer::heim-pc",
+      "contract": "heim-pc/state.drift",
+      "role": "consumer",
+      "repository": "heimgewebe/heim-pc",
+      "commit": "140e84bc28d3b208a51e2edb1cb27c5946c38d49",
+      "status": "historical",
+      "mode": "mirror",
+      "files": [],
+      "evidence": [],
+      "note": "The contract or its only implementation is historical; this claim is retained for audit, not active routing.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ],
+      "mirrorChecks": []
+    },
+    {
+      "id": "heim-pc/config.zones::producer::heim-pc",
+      "contract": "heim-pc/config.zones",
+      "role": "producer",
+      "repository": "heimgewebe/heim-pc",
+      "commit": "140e84bc28d3b208a51e2edb1cb27c5946c38d49",
+      "status": "compatibility",
+      "mode": null,
+      "files": [
+        "scripts/validate_contracts.py"
+      ],
+      "evidence": [
+        {
+          "path": "scripts/validate_contracts.py",
+          "line": 97,
+          "kind": "executable_or_test_reference"
+        }
+      ],
+      "note": "The repository retains a compatibility or migration reference; active production is not established.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ]
+    },
+    {
+      "id": "heim-pc/config.zones::consumer::heim-pc",
+      "contract": "heim-pc/config.zones",
+      "role": "consumer",
+      "repository": "heimgewebe/heim-pc",
+      "commit": "140e84bc28d3b208a51e2edb1cb27c5946c38d49",
+      "status": "compatibility",
+      "mode": "mirror",
+      "files": [],
+      "evidence": [
+        {
+          "path": "scripts/validate_contracts.py",
+          "line": 97,
+          "kind": "executable_or_test_reference"
+        }
+      ],
+      "note": "The claim is retained as a bounded compatibility relationship and does not establish active runtime use.",
+      "doesNotEstablish": [
+        "runtime_use",
+        "runtime_health",
+        "semantic_correctness",
+        "future_compatibility"
+      ],
+      "mirrorChecks": []
+    }
+  ],
+  "doesNotEstablish": [
+    "runtime_use",
+    "runtime_health",
+    "semantic_correctness",
+    "producer_execution",
+    "delivery_success",
+    "complete_organization_coverage",
+    "merge_readiness"
+  ]
+}
