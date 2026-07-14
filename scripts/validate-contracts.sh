@@ -306,3 +306,12 @@ if ((${#fixtures[@]} > 0)); then
 else
   echo "No fixtures found under fixtures/"
 fi
+
+# Governance registry: validate lifecycle, provenance and evidence-bound producer/consumer claims.
+echo "::group::Validate contract consumer registry"
+if command -v uv > /dev/null 2>&1; then
+  uv run python scripts/contracts/validate_consumers.py
+else
+  python3 scripts/contracts/validate_consumers.py
+fi
+echo "::endgroup::"

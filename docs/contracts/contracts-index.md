@@ -1,17 +1,21 @@
 # Contracts-Index des Heimgewebes
 
-Dieses Dokument listet die wichtigsten und derzeit aktiv genutzten Daten-Contracts des Heimgewebes und verknüpft sie mit den jeweiligen Repositories.
+Dieses Dokument ist eine menschlich lesbare Orientierung über wichtige Contractfamilien. Es ist weder vollständig noch eine aktuelle Consumer- oder Runtime-Inventur.
 
-**Hinweis:** Dies ist ein kuratierter Einstiegspunkt, der keinen Anspruch auf Vollständigkeit erhebt, sondern die systemweit relevanten Contracts hervorhebt.
+Maschinenlesbare Quellen:
 
-Ziel:
+- Die von Metarepo veröffentlichten Shared-Contract-Bytes liegen unter `contracts/`.
+- `contracts/consumers.yaml` enthält Lifecycle, Ablösepfade und den überprüften Claimstatus.
+- `contracts/consumer-evidence.v1.json` bindet jeden Claim an exakte Repository-Commits und Pfade.
+- `scripts/contracts/validate_consumers.py` prüft die Bindung fail-closed.
 
-- ein **zentraler Blick** auf alle strukturbildenden Schemas,
-- klare Zuordnung: *welches Repo spricht welchen Contract*,
-- Grundlage für **Codegeneration**, **Validierung** und **Review-Automatisierung**.
+Ein `verified`-Claim belegt Repositorykopplung am auditierten Commit, nicht Live-Nutzung, Gesundheit oder Zustellung. `unverified`, `compatibility` und `historical` bleiben absichtlich sichtbar und dürfen nicht zu aktiver Wahrheit hochgestuft werden.
 
-Die Details der Schemas liegen immer in den jeweiligen Dateien (JSON-Schema, Protobuf, YAML).
-**Quelle der Wahrheit ist immer das jeweilige Repo, nicht dieses Dokument.**
+Ziel dieses Dokuments:
+
+- Contractfamilien verständlich einordnen,
+- auf die kanonischen Schema- und Evidenzdateien verweisen,
+- keine zweite Consumer- oder Runtime-Wahrheit erzeugen.
 
 ---
 

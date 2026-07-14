@@ -1,226 +1,632 @@
 ---
-# Maschinenlesbare Übersicht, welche Repos welche zentralen Heimgewebe-Contracts konsumieren.
-#
-# Grundprinzip:
-# - Alle hier referenzierten Schemas liegen kanonisch im metarepo unter ./contracts/.
-# - Consumer-Repos dürfen diese Schemas:
-#   - nur referenzieren (mode: reference-only), oder
-#   - 1:1 spiegeln (mode: mirror) mit CI-Driftcheck.
-#
-# Diese Datei ist bewusst einfach gehalten, damit sie später von Tools
-# (z. B. wgx oder heimgeist) ausgewertet werden kann.
-
+# Backward-compatible contract governance registry.
+# Existing category/contract/schema/consumers keys remain available.
+# lifecycle/status fields are governance claims bound to contracts/consumer-evidence.v1.json.
+# They do not establish runtime use, health, semantic correctness, or merge readiness.
 event_backbone:
   aussen.event:
     schema: contracts/aussen.event.schema.json
     consumers:
-      - repo: aussensensor
-        files:
-          - contracts/aussen.event.schema.json
-        mode: mirror
-      - repo: chronik
-        files: []
-        mode: reference-only
-
+    - repo: aussensensor
+      files:
+      - contracts/aussen.event.schema.json
+      mode: mirror
+      status: verified
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/event_backbone/aussen.event::consumer::aussensensor
+    - repo: chronik
+      files:
+      - .github/workflows/validate-aussen-fixtures.yml
+      - .github/workflows/validate-aussen.yml
+      - .ai-context.yml
+      - README.md
+      mode: reference-only
+      status: verified
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/event_backbone/aussen.event::consumer::chronik
+    lifecycle: active
+    last_verified: '2026-07-14T21:35:14+02:00'
+    replacement: null
+    status_reason: Reviewed against exact current default-branch commits for the declared repositories.
+    evidence_ref: contracts/consumer-evidence.v1.json#contracts/event_backbone/aussen.event
+    producers:
+    - repo: aussensensor
+      status: verified
+      files:
+      - .github/workflows/contracts-drift.yml
+      - .github/workflows/fixtures-validate.yml
+      - .github/workflows/validate-aussen-fixtures.yml
+      - .github/workflows/validate-aussen.yml
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/event_backbone/aussen.event::producer::aussensensor
   event.line:
     schema: contracts/event.line.schema.json
     consumers:
-      - repo: chronik
-        files: []
-        mode: reference-only
-      # Weitere Repos bei Bedarf ergänzen
-
+    - repo: chronik
+      files:
+      - README.md
+      - docs/event-contracts.md
+      mode: reference-only
+      status: verified
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/event_backbone/event.line::consumer::chronik
+    lifecycle: active
+    last_verified: '2026-07-14T21:35:14+02:00'
+    replacement: null
+    status_reason: Reviewed against exact current default-branch commits for the declared repositories.
+    evidence_ref: contracts/consumer-evidence.v1.json#contracts/event_backbone/event.line
+    producers:
+    - repo: chronik
+      status: unverified
+      files:
+      - README.md
+      - docs/event-contracts.md
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/event_backbone/event.line::producer::chronik
   heimgeist.insight:
     schema: contracts/events/heimgeist.insight.v1.schema.json
     consumers:
-      - repo: chronik
-        files: []
-        mode: reference-only
-      - repo: semantAH
-        files: []
-        mode: reference-only
-      - repo: leitstand
-        files: []
-        mode: reference-only
-
+    - repo: chronik
+      files:
+      - validation.py
+      - docs/heimgeist_spec.md
+      mode: reference-only
+      status: verified
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/event_backbone/heimgeist.insight::consumer::chronik
+    - repo: semantAH
+      files: []
+      mode: reference-only
+      status: unverified
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/event_backbone/heimgeist.insight::consumer::semantAH
+    - repo: leitstand
+      files: []
+      mode: reference-only
+      status: unverified
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/event_backbone/heimgeist.insight::consumer::leitstand
+    lifecycle: active
+    last_verified: '2026-07-14T21:35:14+02:00'
+    replacement: null
+    status_reason: Reviewed against exact current default-branch commits for the declared repositories.
+    evidence_ref: contracts/consumer-evidence.v1.json#contracts/event_backbone/heimgeist.insight
+    producers:
+    - repo: heimgeist
+      status: unverified
+      files:
+      - docs/specs/heimgeist-insight-v1.md
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/event_backbone/heimgeist.insight::producer::heimgeist
 fixtures:
   chronik-fixtures:
     schema: contracts/chronik-fixtures.schema.json
     consumers:
-      - repo: chronik
-        files: []
-        mode: reference-only
-
+    - repo: chronik
+      files:
+      - README.md
+      - docs/event-contracts.md
+      mode: reference-only
+      status: historical
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/fixtures/chronik-fixtures::consumer::chronik
+    lifecycle: historical
+    last_verified: '2026-07-14T21:35:14+02:00'
+    replacement: null
+    status_reason: The declared canonical schema path does not exist at the audited Metarepo commit; Chronik contains documentation
+      references only.
+    evidence_ref: contracts/consumer-evidence.v1.json#contracts/fixtures/chronik-fixtures
+    producers: []
 metrics:
   fleet.health:
     schema: contracts/fleet.health.schema.json
     consumers:
-      - repo: wgx
-        files: []
-        mode: reference-only
-      - repo: leitstand
-        files: []
-        mode: reference-only
-
+    - repo: wgx
+      files: []
+      mode: reference-only
+      status: unverified
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/metrics/fleet.health::consumer::wgx
+    - repo: leitstand
+      files:
+      - README.md
+      - docs/blueprints/leitstand_visualization.md
+      - docs/data-flow.md
+      mode: reference-only
+      status: verified
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/metrics/fleet.health::consumer::leitstand
+    lifecycle: active
+    last_verified: '2026-07-14T21:35:14+02:00'
+    replacement: null
+    status_reason: Reviewed against exact current default-branch commits for the declared repositories.
+    evidence_ref: contracts/consumer-evidence.v1.json#contracts/metrics/fleet.health
+    producers:
+    - repo: wgx
+      status: unverified
+      files: []
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/metrics/fleet.health::producer::wgx
 integrity:
   summary:
     schema: contracts/integrity.summary.schema.json
     consumers:
-      - repo: leitstand
-        files: []
-        mode: reference-only
-      - repo: wgx
-        files: []
-        mode: reference-only
-
+    - repo: leitstand
+      files: []
+      mode: reference-only
+      status: unverified
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/integrity/summary::consumer::leitstand
+    - repo: wgx
+      files: []
+      mode: reference-only
+      status: unverified
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/integrity/summary::consumer::wgx
+    lifecycle: active
+    last_verified: '2026-07-14T21:35:14+02:00'
+    replacement: null
+    status_reason: Reviewed against exact current default-branch commits for the declared repositories.
+    evidence_ref: contracts/consumer-evidence.v1.json#contracts/integrity/summary
+    producers:
+    - repo: semantAH
+      status: unverified
+      files: []
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/integrity/summary::producer::semantAH
 knowledge:
   insights.daily:
     schema: contracts/insights.daily.schema.json
     consumers:
-      - repo: semantAH
-        files: []
-        mode: reference-only
-      - repo: chronik
-        files: []
-        mode: reference-only
-      - repo: leitstand
-        files: []
-        mode: reference-only
-
-  insights.daily.published: # Deprecated alias
+    - repo: semantAH
+      files:
+      - .github/workflows/insights-daily-drift.yml
+      - .github/workflows/publish-insights-daily.yml
+      - scripts/diff_daily_insights.py
+      - scripts/export_daily_insights.py
+      mode: reference-only
+      status: verified
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/knowledge/insights.daily::consumer::semantAH
+    - repo: chronik
+      files:
+      - validation.py
+      - docs/insights.daily.schema.json
+      mode: reference-only
+      status: verified
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/knowledge/insights.daily::consumer::chronik
+    - repo: leitstand
+      files:
+      - README.md
+      - docs/blueprints/leitstand_visualization.md
+      - docs/data-flow.md
+      mode: reference-only
+      status: verified
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/knowledge/insights.daily::consumer::leitstand
+    lifecycle: active
+    last_verified: '2026-07-14T21:35:14+02:00'
+    replacement: null
+    status_reason: Reviewed against exact current default-branch commits for the declared repositories.
+    evidence_ref: contracts/consumer-evidence.v1.json#contracts/knowledge/insights.daily
+    producers:
+    - repo: semantAH
+      status: verified
+      files:
+      - .github/workflows/insights-daily-drift.yml
+      - .github/workflows/publish-insights-daily.yml
+      - scripts/diff_daily_insights.py
+      - scripts/export_daily_insights.py
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/knowledge/insights.daily::producer::semantAH
+  insights.daily.published:
     schema: contracts/events/insights.daily.published.v1.schema.json
     consumers: []
     mode: reference-only
-
+    lifecycle: compatibility
+    last_verified: '2026-07-14T21:35:14+02:00'
+    replacement: knowledge/insights.daily.published.v1
+    status_reason: Deprecated alias retained for readers that still address the old key; no consumers are declared.
+    evidence_ref: contracts/consumer-evidence.v1.json#contracts/knowledge/insights.daily.published
+    producers:
+    - repo: semantAH
+      status: compatibility
+      files: []
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/knowledge/insights.daily.published::producer::semantAH
   insights.daily.published.v1:
     schema: contracts/events/insights.daily.published.v1.schema.json
     consumers:
-      - repo: plexer
-        files: []
-        mode: notification-only
-      - repo: chronik
-        files: []
-        mode: reference-only
-      - repo: leitstand
-        files: []
-        mode: reference-only
-      - repo: hausKI
-        files: []
-        mode: reference-only
-
+    - repo: plexer
+      files: []
+      mode: notification-only
+      status: unverified
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/knowledge/insights.daily.published.v1::consumer::plexer
+    - repo: chronik
+      files: []
+      mode: reference-only
+      status: unverified
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/knowledge/insights.daily.published.v1::consumer::chronik
+    - repo: leitstand
+      files: []
+      mode: reference-only
+      status: unverified
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/knowledge/insights.daily.published.v1::consumer::leitstand
+    - repo: hausKI
+      files: []
+      mode: reference-only
+      status: unverified
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/knowledge/insights.daily.published.v1::consumer::hausKI
+    lifecycle: active
+    last_verified: '2026-07-14T21:35:14+02:00'
+    replacement: null
+    status_reason: Reviewed against exact current default-branch commits for the declared repositories.
+    evidence_ref: contracts/consumer-evidence.v1.json#contracts/knowledge/insights.daily.published.v1
+    producers:
+    - repo: semantAH
+      status: unverified
+      files: []
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/knowledge/insights.daily.published.v1::producer::semantAH
   observatory:
     schema: contracts/knowledge.observatory.schema.json
     consumers:
-      - repo: leitstand
-        files: []
-        mode: reference-only
-      - repo: hausKI
-        files: []
-        mode: reference-only
-      - repo: heimlern
-        files: []
-        mode: reference-only
-
+    - repo: leitstand
+      files:
+      - scripts/vendor-contracts.mjs
+      - vendor/contracts/_pin.json
+      - vendor/contracts/knowledge/observatory.schema.json
+      mode: reference-only
+      status: verified
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/knowledge/observatory::consumer::leitstand
+    - repo: hausKI
+      files: []
+      mode: reference-only
+      status: unverified
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/knowledge/observatory::consumer::hausKI
+    - repo: heimlern
+      files: []
+      mode: reference-only
+      status: unverified
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/knowledge/observatory::consumer::heimlern
+    lifecycle: active
+    last_verified: '2026-07-14T21:35:14+02:00'
+    replacement: null
+    status_reason: Reviewed against exact current default-branch commits for the declared repositories.
+    evidence_ref: contracts/consumer-evidence.v1.json#contracts/knowledge/observatory
+    producers:
+    - repo: semantAH
+      status: verified
+      files:
+      - .github/workflows/contracts-sync-guard.yml
+      - .github/workflows/knowledge-observatory-drift.yml
+      - .github/workflows/publish-knowledge-observatory.yml
+      - scripts/observatory_diff.py
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/knowledge/observatory::producer::semantAH
   knowledge.observatory.published.v1:
     schema: contracts/events/knowledge.observatory.published.v1.schema.json
     consumers:
-      - repo: leitstand
-        files: []
-        mode: reference-only
-      - repo: hausKI
-        files: []
-        mode: reference-only
-      - repo: plexer
-        files: []
-        mode: notification-only
-
+    - repo: leitstand
+      files: []
+      mode: reference-only
+      status: unverified
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/knowledge/knowledge.observatory.published.v1::consumer::leitstand
+    - repo: hausKI
+      files:
+      - crates/core/src/events.rs
+      - crates/core/src/events_tests.rs
+      mode: reference-only
+      status: verified
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/knowledge/knowledge.observatory.published.v1::consumer::hausKI
+    - repo: plexer
+      files: []
+      mode: notification-only
+      status: unverified
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/knowledge/knowledge.observatory.published.v1::consumer::plexer
+    lifecycle: active
+    last_verified: '2026-07-14T21:35:14+02:00'
+    replacement: null
+    status_reason: Reviewed against exact current default-branch commits for the declared repositories.
+    evidence_ref: contracts/consumer-evidence.v1.json#contracts/knowledge/knowledge.observatory.published.v1
+    producers:
+    - repo: semantAH
+      status: unverified
+      files: []
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/knowledge/knowledge.observatory.published.v1::producer::semantAH
 os_context:
   state:
     schema: contracts/os.context.state.schema.json
     consumers:
-      - repo: mitschreiber
-        files: []
-        mode: reference-only
-
+    - repo: mitschreiber
+      files:
+      - .github/workflows/validate.yml
+      - docs/ci.md
+      - docs/contracts.md
+      - renovate.json
+      mode: reference-only
+      status: verified
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/os_context/state::consumer::mitschreiber
+    lifecycle: active
+    last_verified: '2026-07-14T21:35:14+02:00'
+    replacement: null
+    status_reason: Reviewed against exact current default-branch commits for the declared repositories.
+    evidence_ref: contracts/consumer-evidence.v1.json#contracts/os_context/state
+    producers: []
   text.embed:
     schema: contracts/os.context.text.embed.schema.json
     consumers:
-      - repo: semantAH
-        files: []
-        mode: reference-only
-
+    - repo: semantAH
+      files:
+      - crates/indexd/src/api.rs
+      - scripts/observatory_mvp.py
+      - IMPLEMENTATION_SUMMARY.md
+      - contracts/os.context.text.embed.schema.json
+      mode: reference-only
+      status: verified
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/os_context/text.embed::consumer::semantAH
+    lifecycle: active
+    last_verified: '2026-07-14T21:35:14+02:00'
+    replacement: null
+    status_reason: Reviewed against exact current default-branch commits for the declared repositories.
+    evidence_ref: contracts/consumer-evidence.v1.json#contracts/os_context/text.embed
+    producers: []
 policy:
   decision:
     schema: contracts/policy.decision.schema.json
     consumers:
-      - repo: heimlern
-        files: []
-        mode: reference-only
-      - repo: hausKI
-        files: []
-        mode: reference-only
-
+    - repo: heimlern
+      files:
+      - .github/workflows/validate-policy-decisions.yml
+      - scripts/validate_json.py
+      - README.md
+      - contracts/README.md
+      mode: reference-only
+      status: historical
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/policy/decision::consumer::heimlern
+    - repo: hausKI
+      files: []
+      mode: reference-only
+      status: historical
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/policy/decision::consumer::hausKI
+    lifecycle: historical
+    last_verified: '2026-07-14T21:35:14+02:00'
+    replacement: null
+    status_reason: Heimlern is explicitly frozen as historical implementation and has no active product or operator role.
+    evidence_ref: contracts/consumer-evidence.v1.json#contracts/policy/decision
+    producers:
+    - repo: heimlern
+      status: historical
+      files:
+      - .github/workflows/validate-policy-decisions.yml
+      - scripts/validate_json.py
+      - README.md
+      - contracts/README.md
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/policy/decision::producer::heimlern
   feedback:
     schema: contracts/policy.feedback.schema.json
     consumers:
-      - repo: heimlern
-        files: []
-        mode: reference-only
-
+    - repo: heimlern
+      files:
+      - .github/workflows/rust.yml
+      - .github/workflows/validate-feedback-schema.yml
+      - scripts/validate_json.py
+      - tests/validate_feedback_schema.py
+      mode: reference-only
+      status: historical
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/policy/feedback::consumer::heimlern
+    lifecycle: historical
+    last_verified: '2026-07-14T21:35:14+02:00'
+    replacement: null
+    status_reason: Heimlern is explicitly frozen as historical implementation and has no active product or operator role.
+    evidence_ref: contracts/consumer-evidence.v1.json#contracts/policy/feedback
+    producers:
+    - repo: heimlern
+      status: historical
+      files:
+      - .github/workflows/rust.yml
+      - .github/workflows/validate-feedback-schema.yml
+      - scripts/validate_json.py
+      - tests/validate_feedback_schema.py
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/policy/feedback::producer::heimlern
   snapshot:
     schema: contracts/policy.snapshot.schema.json
     consumers:
-      - repo: heimlern
-        files: []
-        mode: reference-only
-
+    - repo: heimlern
+      files:
+      - crates/heimlern-bandits/README.md
+      - crates/heimlern-bandits/src/lib.rs
+      - scripts/validate_json.py
+      - Justfile
+      mode: reference-only
+      status: historical
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/policy/snapshot::consumer::heimlern
+    lifecycle: historical
+    last_verified: '2026-07-14T21:35:14+02:00'
+    replacement: null
+    status_reason: Heimlern is explicitly frozen as historical implementation and has no active product or operator role.
+    evidence_ref: contracts/consumer-evidence.v1.json#contracts/policy/snapshot
+    producers:
+    - repo: heimlern
+      status: historical
+      files:
+      - crates/heimlern-bandits/README.md
+      - crates/heimlern-bandits/src/lib.rs
+      - scripts/validate_json.py
+      - Justfile
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/policy/snapshot::producer::heimlern
   heimlern.ingest.state.v1:
     schema: contracts/heimlern.ingest.state.schema.json
     consumers:
-      - repo: heimlern
-        files: []
-        mode: mirror # Self-mirror: state is persisted and recovered by heimlern itself.
-      - repo: leitstand
-        files: []
-        mode: reference-only
-      - repo: heimgeist
-        files: []
-        mode: reference-only
-
+    - repo: heimlern
+      files: []
+      mode: mirror
+      status: historical
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/policy/heimlern.ingest.state.v1::consumer::heimlern
+    - repo: leitstand
+      files: []
+      mode: reference-only
+      status: historical
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/policy/heimlern.ingest.state.v1::consumer::leitstand
+    - repo: heimgeist
+      files: []
+      mode: reference-only
+      status: historical
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/policy/heimlern.ingest.state.v1::consumer::heimgeist
+    lifecycle: historical
+    last_verified: '2026-07-14T21:35:14+02:00'
+    replacement: null
+    status_reason: The ingest state belongs to the historical Heimlern implementation and has no verified current consumer.
+    evidence_ref: contracts/consumer-evidence.v1.json#contracts/policy/heimlern.ingest.state.v1
+    producers:
+    - repo: heimlern
+      status: historical
+      files: []
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/policy/heimlern.ingest.state.v1::producer::heimlern
 heim-pc:
   state.index:
     schema: contracts/heim-pc/state/heim-pc.state.index.schema.json
     consumers:
-      - repo: heim-pc
-        files: []
-        mode: mirror
+    - repo: heim-pc
+      files: []
+      mode: mirror
+      status: historical
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/heim-pc/state.index::consumer::heim-pc
+    lifecycle: historical
+    last_verified: '2026-07-14T21:35:14+02:00'
+    replacement: null
+    status_reason: The current heim-pc operator-entry contract excludes state/index.json as current truth.
+    evidence_ref: contracts/consumer-evidence.v1.json#contracts/heim-pc/state.index
+    producers:
+    - repo: heim-pc
+      status: historical
+      files: []
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/heim-pc/state.index::producer::heim-pc
   state.repos:
     schema: contracts/heim-pc/state/heim-pc.state.repos.schema.json
     consumers:
-      - repo: heim-pc
-        files: []
-        mode: mirror
+    - repo: heim-pc
+      files: []
+      mode: mirror
+      status: historical
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/heim-pc/state.repos::consumer::heim-pc
+    lifecycle: historical
+    last_verified: '2026-07-14T21:35:14+02:00'
+    replacement: null
+    status_reason: The current heim-pc operator-entry contract excludes state/repos.json as current truth.
+    evidence_ref: contracts/consumer-evidence.v1.json#contracts/heim-pc/state.repos
+    producers:
+    - repo: heim-pc
+      status: historical
+      files: []
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/heim-pc/state.repos::producer::heim-pc
   state.uncertainties:
     schema: contracts/heim-pc/state/heim-pc.state.uncertainties.schema.json
     consumers:
-      - repo: heim-pc
-        files: []
-        mode: mirror
+    - repo: heim-pc
+      files: []
+      mode: mirror
+      status: historical
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/heim-pc/state.uncertainties::consumer::heim-pc
+    lifecycle: historical
+    last_verified: '2026-07-14T21:35:14+02:00'
+    replacement: null
+    status_reason: No current repository reference to this schema was found in the audited heim-pc main commit.
+    evidence_ref: contracts/consumer-evidence.v1.json#contracts/heim-pc/state.uncertainties
+    producers:
+    - repo: heim-pc
+      status: historical
+      files: []
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/heim-pc/state.uncertainties::producer::heim-pc
   state.insights:
     schema: contracts/heim-pc/state/heim-pc.state.insights.schema.json
     consumers:
-      - repo: heim-pc
-        files: []
-        mode: mirror
+    - repo: heim-pc
+      files: []
+      mode: mirror
+      status: historical
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/heim-pc/state.insights::consumer::heim-pc
+    lifecycle: historical
+    last_verified: '2026-07-14T21:35:14+02:00'
+    replacement: null
+    status_reason: No current repository reference to this schema was found in the audited heim-pc main commit.
+    evidence_ref: contracts/consumer-evidence.v1.json#contracts/heim-pc/state.insights
+    producers:
+    - repo: heim-pc
+      status: historical
+      files: []
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/heim-pc/state.insights::producer::heim-pc
   state.drift:
     schema: contracts/heim-pc/state/heim-pc.state.drift.schema.json
     consumers:
-      - repo: heim-pc
-        files: []
-        mode: mirror
+    - repo: heim-pc
+      files: []
+      mode: mirror
+      status: historical
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/heim-pc/state.drift::consumer::heim-pc
+    lifecycle: historical
+    last_verified: '2026-07-14T21:35:14+02:00'
+    replacement: null
+    status_reason: No current repository reference to this schema was found in the audited heim-pc main commit.
+    evidence_ref: contracts/consumer-evidence.v1.json#contracts/heim-pc/state.drift
+    producers:
+    - repo: heim-pc
+      status: historical
+      files: []
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/heim-pc/state.drift::producer::heim-pc
   config.zones:
     schema: contracts/heim-pc/config/zones.schema.json
     consumers:
-      - repo: heim-pc
-        files: []
-        mode: mirror
+    - repo: heim-pc
+      files: []
+      mode: mirror
+      status: compatibility
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/heim-pc/config.zones::consumer::heim-pc
+    lifecycle: compatibility
+    last_verified: '2026-07-14T21:35:14+02:00'
+    replacement: null
+    status_reason: Advalidator reference remains in heim-pc, but the registry does not establish an active runtime data flow.
+    evidence_ref: contracts/consumer-evidence.v1.json#contracts/heim-pc/config.zones
+    producers:
+    - repo: heim-pc
+      status: compatibility
+      files:
+      - scripts/validate_contracts.py
+      last_verified: '2026-07-14T21:35:14+02:00'
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/heim-pc/config.zones::producer::heim-pc
