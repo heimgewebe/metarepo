@@ -1,49 +1,98 @@
-# AGENTS.md — Codex Leitfaden (Metarepo ↔ Sub-Repos)
+# AGENTS.md — Metarepo
 
-## Ziel
-Metarepo dient als zentraler, lernender Meta-Layer. Es spiegelt **kanonische Templates** (Workflows, Justfile, Docs, WGX-Profile) in Sub-Repos und **zieht Verbesserungen** aus Sub-Repos zurück (dialektisches Lernen).
+## Kanonischer Einstieg
 
-## Repos
-- GitHub Organisation: `heimgewebe`
-- Alle Repos öffentlich, außer `vault-privat`.
-- Primäre Kinder: `weltgewebe`, `hausKI`, `hausKI-audio`, `semantAH`, `wgx`, `metarepo`, `chronik`, `aussensensor`, `heimlern`, `lenskit`
+Lies vor jeder Änderung:
 
-## Rollen
-- **Metarepo**: Quelle der Wahrheit für Templates unter `templates/**`.
-- **Sub-Repo**: Darf Templates verbessern → Codex extrahiert Delta, prüft, kuratiert, hebelt ins Metarepo hoch.
+1. [`system/metarepo-role.v1.json`](system/metarepo-role.v1.json)
+2. [`.ai-context.yml`](.ai-context.yml)
+3. den Live-Zustand von Branch, Worktrees, Leases, PRs und CI
 
-## Policies
-- Keine Geheimnisse/Secrets in Templates.
-- Einheitliche Pfade:
-  - Workflows: `.github/workflows/*.yml`
-  - WGX-Profil: `.wgx/profile.yml`
-  - Docs: `docs/**`, inkl. `docs/wgx-konzept.md`, ADR Template `docs/adrs/0000-template.md`
-  - Justfile: `Justfile`
-- Änderungen laufen über PRs mit **Reconciliation Report**.
-- Commit-Konvention (empfohlen):
-  - `chore(templates): sync from <repo>@<sha>: <pattern>`
-  - `feat(templates): adopt upgraded ADR template from <repo>@<sha>`
+Der Rollenvertrag ist normativ. README und dieser Leitfaden erklären ihn nur.
 
-## Haupt-Tasks
-1) **Pull-Lernen**: Ausgewählte Patterns aus Sub-Repo nach `metarepo/templates/**` ziehen.
-2) **Drift-Check**: Unterschiede zwischen Metarepo-Template und Ziel-Repo prüfen.
-3) **Reconcile**: Gewinnerregeln anwenden (Kanonik schlägt lokal, außer „im Feld“ verbesserte Qualität → kuratieren → Kanon updaten).
-4) **Push/PR**: Aktualisierte Templates in Sub-Repos spiegeln.
+## Aufgabe des Repositories
 
-## Tooling
-- `scripts/sync-templates.sh` — bidirektional (pull/push), Filter über `--pattern`.
-- `scripts/wgx-doctor` — Drift-Meter + Reconciliation Report (Markdown unter `reports/`).
-- **Owner-Parameter**: `GITHUB_OWNER` oder `--owner` setzen, z. B. `export GITHUB_OWNER=org && ./scripts/wgx-doctor --repo X --owner-from-env` bzw. `./scripts/sync-templates.sh --push-to X --owner org`.
+Metarepo verwaltet vier gemeinsame Lieferbereiche:
 
-## Sicherheitsmodus
-- Kein Commit ohne Diff-Vorschau.
-- NV: Red-Flag, wenn Datei „funktional“ (z. B. produktiver Code) und nicht im Template-Set → nie überschreiben.
+- Fleet-Mitgliedschaft in `fleet/repos.yml`
+- versionierte Contracts unter `contracts/`
+- kuratierte Templates unter `templates/`
+- wiederverwendbare CI-Workflows unter `.github/workflows/`
 
-## Standard-Befehle
-- Pull Lernen: `./scripts/sync-templates.sh --pull-from <repo> --pattern "<glob>"`
-- Push Kanon: `./scripts/sync-templates.sh --push-to <repo> --pattern "<glob>"`
-- Drift Report: `./scripts/wgx-doctor --repo <repo> --patterns "<glob1>,<glob2>"`
+Metarepo ist keine Control Plane und kein vollständiger Systemkatalog.
 
-## WGX
-- WGX ist dünner Meta-Layer; Standardkommandos: `wgx up|list|run|doctor|validate|smoke`.
-- `.wgx/profile.yml` spiegelt Service-Topologie, Envs-Prio: Devcontainer → Devbox → mise/direnv → Termux.
+## Getrennte Wahrheitsquellen
+
+- **Systemkatalog:** Systemzwecke, Beziehungen, Zuständigkeitsgrenzen und Einstiegspunkte
+- **Bureau:** Aufgaben, Queue, Verifikation und Abschluss
+- **Grabowski:** operative Ausführung, Rechnerzugriff, Leases, Audit und Recovery
+- **Chronik:** zeitliche Ereignis- und Änderungsgeschichte
+- **jeweiliger Dienst:** eigene Laufzeitgesundheit
+
+Diese Informationen nicht im Metarepo nachbauen oder aus Legacy-Dokumenten ableiten.
+
+## Änderungsregeln
+
+### Fleet
+
+- `fleet/repos.yml` ist normativ.
+- `repos.yml` ist eine nicht normative Legacy-Fläche.
+- Fleet-Mitgliedschaft bedeutet nicht automatisch Zugehörigkeit zum gesamten Operator-Ökosystem.
+- Repositories nur nach expliziten Aufnahmekriterien ergänzen oder entfernen.
+
+### Contracts
+
+Vor jeder Contract-Änderung:
+
+1. Producer und Consumer live bestimmen.
+2. Kompatibilität und Versionierung bewerten.
+3. Fixtures sowie Producer- und Consumer-Tests ausführen.
+4. Breaking Changes mit Migrations- und Entfernungskriterium versehen.
+
+### Templates und reusable Workflows
+
+- Aktive organisationsweite Consumer vor Änderung oder Entfernung suchen.
+- Lokale Abweichungen nicht blind überschreiben.
+- Verbesserungen aus Consumer-Repositories erst prüfen und kuratieren.
+- Rollouts über getrennte PRs mit Drift- und Consumerbelegen durchführen.
+- Externe Actions pinnen; bestehende Pinning-Policy beachten.
+
+## Legacy- und Kompatibilitätsflächen
+
+Folgende Pfade sind nicht Teil der normativen Rolle:
+
+- `repos.yml`
+- `wgx/`
+- `servers/local-mcp/`
+
+Der Workflow `.github/workflows/heimgewebe-command-dispatch.yml` ist weiterhin eine aktive Kompatibilitätsfläche. Keine dieser Flächen ohne vollständige Consumerinventur und grünen Migrations-Readback entfernen.
+
+Die früheren Organismus- und Zielbilddokumente sind keine aktuelle Architekturwahrheit. Ihre Historisierung erfolgt gesondert.
+
+## Sicherheits- und Arbeitsmodus
+
+- Fremde Dirty-States, Worktrees, Branches, Prozesse und Leases nie resetten oder übernehmen.
+- Änderungen in einem isolierten, sauberen Worktree ausführen.
+- Vor nichttrivialem Merge vollständigen Diff bereitstellen und an Head sowie Diff-SHA-256 binden.
+- Kein Shared Asset ohne belegte Consumer-Auswirkung mergen.
+- Keine Secrets in Templates, Fixtures, Reports oder Workflow-Ausgaben schreiben.
+
+## Prüfungen
+
+```bash
+just validate
+just contracts-validate
+python3 -m pytest tests/test_metarepo_role_contract.py
+```
+
+Für Template- und Fleet-Arbeit zusätzlich die betroffenen Drift-, WGX- und Consumer-Checks ausführen.
+
+## Bestehendes Tooling
+
+```bash
+./scripts/sync-templates.sh --pull-from <repo> --pattern "<glob>"
+./scripts/sync-templates.sh --push-to <repo> --pattern "<glob>"
+./scripts/wgx-doctor --repo <repo> --patterns "<glob1>,<glob2>"
+```
+
+Diese Werkzeuge begründen keine Wahrheit außerhalb der im Rollenvertrag genannten Bereiche.

@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "kind": "metarepo_role",
+  "id": "repo:metarepo",
+  "status": "active",
+  "purpose": "Versionierte Quelle für Fleet-Mitgliedschaft, gemeinsame Contracts, Templates und wiederverwendbare CI-Workflows.",
+  "owns": [
+    {
+      "domain": "fleet_membership",
+      "authoritative_source": "fleet/repos.yml",
+      "scope": "Mitgliedschaft in der gemeinsam verwalteten Metarepo-Fleet, nicht das vollständige Operator-Ökosystem."
+    },
+    {
+      "domain": "shared_contracts",
+      "authoritative_source": "contracts/",
+      "scope": "Im Metarepo veröffentlichte, versionierte Daten- und Workflowverträge."
+    },
+    {
+      "domain": "shared_templates",
+      "authoritative_source": "templates/",
+      "scope": "Kuratierte Vorlagen, die ausdrücklich für mehrere Consumer-Repositories bestimmt sind."
+    },
+    {
+      "domain": "reusable_workflows",
+      "authoritative_source": ".github/workflows/",
+      "scope": "Als reusable workflow veröffentlichte CI-Bausteine und ihre Kompatibilitätsverträge."
+    }
+  ],
+  "does_not_own": [
+    {
+      "domain": "ecosystem_system_catalog",
+      "owner": "repo:systemkatalog",
+      "reason": "Systemzwecke, Beziehungen, Zuständigkeitsgrenzen und Einstiegspunkte gehören in den Systemkatalog."
+    },
+    {
+      "domain": "task_and_completion_truth",
+      "owner": "repo:bureau",
+      "reason": "Aufgabenstatus, Queue, Verifikation und Abschlusswahrheit gehören ins Bureau."
+    },
+    {
+      "domain": "operator_execution",
+      "owner": "repo:grabowski",
+      "reason": "Rechnerzugriff, Leases, Audit, Recovery und operative Ausführung gehören zu Grabowski."
+    },
+    {
+      "domain": "runtime_health",
+      "owner": "responsible_runtime",
+      "reason": "Laufzeitgesundheit wird vom jeweiligen Dienst und seinen Beobachtungsflächen belegt."
+    },
+    {
+      "domain": "ecosystem_history",
+      "owner": "repo:chronik",
+      "reason": "Zeitliche Ereignis- und Änderungsgeschichte gehört in Chronik, nicht in ein zweites Statusmodell."
+    }
+  ],
+  "interfaces": {
+    "consumes": [
+      {
+        "name": "system_catalog_references",
+        "owner": "repo:systemkatalog"
+      },
+      {
+        "name": "consumer_usage_evidence",
+        "source": "Repository- und GitHub-Caller-Scans"
+      },
+      {
+        "name": "fleet_tooling",
+        "owner": "repo:wgx"
+      }
+    ],
+    "produces": [
+      "fleet_membership",
+      "shared_contracts",
+      "shared_templates",
+      "reusable_workflows"
+    ]
+  },
+  "compatibility_surfaces": [
+    {
+      "path": "repos.yml",
+      "status": "legacy_active",
+      "authoritative": false,
+      "target_state": "generated_projection_of:fleet/repos.yml",
+      "removal_gate": "Alle aktiven Tooling-Consumer lesen fleet/repos.yml oder eine nachweislich generierte Projektion."
+    },
+    {
+      "path": "wgx/",
+      "status": "legacy_active",
+      "authoritative": false,
+      "replacement_owner": "repo:wgx",
+      "removal_gate": "Lokale Metarepo-Aufrufe sind auf das kanonische WGX umgestellt und Consumer-Tests sind grün."
+    },
+    {
+      "path": "servers/local-mcp/",
+      "status": "legacy_review",
+      "authoritative": false,
+      "replacement_owner": "repo:grabowski",
+      "removal_gate": "Lokale IDE-Verbraucher sind inventarisiert und ein benötigter Restumfang ist explizit begründet."
+    },
+    {
+      "path": ".github/workflows/heimgewebe-command-dispatch.yml",
+      "status": "compatibility_active",
+      "authoritative": false,
+      "removal_gate": "Alle organisationsweiten Caller sind auf einen aktuellen, auditierbaren Dispatchpfad migriert."
+    }
+  ],
+  "non_authoritative_legacy_documents": [
+    "docs/system/heimgewebe-organismus.md",
+    "docs/system/heimgewebe-zielbild.md",
+    "docs/system/architecture.md",
+    "docs/heimgewebe-organismus.md",
+    "docs/heimgewebe-zielbild.md"
+  ],
+  "invariants": [
+    "Metarepo darf nicht als Control Plane oder Quelle der gesamten Systemarchitektur bezeichnet werden.",
+    "Fleet-Mitgliedschaft ist nicht gleichbedeutend mit Zugehörigkeit zum vollständigen Operator-Ökosystem.",
+    "Shared Assets werden erst nach belegter Consumer-Auswirkung geändert oder entfernt.",
+    "README.md, .ai-context.yml und AGENTS.md müssen auf diesen Rollenvertrag verweisen und dieselben Wahrheitsgrenzen ausdrücken.",
+    "Legacy- und Kompatibilitätsflächen bleiben ausdrücklich nicht normativ, solange ihre Ablösung nicht verifiziert ist."
+  ],
+  "entrypoints": {
+    "human": "README.md",
+    "agent": ".ai-context.yml",
+    "operator_guidance": "AGENTS.md",
+    "normative_role_contract": "system/metarepo-role.v1.json"
+  },
+  "verification": {
+    "last_verified_at": "2026-07-14",
+    "last_verified_against_commit": "4777fd5cfafea22813f9c3d647b33a0ffefd994b",
+    "evidence_scope": [
+      "metarepo origin/main",
+      "systemkatalog role projection",
+      "organisation-wide reusable-workflow caller search"
+    ],
+    "does_not_establish": [
+      "vollständige lokale IDE-Nutzung von servers/local-mcp",
+      "Entfernbarkeit einer Compatibility Surface ohne Consumer-Migration"
+    ]
+  }
+}
