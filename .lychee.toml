@@ -1,6 +1,6 @@
 verbose = "info"
 no_progress = true
-include_fragments = true
+include_fragments = "full"
 accept = [200, 204, 301, 302, 303, 307, 308, 503]
 timeout = 30
 max_redirects = 5
