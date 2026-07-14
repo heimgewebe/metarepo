@@ -9,12 +9,14 @@ permissions:
     paths:
       - README.md
       - docs/**
+      - contracts/**/*.md
       - .lychee.toml
       - .github/workflows/linkcheck.yml
   pull_request:
     paths:
       - README.md
       - docs/**
+      - contracts/**/*.md
       - .lychee.toml
       - .github/workflows/linkcheck.yml
 defaults:
@@ -29,15 +31,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      # Für Core-Actions nutzen wir stabile Major-Tags statt SHAs, um 404-Risiken zu vermeiden.
-      - uses: actions/checkout@v7  # v7 (major tag)
-      - name: Install lychee
-        run: |
-          chmod +x scripts/tools/lychee-pin.sh
-          ./scripts/tools/lychee-pin.sh ensure
-          echo "${PWD}/tools/bin" >> "$GITHUB_PATH"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
+        with:
+          persist-credentials: false
+
       - name: Cache lychee URL state
         uses: actions/cache@v6  # v6 (major tag)
         with:
@@ -45,8 +43,12 @@ jobs:
           key: ${{ runner.os }}-lychee-${{ hashFiles('.lychee.toml', 'README.md', 'docs/**/*.md', 'contracts/**/*.md') }}
           restore-keys: |
             ${{ runner.os }}-lychee-
-      - name: Run lychee on docs & README (uses .lychee.toml)
-        run: lychee --config .lychee.toml README.md 'docs/**/*.md' 'contracts/**/*.md'
+
+      - name: Run lychee on docs and README
+        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8  # v2.9.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           LYCHEE_CACHE_DIR: ~/.cache/lychee
+        with:
+          args: --config .lychee.toml README.md 'docs/**/*.md' 'contracts/**/*.md'
+          fail: true
