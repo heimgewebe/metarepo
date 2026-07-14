@@ -4,6 +4,7 @@ import hashlib
 import os
 import shutil
 import subprocess
+import sys
 import tarfile
 from pathlib import Path
 
@@ -12,6 +13,8 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "tools" / "actionlint-pin.sh"
 SEMVER = ROOT / "scripts" / "lib" / "semver.sh"
+BASH = shutil.which("bash")
+assert BASH is not None
 
 
 def _write_executable(path: Path, content: str) -> None:
@@ -33,7 +36,7 @@ def _fixture(tmp_path: Path, *, checksum_mode: str = "valid") -> tuple[Path, Pat
     actionlint = payload / "actionlint"
     _write_executable(
         actionlint,
-        "#!/usr/bin/env sh\n"
+        "#!/bin/sh\n"
         'if [ "${1:-}" = "-version" ]; then printf "1.7.5\\n"; exit 0; fi\n'
         'exit 0\n',
     )
@@ -46,7 +49,7 @@ def _fixture(tmp_path: Path, *, checksum_mode: str = "valid") -> tuple[Path, Pat
     fakebin.mkdir()
     _write_executable(
         fakebin / "uname",
-        "#!/usr/bin/env sh\n"
+        "#!/bin/sh\n"
         'case "${1:-}" in -s) printf "Linux\\n";; -m) printf "x86_64\\n";; *) exit 2;; esac\n',
     )
     curl_log = tmp_path / "curl.log"
@@ -70,7 +73,7 @@ def _fixture(tmp_path: Path, *, checksum_mode: str = "valid") -> tuple[Path, Pat
     else:
         raise AssertionError(checksum_mode)
 
-    curl_script = f"""#!/usr/bin/env python3
+    curl_script = f"""#!{sys.executable}
 import pathlib
 import shutil
 import sys
@@ -88,14 +91,35 @@ else:
     shutil.copyfile({str(archive)!r}, out)
 """
     _write_executable(fakebin / "curl", curl_script)
+    required_commands = (
+        "awk",
+        "dirname",
+        "grep",
+        "gzip",
+        "head",
+        "install",
+        "ln",
+        "mkdir",
+        "mktemp",
+        "mv",
+        "rm",
+        "sed",
+        "sha256sum",
+        "tar",
+        "tr",
+    )
+    for command in required_commands:
+        source = shutil.which(command)
+        assert source is not None, command
+        (fakebin / command).symlink_to(source)
     return repo, fakebin
 
 
 def _run(repo: Path, fakebin: Path) -> subprocess.CompletedProcess[str]:
     env = os.environ.copy()
-    env["PATH"] = f"{fakebin}:{env['PATH']}"
+    env["PATH"] = str(fakebin)
     return subprocess.run(
-        ["bash", "scripts/tools/actionlint-pin.sh", "ensure"],
+        [BASH, "scripts/tools/actionlint-pin.sh", "ensure"],
         cwd=repo,
         env=env,
         text=True,
@@ -137,6 +161,7 @@ def test_checksum_failures_block_installation(tmp_path: Path, mode: str, message
     assert result.returncode != 0
     assert message in result.stderr
     assert not (repo / "tools" / "bin" / "actionlint").exists()
+
 
 def test_checksum_failure_preserves_existing_binary(tmp_path: Path) -> None:
     repo, fakebin = _fixture(tmp_path, checksum_mode="mismatch")
