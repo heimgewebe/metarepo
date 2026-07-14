@@ -73,10 +73,12 @@ download_tool() {
   local checksum_base="https://github.com/rhysd/actionlint/releases/download/${req_version_raw}"
 
   ensure_dir
-  local tmp_bin tmp_checksum
+  local tmp_bin tmp_checksum tmp_extract tmp_target
   tmp_bin="$(mktemp)"
   tmp_checksum="$(mktemp)"
-  trap 'rm -f -- "${tmp_bin-}" "${tmp_checksum-}" 2>/dev/null || true' EXIT
+  tmp_extract="$(mktemp -d)"
+  tmp_target="$(mktemp "${BIN_DIR}/.${TOOL_NAME}.tmp.XXXXXX")"
+  trap 'rm -rf -- "${tmp_bin-}" "${tmp_checksum-}" "${tmp_extract-}" "${tmp_target-}" 2>/dev/null || true' EXIT
 
   log "Downloading actionlint from ${url}"
   log "Version: ${req_version_raw}, Target: ${target}, Filename: ${filename}"
@@ -90,57 +92,51 @@ download_tool() {
     die "Download fehlgeschlagen: ${url}"
   fi
 
-  local checksum_candidates=("checksums.txt" "checksums" "SHA256SUMS")
-  local checksum_found=false
+  local checksum_filename="${TOOL_NAME}_${ver_numeric}_checksums.txt"
+  local checksum_url="${checksum_base}/${checksum_filename}"
 
-  for cand in "${checksum_candidates[@]}"; do
-    local c_url="${checksum_base}/${cand}"
-    log "Versuche Checksummen von ${c_url}..."
-    if curl -fSL --retry 3 --connect-timeout 10 "${c_url}" -o "${tmp_checksum}"; then
-      log "Checksummen geladen: ${cand}"
-      checksum_found=true
-      break
-    fi
-  done
-
-  if $checksum_found; then
-    log "Verifiziere Checksumme..."
-    local expected_sum
-    expected_sum=$(grep "${filename}$" "${tmp_checksum}" | awk '{print $1}' || true)
-
-    if [[ -z "${expected_sum}" ]]; then
-      log "WARN: Keine Checksumme für ${filename} gefunden."
-    else
-      local actual_sum
-      if have_cmd sha256sum; then
-        actual_sum=$(sha256sum "${tmp_bin}" | awk '{print $1}')
-      elif have_cmd shasum; then
-        actual_sum=$(shasum -a 256 "${tmp_bin}" | awk '{print $1}')
-      elif have_cmd python3; then
-        log "Using Python3 fallback for SHA256 checksum..."
-        actual_sum=$(python3 -c "import hashlib; print(hashlib.sha256(open('${tmp_bin}', 'rb').read()).hexdigest())")
-      elif have_cmd python; then
-        log "Using Python fallback for SHA256 checksum..."
-        actual_sum=$(python -c "import hashlib; print(hashlib.sha256(open('${tmp_bin}', 'rb').read()).hexdigest())")
-      else
-        log "WARN: No checksum tool (sha256sum, shasum, python) available - skipping checksum verification."
-        actual_sum=""
-      fi
-
-      if [[ -n "${actual_sum}" ]]; then
-        if [[ "${expected_sum}" != "${actual_sum}" ]]; then
-          die "Checksum-Fehler! Erwartet: ${expected_sum}, Ist: ${actual_sum}"
-        fi
-        log "Checksumme OK: ${actual_sum}"
-      fi
-    fi
-  else
-    log "WARN: Konnte keine Checksummen-Datei laden. Überspringe Verifikation."
+  log "Lade offizielle Prüfsummen von ${checksum_url}..."
+  if ! curl -fSL --retry 3 --connect-timeout 10 "${checksum_url}" -o "${tmp_checksum}"; then
+    die "Prüfsummen-Download fehlgeschlagen: ${checksum_url}"
   fi
 
-  tar -xzf "${tmp_bin}" -C "${BIN_DIR}" actionlint
-  chmod +x "${TOOL_LOCAL}" || true
-  log "${TOOL_NAME} erfolgreich installiert."
+  local checksum_matches expected_sum actual_sum
+  checksum_matches=$(awk -v expected="${filename}" '$2 == expected { count += 1 } END { print count + 0 }' "${tmp_checksum}")
+  if [[ "${checksum_matches}" != "1" ]]; then
+    die "Prüfsummen-Datei muss genau einen Eintrag für ${filename} enthalten; gefunden: ${checksum_matches}"
+  fi
+  expected_sum=$(awk -v expected="${filename}" '$2 == expected { print $1 }' "${tmp_checksum}")
+  if [[ ! "${expected_sum}" =~ ^[0-9a-fA-F]{64}$ ]]; then
+    die "Ungültige SHA-256-Prüfsumme für ${filename}: ${expected_sum}"
+  fi
+  expected_sum="$(printf '%s' "${expected_sum}" | tr '[:upper:]' '[:lower:]')"
+
+  if have_cmd sha256sum; then
+    actual_sum=$(sha256sum "${tmp_bin}" | awk '{print $1}')
+  elif have_cmd shasum; then
+    actual_sum=$(shasum -a 256 "${tmp_bin}" | awk '{print $1}')
+  elif have_cmd python3; then
+    actual_sum=$(python3 -c 'import hashlib, sys; print(hashlib.sha256(open(sys.argv[1], "rb").read()).hexdigest())' "${tmp_bin}")
+  elif have_cmd python; then
+    actual_sum=$(python -c 'import hashlib, sys; print(hashlib.sha256(open(sys.argv[1], "rb").read()).hexdigest())' "${tmp_bin}")
+  else
+    die "Kein SHA-256-Werkzeug verfügbar; Installation wird nicht ungeprüft fortgesetzt."
+  fi
+
+  if [[ "${expected_sum}" != "${actual_sum}" ]]; then
+    die "Checksum-Fehler! Erwartet: ${expected_sum}, Ist: ${actual_sum}"
+  fi
+  log "Checksumme OK: ${actual_sum}"
+
+  if ! tar -xzf "${tmp_bin}" -C "${tmp_extract}" actionlint; then
+    die "Actionlint-Archiv konnte nicht sicher entpackt werden."
+  fi
+  if [[ ! -f "${tmp_extract}/actionlint" ]]; then
+    die "Actionlint-Binary fehlt im verifizierten Archiv."
+  fi
+  install -m 0755 "${tmp_extract}/actionlint" "${tmp_target}"
+  mv -f "${tmp_target}" "${TOOL_LOCAL}"
+  log "${TOOL_NAME} erfolgreich geprüft und atomar installiert."
 }
 
 resolved_tool() {
