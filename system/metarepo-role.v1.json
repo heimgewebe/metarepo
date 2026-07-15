@@ -8,7 +8,8 @@
     {
       "domain": "fleet_membership",
       "authoritative_source": "fleet/repos.yml",
-      "scope": "Mitgliedschaft in der gemeinsam verwalteten Metarepo-Fleet, nicht das vollständige Operator-Ökosystem."
+      "scope": "Mitgliedschaft wird ausschließlich in fleet/repos.yml entschieden; operative Fleet-Metadaten liegen getrennt in fleet/repo-metadata.yml.",
+      "metadata_source": "fleet/repo-metadata.yml"
     },
     {
       "domain": "shared_contracts",
@@ -78,10 +79,14 @@
   "compatibility_surfaces": [
     {
       "path": "repos.yml",
-      "status": "legacy_active",
+      "status": "compatibility_generated",
       "authoritative": false,
-      "target_state": "generated_projection_of:fleet/repos.yml",
-      "removal_gate": "Alle aktiven Tooling-Consumer lesen fleet/repos.yml oder eine nachweislich generierte Projektion."
+      "target_state": "deterministic_generated_projection",
+      "removal_gate": "Alle aktiven Tooling-Consumer lesen die kanonischen Mitgliedschafts- und Metadatenquellen direkt.",
+      "generated_from": [
+        "fleet/repos.yml",
+        "fleet/repo-metadata.yml"
+      ]
     },
     {
       "path": "wgx/",
@@ -116,7 +121,9 @@
     "Fleet-Mitgliedschaft ist nicht gleichbedeutend mit Zugehörigkeit zum vollständigen Operator-Ökosystem.",
     "Shared Assets werden erst nach belegter Consumer-Auswirkung geändert oder entfernt.",
     "README.md, .ai-context.yml und AGENTS.md müssen auf diesen Rollenvertrag verweisen und dieselben Wahrheitsgrenzen ausdrücken.",
-    "Legacy- und Kompatibilitätsflächen bleiben ausdrücklich nicht normativ, solange ihre Ablösung nicht verifiziert ist."
+    "Legacy- und Kompatibilitätsflächen bleiben ausdrücklich nicht normativ, solange ihre Ablösung nicht verifiziert ist.",
+    "repos.yml darf nicht manuell geändert werden und muss bytegenau aus fleet/repos.yml sowie fleet/repo-metadata.yml reproduzierbar sein.",
+    "Einträge mit fleet: false dürfen nicht in repos.yml projiziert oder allein aufgrund ihrer Erwähnung als Fleet-Ziel behandelt werden."
   ],
   "entrypoints": {
     "human": "README.md",
@@ -125,12 +132,14 @@
     "normative_role_contract": "system/metarepo-role.v1.json"
   },
   "verification": {
-    "last_verified_at": "2026-07-14",
-    "last_verified_against_commit": "4777fd5cfafea22813f9c3d647b33a0ffefd994b",
+    "last_verified_at": "2026-07-15",
+    "last_verified_against_commit": "e40c43691257aae2f432c33bd220389627d194b8",
     "evidence_scope": [
       "metarepo origin/main",
       "systemkatalog role projection",
-      "organisation-wide reusable-workflow caller search"
+      "organisation-wide reusable-workflow caller search",
+      "top-level repos.yml consumer and projection audit",
+      "semantic equality with the prior top-level repos.yml consumer contract"
     ],
     "does_not_establish": [
       "vollständige lokale IDE-Nutzung von servers/local-mcp",

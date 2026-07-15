@@ -82,6 +82,52 @@ def test_generate_integrity_sources_standard(tmp_path):
 
     assert "testorg/metarepo" in sources_map
 
+def test_generate_integrity_sources_prefers_canonical_metadata(tmp_path):
+    fleet_dir = tmp_path / "fleet"
+    fleet_dir.mkdir()
+    with open(fleet_dir / "repos.yml", "w") as f:
+        yaml.dump({"repos": [{"name": "repo1"}]}, f)
+    with open(fleet_dir / "repo-metadata.yml", "w") as f:
+        yaml.dump(
+            {
+                "schema_version": 1,
+                "github": {"owner": "canonical-owner"},
+                "repositories": {
+                    "repo1": {
+                        "default_branch": "main",
+                        "integrity": {"enabled": False},
+                    }
+                },
+            },
+            f,
+        )
+    with open(tmp_path / "repos.yml", "w") as f:
+        yaml.dump(
+            {
+                "github": {"owner": "legacy-owner"},
+                "repos": [{"name": "repo1"}],
+            },
+            f,
+        )
+
+    env = os.environ.copy()
+    env["HG_ROOT"] = str(tmp_path)
+    result = run_script(env)
+
+    assert result.returncode == 0, result.stderr
+    data = json.loads(
+        (tmp_path / "reports/integrity/sources.v1.json").read_text(encoding="utf-8")
+    )
+    assert data["sources"] == [
+        {
+            "repo": "canonical-owner/repo1",
+            "summary_url": "https://github.com/canonical-owner/repo1/releases/download/integrity/summary.json",
+            "enabled": False,
+        }
+    ]
+    assert "compatibility projection" not in result.stderr
+
+
 def test_generate_integrity_sources_no_repo_config(tmp_path):
     # Setup mock file structure (without repos.yml)
     fleet_dir = tmp_path / "fleet"
