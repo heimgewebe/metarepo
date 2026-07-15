@@ -1,25 +1,20 @@
-# Heimgewebe – Meta-Projektordner
+# Heimgewebe – historischer Meta-Projektordner
 
-Dieser Ordner enthält Meta-Dokumente für den Heimgewebe-Organismus.
+> **Status:** historischer Kompatibilitätspfad
+>
+> **Gültig bis:** 2026-07-14
+>
+> **Abgelöst am:** 2026-07-15
 
-👉 **Erste Lektüre:** `PROJECT.md`
+Dieser Ordner war als zentrale Denk- und Steuerungsebene des früheren Heimgewebe-Organismus gedacht. Diese Funktion besteht nicht mehr.
 
-## Ordnerübersicht
+Das unveränderte Original liegt unter [`docs/archive/heimgewebe-organismus-v0.2/project/README.md`](../docs/archive/heimgewebe-organismus-v0.2/project/README.md).
 
-- `overview/`
-  Zusammenfassungen über mehrere Repos, Architektur-Overviews.
+Aktuell gelten:
 
-- `dumps/`
-  Repo-Dumps, Merge-Dumps, Vollsnapshots (read-only Analysegrundlage).
+- Systemzwecke und Beziehungen: [Systemkatalog](https://github.com/heimgewebe/systemkatalog/blob/main/rendered/system-catalog.md)
+- Aufgaben und Abschluss: Bureau
+- Ausführung, Leases, Audit und Recovery: Grabowski
+- Metarepo-Lieferauftrag: [`system/metarepo-role.v1.json`](../system/metarepo-role.v1.json)
 
-- `roadmaps/`
-  Zielbilder, Capability-Pläne, Entwicklungsphasen.
-
-- `playbooks/`
-  Konkrete Handlungsanleitungen (z. B. „CI rot → was tun?“).
-
-- `notes/`
-  Freie Notizen, Denkfragmente, Übergangsdokumente.
-
-Dieser Ordner enthält **keinen Code**.
-Er ist die Denk- und Steuerungsebene.
+Die Unterordner bleiben ausschließlich als historisches Material auffindbar.

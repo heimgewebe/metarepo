@@ -1,0 +1,52 @@
+```mermaid
+%%{init: {'theme':'neutral'}}%%
+flowchart LR
+    subgraph Producer
+      SEM["semantAH<br/>insights/today.json"]
+      WGX["wgx<br/>metrics.json (Snapshot)"]
+      AUD["hausKI-audio<br/>audio.session_*,<br/>audio.latency_ms"]
+      AUS["aussensensor<br/>export/feed.jsonl"]
+    end
+
+    subgraph Core
+      HKI["hausKI<br/>State (SQLite)<br/>Events (~/.hauski/events/*.jsonl)"]
+      HLM["heimlern<br/>Decisions: action, score, why"]
+    end
+
+    subgraph Persistence_UI["Persistenz & UI"]
+      CHRONIK["chronik<br/>/data/{domain}.jsonl"]
+      LST["leitstand<br/>UI/Dashboard"]
+      CHRONIK -- "Events" --> LST
+    end
+
+    subgraph Meta
+      META["metarepo
+contracts/*.schema.json"]
+    end
+
+    %% Contracts (Schemas)
+    META ---|insights.schema.json| SEM
+    META ---|metrics.snapshot.schema.json| WGX
+    META ---|audio.events.schema.json| AUD
+    META ---|aussen.event.schema.json| AUS
+    META ---|event.line.schema.json| HKI
+    META ---|policy.decision.schema.json| HLM
+
+    %% Flows
+    SEM -->|insights/today.json| HKI
+    SEM -->|insights/today.json| CHRONIK
+
+    WGX -->|metrics.json| HKI
+    HKI -->|"/v1/ingest/metrics<br/>(append Event)"| HKI
+
+    AUD -->|audio.events| HKI
+    AUD -->|audio.events| CHRONIK
+
+    AUS -->|feed.jsonl → HTTP /ingest/aussen| CHRONIK
+
+    HKI -->|/v1/policy/decide| HLM
+    HLM -->|action, score, why| HKI
+    HKI -->|/v1/policy/feedback reward| HLM
+
+    HKI -->|events JSONL| CHRONIK
+```

@@ -1,3 +1,6 @@
 * text=auto eol=lf
 *.sh text eol=lf
 Justfile text eol=lf
+
+# Byte-exact historical source; integrity is verified through the archive manifest.
+docs/archive/heimgewebe-organismus-v0.2/vision/leitwerk-blueprint -diff
