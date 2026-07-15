@@ -35,7 +35,7 @@ Der Integritätsstatus wird aktiv gesammelt:
     *   Der Bericht muss als Datei `summary.json` unter dem Release-Tag **`integrity`** veröffentlicht werden.
     *   Die `summary_url` in der Quellenliste zeigt auf dieses Asset.
 *   **`reports/integrity/sources.v1.json`**: Die **Single Source of Truth (SoT)** für Integritätsquellen.
-    *   Wird generiert aus der Fleet-Definition (`fleet/repos.yml`).
+    *   Wird aus der Fleet-Mitgliedschaft (`fleet/repos.yml`) und den operativen Overrides (`fleet/repo-metadata.yml`) generiert.
     *   Schema: `contracts/integrity.sources.v1.schema.json`.
 
 ### Quellen-Liste (SoT)
