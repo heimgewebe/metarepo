@@ -27,4 +27,8 @@ Dieses Verzeichnis bewahrt die frühere Organismus-, Zielbild-, Rollen- und Arch
 - `canvas/`: frühere Obsidian-Canvas-Diagramme
 - `manifest.v1.json`: Hash- und Ablösungsnachweis
 
+## Linkanker
+
+Die Originaldateien bleiben bytegetreu und behalten deshalb ihre damaligen relativen Links. Elf kleine Dateien unter `archive/`, `adrs/`, `contracts/`, `fleet/`, `vision/` sowie im Archivwurzelverzeichnis stellen genau die damals erwarteten Zielpfade wieder her. Diese Linkanker sind **keine Archivoriginale** und werden im Manifest getrennt von den hashgebundenen Originalen ausgewiesen.
+
 Die bisherigen Einstiegspfade bleiben als Kompatibilitätsseiten erhalten. Sie verweisen auf dieses Archiv und die aktuellen Quellen, enthalten aber nicht mehr die alte Darstellung als scheinbar aktuelle Architektur.

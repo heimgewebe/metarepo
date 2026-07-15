@@ -157,6 +157,32 @@ def test_legacy_archive_manifest_binds_unchanged_originals() -> None:
         assert file_sha256(archived) == item["sha256"]
         assert (ROOT / item["former_path"]).exists()
 
+    anchors = manifest["compatibility_link_anchors"]
+    assert len(anchors) == 11
+    assert len({item["path"] for item in anchors}) == len(anchors)
+    for item in anchors:
+        anchor = archive_root / item["path"]
+        target = ROOT / item["target"]
+        assert anchor.is_file()
+        assert target.exists()
+        text = anchor.read_text(encoding="utf-8")
+        assert "Historischer Linkanker" in text
+        assert item["target"].split("/", 1)[1] in text
+
+    repository_anchors = manifest["repository_compatibility_link_anchors"]
+    assert repository_anchors == [
+        {
+            "path": "docs/archive/contracts/README.md",
+            "directory_target": "docs/archive/contracts",
+            "target": "contracts/",
+        }
+    ]
+    repository_anchor = ROOT / repository_anchors[0]["path"]
+    assert repository_anchor.is_file()
+    assert (ROOT / repository_anchors[0]["directory_target"]).is_dir()
+    assert (ROOT / repository_anchors[0]["target"]).is_dir()
+    assert "kein Contract-Archiv" in repository_anchor.read_text(encoding="utf-8")
+
 
 def test_legacy_compatibility_pages_cannot_pose_as_current_architecture() -> None:
     role = load_role()

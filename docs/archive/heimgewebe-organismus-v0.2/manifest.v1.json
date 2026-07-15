@@ -104,5 +104,58 @@
       "former_path": "heimgewebe/PROJECT.md",
       "sha256": "1599d97f515ef04dc1d05bc123aeacb12e0f1cad64d9d447166aa8fcbc1e18f0"
     }
+  ],
+  "compatibility_link_anchors": [
+    {
+      "path": "archive/system-overview.md",
+      "target": "docs/archive/system-overview.md"
+    },
+    {
+      "path": "repo-matrix.md",
+      "target": "docs/repo-matrix.md"
+    },
+    {
+      "path": "contracts/contracts-index.md",
+      "target": "docs/contracts/contracts-index.md"
+    },
+    {
+      "path": "contracts/contract-versioning.md",
+      "target": "docs/contracts/contract-versioning.md"
+    },
+    {
+      "path": "archive/heimgewebe-gesamt.md",
+      "target": "docs/archive/heimgewebe-gesamt.md"
+    },
+    {
+      "path": "konzept-kern.md",
+      "target": "docs/konzept-kern.md"
+    },
+    {
+      "path": "adrs/README.md",
+      "target": "docs/adrs/README.md"
+    },
+    {
+      "path": "vision/heimgewebe-evolution-maximaleffizienz.md",
+      "target": "docs/vision/heimgewebe-evolution-maximaleffizienz.md"
+    },
+    {
+      "path": "vision/heimgewebe-v2-detailed.md",
+      "target": "docs/vision/heimgewebe-v2-detailed.md"
+    },
+    {
+      "path": "vision/heimgewebe-autopoiesis.md",
+      "target": "docs/vision/heimgewebe-autopoiesis.md"
+    },
+    {
+      "path": "fleet/push-to-fleet.md",
+      "target": "docs/fleet/push-to-fleet.md"
+    }
+  ],
+  "repository_compatibility_link_anchors": [
+    {
+      "path": "docs/archive/contracts/README.md",
+      "directory_target": "docs/archive/contracts",
+      "target": "contracts/"
+    }
   ]
 }
