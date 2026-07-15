@@ -19,6 +19,7 @@ repos:
   - name: aussensensor
   - name: chronik
   - name: lenskit
+  - name: konvergenzregelkreis
   - name: mitschreiber
   - name: sichter
   - name: leitstand
