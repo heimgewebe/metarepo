@@ -134,6 +134,25 @@ def test_fleet_false_related_repository_cannot_be_projected() -> None:
         build_projection(fleet, metadata)
 
 
+def test_fleet_false_primary_repository_cannot_be_projected() -> None:
+    fleet = {
+        "repos": [
+            {"name": "core"},
+            {"name": "private", "fleet": False},
+        ]
+    }
+    metadata = {
+        "schema_version": 1,
+        "github": {"owner": "example"},
+        "repositories": {
+            "private": {"default_branch": "main"},
+        },
+    }
+
+    with pytest.raises(ProjectionError, match="not projectable"):
+        build_projection(fleet, metadata)
+
+
 def test_fleet_flag_must_be_boolean() -> None:
     fleet = {
         "static": {"include": [{"name": "related", "fleet": "no"}]},

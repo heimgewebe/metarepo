@@ -117,7 +117,7 @@ def _entry_name(entry: Any, *, label: str) -> str:
     raise ProjectionError(f"{label} entry must contain a non-empty name")
 
 
-def _static_entry_is_projectable(entry: Any, *, label: str) -> bool:
+def _entry_is_projectable(entry: Any, *, label: str) -> bool:
     if not isinstance(entry, dict) or "fleet" not in entry:
         return True
     fleet_flag = entry["fleet"]
@@ -140,7 +140,8 @@ def collect_projectable_repositories(fleet: dict[str, Any]) -> set[str]:
         if name in all_names:
             raise ProjectionError(f"duplicate Fleet repository: {name}")
         all_names.add(name)
-        projectable.add(name)
+        if _entry_is_projectable(entry, label=f"repos[{index}]"):
+            projectable.add(name)
 
     static = fleet.get("static", {})
     if static is None:
@@ -158,7 +159,7 @@ def collect_projectable_repositories(fleet: dict[str, Any]) -> set[str]:
         if name in all_names:
             raise ProjectionError(f"repository occurs more than once in Fleet scope: {name}")
         all_names.add(name)
-        if _static_entry_is_projectable(entry, label=label):
+        if _entry_is_projectable(entry, label=label):
             projectable.add(name)
 
     if not projectable:
