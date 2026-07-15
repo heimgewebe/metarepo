@@ -1,0 +1,81 @@
+---
+schema_version: 1
+
+# Operative Metadaten für Repositories, die von bestehendem Metarepo-Tooling
+# verarbeitet werden. Die Zugehörigkeit zur Fleet wird ausschließlich in
+# fleet/repos.yml entschieden. Jeder Eintrag hier muss dort entweder als
+# Core-Fleet- oder als Related-Repository bekannt sein.
+github:
+  owner: heimgewebe
+
+repositories:
+  contracts-mirror:
+    default_branch: main
+    domain: contracts
+    scope: schema
+    metrics:
+      enable: false
+  weltgewebe:
+    default_branch: main
+    domain: aussen
+    scope: events
+    metrics:
+      enable: false
+  hausKI:
+    default_branch: main
+    domain: assistant
+    scope: policy
+    metrics:
+      enable: true
+  hausKI-audio:
+    default_branch: main
+    depends_on:
+      - hausKI
+    domain: audio
+    scope: events
+    metrics:
+      enable: false
+  semantAH:
+    default_branch: main
+    domain: insights
+    scope: export
+    metrics:
+      enable: false
+  wgx:
+    default_branch: main
+    domain: platform
+    scope: metrics
+    metrics:
+      enable: true
+  lenskit:
+    default_branch: main
+    domain: epistemic
+    scope: scanner-merger
+    metrics:
+      enable: false
+  chronik:
+    default_branch: main
+    domain: chronik
+    scope: ingest
+    metrics:
+      enable: false
+  aussensensor:
+    default_branch: main
+    domain: aussen
+    scope: events
+    metrics:
+      enable: false
+  heimlern:
+    default_branch: main
+    domain: policy
+    scope: library
+    metrics:
+      enable: false
+  vault-gewebe:
+    default_branch: main
+    domain: vault
+    scope: content
+    metrics:
+      enable: false
+    wgx:
+      profile_expected: false

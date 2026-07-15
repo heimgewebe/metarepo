@@ -1,59 +1,80 @@
 # Kernkonzepte des Metarepo
 
-Dieses Dokument beschreibt die grundlegende Architektur und die zentralen Prozesse des `metarepo`. Das Ziel ist es, ein konsistentes und zentral verwaltetes System über eine Flotte von Sub-Repositories zu schaffen.
+Das Metarepo veröffentlicht gemeinsame Fleet-Assets für ausdrücklich
+aufgenommene Repositories. Seine normative Rolle ist in
+[`system/metarepo-role.v1.json`](../system/metarepo-role.v1.json) festgelegt.
+Es ist keine Control Plane und keine Quelle der gesamten
+Ökosystemarchitektur.
 
-## Metarepo-Architektur
+## Kernflächen
 
-Das `metarepo` dient als "Single Source of Truth" für kanonische Konfigurationen, die in andere Repositories (Sub-Repos) verteilt werden. Die Hauptkomponenten sind:
+- **`fleet/repos.yml`** – einzige normative Quelle der Fleet-Mitgliedschaft und
+  des Related-Scope.
+- **`fleet/repo-metadata.yml`** – operative Zusatzdaten für bestehende
+  Metarepo-Consumer, beispielsweise Branch, Domain, Abhängigkeiten und
+  Tooling-Overrides.
+- **`repos.yml`** – deterministisch erzeugte, nicht normative
+  Kompatibilitätsprojektion für noch nicht migrierte WGX-, Graph-, Readiness-
+  und Template-Consumer.
+- **`templates/`** – kuratierte Vorlagen, die ausdrücklich für mehrere
+  Consumer-Repositories bestimmt sind.
+- **`.github/workflows/`** – wiederverwendbare CI-Bausteine und ihre
+  Kompatibilitätsverträge.
+- **`contracts/`** – gemeinsame versionierte Daten- und Workflowverträge.
 
-- **`templates/`**: Dieses Verzeichnis enthält die Vorlagen, die in die Sub-Repos synchronisiert werden. Dazu gehören CI/CD-Workflows, `Justfile`-Konfigurationen, Dokumentation und `.wgx/profile.yml`-Dateien.
-- **`repos.yml`**: Die zentrale Inventarliste der Flotte. Diese Datei definiert, welche Repositories vom `metarepo` verwaltet werden, und enthält Metadaten wie den Namen, den Branch und die Abhängigkeiten.
-- **`scripts/`**: Enthält die Orchestrierungs- und Synchronisationslogik. Das `wgx`-Skript ist das primäre Werkzeug für die Interaktion mit der Flotte.
-- **`AGENTS.md`**: Definiert die Regeln und Prozesse für automatisierte Agenten (wie diesen), die im Repository arbeiten.
+## Wahrheitsgrenzen
 
-## Synchronisationsprozess
+Fleet-Mitgliedschaft bedeutet nicht automatisch Zugehörigkeit zum gesamten
+Operator-Ökosystem. Systemzwecke und Beziehungen gehören in den Systemkatalog;
+Aufgabenstatus und Abschlusswahrheit ins Bureau; operative Ausführung,
+Leases und Recovery zu Grabowski.
 
-Der Abgleich von Konfigurationen zwischen dem `metarepo` und den Sub-Repos ist ein fundamentaler Prozess. Er folgt einem dialektischen Modell des Lernens und Verteilens.
+Ein Repository wird nur dann in die Core-Fleet aufgenommen, wenn ein konkreter
+gemeinsamer Contract-, Template-, Workflow- oder Prüfbedarf besteht.
+`static.include` kann Related-Repositories sichtbar machen. Einträge mit
+`fleet: false` sind nicht projektierbar und dürfen nicht als Fleet-Ziel
+behandelt werden.
 
-### Push (Kanon → Sub-Repo)
-Dies ist der Standardprozess, bei dem die kanonischen Vorlagen aus dem `metarepo` in die Sub-Repos verteilt werden. Der `wgx up`-Befehl automatisiert diesen Prozess:
+## Projektion statt zweiter Wahrheit
 
-1.  **Klonen**: Das Ziel-Repo wird temporär geklont.
-2.  **Kopieren**: Die Vorlagen aus `templates/` werden in das geklonte Repo kopiert. Variablen (`{{REPO_NAME}}`) werden ersetzt.
-3.  **Commit & PR**: Die Änderungen werden in einen neuen Branch committet, und ein Pull Request wird erstellt.
+Die operative Legacy-Struktur bleibt vorübergehend erhalten, wird aber nicht
+mehr manuell gepflegt:
 
-### Pull (Sub-Repo → Kanon)
-In manchen Fällen werden Verbesserungen direkt in einem Sub-Repo entwickelt. Der `scripts/sync-templates.sh`-Befehl ermöglicht es, diese Änderungen zurück in das `metarepo` zu ziehen, um sie zu kuratieren und als neuen kanonischen Standard zu übernehmen.
-
-### Drift
-Als "Drift" wird der Zustand bezeichnet, in dem die Konfiguration eines Sub-Repos von der kanonischen Vorlage im `metarepo` abweicht. Werkzeuge wie `scripts/wgx-doctor` sind dazu gedacht, diesen Drift zu erkennen und zu melden.
-
-## Die Rolle von `repos.yml`
-
-Die `repos.yml`-Datei ist das Herzstück der Flottenverwaltung. Sie definiert den "Scope" der Operationen und ermöglicht eine präzise Steuerung der Synchronisation. Eine typische Struktur sieht wie folgt aus:
-
-```yaml
-github:
-  owner: heimgewebe
-  mode: github # 'github' für dynamische Listen, 'static' für feste
-
-repos:
-  - name: metarepo
-    branch: main
-  - name: wgx
-    branch: main
+```bash
+just fleet-projection
+just fleet-projection-check
 ```
 
-- **`owner`**: Der GitHub-Organisationname.
-- **`mode`**: Bestimmt, ob die Liste der Repos dynamisch von GitHub (`github`) oder aus der statischen Liste in `repos` (`static`) bezogen wird.
-- **`repos`**: Eine Liste von Repository-Objekten, die den Namen und optional weitere Metadaten enthalten.
+Der Generator liest ausschließlich `fleet/repos.yml` und
+`fleet/repo-metadata.yml`. `just validate` prüft bytegenaue Reproduzierbarkeit.
+Die semantische Struktur der Projektion ist zusätzlich an einen
+Consumer-Vertragstest gebunden.
 
----
+## Verteilung gemeinsamer Assets
+
+### Metarepo → Consumer
+
+Kuratierte Templates, Contracts oder reusable Workflows werden nach
+Consumerprüfung veröffentlicht. Bestehendes WGX- oder Sync-Tooling kann die
+generierte `repos.yml` weiterverwenden, bis es auf die kanonischen Quellen
+umgestellt ist.
+
+### Consumer → Metarepo
+
+Verbesserungen aus einzelnen Repositories werden nicht automatisch zur
+Fleet-Norm. Sie müssen im Metarepo kuratiert, gegen aktive Consumer geprüft und
+als eigener Review- und Mergevorgang veröffentlicht werden.
+
+### Drift
+
+Drift bezeichnet eine Abweichung zwischen normativen Quellen, generierten
+Projektionen oder verteilten gemeinsamen Assets. Driftberichte sind Befunde;
+sie ändern weder Fleet-Mitgliedschaft noch Aufgabenstatus automatisch.
 
 ## Siehe auch
 
-- [Templates](./templates.md) – Template-Verteilung und Drift-Kontrolle
-- [Fleet Management](./fleet/fleet.md) – Fleet-Operationen im Überblick
-- [WGX Konzept](./fleet/wgx-konzept.md) – Fleet-Motor und Kommandos
-- [Architecture](./system/architecture.md) – Systemarchitektur
-- [ADR-002: Distribution & Drift-Regeln](./adrs/002-distribution-drift.md) – Architekturentscheidung
+- [Fleet-Quellen und `repos.yml`-Projektion](./repos.yml.md)
+- [Fleet-Operations](./fleet/fleet.md)
+- [Templates](./templates.md)
+- [WGX-Konzept](./fleet/wgx-konzept.md)
+- [ADR-002: Distribution und Drift](./adrs/002-distribution-drift.md)

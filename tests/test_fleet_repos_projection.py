@@ -1,0 +1,242 @@
+from __future__ import annotations
+
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import subprocess
+import sys
+
+import pytest
+import yaml
+
+
+ROOT = Path(__file__).resolve().parents[1]
+SCRIPT = ROOT / "scripts" / "fleet" / "generate_repos_projection.py"
+LEGACY_SEMANTIC_SHA256 = "bbeeb43183de6526d0d2a22a4e82a37ca083416d23060525610bee9bf1a20737"
+SPEC = importlib.util.spec_from_file_location("generate_repos_projection", SCRIPT)
+assert SPEC and SPEC.loader
+MODULE = importlib.util.module_from_spec(SPEC)
+sys.modules[SPEC.name] = MODULE
+SPEC.loader.exec_module(MODULE)
+
+ProjectionError = MODULE.ProjectionError
+build_projection = MODULE.build_projection
+expected_projection = MODULE.expected_projection
+
+
+def test_repository_projection_is_current() -> None:
+    expected = expected_projection(
+        ROOT / "fleet" / "repos.yml",
+        ROOT / "fleet" / "repo-metadata.yml",
+    )
+    assert (ROOT / "repos.yml").read_text(encoding="utf-8") == expected
+
+
+def test_projection_preserves_complete_legacy_semantics() -> None:
+    projection = yaml.safe_load((ROOT / "repos.yml").read_text(encoding="utf-8"))
+    canonical = json.dumps(
+        projection,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+
+    assert hashlib.sha256(canonical).hexdigest() == LEGACY_SEMANTIC_SHA256
+
+
+def test_projection_preserves_legacy_consumer_shape() -> None:
+    projection = yaml.safe_load((ROOT / "repos.yml").read_text(encoding="utf-8"))
+
+    assert projection["mode"] == "static"
+    assert projection["github"]["owner"] == "heimgewebe"
+    names = [item["name"] for item in projection["repos"]]
+    assert names == [
+        "contracts-mirror",
+        "weltgewebe",
+        "hausKI",
+        "hausKI-audio",
+        "semantAH",
+        "wgx",
+        "lenskit",
+        "chronik",
+        "aussensensor",
+        "heimlern",
+        "vault-gewebe",
+    ]
+    assert all(
+        item["url"].startswith("https://github.com/heimgewebe/")
+        for item in projection["repos"]
+    )
+
+
+def test_metadata_must_reference_projectable_fleet_or_related_repo() -> None:
+    fleet = {"repos": [{"name": "known"}]}
+    metadata = {
+        "schema_version": 1,
+        "github": {"owner": "example"},
+        "repositories": {
+            "unknown": {"default_branch": "main"},
+        },
+    }
+
+    with pytest.raises(ProjectionError, match="not projectable"):
+        build_projection(fleet, metadata)
+
+
+def test_related_repository_metadata_is_allowed() -> None:
+    fleet = {
+        "static": {"include": [{"name": "related", "status": "related"}]},
+        "repos": [{"name": "core"}],
+    }
+    metadata = {
+        "schema_version": 1,
+        "github": {"owner": "example"},
+        "repositories": {
+            "related": {"default_branch": "main"},
+        },
+    }
+
+    projection = build_projection(fleet, metadata)
+    assert projection["repos"] == [
+        {
+            "name": "related",
+            "url": "https://github.com/example/related",
+            "default_branch": "main",
+        }
+    ]
+
+
+def test_fleet_false_related_repository_cannot_be_projected() -> None:
+    fleet = {
+        "static": {"include": [{"name": "private", "fleet": False}]},
+        "repos": [{"name": "core"}],
+    }
+    metadata = {
+        "schema_version": 1,
+        "github": {"owner": "example"},
+        "repositories": {
+            "private": {"default_branch": "main"},
+        },
+    }
+
+    with pytest.raises(ProjectionError, match="not projectable"):
+        build_projection(fleet, metadata)
+
+
+def test_fleet_flag_must_be_boolean() -> None:
+    fleet = {
+        "static": {"include": [{"name": "related", "fleet": "no"}]},
+        "repos": [{"name": "core"}],
+    }
+    metadata = {
+        "schema_version": 1,
+        "github": {"owner": "example"},
+        "repositories": {"core": {"default_branch": "main"}},
+    }
+
+    with pytest.raises(ProjectionError, match="fleet must be boolean"):
+        build_projection(fleet, metadata)
+
+
+def test_normalized_metadata_names_must_be_unique() -> None:
+    fleet = {"repos": [{"name": "core"}]}
+    metadata = {
+        "schema_version": 1,
+        "github": {"owner": "example"},
+        "repositories": {
+            "core": {"default_branch": "main"},
+            " core ": {"default_branch": "main"},
+        },
+    }
+
+    with pytest.raises(ProjectionError, match="duplicate normalized metadata"):
+        build_projection(fleet, metadata)
+
+
+def test_duplicate_yaml_keys_fail_closed(tmp_path: Path) -> None:
+    fleet = tmp_path / "fleet.yml"
+    metadata = tmp_path / "metadata.yml"
+    fleet.write_text("repos:\n  - name: core\n", encoding="utf-8")
+    metadata.write_text(
+        "schema_version: 1\n"
+        "github:\n"
+        "  owner: example\n"
+        "repositories:\n"
+        "  core:\n"
+        "    default_branch: main\n"
+        "  core:\n"
+        "    default_branch: trunk\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ProjectionError, match="duplicate key 'core'"):
+        expected_projection(fleet, metadata)
+
+
+def test_unknown_dependency_is_rejected() -> None:
+    fleet = {"repos": [{"name": "core"}]}
+    metadata = {
+        "schema_version": 1,
+        "github": {"owner": "example"},
+        "repositories": {
+            "core": {
+                "default_branch": "main",
+                "depends_on": ["missing"],
+            },
+        },
+    }
+
+    with pytest.raises(ProjectionError, match="non-projectable repositories"):
+        build_projection(fleet, metadata)
+
+
+def test_nested_consumer_metadata_must_be_mapping() -> None:
+    fleet = {"repos": [{"name": "core"}]}
+    metadata = {
+        "schema_version": 1,
+        "github": {"owner": "example"},
+        "repositories": {
+            "core": {"default_branch": "main", "metrics": False},
+        },
+    }
+
+    with pytest.raises(ProjectionError, match="metrics must be a mapping"):
+        build_projection(fleet, metadata)
+
+
+def test_check_mode_fails_for_stale_projection(tmp_path: Path) -> None:
+    fleet = tmp_path / "fleet.yml"
+    metadata = tmp_path / "metadata.yml"
+    output = tmp_path / "repos.yml"
+    fleet.write_text("repos:\n  - name: core\n", encoding="utf-8")
+    metadata.write_text(
+        "schema_version: 1\n"
+        "github:\n"
+        "  owner: example\n"
+        "repositories:\n"
+        "  core:\n"
+        "    default_branch: main\n",
+        encoding="utf-8",
+    )
+    output.write_text("stale: true\n", encoding="utf-8")
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(SCRIPT),
+            "--fleet-file",
+            str(fleet),
+            "--metadata-file",
+            str(metadata),
+            "--output",
+            str(output),
+            "--check",
+        ],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode == 1
+    assert "repos.yml is stale" in result.stderr

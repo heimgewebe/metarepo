@@ -4,7 +4,10 @@ Generate the canonical list of integrity sources (Pull-Model).
 
 Source of truth:
   - fleet/repos.yml (Fleet membership)
-  - repos.yml (Metadata, overrides)
+  - fleet/repo-metadata.yml (Metadata, overrides)
+
+Compatibility fallback:
+  - repos.yml is read only when the canonical metadata file is absent.
 
 Output:
   - reports/integrity/sources.v1.json
@@ -22,16 +25,29 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
+
 def load_yaml(yaml_mod: Any, path: Path) -> Any:
     with open(path, "r", encoding="utf-8") as f:
         return yaml_mod.safe_load(f)
+
 
 def utc_now_iso() -> str:
     # Support SOURCE_DATE_EPOCH for reproducible builds
     if "SOURCE_DATE_EPOCH" in os.environ:
         ts = int(os.environ["SOURCE_DATE_EPOCH"])
-        return datetime.fromtimestamp(ts, timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+        return (
+            datetime.fromtimestamp(ts, timezone.utc)
+            .replace(microsecond=0)
+            .isoformat()
+            .replace("+00:00", "Z")
+        )
+    return (
+        datetime.now(timezone.utc)
+        .replace(microsecond=0)
+        .isoformat()
+        .replace("+00:00", "Z")
+    )
+
 
 def detect_repo_root() -> Path:
     env = os.environ.get("HG_ROOT") or os.environ.get("HEIMGEWEBE_ROOT")
@@ -39,16 +55,21 @@ def detect_repo_root() -> Path:
         return Path(env).resolve()
     return _REPO_ROOT
 
+
 def main():
     try:
         import yaml
     except ModuleNotFoundError:
-        # Metarepo Control Plane requires PyYAML via uv
-        sys.exit("Error: pyyaml not installed. Please run via 'uv run scripts/generate_integrity_sources.py'.")
+        # Metarepo tooling requires PyYAML via uv.
+        sys.exit(
+            "Error: pyyaml not installed. Please run via "
+            "'uv run scripts/generate_integrity_sources.py'."
+        )
 
     repo_root = detect_repo_root()
     fleet_repos_file = repo_root / "fleet/repos.yml"
-    repos_yml_file = repo_root / "repos.yml"
+    metadata_file = repo_root / "fleet/repo-metadata.yml"
+    legacy_repos_yml_file = repo_root / "repos.yml"
     output_file = repo_root / "reports/integrity/sources.v1.json"
 
     # Load Fleet Membership
@@ -93,19 +114,41 @@ def main():
     repo_configs = {}
     default_owner = "heimgewebe"
 
-    if repos_yml_file.exists():
-        raw_repos = load_yaml(yaml, repos_yml_file)
+    if metadata_file.exists():
+        raw_metadata = load_yaml(yaml, metadata_file)
+        if not isinstance(raw_metadata, dict):
+            sys.exit(f"Error: {metadata_file} must have a mapping root.")
+        if raw_metadata.get("schema_version") != 1:
+            sys.exit(f"Error: {metadata_file} schema_version must be 1.")
+        github = raw_metadata.get("github", {})
+        if not isinstance(github, dict):
+            sys.exit(f"Error: {metadata_file} github must be a mapping.")
+        default_owner = github.get("owner", default_owner)
+        repositories = raw_metadata.get("repositories", {})
+        if not isinstance(repositories, dict):
+            sys.exit(f"Error: {metadata_file} repositories must be a mapping.")
+        for name, config in repositories.items():
+            if isinstance(name, str) and isinstance(config, dict):
+                repo_configs[name] = config
+    elif legacy_repos_yml_file.exists():
+        print(
+            "Warning: canonical metadata missing; using compatibility projection "
+            f"{legacy_repos_yml_file}",
+            file=sys.stderr,
+        )
+        raw_repos = load_yaml(yaml, legacy_repos_yml_file)
         default_owner = raw_repos.get("github", {}).get("owner", default_owner)
 
         if "repos" in raw_repos and isinstance(raw_repos["repos"], list):
-            for r in raw_repos["repos"]:
-                name = r.get("name")
+            for repository in raw_repos["repos"]:
+                name = repository.get("name")
                 if name:
-                    repo_configs[name] = r
+                    repo_configs[name] = repository
 
     if not fleet_list:
         print(
-            f"Warning: No repositories found in {fleet_repos_file}; generated sources list will be empty.",
+            f"Warning: No repositories found in {fleet_repos_file}; "
+            "generated sources list will be empty.",
             file=sys.stderr,
         )
 
@@ -114,7 +157,8 @@ def main():
 
     for repo_name in sorted(fleet_list):
         config = repo_configs.get(repo_name, {})
-        # config usage: specifically to check for integrity.enabled override
+        # Metadata may explicitly disable integrity for one Fleet member. The
+        # generated repos.yml is consulted only by the compatibility fallback.
 
         # Use default owner for all repos (per-repo owner override not currently supported)
         owner = default_owner
@@ -125,22 +169,28 @@ def main():
             sys.exit(1)
         seen_repos.add(full_repo_name)
 
-        # Determine URL
         # Contract: https://github.com/<owner>/<repo>/releases/download/integrity/summary.json
-        summary_url = f"https://github.com/{owner}/{repo_name}/releases/download/integrity/summary.json"
+        summary_url = (
+            f"https://github.com/{owner}/{repo_name}/"
+            "releases/download/integrity/summary.json"
+        )
 
-        # Check if enabled via overrides
-        # Logic: fleet implies enabled, unless explicitly disabled in repos.yml metadata
+        # Fleet implies enabled unless canonical metadata explicitly disables it.
         enabled = True
         integrity_config = config.get("integrity", {})
-        if isinstance(integrity_config, dict) and integrity_config.get("enabled") is False:
+        if (
+            isinstance(integrity_config, dict)
+            and integrity_config.get("enabled") is False
+        ):
             enabled = False
 
-        sources.append({
-            "repo": full_repo_name,
-            "summary_url": summary_url,
-            "enabled": enabled
-        })
+        sources.append(
+            {
+                "repo": full_repo_name,
+                "summary_url": summary_url,
+                "enabled": enabled,
+            }
+        )
 
     # Check for idempotence to avoid drift in timestamps
     existing_data = None
@@ -163,13 +213,14 @@ def main():
     output_data = {
         "apiVersion": "integrity.sources.v1",
         "generated_at": new_generated_at,
-        "sources": sources
+        "sources": sources,
     }
 
     output_file.parent.mkdir(parents=True, exist_ok=True)
     with open(output_file, "w", encoding="utf-8") as f:
         json.dump(output_data, f, indent=2)
         f.write("\n")
+
 
 if __name__ == "__main__":
     main()

@@ -34,13 +34,19 @@ Zugehörigkeit zum vollständigen Operator-Ökosystem.
 
 ### Fleet
 
-[`fleet/repos.yml`](fleet/repos.yml) ist die normative Quelle der gemeinsam
-verwalteten Metarepo-Fleet. Die gerenderte Übersicht wird daraus erzeugt:
-[`docs/_generated/fleet.md`](docs/_generated/fleet.md).
+[`fleet/repos.yml`](fleet/repos.yml) ist die einzige normative Quelle der
+Fleet-Mitgliedschaft. Operative Zusatzdaten wie Branch, Domain, Abhängigkeiten
+und Tooling-Overrides liegen getrennt in
+[`fleet/repo-metadata.yml`](fleet/repo-metadata.yml).
 
-Das Top-Level-[`repos.yml`](repos.yml) wird noch von bestehendem Tooling
-verwendet. Es ist eine **nicht normative Legacy-Fläche** und soll zu einer
-reproduzierbaren Projektion von `fleet/repos.yml` werden.
+Das Top-Level-[`repos.yml`](repos.yml) ist eine **generierte, nicht normative
+Kompatibilitätsprojektion** für bestehendes WGX-, Graph- und Template-Tooling.
+Sie wird ausschließlich mit `just fleet-projection` aus den beiden kanonischen
+Fleet-Dateien erzeugt. `just fleet-projection-check` und `just validate`
+blockieren manuelle Änderungen oder vergessene Regeneration.
+
+Die gerenderte Fleet-Übersicht wird aus der Mitgliedschaftsquelle erzeugt:
+[`docs/_generated/fleet.md`](docs/_generated/fleet.md).
 
 ### Contracts
 
@@ -65,7 +71,7 @@ Workflowverträge. Änderungen benötigen:
 Diese Flächen sind weiterhin vorhanden, aber nicht Teil der normativen
 Metarepo-Rolle:
 
-- `repos.yml` – aktives Legacy-Manifest; Ziel: generierte Fleet-Projektion
+- `repos.yml` – deterministisch generierte Kompatibilitätsprojektion; nicht manuell bearbeiten
 - `wgx/` – vendierter Altstand; kanonischer Eigentümer ist das Repository `wgx`
 - `servers/local-mcp/` – lokale Legacy-Brücke; Nutzung und Ablösung werden geprüft
 - `.github/workflows/heimgewebe-command-dispatch.yml` – aktive
@@ -87,7 +93,10 @@ gegenwärtige Systemtopologie ist der Systemkatalog zuständig.
 # Abhängigkeiten installieren
 just deps
 
-# lokale Validierung einschließlich Tests und Workflow-Linting
+# repos.yml aus den kanonischen Fleet-Quellen erzeugen
+just fleet-projection
+
+# lokale Validierung einschließlich Projektionsdrift, Tests und Workflow-Linting
 just validate
 
 # Contract-Prüfungen
@@ -137,14 +146,14 @@ Beispiele für bestehendes Tooling:
 ```text
 metarepo/
 ├── system/              # Maschinenlesbare Rollen- und Wahrheitsverträge
-├── fleet/               # Normative Fleet-Mitgliedschaft
+├── fleet/               # Mitgliedschaft und getrennte operative Fleet-Metadaten
 ├── contracts/           # Gemeinsame versionierte Contracts
 ├── templates/           # Kuratierte Shared Templates
 ├── .github/workflows/   # Reusable Workflows und Repo-CI
 ├── scripts/             # Sync-, Prüf- und Migrationswerkzeuge
 ├── docs/                # Metarepo-Dokumentation und Legacy-Material
 ├── reports/             # Nicht normative Befunde und Drift-Reports
-├── repos.yml            # Legacy-Manifest; nicht normativ
+├── repos.yml            # Generierte Kompatibilitätsprojektion; nicht normativ
 └── Justfile
 ```
 

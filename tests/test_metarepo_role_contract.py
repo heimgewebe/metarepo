@@ -47,6 +47,9 @@ def test_all_local_contract_paths_exist() -> None:
 
     for item in role["owns"]:
         assert (ROOT / item["authoritative_source"]).exists()
+        metadata_source = item.get("metadata_source")
+        if metadata_source:
+            assert (ROOT / metadata_source).exists()
 
     for item in role["compatibility_surfaces"]:
         assert (ROOT / item["path"]).exists()
@@ -88,6 +91,13 @@ def test_legacy_surfaces_are_explicitly_non_normative() -> None:
     for item in compatibility.values():
         assert item["authoritative"] is False
 
+    repos_projection = compatibility["repos.yml"]
+    assert repos_projection["status"] == "compatibility_generated"
+    assert repos_projection["generated_from"] == [
+        "fleet/repos.yml",
+        "fleet/repo-metadata.yml",
+    ]
+
     dispatcher = compatibility[
         ".github/workflows/heimgewebe-command-dispatch.yml"
     ]
@@ -95,10 +105,18 @@ def test_legacy_surfaces_are_explicitly_non_normative() -> None:
     assert dispatcher["removal_gate"]
 
 
+def test_role_contract_records_projection_safety_invariants() -> None:
+    invariants = load_role()["invariants"]
+
+    assert any("bytegenau" in item and "repos.yml" in item for item in invariants)
+    assert any("fleet: false" in item and "nicht" in item for item in invariants)
+
+
 def test_role_contract_records_verification_limits() -> None:
     verification = load_role()["verification"]
 
+    assert verification["last_verified_at"] == "2026-07-15"
     assert verification["last_verified_against_commit"] == (
-        "4777fd5cfafea22813f9c3d647b33a0ffefd994b"
+        "e40c43691257aae2f432c33bd220389627d194b8"
     )
     assert verification["does_not_establish"]

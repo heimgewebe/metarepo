@@ -35,8 +35,9 @@ Diese Informationen nicht im Metarepo nachbauen oder aus Legacy-Dokumenten ablei
 
 ### Fleet
 
-- `fleet/repos.yml` ist normativ.
-- `repos.yml` ist eine nicht normative Legacy-Fläche.
+- `fleet/repos.yml` ist die einzige normative Mitgliedschaftsquelle.
+- `fleet/repo-metadata.yml` ist die normative Quelle operativer Zusatzdaten.
+- `repos.yml` ist eine deterministisch generierte, nicht normative Kompatibilitätsprojektion und darf nicht manuell bearbeitet werden.
 - Fleet-Mitgliedschaft bedeutet nicht automatisch Zugehörigkeit zum gesamten Operator-Ökosystem.
 - Repositories nur nach expliziten Aufnahmekriterien ergänzen oder entfernen.
 
@@ -61,7 +62,7 @@ Vor jeder Contract-Änderung:
 
 Folgende Pfade sind nicht Teil der normativen Rolle:
 
-- `repos.yml`
+- `repos.yml` (generierte Kompatibilitätsprojektion)
 - `wgx/`
 - `servers/local-mcp/`
 
@@ -80,12 +81,13 @@ Die früheren Organismus- und Zielbilddokumente sind keine aktuelle Architekturw
 ## Prüfungen
 
 ```bash
+just fleet-projection-check
 just validate
 just contracts-validate
 python3 -m pytest tests/test_metarepo_role_contract.py
 ```
 
-Für Template- und Fleet-Arbeit zusätzlich die betroffenen Drift-, WGX- und Consumer-Checks ausführen.
+Für Fleet-Änderungen zuerst die kanonischen Dateien bearbeiten, anschließend `just fleet-projection` ausführen und danach die betroffenen Drift-, WGX- und Consumer-Checks prüfen.
 
 ## Bestehendes Tooling
 
