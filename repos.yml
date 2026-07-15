@@ -1,88 +1,87 @@
 # GENERATED FILE. DO NOT EDIT.
 # Sources: fleet/repos.yml and fleet/repo-metadata.yml
----
 mode: static
 github:
   owner: heimgewebe
 repos:
-- name: contracts-mirror
-  url: https://github.com/heimgewebe/contracts-mirror
-  default_branch: main
-  domain: contracts
-  scope: schema
-  metrics:
-    enable: false
-- name: weltgewebe
-  url: https://github.com/heimgewebe/weltgewebe
-  default_branch: main
-  domain: aussen
-  scope: events
-  metrics:
-    enable: false
-- name: hausKI
-  url: https://github.com/heimgewebe/hausKI
-  default_branch: main
-  domain: assistant
-  scope: policy
-  metrics:
-    enable: true
-- name: hausKI-audio
-  url: https://github.com/heimgewebe/hausKI-audio
-  default_branch: main
-  depends_on:
-  - hausKI
-  domain: audio
-  scope: events
-  metrics:
-    enable: false
-- name: semantAH
-  url: https://github.com/heimgewebe/semantAH
-  default_branch: main
-  domain: insights
-  scope: export
-  metrics:
-    enable: false
-- name: wgx
-  url: https://github.com/heimgewebe/wgx
-  default_branch: main
-  domain: platform
-  scope: metrics
-  metrics:
-    enable: true
-- name: lenskit
-  url: https://github.com/heimgewebe/lenskit
-  default_branch: main
-  domain: epistemic
-  scope: scanner-merger
-  metrics:
-    enable: false
-- name: chronik
-  url: https://github.com/heimgewebe/chronik
-  default_branch: main
-  domain: chronik
-  scope: ingest
-  metrics:
-    enable: false
-- name: aussensensor
-  url: https://github.com/heimgewebe/aussensensor
-  default_branch: main
-  domain: aussen
-  scope: events
-  metrics:
-    enable: false
-- name: heimlern
-  url: https://github.com/heimgewebe/heimlern
-  default_branch: main
-  domain: policy
-  scope: library
-  metrics:
-    enable: false
-- name: vault-gewebe
-  url: https://github.com/heimgewebe/vault-gewebe
-  default_branch: main
-  domain: vault
-  scope: content
-  metrics:
-    enable: false
-  wgx:
-    profile_expected: false
+  - name: contracts-mirror
+    url: https://github.com/heimgewebe/contracts-mirror
+    default_branch: main
+    domain: contracts
+    scope: schema
+    metrics:
+      enable: false
+  - name: weltgewebe
+    url: https://github.com/heimgewebe/weltgewebe
+    default_branch: main
+    domain: aussen
+    scope: events
+    metrics:
+      enable: false
+  - name: hausKI
+    url: https://github.com/heimgewebe/hausKI
+    default_branch: main
+    domain: assistant
+    scope: policy
+    metrics:
+      enable: true
+  - name: hausKI-audio
+    url: https://github.com/heimgewebe/hausKI-audio
+    default_branch: main
+    depends_on:
+      - hausKI
+    domain: audio
+    scope: events
+    metrics:
+      enable: false
+  - name: semantAH
+    url: https://github.com/heimgewebe/semantAH
+    default_branch: main
+    domain: insights
+    scope: export
+    metrics:
+      enable: false
+  - name: wgx
+    url: https://github.com/heimgewebe/wgx
+    default_branch: main
+    domain: platform
+    scope: metrics
+    metrics:
+      enable: true
+  - name: lenskit
+    url: https://github.com/heimgewebe/lenskit
+    default_branch: main
+    domain: epistemic
+    scope: scanner-merger
+    metrics:
+      enable: false
+  - name: chronik
+    url: https://github.com/heimgewebe/chronik
+    default_branch: main
+    domain: chronik
+    scope: ingest
+    metrics:
+      enable: false
+  - name: aussensensor
+    url: https://github.com/heimgewebe/aussensensor
+    default_branch: main
+    domain: aussen
+    scope: events
+    metrics:
+      enable: false
+  - name: heimlern
+    url: https://github.com/heimgewebe/heimlern
+    default_branch: main
+    domain: policy
+    scope: library
+    metrics:
+      enable: false
+  - name: vault-gewebe
+    url: https://github.com/heimgewebe/vault-gewebe
+    default_branch: main
+    domain: vault
+    scope: content
+    metrics:
+      enable: false
+    wgx:
+      profile_expected: false

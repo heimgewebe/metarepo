@@ -49,6 +49,13 @@ class ProjectionError(ValueError):
     """Raised when canonical Fleet inputs cannot produce a safe projection."""
 
 
+class IndentedSafeDumper(yaml.SafeDumper):
+    """Safe dumper that preserves legacy-compatible sequence indentation."""
+
+    def increase_indent(self, flow: bool = False, indentless: bool = False) -> None:
+        return super().increase_indent(flow, False)
+
+
 class UniqueKeyLoader(yaml.SafeLoader):
     """Safe YAML loader that rejects duplicate mapping keys."""
 
@@ -280,11 +287,11 @@ def build_projection(
 
 
 def render_projection(projection: dict[str, Any]) -> str:
-    body = yaml.safe_dump(
+    body = yaml.dump(
         projection,
+        Dumper=IndentedSafeDumper,
         allow_unicode=True,
         default_flow_style=False,
-        explicit_start=True,
         sort_keys=False,
         width=1000,
     )

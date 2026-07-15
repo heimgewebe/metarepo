@@ -10,6 +10,8 @@ import sys
 import pytest
 import yaml
 
+from wgx import repo_config
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "fleet" / "generate_repos_projection.py"
@@ -31,6 +33,14 @@ def test_repository_projection_is_current() -> None:
         ROOT / "fleet" / "repo-metadata.yml",
     )
     assert (ROOT / "repos.yml").read_text(encoding="utf-8") == expected
+
+
+def test_projection_is_loadable_by_existing_legacy_consumers() -> None:
+    projection = repo_config.load_config(ROOT / "repos.yml")
+
+    assert projection["mode"] == "static"
+    assert projection["github"]["owner"] == "heimgewebe"
+    assert len(projection["repos"]) == 11
 
 
 def test_projection_preserves_complete_legacy_semantics() -> None:
