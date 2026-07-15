@@ -1,40 +1,15 @@
-# Heimgeist vs. HausKI – funktionale Grenzziehung
+# Heimgeist vs. HausKI – funktionale Grenzziehung (historisch)
 
-## Heimgeist (Meta-Agent, Systembeobachter)
+> **Status:** historische Rollenbeschreibung, nicht normativ
+>
+> **Gültig bis:** 2026-07-14
+>
+> **Abgelöst am:** 2026-07-15
 
-Heimgeist agiert auf der Ebene des gesamten Heimgewebes. Er liest Ereignisse (chronik), erkennt Muster, bewertet Risiken, interpretiert semantische Kontexte (semantAH) und stößt systemische Handlungen an.
+Diese Datei schrieb Heimgeist und HausKI feste systemweite Entscheidungs- und Ausführungsrollen zu. Diese Rollenbeschreibung ist keine aktuelle Architekturwahrheit mehr.
 
-Sein Fokus liegt auf:
-- Konsistenzprüfung im Gesamtverbund
-- Erkennen von Drift, Redundanzen, Brüchen
-- Delegation von Aufgaben an passende Subsysteme
-- Kontextualisierung und Reflexion von Ereignissen
-- Auslösen von Guard/Smoke-Prüfungen über WGX
+Das unveränderte Original liegt unter [`docs/archive/heimgewebe-organismus-v0.2/system/heimgeist_vs_hauski.md`](../archive/heimgewebe-organismus-v0.2/system/heimgeist_vs_hauski.md).
 
-Heimgeist denkt über das System nach – nicht über das einzelne Problem.
+Aktuelle Zwecke, Grenzen und Beziehungen werden im [Systemkatalog](https://github.com/heimgewebe/systemkatalog/blob/main/rendered/system-catalog.md) gelesen. Laufzeitfähigkeiten müssen zusätzlich in den jeweiligen Repositories und Runtimes belegt werden.
 
----
-
-## HausKI (lokaler Orchestrator und Inferenz-Motor)
-
-HausKI arbeitet auf der Ebene der konkreten Interaktion. Er führt Modelle aus, orchestriert Inferenzpipelines, verwaltet lokalen Speicher (short-term, working context, long-term), führt RAG-Abfragen aus, steuert Audio-/Dev-Tools und interagiert direkt mit dem Nutzer.
-
-Sein Fokus liegt auf:
-- Ausführen von Assistenz-Anfragen
-- Koordinieren lokaler Agents und Modelle
-- Interpretieren von RAG-Graphen (semantAH)
-- Dev-Assistenz (PR-Drafter, Lokaler Review)
-- Offline-First-Policies, GPU-Scheduling
-
-HausKI ist der aktive Motor – Heimgeist ist der systemweite Beobachter.
-
----
-
-## Interaktion
-
-1. Ereignisse laufen in chronik.
-2. Heimgeist interpretiert.
-3. Heimgeist entscheidet, was passieren soll.
-4. HausKI entscheidet, wie es lokal ausgeführt wird.
-
-Eine Trennung wie zwischen Regisseur (Heimgeist) und Ensemble (HausKI).
+Dieser Pfad bleibt nur als historischer Kompatibilitätseinstieg erhalten.

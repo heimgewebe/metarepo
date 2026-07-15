@@ -1,65 +1,21 @@
-# Heimgewebe – Projektordner (Meta-Ebene)
+# Heimgewebe – Meta-Projektbeschreibung (historisch)
 
-Dieser Ordner ist die zentrale Meta-Dokumentation für den Heimgewebe-Organismus.
+> **Status:** historisch, nicht normativ
+>
+> **Gültig bis:** 2026-07-14
+>
+> **Abgelöst am:** 2026-07-15
 
-Er dient als:
-- Orientierungsanker für KI-Agenten,
-- Driftbremse für Architektur-Entscheidungen,
-- Sammelpunkt für Overviews, Dumps, Roadmaps und Playbooks.
+Diese Datei beschrieb den Ordner `heimgewebe/` als zentrale Meta-Dokumentation, Architektur-Driftbremse und Gedächtnis über den Repositories. Das widerspricht der heutigen Trennung der Wahrheitsquellen.
 
-## Grundidee
+Das unveränderte Original liegt unter [`docs/archive/heimgewebe-organismus-v0.2/project/PROJECT.md`](../docs/archive/heimgewebe-organismus-v0.2/project/PROJECT.md).
 
-Heimgewebe ist ein verteilter technischer Organismus.
-Er besteht aus spezialisierten Repositories, die über Events, Semantik,
-Entscheidungen und Motorik miteinander verbunden sind.
+## Aktuelle Zuständigkeiten
 
-Dieser Ordner beschreibt nicht einzelne Repos,
-sondern das Zusammenspiel des Gesamtsystems.
+- **Systemkatalog:** stabile Zwecke, Grenzen, Beziehungen und Einstiegspunkte
+- **Bureau:** Aufgaben, Reihenfolge, Verifikation und Abschluss
+- **Grabowski:** operative Ausführung, Leases, Audit und Recovery
+- **Chronik:** historische Ereignisse
+- **Metarepo:** Fleet-Mitgliedschaft, gemeinsame Contracts, Templates und wiederverwendbare Workflows
 
-## Zentrale Achsen des Organismus
-
-- Events / Chronik
-  Alles Relevante wird als Event sichtbar (z. B. `event.line`, `aussen.event.*`).
-
-- Semantik / Wissen
-  `semantAH` erzeugt Bedeutung (Insights, Graph, Embeddings).
-
-- Entscheidungen
-  `hausKI` orchestriert, trifft Entscheidungen und verbindet Achsen.
-
-- Fleet / Motorik
-  `wgx` standardisiert Guard, Smoke, Metriken und Fleet-Health.
-
-- Commands
-  Intentionen entstehen primär über Git/CI, strikt getrennt von Events.
-
-- OS-Kontext
-  `mitschreiber` erfasst Fenster, Apps, Texte als `os.context.*`.
-
-## Nutzungsregeln für KI-Agenten
-
-1. Contracts first
-   Keine Annahmen treffen, bevor Dumps, Contracts und Zielbilder gelesen wurden.
-
-2. Events ≠ Commands
-   Ereignisse sind Fakten, Commands sind Absichten. Nicht vermischen.
-
-3. WGX bevorzugen
-   Für CI, Guard, Smoke, Metriken ist `wgx` die Standard-Motorik.
-
-4. Keine Halluzination
-   Fehlende Information explizit als Lücke markieren, nicht auffüllen.
-
-5. Jede Empfehlung prüfen
-   - Prämissencheck
-   - Risikoabschätzung
-   - Alternativweg
-
-## Zweck dieses Ordners
-
-Dieser Ordner soll verhindern, dass:
-- Architektur implodiert,
-- KI-Agenten kontextlos optimieren,
-- Entscheidungen inkonsistent werden.
-
-Er ist das Gedächtnis *über* den Repos.
+Dieser Pfad bleibt nur für historische Verweise erhalten.

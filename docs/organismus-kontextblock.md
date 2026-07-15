@@ -1,14 +1,19 @@
-## Organismus-Kontext
+## Heimgewebe-Kontext
 
-Dieses Repository ist Teil des **Heimgewebe-Organismus**.
+Dieses Repository gehört zum Heimgewebe-Ökosystem. Stabile Systemzwecke, Zuständigkeitsgrenzen, Beziehungen und Einstiegspunkte werden im **Systemkatalog** beschrieben:
 
-Die übergeordnete Architektur, Achsen, Rollen und Contracts sind zentral beschrieben im
-👉 [`metarepo/docs/system/heimgewebe-organismus.md`](system/heimgewebe-organismus.md)
-sowie im Zielbild
-👉 [`metarepo/docs/system/heimgewebe-zielbild.md`](system/heimgewebe-zielbild.md).
+- [erzeugte Leseansicht](https://github.com/heimgewebe/systemkatalog/blob/main/rendered/system-catalog.md)
+- [maschinenlesbare Systeme](https://github.com/heimgewebe/systemkatalog/blob/main/registry/ecosystem/nodes.json)
+- [Wahrheitszuständigkeiten](https://github.com/heimgewebe/systemkatalog/blob/main/registry/ecosystem/authority-matrix.v1.json)
 
-Alle Rollen-Definitionen, Datenflüsse und Contract-Zuordnungen dieses Repos
-sind dort verankert.
+Andere Wahrheiten bleiben bei ihren Primärsystemen:
 
-<!-- Hinweis: Diese Datei ist als Snippet gedacht, das in READMEs anderer Repos
-     eingebunden oder hineinkopiert werden kann. -->
+- Aufgaben, Queue und Abschluss: **Bureau**
+- Ausführung, Leases, Audit und Recovery: **Grabowski**
+- Repository-, Branch-, PR- und Reviewzustand: **GitHub**
+- Laufzeitgesundheit: jeweilige Runtime und Healthchecks
+- historische Ereignisse: **Chronik**
+
+Die früheren Organismus- und Zielbilddokumente im Metarepo sind historisches Material und keine aktuelle Architekturquelle.
+
+<!-- Dieses Snippet darf in andere Repositories übernommen werden. Es verweist nur auf Primärquellen und bildet keine zweite Systemwahrheit. -->

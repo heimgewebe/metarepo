@@ -1,78 +1,83 @@
 # Metarepo Documentation
 
-Welcome to the Heimgewebe Metarepo documentation!
+## Current role and source boundaries
 
-## Core Documentation
+Metarepo is a delivery repository for Fleet membership, shared contracts, curated templates and reusable workflows. It is not the system catalog or an ecosystem control plane.
 
-### Architecture & Vision
-- [Architecture](system/architecture.md): System overview and component layers
-- [Vision](vision/vision.md): Guidelines and roadmap
-- [Konzept Kern](konzept-kern.md): Core concepts - Governance, Sync, Drift (German)
-- [Nutzung](nutzung.md): Usage & Daily Operations (German)
+- [Normative Metarepo role](../system/metarepo-role.v1.json)
+- [Agent and operator guidance](../AGENTS.md)
+- [Systemkatalog rendered view](https://github.com/heimgewebe/systemkatalog/blob/main/rendered/system-catalog.md)
+- [Systemkatalog machine-readable inventory](https://github.com/heimgewebe/systemkatalog/blob/main/registry/ecosystem/nodes.json)
+- [Source-of-truth context snippet](organismus-kontextblock.md)
 
-### Fleet Management
-- [Fleet](fleet/fleet.md): Template synchronization and fleet operations
+Tasks, priorities and completion belong to Bureau. Execution, leases, audit and recovery belong to Grabowski. Historical events belong to Chronik. Runtime health belongs to each responsible service.
+
+## Repository delivery documentation
+
+### Fleet management
+
+- [Fleet](fleet/fleet.md): template synchronization and fleet operations
 - [Push to Fleet](fleet/push-to-fleet.md): Fleet deployment procedures
-- [Repo Matrix](repo-matrix.md): Repository roles and status
-- [Templates](templates.md): Template distribution and drift management
+- [Repo Matrix](repo-matrix.md): legacy repository-role overview; verify against Systemkatalog before use
+- [Templates](templates.md): template distribution and drift management
 - [Automation](policies/automation.md): CI/CD and automation patterns
-- [CI Reusables](policies/ci-reusables.md): Reusable workflow patterns
+- [CI Reusables](policies/ci-reusables.md): reusable workflow patterns
+- [Repos.yml Documentation](repos.yml.md): generated compatibility projection reference
 
-### Contracts & APIs
-- [Contract Versioning](contracts/contract-versioning.md): Rollout process
-- [Knowledge Contracts](knowledge-contracts.md): Knowledge graph contracts
-- [Contracts Overview](contracts/contracts-index.md): Contract index
+### Contracts and APIs
+
+- [Contract Versioning](contracts/contract-versioning.md): rollout process
+- [Knowledge Contracts](knowledge-contracts.md): knowledge graph contracts
+- [Contracts Overview](contracts/contracts-index.md): contract index
 - [API](api.md): API documentation
+- [Mitschreiber Contract](contracts/mitschreiber.md): intent and context events
+- [Sichter Contract](contracts/sichter.md): review and diagnostic events
 
-#### Contract Details
-- [Mitschreiber Contract](contracts/mitschreiber.md): Intent and context events
-- [Sichter Contract](contracts/sichter.md): Review and diagnostic events
+### Development and operations
 
-### Development
 - [WGX Konzept](fleet/wgx-konzept.md): Fleet motor and commands
-- [WGX Stub](wgx-stub.md): WGX stub implementation
-- [Agents](agents.md): Guidelines for AI agents
-- [Environment](fleet/environment.md): Development environment setup
-- [E2E](runbooks/e2e.md): End-to-end testing
-- [Troubleshooting](runbooks/troubleshooting.md): Common issues and solutions
-- [Runbooks](runbooks/runbooks.md): Operational runbooks
-- [Graph](graph.md): Dependency analysis
+- [WGX Stub](wgx-stub.md): WGX compatibility implementation
+- [Agents](agents.md): guidelines for AI agents
+- [Environment](fleet/environment.md): development environment setup
+- [E2E](runbooks/e2e.md): end-to-end testing
+- [Troubleshooting](runbooks/troubleshooting.md): common issues and solutions
+- [Runbooks](runbooks/runbooks.md): operational runbooks
+- [Graph](graph.md): dependency analysis
 
-### Process & Guidelines
-- [Leitlinien](leitlinien.md): Development guidelines (German)
-- [Language Guide](language-guide.md): Bilingual documentation strategy
-- [Architecture Decision Records (ADRs)](adrs/README.md): Design decisions and rationale
-- [Policies](policies/orientierung.md): General policies and orientation
-- [GitHub Actions Pinning](policies/github-actions-pinning.md): Action versioning policy
-- [Repos.yml Documentation](repos.yml.md): Fleet configuration reference
+### Process and guidelines
 
-### Vision & Planning
-- [Vision Overview](vision/README.md): Vision documents overview
-- [Heimgewebe Evolution](vision/heimgewebe-evolution-maximaleffizienz.md): System evolution strategy
-- [Heimgewebe v2 Detailed](vision/heimgewebe-v2-detailed.md): Detailed v2 roadmap
+- [Leitlinien](leitlinien.md): development guidelines
+- [Language Guide](language-guide.md): bilingual documentation strategy
+- [Architecture Decision Records](adrs/README.md): historical decisions and rationale
+- [Policies](policies/orientierung.md): general policies and orientation
+- [GitHub Actions Pinning](policies/github-actions-pinning.md): action versioning policy
 
-### System Documentation
-- [Heimgeist vs HausKI](system/heimgeist_vs_hauski.md): Component comparison
-- [IDEal Blueprint](vision/IDEal_Blueprint.md): IDE integration blueprint
-- [System Organism](system/heimgewebe-organismus.md): Organism model
-- [System Target State](system/heimgewebe-zielbild.md): Target state definition
+## Historical architecture and planning
 
-## Tools Documentation
+The former Organismus v0.2 model, target state, diagrams, vision and capability plans are preserved for provenance only:
 
-The following documentation relates to tools used by this repository:
+- [Archive index](archive/heimgewebe-organismus-v0.2/README.md)
+- [Hash-bound archive manifest](archive/heimgewebe-organismus-v0.2/manifest.v1.json)
+- [Organism compatibility page](system/heimgewebe-organismus.md)
+- [Target-state compatibility page](system/heimgewebe-zielbild.md)
+- [Architecture compatibility page](system/architecture.md)
+- [Vision compatibility page](vision/vision.md)
+- [Capability-plan compatibility page](vision/heimgewebe-capability-plan.md)
+- [Capability-roadmap compatibility page](roadmaps/heimgewebe-capabilities-2026.md)
 
-### Just Task Runner
-- [Just Commands](tools/just.md): Just task runner overview
+These files are not current architecture, task or roadmap sources.
 
-### actionlint (GitHub Actions Linter)
-- [actionlint Checks](policies/checks.md): GitHub Actions linting (actionlint tool)
-- [actionlint Installation](runbooks/install.md): Tool installation (actionlint)
-- [actionlint Usage](runbooks/usage.md): Tool usage (actionlint)
-- [actionlint Configuration](config.md): Tool configuration (actionlint)
-- [actionlint References](reference.md): Additional resources (actionlint)
+## Tool documentation
 
-## Quick Links
+- [Just Commands](tools/just.md)
+- [actionlint Checks](policies/checks.md)
+- [actionlint Installation](runbooks/install.md)
+- [actionlint Usage](runbooks/usage.md)
+- [actionlint Configuration](config.md)
+- [actionlint References](reference.md)
 
-- Main README: [../README.md](../README.md)
-- Contributing Guide: [../CONTRIBUTING.md](../CONTRIBUTING.md)
-- Agents Guide: [../AGENTS.md](../AGENTS.md)
+## Quick links
+
+- [Main README](../README.md)
+- [Contributing Guide](../CONTRIBUTING.md)
+- [Agents Guide](../AGENTS.md)

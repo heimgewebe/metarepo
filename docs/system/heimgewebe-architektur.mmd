@@ -1,50 +1,10 @@
-```mermaid
-graph TD
-    subgraph META["Kontroll- & Vertrags-Ebene"]
-        M[metarepo<br/>Templates · Contracts · CI]
-        T[lenskit<br/>Merger & Scanner]
-    end
-
-    subgraph INNEN["Innenwelt – lokales Selbst"]
-        WGX[wgx<br/>System · Backups · Metrics]
-        HKI[hausKI<br/>Orchestrator · State · Events]
-        HLA[heimlern<br/>Policies · Lernen · Why]
-        SEM[semantAH<br/>Vault · Embeddings · Insights]
-        AUD[hausKI-audio<br/>Audio · Routing · Latenzen]
-    end
-
-    subgraph VIS["Persistenz & Darstellung"]
-        CHRONIK[chronik<br/>Ingest · Persistenz · Audit]
-        LST[leitstand<br/>UI · Panels · Explain]
-        CHRONIK --> LST
-        AUS[aussensensor<br/>Außenfeed · Sensorik]
-    end
-
-    subgraph AUSSEN["Kooperative Nachbarschaft"]
-        WELT[weltgewebe<br/>Gemeinschaft · Karten · Güterverwaltung]
-    end
-
-    M --> WGX
-    M --> HKI
-    M --> CHRONIK
-    M --> LST
-    M --> AUS
-
-    WGX --> HKI
-    HKI --> HLA
-    HKI --> CHRONIK
-    HKI --> SEM
-    HKI --> AUD
-    HLA --> HKI
-    SEM --> HKI
-    AUD --> HKI
-
-    AUS --> CHRONIK
-    WELT -. know-how .-> AUS
-    AUS -. insights .-> WELT
-
-    style META fill:#cce5ff,stroke:#003366,stroke-width:2px
-    style INNEN fill:#e6ffe6,stroke:#006600,stroke-width:2px
-    style VIS fill:#fff0cc,stroke:#996600,stroke-width:2px
-    style AUSSEN fill:#ffe6e6,stroke:#660000,stroke-width:2px
-```
+%% Status: historical_non_normative
+%% Valid through: 2026-07-14; superseded: 2026-07-15
+flowchart TD
+    H["HISTORISCHER KOMPATIBILITÄTSPFAD<br/>Die frühere Organismus-Architektur ist nicht mehr aktuell."]
+    A["Unverändertes Diagramm im Archiv v0.2"]
+    C["Aktuelle Systemkarte im Systemkatalog"]
+    H --> A
+    H --> C
+    click A "https://github.com/heimgewebe/metarepo/blob/main/docs/archive/heimgewebe-organismus-v0.2/system/heimgewebe-architektur.mmd" "Historisches Original"
+    click C "https://github.com/heimgewebe/systemkatalog/blob/main/rendered/ecosystem-registry-map.mmd" "Aktuelle Systemkatalog-Karte"

@@ -1,20 +1,15 @@
 {
   "nodes": [
-    { "id": "wgx", "type": "text", "text": "wgx\n(metrics.snapshot.json)", "x": -200, "y": -160, "width": 260, "height": 120, "color": "5" },
-    { "id": "hauski", "type": "text", "text": "hausKI\n(events.jsonl)", "x": -200, "y": 0, "width": 260, "height": 120, "color": "3" },
-    { "id": "semantah", "type": "text", "text": "semantAH\n(insights/today.json)", "x": -200, "y": 160, "width": 260, "height": 120, "color": "5" },
-    { "id": "audio", "type": "text", "text": "hausKI-audio\n(audio.events)", "x": -200, "y": 320, "width": 260, "height": 120, "color": "5" },
-    { "id": "aussen", "type": "text", "text": "aussensensor\n(feed.jsonl)", "x": -200, "y": 480, "width": 260, "height": 120, "color": "3" },
-
-    { "id": "chronik", "type": "text", "text": "chronik\n/data/{domain}.jsonl", "x": 220, "y": 160, "width": 260, "height": 120, "color": "3" },
-    { "id": "leitstand", "type": "text", "text": "leitstand\nUI/Dashboard", "x": 520, "y": 160, "width": 260, "height": 120, "color": "4" }
+    {
+      "id": "historical-notice",
+      "type": "text",
+      "text": "# Historischer Kompatibilitätspfad\n\nDer frühere Heimgewebe-Organismusdatenfluss ist **nicht mehr aktuell**.\n\n- Gültig bis: 2026-07-14\n- Abgelöst am: 2026-07-15\n- [Unverändertes Canvas im Archiv v0.2](../archive/heimgewebe-organismus-v0.2/canvas/heimgewebe-dataflow.canvas)\n- [Aktuelle Beziehungen im Systemkatalog](https://github.com/heimgewebe/systemkatalog/blob/main/rendered/ecosystem-registry-map.mmd)\n- [Aktuelle Metarepo-Rolle](../../system/metarepo-role.v1.json)",
+      "x": 0,
+      "y": 0,
+      "width": 720,
+      "height": 420,
+      "color": "1"
+    }
   ],
-  "edges": [
-    { "id": "d1", "fromNode": "wgx", "fromSide": "right", "toNode": "chronik", "toSide": "left", "label": "metrics.snapshot.json" },
-    { "id": "d2", "fromNode": "hauski", "fromSide": "right", "toNode": "chronik", "toSide": "left", "label": "events.jsonl" },
-    { "id": "d3", "fromNode": "semantah", "fromSide": "right", "toNode": "chronik", "toSide": "left", "label": "insights/today.json" },
-    { "id": "d4", "fromNode": "audio", "fromSide": "right", "toNode": "chronik", "toSide": "left", "label": "audio.events" },
-    { "id": "d5", "fromNode": "aussen", "fromSide": "right", "toNode": "chronik", "toSide": "left", "label": "feed.jsonl /ingest/aussen" },
-    { "id": "d6", "fromNode": "chronik", "fromSide": "right", "toNode": "leitstand", "toSide": "left", "label": "Events" }
-  ]
+  "edges": []
 }

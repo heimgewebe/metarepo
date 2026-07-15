@@ -76,6 +76,21 @@
       "reusable_workflows"
     ]
   },
+  "architecture_sources": {
+    "repository_role": {
+      "owner": "repo:metarepo",
+      "path": "system/metarepo-role.v1.json"
+    },
+    "ecosystem_semantics": {
+      "owner": "repo:systemkatalog",
+      "repository": "https://github.com/heimgewebe/systemkatalog",
+      "rendered_path": "rendered/system-catalog.md",
+      "inventory_path": "registry/ecosystem/nodes.json",
+      "authority_matrix_path": "registry/ecosystem/authority-matrix.v1.json",
+      "verified_at": "2026-07-15",
+      "verified_commit": "ac0e7cc8862c97125862b1475068832d8d517475"
+    }
+  },
   "compatibility_surfaces": [
     {
       "path": "repos.yml",
@@ -109,12 +124,40 @@
       "removal_gate": "Alle organisationsweiten Caller sind auf einen aktuellen, auditierbaren Dispatchpfad migriert."
     }
   ],
+  "legacy_document_policy": {
+    "status": "historical_non_normative",
+    "valid_through": "2026-07-14",
+    "superseded_on": "2026-07-15",
+    "archive_root": "docs/archive/heimgewebe-organismus-v0.2",
+    "archive_manifest": "docs/archive/heimgewebe-organismus-v0.2/manifest.v1.json",
+    "compatibility_paths_preserved": true,
+    "replacement_sources": [
+      "system/metarepo-role.v1.json",
+      "https://github.com/heimgewebe/systemkatalog/blob/main/rendered/system-catalog.md",
+      "https://github.com/heimgewebe/systemkatalog/blob/main/registry/ecosystem/nodes.json"
+    ]
+  },
   "non_authoritative_legacy_documents": [
     "docs/system/heimgewebe-organismus.md",
     "docs/system/heimgewebe-zielbild.md",
     "docs/system/architecture.md",
     "docs/heimgewebe-organismus.md",
-    "docs/heimgewebe-zielbild.md"
+    "docs/heimgewebe-zielbild.md",
+    "docs/vision/vision.md",
+    "docs/vision/heimgewebe-capability-plan.md",
+    "docs/roadmaps/heimgewebe-capabilities-2026.md",
+    "docs/system/heimgewebe-architektur.mmd",
+    "docs/system/heimgewebe-dataflow.mmd",
+    "docs/canvas/heimgewebe-architektur.canvas",
+    "docs/canvas/heimgewebe-dataflow.canvas",
+    "docs/architecture/integrity-neurose.md",
+    "docs/architecture/pipeline-channels.md",
+    "docs/system/plexer-eventmodel.md",
+    "docs/system/heimgeist_vs_hauski.md",
+    "docs/vision/leitwerk-blueprint",
+    "docs/vision/README.md",
+    "heimgewebe/README.md",
+    "heimgewebe/PROJECT.md"
   ],
   "invariants": [
     "Metarepo darf nicht als Control Plane oder Quelle der gesamten Systemarchitektur bezeichnet werden.",
@@ -122,6 +165,8 @@
     "Shared Assets werden erst nach belegter Consumer-Auswirkung geändert oder entfernt.",
     "README.md, .ai-context.yml und AGENTS.md müssen auf diesen Rollenvertrag verweisen und dieselben Wahrheitsgrenzen ausdrücken.",
     "Legacy- und Kompatibilitätsflächen bleiben ausdrücklich nicht normativ, solange ihre Ablösung nicht verifiziert ist.",
+    "Historische Organismus-Dokumente und Diagramme müssen über das hashgebundene Archivmanifest auffindbar bleiben; ihre bisherigen Pfade dürfen keine aktuelle Architektur behaupten.",
+    "Aktive Ökosystemsemantik wird aus dem Systemkatalog referenziert und nicht im Metarepo dupliziert.",
     "repos.yml darf nicht manuell geändert werden und muss bytegenau aus fleet/repos.yml sowie fleet/repo-metadata.yml reproduzierbar sein.",
     "Einträge mit fleet: false dürfen nicht in repos.yml projiziert oder allein aufgrund ihrer Erwähnung als Fleet-Ziel behandelt werden."
   ],
@@ -133,17 +178,19 @@
   },
   "verification": {
     "last_verified_at": "2026-07-15",
-    "last_verified_against_commit": "e40c43691257aae2f432c33bd220389627d194b8",
+    "last_verified_against_commit": "0a0f6ddd25aeb634dbee7060c650923fe7b709ea",
     "evidence_scope": [
       "metarepo origin/main",
-      "systemkatalog role projection",
-      "organisation-wide reusable-workflow caller search",
+      "systemkatalog commit ac0e7cc8862c97125862b1475068832d8d517475",
+      "organisation-wide legacy-document caller search",
       "top-level repos.yml consumer and projection audit",
-      "semantic equality with the prior top-level repos.yml consumer contract"
+      "semantic equality with the prior top-level repos.yml consumer contract",
+      "rest-drift scan of active architecture, vision and heimgewebe meta-project surfaces"
     ],
     "does_not_establish": [
       "vollständige lokale IDE-Nutzung von servers/local-mcp",
-      "Entfernbarkeit einer Compatibility Surface ohne Consumer-Migration"
+      "Entfernbarkeit einer Compatibility Surface ohne Consumer-Migration",
+      "vollständige Migration externer Verweise auf historische Organismus-Pfade"
     ]
   }
 }

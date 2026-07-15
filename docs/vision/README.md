@@ -1,21 +1,20 @@
-# Heimgewebe Vision – Index
+# Heimgewebe Vision – historischer Index
 
-Dieses Verzeichnis bündelt zwei Ebenen:
+> **Status:** historische Konzept- und Planungsfläche
+>
+> **Gültig bis:** 2026-07-14
+>
+> **Abgelöst am:** 2026-07-15
 
-1. **Executive Summary:** [`heimgewebe-evolution-maximaleffizienz.md`](./heimgewebe-evolution-maximaleffizienz.md)
-   – kurz, handlungsorientiert, Wellen-Plan (Wave-1 bis -3).
+Die Dateien in diesem Verzeichnis dokumentieren frühere Visionen, Blueprint- und Autopoiesis-Entwürfe. Sie sind weder aktive Roadmap noch aktuelle Architekturquelle.
 
-2. **Deep Dive (Detail):** [`heimgewebe-v2-detailed.md`](./heimgewebe-v2-detailed.md)
-   – vollständige Begründungen, Rollen, Datenflüsse, Evaluationsmetriken.
+Das unveränderte frühere Indexdokument liegt unter [`docs/archive/heimgewebe-organismus-v0.2/vision/README.md`](../archive/heimgewebe-organismus-v0.2/vision/README.md).
 
-3. **Autopoiesis (Konzept):** [`heimgewebe-autopoiesis.md`](./heimgewebe-autopoiesis.md)
-   – Dialektische Erörterung: Heimgewebe als autopoetischer KI-Organismus.
+## Aktuelle Quellen
 
-Weitere Umsetzung:
-- **Fleet-Rollout:** [`../fleet/push-to-fleet.md`](../fleet/push-to-fleet.md)
-- **Agent-Contracts:** `contracts/agent.tool.schema.json`
-- **Intent-Events:** `contracts/intent.event.schema.json`
+- Systemzwecke, Grenzen und Beziehungen: [Systemkatalog](https://github.com/heimgewebe/systemkatalog/blob/main/rendered/system-catalog.md)
+- Aktive Aufgaben und Reihenfolge: Bureau
+- Metarepo-Rolle: [`system/metarepo-role.v1.json`](../../system/metarepo-role.v1.json)
+- Historische Originale und Hashes: [Archivmanifest](../archive/heimgewebe-organismus-v0.2/manifest.v1.json)
 
-## Navigationshilfe
-- Einstieg operativ: *Executive Summary* → Just-Targets → Fleet-Push.
-- Entscheidung/Design: *Deep Dive* → Architektur, Trade-offs, Roadmap-Details.
+Einzelne Konzeptdateien dürfen als Denkgeschichte gelesen werden, aber nicht als Implementierungs- oder Prioritätsauftrag.

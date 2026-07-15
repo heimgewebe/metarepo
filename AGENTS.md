@@ -68,7 +68,7 @@ Folgende Pfade sind nicht Teil der normativen Rolle:
 
 Der Workflow `.github/workflows/heimgewebe-command-dispatch.yml` ist weiterhin eine aktive Kompatibilitätsfläche. Keine dieser Flächen ohne vollständige Consumerinventur und grünen Migrations-Readback entfernen.
 
-Die früheren Organismus- und Zielbilddokumente sind keine aktuelle Architekturwahrheit. Ihre Historisierung erfolgt gesondert.
+Die früheren Organismus-, Zielbild-, Rollen- und Diagrammdokumente sind keine aktuelle Architekturwahrheit. Die unveränderten Originale liegen hashgebunden unter `docs/archive/heimgewebe-organismus-v0.2/`; ihre bisherigen Pfade sind nur historische Kompatibilitätseinstiege.
 
 ## Sicherheits- und Arbeitsmodus
 

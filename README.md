@@ -82,10 +82,10 @@ grüner Migrations-Readback belegt sind.
 
 ## Historische Architekturdokumente
 
-Die vorhandenen Dokumente zum früheren „Heimgewebe-Organismus“, insbesondere
-unter `docs/system/`, sind **keine aktuelle Architekturwahrheit**. Sie bleiben
-bis zur gesonderten Historisierung als Legacy-Material auffindbar. Für die
-gegenwärtige Systemtopologie ist der Systemkatalog zuständig.
+Die Dokumente zum früheren „Heimgewebe-Organismus“ sind seit dem 15. Juli 2026
+hashgebunden unter `docs/archive/heimgewebe-organismus-v0.2/` archiviert. Ihre
+bisherigen Pfade bleiben als ausdrücklich historische Kompatibilitätseinstiege
+erhalten. Für die gegenwärtige Systemtopologie ist der Systemkatalog zuständig.
 
 ## Schnellstart
 
