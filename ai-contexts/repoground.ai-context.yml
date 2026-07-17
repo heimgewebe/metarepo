@@ -2,9 +2,9 @@
 ai_context_version: 1.1
 
 project:
-  name: lenskit
-  summary: Scanner- und Merger-Kern für Repo-Snapshots und epistemische Artefakte.
-  role: epistemic_scanner_merger_core
+  name: repoground
+  summary: Verifizierbarer Codebase-Kontext für Menschen und KI-Systeme.
+  role: verifiable_codebase_context
   primary_language: mixed
   visibility: public
 
@@ -21,10 +21,10 @@ interfaces:
     - "Fleet repository trees and metadata"
     - "Commit history and file snapshots"
   produces:
-    - "merge artifacts"
-    - "fleet snapshots"
-    - "scanner reports"
-    - "agent-readable epistemic bundles"
+    - "canonical repository snapshots"
+    - "retrieval and navigation indices"
+    - "evidence-bound codebase context"
+    - "agent-readable bundles"
 
 boundaries:
   responsible_for:
@@ -49,12 +49,12 @@ architecture:
   note: "Historische Pfade wie tools/bin/* nur bei bestätigter Existenz verwenden; nicht automatisch umbenennen."
   data_flow:
     input: "Fleet state and repository trees"
-    processing: "Scan + Merge + Snapshot + Report"
-    output: "Epistemic artifacts and machine-readable reports"
+    processing: "Scan + Snapshot + Index + Evidence binding"
+    output: "Verifiable codebase context and machine-readable evidence"
 
 conventions:
   branching: "main, feature/*"
-  commit_prefix: "lenskit"
+  commit_prefix: "repoground"
   ci_platform: github_actions
 
 documentation:
@@ -66,4 +66,4 @@ ai_guidance:
     - preserve reproducibility of generated artifacts
     - verify concrete filesystem paths before path-specific assumptions
   dont:
-    - introduce repo-local utility assumptions into lenskit identity
+    - introduce repo-local utility assumptions into RepoGround identity

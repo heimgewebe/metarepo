@@ -90,36 +90,32 @@ if [ "$ERRORS" -eq 1 ]; then
   exit 1
 fi
 
-# 3. Guard against stale repo-identity references to legacy repo name "tools"
-# Allowlist rules (exclusion semantics vary by implementation):
-# - reports/sync-logs/** may contain historical names by design.
-#   (rg: path-scoped glob; grep fallback: basename "sync-logs")
-# - tools/** is a local toolchain tree, not repo identity.
-#   (rg: path-scoped glob; grep fallback: basename "tools" matches all tools dirs)
-# - scripts/tools/** contains local helper scripts, not repo identity.
-#   (rg: path-scoped glob; grep fallback: covered by basename "tools")
-# - scripts/fleet/check_docs_drift.sh contains the guard patterns itself.
-#   (rg: path-scoped glob; grep fallback: basename "check_docs_drift.sh")
-# Note: docs/archive/** was migrated (tools→lenskit) in commit 7038fdd, so no exclusion needed.
-# Implementation note: rg globs are path-scoped and precise; grep fallback uses basename
-# exclusions for portability across GNU/BSD/busybox variants.
+# 3. Guard against stale active repo identities "tools" and "lenskit"
+# Allowlist rules:
+# - reports/sync-logs/** and docs/archive/** are immutable historical evidence.
+# - tools/** and scripts/tools/** are local toolchain trees, not repo identity.
+# - the command-dispatch workflow intentionally recognizes legacy aliases so it
+#   can direct callers to RepoGround; the patterns below target active identity
+#   declarations and allowlists, not that explicit compatibility branch.
+# - this script contains the guard patterns itself.
 
-echo "Scanning for stale repo-identity references (tools -> lenskit)..."
+echo "Scanning for stale repo identities (tools/lenskit -> repoground)..."
 
-LEGACY_PATTERN_PCRE='(github\.com/heimgewebe/tools|heimgewebe/tools|^\s*-\s*name:\s*tools\s*$|ALLOWED_TARGET_REPOS:.*\btools\b)'
-LEGACY_PATTERN_ERE='(github\.com/heimgewebe/tools|heimgewebe/tools|^[[:space:]]*-[[:space:]]*name:[[:space:]]*tools[[:space:]]*$|ALLOWED_TARGET_REPOS:.*(^|[^[:alnum:]_])tools([^[:alnum:]_]|$))'
+LEGACY_PATTERN_RG='(github\.com/heimgewebe/(tools|lenskit)(\.git)?|heimgewebe/(tools|lenskit)\b|^\s*-\s*name:\s*(tools|lenskit)\s*$|^\s*name:\s*(tools|lenskit)\s*$|ALLOWED_TARGET_REPOS:.*\b(tools|lenskit)\b)'
+LEGACY_PATTERN_ERE='(github\.com/heimgewebe/(tools|lenskit)(\.git)?|heimgewebe/(tools|lenskit)([^[:alnum:]_.-]|$)|^[[:space:]]*-[[:space:]]*name:[[:space:]]*(tools|lenskit)[[:space:]]*$|^[[:space:]]*name:[[:space:]]*(tools|lenskit)[[:space:]]*$|ALLOWED_TARGET_REPOS:.*(^|[^[:alnum:]_])(tools|lenskit)([^[:alnum:]_]|$))'
 if has_rg; then
   set +e
-  rg -n --pcre2 \
+  rg -n \
     --glob '!reports/sync-logs/**' \
+    --glob '!docs/archive/**' \
     --glob '!tools/**' \
     --glob '!scripts/tools/**' \
     --glob '!scripts/fleet/check_docs_drift.sh' \
-    "$LEGACY_PATTERN_PCRE" .
+    "$LEGACY_PATTERN_RG" .
   rc=$?
   set -e
   if [ "$rc" -eq 0 ]; then
-    echo "❌ Found stale repo-identity reference(s) to 'tools'. Use 'lenskit' instead."
+    echo "❌ Found stale active repo identity. Use 'repoground' instead."
     exit 1
   elif [ "$rc" -eq 1 ]; then
     :
@@ -134,6 +130,7 @@ else
     grep -r -I -n -E \
       --exclude-dir='.git' \
       --exclude-dir='sync-logs' \
+      --exclude-dir='archive' \
       --exclude-dir='tools' \
       --exclude='check_docs_drift.sh' \
       -e "$LEGACY_PATTERN_ERE" \
@@ -144,15 +141,12 @@ else
   set -e
 
   if [ "$rc" -eq 0 ]; then
-    # Matches found
     echo "$GREP_OUT"
-    echo "❌ Found stale repo-identity reference(s) to 'tools'. Use 'lenskit' instead."
+    echo "❌ Found stale active repo identity. Use 'repoground' instead."
     exit 1
   elif [ "$rc" -eq 1 ]; then
-    # No matches - clean
     :
   else
-    # grep error (exit 2+)
     if [ -n "$GREP_OUT" ]; then
       echo "$GREP_OUT" >&2
     fi

@@ -15,7 +15,7 @@ from wgx import repo_config
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "fleet" / "generate_repos_projection.py"
-LEGACY_SEMANTIC_SHA256 = "bbeeb43183de6526d0d2a22a4e82a37ca083416d23060525610bee9bf1a20737"
+PROJECTION_SEMANTIC_SHA256 = "a471bd9907f066acef70dc2f71bf26fda82ee30c657c588ea8d04d0c71164081"
 SPEC = importlib.util.spec_from_file_location("generate_repos_projection", SCRIPT)
 assert SPEC and SPEC.loader
 MODULE = importlib.util.module_from_spec(SPEC)
@@ -43,7 +43,7 @@ def test_projection_is_loadable_by_existing_legacy_consumers() -> None:
     assert len(projection["repos"]) == 11
 
 
-def test_projection_preserves_complete_legacy_semantics() -> None:
+def test_projection_pins_complete_compatibility_semantics() -> None:
     projection = yaml.safe_load((ROOT / "repos.yml").read_text(encoding="utf-8"))
     canonical = json.dumps(
         projection,
@@ -52,7 +52,7 @@ def test_projection_preserves_complete_legacy_semantics() -> None:
         separators=(",", ":"),
     ).encode("utf-8")
 
-    assert hashlib.sha256(canonical).hexdigest() == LEGACY_SEMANTIC_SHA256
+    assert hashlib.sha256(canonical).hexdigest() == PROJECTION_SEMANTIC_SHA256
 
 
 def test_projection_preserves_legacy_consumer_shape() -> None:
@@ -68,7 +68,7 @@ def test_projection_preserves_legacy_consumer_shape() -> None:
         "hausKI-audio",
         "semantAH",
         "wgx",
-        "lenskit",
+        "repoground",
         "chronik",
         "aussensensor",
         "heimlern",

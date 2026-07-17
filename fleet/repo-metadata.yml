@@ -47,10 +47,10 @@ repositories:
     scope: metrics
     metrics:
       enable: true
-  lenskit:
+  repoground:
     default_branch: main
     domain: epistemic
-    scope: scanner-merger
+    scope: codebase-context
     metrics:
       enable: false
   chronik:

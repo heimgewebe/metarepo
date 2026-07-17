@@ -12,7 +12,7 @@ Quelle: [`repos.yml`](../repos.yml).
 | [hausKI](https://github.com/heimgewebe/hausKI) | main | assistant | policy | ✅ | – |
 | [hausKI-audio](https://github.com/heimgewebe/hausKI-audio) | main | audio | events | – | hausKI |
 | [heimlern](https://github.com/heimgewebe/heimlern) | main | policy | library | – | – |
-| [lenskit](https://github.com/heimgewebe/lenskit) | main | epistemic | scanner-merger | – | – |
+| [repoground](https://github.com/heimgewebe/repoground) | main | epistemic | codebase-context | – | – |
 | [semantAH](https://github.com/heimgewebe/semantAH) | main | insights | export | – | – |
 | [vault-gewebe](https://github.com/heimgewebe/vault-gewebe) | main | vault | content | – | – |
 | [weltgewebe](https://github.com/heimgewebe/weltgewebe) | main | aussen | events | – | – |
