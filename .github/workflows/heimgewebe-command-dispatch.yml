@@ -23,7 +23,7 @@ jobs:
     env:
       # Whitelist der Ziel-Repos (kommagetrennt). Kann pro Repo via
       # Repository-Variable HEIMGEWEBE_ALLOWED_REPOS überschrieben werden.
-      ALLOWED_TARGET_REPOS: ${{ vars.HEIMGEWEBE_ALLOWED_REPOS || 'sichter,wgx,heimgeist,metarepo,hausKI,semantAH,heimlern,chronik,leitstand,lenskit' }}
+      ALLOWED_TARGET_REPOS: ${{ vars.HEIMGEWEBE_ALLOWED_REPOS || 'sichter,wgx,heimgeist,metarepo,hausKI,semantAH,heimlern,chronik,leitstand,repoground' }}
 
       # Whitelist der erlaubten Kommandos (kommagetrennt). Kann via
       # Repository-Variable HEIMGEWEBE_ALLOWED_COMMANDS überschrieben werden.
@@ -139,9 +139,9 @@ jobs:
             }
 
             // Whitelist-Checks
-            if (targetRepo === "tools") {
+            if (["tools", "lenskit"].includes(targetRepo)) {
               await reply(
-                "⚠️ Das Ziel-Repo **tools** ist deprecated. Bitte nutze **lenskit**.\n\n" +
+                `⚠️ Das Ziel-Repo **${targetRepo}** ist deprecated. Bitte nutze **repoground**.\n\n` +
                 `Erlaubte Repos: \`${allowedRepos.join(", ")}\`.`
               );
               return;

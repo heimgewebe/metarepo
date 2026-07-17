@@ -9,7 +9,7 @@ autopoetischer KI-Organismus funktioniert:
 - **semantAH** – semantischer Index und Insights
 - **chronik** – Ereignisspeicher (Event-Log, Audit)
 - **leitstand** – UI / Dashboard
-- plus weitere Organe: **aussensensor**, **heimlern**, **vault-gewebe**, **weltgewebe**, **lenskit**, **sichter**, **mitschreiber**, **heimgeist**, **plexer**.
+- plus weitere Organe: **aussensensor**, **heimlern**, **vault-gewebe**, **weltgewebe**, **repoground**, **sichter**, **mitschreiber**, **heimgeist**, **plexer**.
 
 Dieses Dokument erklärt:
 
@@ -222,9 +222,9 @@ wird öffentlich sichtbar.
 
 ---
 
-### 2.11 lenskit – Merger & Scanner
+### 2.11 RepoGround – verifizierbarer Codebase-Kontext
 
-**Repo:** `heimgewebe/lenskit`
+**Repo:** `heimgewebe/repoground`
 
 - Enthält:
   - Merging-Tools (z. B. repomerger, wc-merger) zur Snapshot-Erstellung.
@@ -232,7 +232,7 @@ wird öffentlich sichtbar.
 - Wird von metarepo/wgx genutzt, um Org-Assets zu generieren (z. B. Tabellen aus `repos.yml`).
 
 **Nutzen:**
-lenskit ist der **Scanner-/Merger-Kern**: es erzeugt konsistente Snapshots
+RepoGround erzeugt **verifizierbaren Codebase-Kontext**: konsistente Snapshots
 und mehrstufige Artefakte für Analyse, Reflexion und Agentenbetrieb.
 
 ---
