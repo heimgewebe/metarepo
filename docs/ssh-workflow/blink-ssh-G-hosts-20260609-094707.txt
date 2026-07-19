@@ -1,0 +1,88 @@
+[2026-06-09T09:47:07+02:00] CMD: for h in heim-pc pcclip pcnew pclatest
+[2026-06-09T09:47:07+02:00] CMD: echo "===== $h ====="
+===== heim-pc =====
+[2026-06-09T09:47:07+02:00] CMD: ssh -G "$h" 2> /dev/null
+[2026-06-09T09:47:07+02:00] CMD: grep -Ei '^(hostname|user|port|requesttty|remotecommand|identityfile|preferredauthentications|passwordauthentication|connecttimeout|serveraliveinterval|serveralivecountmax) '
+user alex
+hostname heim-pc
+port 22
+passwordauthentication yes
+requesttty auto
+serveralivecountmax 3
+serveraliveinterval 0
+identityfile ~/.ssh/id_rsa
+identityfile ~/.ssh/id_ecdsa
+identityfile ~/.ssh/id_ecdsa_sk
+identityfile ~/.ssh/id_ed25519
+identityfile ~/.ssh/id_ed25519_sk
+identityfile ~/.ssh/id_xmss
+identityfile ~/.ssh/id_dsa
+connecttimeout none
+[2026-06-09T09:47:07+02:00] CMD: echo
+
+[2026-06-09T09:47:07+02:00] CMD: for h in heim-pc pcclip pcnew pclatest
+[2026-06-09T09:47:07+02:00] CMD: echo "===== $h ====="
+===== pcclip =====
+[2026-06-09T09:47:07+02:00] CMD: ssh -G "$h" 2> /dev/null
+[2026-06-09T09:47:07+02:00] CMD: grep -Ei '^(hostname|user|port|requesttty|remotecommand|identityfile|preferredauthentications|passwordauthentication|connecttimeout|serveraliveinterval|serveralivecountmax) '
+user alex
+hostname pcclip
+port 22
+passwordauthentication yes
+requesttty auto
+serveralivecountmax 3
+serveraliveinterval 0
+identityfile ~/.ssh/id_rsa
+identityfile ~/.ssh/id_ecdsa
+identityfile ~/.ssh/id_ecdsa_sk
+identityfile ~/.ssh/id_ed25519
+identityfile ~/.ssh/id_ed25519_sk
+identityfile ~/.ssh/id_xmss
+identityfile ~/.ssh/id_dsa
+connecttimeout none
+[2026-06-09T09:47:07+02:00] CMD: echo
+
+[2026-06-09T09:47:07+02:00] CMD: for h in heim-pc pcclip pcnew pclatest
+[2026-06-09T09:47:07+02:00] CMD: echo "===== $h ====="
+===== pcnew =====
+[2026-06-09T09:47:07+02:00] CMD: ssh -G "$h" 2> /dev/null
+[2026-06-09T09:47:07+02:00] CMD: grep -Ei '^(hostname|user|port|requesttty|remotecommand|identityfile|preferredauthentications|passwordauthentication|connecttimeout|serveraliveinterval|serveralivecountmax) '
+user alex
+hostname pcnew
+port 22
+passwordauthentication yes
+requesttty auto
+serveralivecountmax 3
+serveraliveinterval 0
+identityfile ~/.ssh/id_rsa
+identityfile ~/.ssh/id_ecdsa
+identityfile ~/.ssh/id_ecdsa_sk
+identityfile ~/.ssh/id_ed25519
+identityfile ~/.ssh/id_ed25519_sk
+identityfile ~/.ssh/id_xmss
+identityfile ~/.ssh/id_dsa
+connecttimeout none
+[2026-06-09T09:47:07+02:00] CMD: echo
+
+[2026-06-09T09:47:07+02:00] CMD: for h in heim-pc pcclip pcnew pclatest
+[2026-06-09T09:47:07+02:00] CMD: echo "===== $h ====="
+===== pclatest =====
+[2026-06-09T09:47:07+02:00] CMD: ssh -G "$h" 2> /dev/null
+[2026-06-09T09:47:07+02:00] CMD: grep -Ei '^(hostname|user|port|requesttty|remotecommand|identityfile|preferredauthentications|passwordauthentication|connecttimeout|serveraliveinterval|serveralivecountmax) '
+user alex
+hostname pclatest
+port 22
+passwordauthentication yes
+requesttty auto
+serveralivecountmax 3
+serveraliveinterval 0
+identityfile ~/.ssh/id_rsa
+identityfile ~/.ssh/id_ecdsa
+identityfile ~/.ssh/id_ecdsa_sk
+identityfile ~/.ssh/id_ed25519
+identityfile ~/.ssh/id_ed25519_sk
+identityfile ~/.ssh/id_xmss
+identityfile ~/.ssh/id_dsa
+connecttimeout none
+[2026-06-09T09:47:07+02:00] CMD: echo
+
