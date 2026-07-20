@@ -64,7 +64,11 @@ def _node_ids(names: Sequence[str]) -> Mapping[str, str]:
     return mapping
 
 
-def render_index(repos: Sequence[Mapping[str, object]], ordered_names: Sequence[str]) -> str:
+def render_index(
+    repos: Sequence[Mapping[str, object]],
+    ordered_names: Sequence[str],
+    archived_references: Sequence[Mapping[str, object]] = (),
+) -> str:
     lines = [
         "# Org Index",
         "",
@@ -93,10 +97,30 @@ def render_index(repos: Sequence[Mapping[str, object]], ordered_names: Sequence[
             f"| {link} | {default_branch} | {domain} | {scope} | {metrics_marker} | {depends} |"
         )
     lines.append("")
+    if archived_references:
+        lines.extend([
+            "## Archived References", "",
+            "Historische Repositories ohne aktive Fleet-, Runtime- oder Routing-Autorität.", "",
+            "| Repo | Status | Bound Commit | Evidence |",
+            "| --- | --- | --- | --- |",
+        ])
+        for repo in sorted(archived_references, key=lambda item: str(item.get("name", ""))):
+            name = str(repo.get("name") or "")
+            url = str(repo.get("url") or "")
+            link = f"[{name}]({url})" if url else name
+            status = _escape_markdown(str(repo.get("status") or "archived-reference"))
+            commit = _escape_markdown(str(repo.get("source_commit") or "–"))
+            locator = _escape_markdown(str(repo.get("locator") or "–"))
+            lines.append(f"| {link} | {status} | `{commit}` | `{locator}` |")
+        lines.append("")
     return "\n".join(lines)
 
 
-def render_graph(repos: Sequence[Mapping[str, object]], ordered_names: Sequence[str]) -> str:
+def render_graph(
+    repos: Sequence[Mapping[str, object]],
+    ordered_names: Sequence[str],
+    archived_references: Sequence[Mapping[str, object]] = (),
+) -> str:
     repo_map = {str(repo["name"]): repo for repo in repos if "name" in repo}
     ids = _node_ids(ordered_names)
     lines = [
@@ -121,6 +145,17 @@ def render_graph(repos: Sequence[Mapping[str, object]], ordered_names: Sequence[
             if dependency not in repo_map:
                 continue
             lines.append(f"    {ids[dependency]} --> {ids[name]}")
+    if archived_references:
+        archived_names = [str(item.get("name") or "") for item in archived_references]
+        archived_ids = _node_ids(archived_names)
+        lines.append('    subgraph archived_references["Archived References"]')
+        for repo in sorted(archived_references, key=lambda item: str(item.get("name", ""))):
+            name = str(repo.get("name") or "")
+            status = str(repo.get("status") or "archived-reference")
+            label = f"{name}\\n({status}; non-operational)".replace('"', "'")
+            lines.append(f'        archived_{archived_ids[name]}["{label}"]')
+            lines.append(f"        style archived_{archived_ids[name]} stroke-dasharray: 5 5")
+        lines.append("    end")
     lines.append("")
     return "\n".join(lines)
 
@@ -130,6 +165,23 @@ def load_repos(path: Path) -> List[Mapping[str, object]]:
     repos = repo_config.gather_repos(data)
     repos.sort(key=lambda entry: str(entry.get("name", "")))
     return repos
+
+
+def load_archived_references(path: Path) -> List[Mapping[str, object]]:
+    data = repo_config.load_config(path)
+    archived = data.get("archived_references", [])
+    if archived is None:
+        return []
+    if not isinstance(archived, list):
+        raise ValueError("archived_references must be a list")
+    result: List[Mapping[str, object]] = []
+    for entry in archived:
+        if not isinstance(entry, dict) or not entry.get("name"):
+            raise ValueError("archived reference entries require a name")
+        if entry.get("status") != "archived-reference" or entry.get("fleet") is not False:
+            raise ValueError("archived references must be non-Fleet archived-reference entries")
+        result.append(entry)
+    return result
 
 
 def determine_order(repos: Sequence[Mapping[str, object]]) -> List[str]:
@@ -148,18 +200,19 @@ def main() -> None:
         raise SystemExit(f"repos file not found: {repos_path}")
 
     repos = load_repos(repos_path)
+    archived_references = load_archived_references(repos_path)
     ordered_names = determine_order(repos)
 
     if args.index_output:
         index_path = Path(args.index_output)
         _ensure_parent(index_path)
-        index_content = render_index(repos, ordered_names)
+        index_content = render_index(repos, ordered_names, archived_references)
         index_path.write_text(index_content, encoding="utf-8")
 
     if args.graph_output:
         graph_path = Path(args.graph_output)
         _ensure_parent(graph_path)
-        graph_content = render_graph(repos, ordered_names)
+        graph_content = render_graph(repos, ordered_names, archived_references)
         graph_path.write_text(graph_content, encoding="utf-8")
 
 

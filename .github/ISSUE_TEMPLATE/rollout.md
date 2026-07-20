@@ -7,6 +7,7 @@ labels: ["contracts-v1", "fleet"]
 > Markiere nicht zutreffende Punkte mit _N/A_. Die Checkliste dient als Abnahme-Gate für Producer & Consumer.
 
 ## Basisdaten
+- [ ] Zielrepo ist in `fleet/repos.yml` aktiv und keine `archived-reference`
 - [ ] Branch `feat/contracts-v1` vorhanden
 - [ ] Reusable Workflow `contracts-validate` eingebunden (`heimgewebe/metarepo@contracts-v1`)
 - [ ] Repo-spezifische Tests/CI grün
@@ -23,7 +24,6 @@ labels: ["contracts-v1", "fleet"]
 - [ ] **hausKI** – JSONL Event-Log `~/.hauski/events/YYYY-MM.jsonl` validiert gegen `event.line.schema.json`
 - [ ] **chronik** – `POST /ingest/{domain}` appends nach `data/{domain}.jsonl`
 - [ ] **leitstand** (UI) – Panels „Heute/Wissen/PC/Musik/Außen“ zeigen valide Daten, inkl. `why`
-- [ ] **heimlern** – `policy.decision.schema.json` implementiert (`Decide` + `Feedback`), Beispiel integriert
 
 ## Dokumentation & Enablement
 - [ ] README/Docs verweisen auf `docs/contracts.md`

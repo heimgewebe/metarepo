@@ -41,4 +41,6 @@ def test_repo_identity_guard_does_not_require_pcre2() -> None:
 
     assert "LEGACY_PATTERN_RG=" in guard
     assert '"$LEGACY_PATTERN_RG" .' in guard
+    assert "--glob '!tests/**'" in guard
+    assert "--exclude-dir='tests'" in guard
     assert "--pcre2" not in guard

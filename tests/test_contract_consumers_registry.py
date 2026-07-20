@@ -59,7 +59,7 @@ def _contract_evidence(evidence: dict[str, object], contract_id: str) -> dict[st
 def test_current_registry_is_valid_and_evidence_bound() -> None:
     summary = validate_registry(ROOT)
 
-    assert summary == {"contracts": 23, "claims": 59, "repositories": 11}
+    assert summary == {"contracts": 23, "claims": 58, "repositories": 11}
 
 
 def test_active_contract_with_missing_schema_fails_closed() -> None:

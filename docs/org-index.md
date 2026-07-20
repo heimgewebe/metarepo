@@ -11,9 +11,16 @@ Quelle: [`repos.yml`](../repos.yml).
 | [contracts-mirror](https://github.com/heimgewebe/contracts-mirror) | main | contracts | schema | – | – |
 | [hausKI](https://github.com/heimgewebe/hausKI) | main | assistant | policy | ✅ | – |
 | [hausKI-audio](https://github.com/heimgewebe/hausKI-audio) | main | audio | events | – | hausKI |
-| [heimlern](https://github.com/heimgewebe/heimlern) | main | policy | library | – | – |
 | [repoground](https://github.com/heimgewebe/repoground) | main | epistemic | codebase-context | – | – |
 | [semantAH](https://github.com/heimgewebe/semantAH) | main | insights | export | – | – |
 | [vault-gewebe](https://github.com/heimgewebe/vault-gewebe) | main | vault | content | – | – |
 | [weltgewebe](https://github.com/heimgewebe/weltgewebe) | main | aussen | events | – | – |
 | [wgx](https://github.com/heimgewebe/wgx) | main | platform | metrics | ✅ | – |
+
+## Archived References
+
+Historische Repositories ohne aktive Fleet-, Runtime- oder Routing-Autorität.
+
+| Repo | Status | Bound Commit | Evidence |
+| --- | --- | --- | --- |
+| [heimlern](https://github.com/heimgewebe/heimlern) | archived-reference | `f74579cbe46d5f5f7b95c4c3431da03efb67cc85` | `docs/archive-readiness.v1.json` |

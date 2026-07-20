@@ -1,28 +1,12 @@
-# End-to-End: aussensensor → chronik → heimlern
+# Historischer E2E-Pfad: aussensensor → chronik → heimlern
 
-> **Ziel:** Nachweis, dass ein Außen-Event korrekt eine Policy-Anpassung triggert.
+> **Status:** archiviert und bedingungslos stillgelegt.
 
-## Setup
-- **aussensensor**: lauscht auf `aussen.event` (z.B. via `POST /ingest/aussen`)
-- **chronik**: persistiert Events, `heimlern` ist Consumer
-- **heimlern**: Policy `demo-policy-aussen` (reagiert auf `aussen.event.score > 0.8`)
-- **hausKI**: orchestriert, nutzt `heimlern`
+Der frühere direkte Push von Außen-Events zu Heimlern ist kein aktiver Betriebsweg mehr.
+Heimlern ist eine archivierte Referenz ohne Ingest-, Runtime-, Queue-, Routing- oder
+Produktionsautorität. Die Dateien `scripts/e2e/run_aussen_to_heimlern.sh` und
+`scripts/e2e/report.sh` bleiben als eindeutige Kompatibilitäts-Tombstones erhalten und
+brechen immer mit Exit-Code 64 ab. Umgebungsvariablen können diesen Zustand nicht umgehen.
 
-## Ablauf
-1. `just e2e.reset`
-2. Event simulieren:
-   ```bash
-   just e2e.aussen-event score=0.9 content="Test-Event"
-   ```
-3. Logs prüfen:
-   - `aussensensor` loggt Event-Empfang & -Export.
-   - `chronik` loggt Ingest.
-   - `hausKI` loggt Policy-Aufruf & Entscheidung.
-   - `heimlern` loggt `reward()`-Aufruf.
-4. Report prüfen:
-   - Report: `./.hauski-reports/<timestamp>-e2e-aussen-chronik-heimlern.md`
-   - Inhalt: Event, Policy-Entscheidung, Reward-Kalkulation.
-
-## Erwartetes Ergebnis
-- Policy-Parameter in `heimlern` wurden angepasst.
-- Report enthält alle Schritte mit korrekten Werten.
+Normative Vertragskopien und vorhandene historische Reports bleiben als Belege erhalten.
+Aktive Datenflüsse werden aus aktuellen Verträgen, Systemkatalog und Runtime-Readbacks abgeleitet.

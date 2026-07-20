@@ -1081,24 +1081,6 @@
       ]
     },
     {
-      "id": "knowledge/observatory::consumer::heimlern",
-      "contract": "knowledge/observatory",
-      "role": "consumer",
-      "repository": "heimgewebe/heimlern",
-      "commit": "8dbebea6b253f9d2f41514a15d34e5166602e792",
-      "status": "unverified",
-      "mode": "reference-only",
-      "files": [],
-      "evidence": [],
-      "note": "No exact reference to the schema basename was found in the audited default-branch commit.",
-      "doesNotEstablish": [
-        "runtime_use",
-        "runtime_health",
-        "semantic_correctness",
-        "future_compatibility"
-      ]
-    },
-    {
       "id": "knowledge/knowledge.observatory.published.v1::producer::semantAH",
       "contract": "knowledge/knowledge.observatory.published.v1",
       "role": "producer",

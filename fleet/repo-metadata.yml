@@ -65,12 +65,6 @@ repositories:
     scope: events
     metrics:
       enable: false
-  heimlern:
-    default_branch: main
-    domain: policy
-    scope: library
-    metrics:
-      enable: false
   vault-gewebe:
     default_branch: main
     domain: vault

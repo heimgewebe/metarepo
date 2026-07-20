@@ -69,13 +69,6 @@ repos:
     scope: events
     metrics:
       enable: false
-  - name: heimlern
-    url: https://github.com/heimgewebe/heimlern
-    default_branch: main
-    domain: policy
-    scope: library
-    metrics:
-      enable: false
   - name: vault-gewebe
     url: https://github.com/heimgewebe/vault-gewebe
     default_branch: main
@@ -85,3 +78,12 @@ repos:
       enable: false
     wgx:
       profile_expected: false
+archived_references:
+  - name: heimlern
+    url: https://github.com/heimgewebe/heimlern
+    status: archived-reference
+    fleet: false
+    default_branch: main
+    source_commit: f74579cbe46d5f5f7b95c4c3431da03efb67cc85
+    locator: docs/archive-readiness.v1.json
+    content_sha256: bbf1d19865812b9584a3645ecd031f0854ee6110849d249692b4ac62d8f8d1e0
