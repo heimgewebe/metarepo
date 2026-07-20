@@ -23,7 +23,7 @@ jobs:
     env:
       # Whitelist der Ziel-Repos (kommagetrennt). Kann pro Repo via
       # Repository-Variable HEIMGEWEBE_ALLOWED_REPOS überschrieben werden.
-      ALLOWED_TARGET_REPOS: ${{ vars.HEIMGEWEBE_ALLOWED_REPOS || 'sichter,wgx,heimgeist,metarepo,hausKI,semantAH,heimlern,chronik,leitstand,repoground' }}
+      ALLOWED_TARGET_REPOS: ${{ vars.HEIMGEWEBE_ALLOWED_REPOS || 'sichter,wgx,heimgeist,metarepo,hausKI,semantAH,chronik,leitstand,repoground' }}
 
       # Whitelist der erlaubten Kommandos (kommagetrennt). Kann via
       # Repository-Variable HEIMGEWEBE_ALLOWED_COMMANDS überschrieben werden.
@@ -136,6 +136,17 @@ jobs:
                 issue_number: issue.number,
                 body,
               });
+            }
+
+            // Archivierte Repositories bleiben auch dann gesperrt, wenn eine
+            // Repository-Variable sie versehentlich wieder in die Whitelist aufnimmt.
+            const archivedRepos = new Set(["heimlern"]);
+            if (archivedRepos.has(targetRepo)) {
+              await reply(
+                `⚠️ Das Ziel-Repo **${targetRepo}** ist eine archivierte Referenz ohne Dispatch-Autorität.\n\n` +
+                `Erlaubte aktive Repos: \`${allowedRepos.filter((repo) => !archivedRepos.has(repo)).join(", ")}\`.`
+              );
+              return;
             }
 
             // Whitelist-Checks

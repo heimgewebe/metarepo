@@ -15,7 +15,7 @@ from wgx import repo_config
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "fleet" / "generate_repos_projection.py"
-PROJECTION_SEMANTIC_SHA256 = "a471bd9907f066acef70dc2f71bf26fda82ee30c657c588ea8d04d0c71164081"
+PROJECTION_SEMANTIC_SHA256 = "17681403a785f75c270dbf51e26c8fd1ade1d76dcd7cf042d247252c5edbfaaf"
 SPEC = importlib.util.spec_from_file_location("generate_repos_projection", SCRIPT)
 assert SPEC and SPEC.loader
 MODULE = importlib.util.module_from_spec(SPEC)
@@ -40,7 +40,8 @@ def test_projection_is_loadable_by_existing_legacy_consumers() -> None:
 
     assert projection["mode"] == "static"
     assert projection["github"]["owner"] == "heimgewebe"
-    assert len(projection["repos"]) == 11
+    assert len(projection["repos"]) == 10
+    assert [item["name"] for item in projection["archived_references"]] == ["heimlern"]
 
 
 def test_projection_pins_complete_compatibility_semantics() -> None:
@@ -71,7 +72,6 @@ def test_projection_preserves_legacy_consumer_shape() -> None:
         "repoground",
         "chronik",
         "aussensensor",
-        "heimlern",
         "vault-gewebe",
     ]
     assert all(
@@ -269,3 +269,44 @@ def test_check_mode_fails_for_stale_projection(tmp_path: Path) -> None:
 
     assert result.returncode == 1
     assert "repos.yml is stale" in result.stderr
+
+
+def test_archived_reference_is_separate_and_exactly_bound() -> None:
+    projection = yaml.safe_load((ROOT / "repos.yml").read_text(encoding="utf-8"))
+    assert projection["archived_references"] == [
+        {
+            "name": "heimlern",
+            "url": "https://github.com/heimgewebe/heimlern",
+            "status": "archived-reference",
+            "fleet": False,
+            "default_branch": "main",
+            "source_commit": "f74579cbe46d5f5f7b95c4c3431da03efb67cc85",
+            "locator": "docs/archive-readiness.v1.json",
+            "content_sha256": (
+                "bbf1d19865812b9584a3645ecd031f0854ee6110849d249692b4ac62d8f8d1e0"
+            ),
+        }
+    ]
+    assert "heimlern" not in [item["name"] for item in projection["repos"]]
+
+
+def test_archived_reference_cannot_be_projectable() -> None:
+    fleet = {
+        "static": {
+            "include": [
+                {
+                    "name": "old",
+                    "status": "archived-reference",
+                    "fleet": True,
+                }
+            ]
+        },
+        "repos": [{"name": "core"}],
+    }
+    metadata = {
+        "schema_version": 1,
+        "github": {"owner": "example"},
+        "repositories": {"core": {"default_branch": "main"}},
+    }
+    with pytest.raises(ProjectionError, match="must set fleet: false"):
+        build_projection(fleet, metadata)

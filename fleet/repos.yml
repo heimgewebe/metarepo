@@ -7,6 +7,14 @@ static:
     - name: vault-privat
       status: related
       fleet: false
+    - name: heimlern
+      url: "https://github.com/heimgewebe/heimlern"
+      status: archived-reference
+      fleet: false
+      default_branch: main
+      source_commit: f74579cbe46d5f5f7b95c4c3431da03efb67cc85
+      locator: docs/archive-readiness.v1.json
+      content_sha256: bbf1d19865812b9584a3645ecd031f0854ee6110849d249692b4ac62d8f8d1e0
 
 repos:
   - name: metarepo
@@ -14,7 +22,6 @@ repos:
   - name: contracts-mirror
   - name: hausKI
   - name: hausKI-audio
-  - name: heimlern
   - name: semantAH
   - name: aussensensor
   - name: chronik

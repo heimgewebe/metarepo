@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 import difflib
 from pathlib import Path
+import re
 import sys
 from typing import Any
 
@@ -43,6 +44,8 @@ REPO_FIELD_ORDER = (
 ALLOWED_REPO_FIELDS = set(REPO_FIELD_ORDER)
 MAPPING_REPO_FIELDS = ("metrics", "wgx", "integrity")
 STRING_REPO_FIELDS = ("domain", "scope")
+HEX40_RE = re.compile(r"^[0-9a-f]{40}$")
+HEX64_RE = re.compile(r"^[0-9a-f]{64}$")
 
 
 class ProjectionError(ValueError):
@@ -126,6 +129,69 @@ def _entry_is_projectable(entry: Any, *, label: str) -> bool:
     return fleet_flag
 
 
+def _entry_status(entry: Any) -> str | None:
+    if not isinstance(entry, dict) or "status" not in entry:
+        return None
+    status = entry["status"]
+    if not isinstance(status, str) or not status.strip():
+        raise ProjectionError("repository status must be a non-empty string when present")
+    return status.strip()
+
+
+def collect_archived_references(
+    fleet: dict[str, Any], *, owner: str
+) -> list[dict[str, Any]]:
+    """Return exact non-operational repository references."""
+    static = fleet.get("static", {}) or {}
+    if not isinstance(static, dict):
+        raise ProjectionError("fleet/repos.yml static must be a mapping")
+    include = static.get("include", []) or []
+    if not isinstance(include, list):
+        raise ProjectionError("fleet/repos.yml static.include must be a list")
+
+    archived: list[dict[str, Any]] = []
+    for index, entry in enumerate(include):
+        if _entry_status(entry) != "archived-reference":
+            continue
+        label = f"static.include[{index}]"
+        if not isinstance(entry, dict):
+            raise ProjectionError(f"{label} archived reference must be a mapping")
+        if entry.get("fleet") is not False:
+            raise ProjectionError(f"{label} archived reference must set fleet: false")
+        name = _entry_name(entry, label=label)
+        url = entry.get("url", f"https://github.com/{owner}/{name}")
+        default_branch = entry.get("default_branch", "main")
+        source_commit = entry.get("source_commit")
+        locator = entry.get("locator")
+        content_sha256 = entry.get("content_sha256")
+        if not isinstance(url, str) or not url.strip():
+            raise ProjectionError(f"{label}.url must be non-empty")
+        if not isinstance(default_branch, str) or not default_branch.strip():
+            raise ProjectionError(f"{label}.default_branch must be non-empty")
+        if not isinstance(source_commit, str) or not HEX40_RE.fullmatch(source_commit):
+            raise ProjectionError(f"{label}.source_commit must be a lowercase 40-hex commit")
+        if (
+            not isinstance(locator, str)
+            or not locator.strip()
+            or locator.startswith("/")
+            or ".." in Path(locator).parts
+        ):
+            raise ProjectionError(f"{label}.locator must be a safe relative path")
+        if not isinstance(content_sha256, str) or not HEX64_RE.fullmatch(content_sha256):
+            raise ProjectionError(f"{label}.content_sha256 must be lowercase 64-hex")
+        archived.append({
+            "name": name,
+            "url": url.strip(),
+            "status": "archived-reference",
+            "fleet": False,
+            "default_branch": default_branch.strip(),
+            "source_commit": source_commit,
+            "locator": locator.strip(),
+            "content_sha256": content_sha256,
+        })
+    return archived
+
+
 def collect_projectable_repositories(fleet: dict[str, Any]) -> set[str]:
     """Return repositories eligible for the public compatibility projection."""
 
@@ -140,7 +206,10 @@ def collect_projectable_repositories(fleet: dict[str, Any]) -> set[str]:
         if name in all_names:
             raise ProjectionError(f"duplicate Fleet repository: {name}")
         all_names.add(name)
-        if _entry_is_projectable(entry, label=f"repos[{index}]"):
+        projectable_entry = _entry_is_projectable(entry, label=f"repos[{index}]")
+        if _entry_status(entry) == "archived-reference" and projectable_entry:
+            raise ProjectionError("archived-reference repositories must set fleet: false")
+        if projectable_entry:
             projectable.add(name)
 
     static = fleet.get("static", {})
@@ -159,7 +228,10 @@ def collect_projectable_repositories(fleet: dict[str, Any]) -> set[str]:
         if name in all_names:
             raise ProjectionError(f"repository occurs more than once in Fleet scope: {name}")
         all_names.add(name)
-        if _entry_is_projectable(entry, label=label):
+        projectable_entry = _entry_is_projectable(entry, label=label)
+        if _entry_status(entry) == "archived-reference" and projectable_entry:
+            raise ProjectionError("archived-reference repositories must set fleet: false")
+        if projectable_entry:
             projectable.add(name)
 
     if not projectable:
@@ -253,6 +325,7 @@ def build_projection(
         )
 
     projectable = collect_projectable_repositories(fleet)
+    archived_references = collect_archived_references(fleet, owner=owner)
     projected: list[dict[str, Any]] = []
     normalized_names: set[str] = set()
 
@@ -284,6 +357,7 @@ def build_projection(
         "mode": "static",
         "github": {"owner": owner},
         "repos": projected,
+        "archived_references": archived_references,
     }
 
 

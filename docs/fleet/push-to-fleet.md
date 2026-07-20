@@ -25,11 +25,12 @@ repos:
     default_branch: main
   # - name: heimgewebe/chronik
   #   default_branch: main
-  - name: heimgewebe/heimlern
-    default_branch: main
   - name: heimgewebe/aussensensor
     default_branch: main
 ```
+
+Archivierte Referenzen mit `fleet: false`, darunter Heimlern, dürfen nicht als Rollout-Ziel
+aufgenommen werden. Der Generator und die Fleet-Konfiguration schließen sie fail-closed aus.
 
 ## Ausführen
 Ein Repo:

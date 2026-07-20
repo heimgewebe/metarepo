@@ -176,17 +176,15 @@ ci:
 contracts-validate:
     @scripts/validate-contracts.sh
 
+# Historische Kompatibilitätsnamen; alle drei Rezepte brechen fail-closed ab.
 e2e-dry:
-    set -a; [ -f scripts/e2e/.env ] && . scripts/e2e/.env || true; set +a
-    DRY_RUN=1 bash scripts/e2e/run_aussen_to_heimlern.sh
+    @bash scripts/e2e/run_aussen_to_heimlern.sh
 
 e2e:
-    set -a; [ -f scripts/e2e/.env ] && . scripts/e2e/.env || true; set +a
-    DRY_RUN=0 bash scripts/e2e/run_aussen_to_heimlern.sh
-    bash scripts/e2e/report.sh
+    @bash scripts/e2e/run_aussen_to_heimlern.sh
 
 e2e-report:
-    bash scripts/e2e/report.sh
+    @bash scripts/e2e/report.sh
 
 # --- Interne Rezepte ----------------------------------------------------------
 _wgx *args:

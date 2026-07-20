@@ -4,10 +4,10 @@ Generates the fleet documentation (docs/_generated/fleet.md) from fleet/repos.ym
 Uses a simple internal YAML parser since PyYAML is not available in the base environment.
 """
 
-import sys
+import hashlib
 import os
-from datetime import datetime
-import subprocess
+from pathlib import Path
+import sys
 
 # Add repo root to sys.path to import wgx.repo_config
 sys.path.append(os.getcwd())
@@ -80,13 +80,9 @@ def simple_yaml_load(filepath):
 
     return data
 
-def get_git_info():
-    try:
-        commit_hash = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"]).decode("utf-8").strip()
-        date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        return commit_hash, date
-    except:
-        return "unknown", datetime.now().strftime("%Y-%m-%d")
+def source_sha256(filepath: str) -> str:
+    """Return an exact, reproducible binding to the canonical Fleet source."""
+    return hashlib.sha256(Path(filepath).read_bytes()).hexdigest()
 
 def generate_fleet_docs():
     if not os.path.exists(FLEET_FILE):
@@ -96,12 +92,12 @@ def generate_fleet_docs():
     # Use simple parser
     data = simple_yaml_load(FLEET_FILE)
 
-    commit_hash, date = get_git_info()
+    source_hash = source_sha256(FLEET_FILE)
 
     content = []
     content.append("<!-- GENERATED FILE - DO NOT EDIT -->")
     content.append("<!-- Source: fleet/repos.yml -->")
-    content.append(f"<!-- Generated at: {date} (Commit: {commit_hash}) -->")
+    content.append(f"<!-- Source SHA-256: {source_hash} -->")
     content.append("")
     content.append("# Heimgewebe Fleet Overview")
     content.append("")
@@ -152,7 +148,7 @@ def generate_fleet_docs():
         os.makedirs(output_dir)
 
     with open(OUTPUT_FILE, "w") as f:
-        f.write("\n".join(content))
+        f.write("\n".join(content) + "\n")
 
     print(f"Successfully generated {OUTPUT_FILE}")
 

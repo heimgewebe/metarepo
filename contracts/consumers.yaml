@@ -291,12 +291,6 @@ knowledge:
       status: unverified
       last_verified: '2026-07-14T21:35:14+02:00'
       evidence_ref: contracts/consumer-evidence.v1.json#claims/knowledge/observatory::consumer::hausKI
-    - repo: heimlern
-      files: []
-      mode: reference-only
-      status: unverified
-      last_verified: '2026-07-14T21:35:14+02:00'
-      evidence_ref: contracts/consumer-evidence.v1.json#claims/knowledge/observatory::consumer::heimlern
     lifecycle: active
     last_verified: '2026-07-14T21:35:14+02:00'
     replacement: null

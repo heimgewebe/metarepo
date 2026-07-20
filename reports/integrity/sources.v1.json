@@ -1,6 +1,6 @@
 {
   "apiVersion": "integrity.sources.v1",
-  "generated_at": "2026-07-17T14:40:06Z",
+  "generated_at": "2026-07-20T14:56:46Z",
   "sources": [
     {
       "repo": "heimgewebe/aussensensor",
@@ -35,11 +35,6 @@
     {
       "repo": "heimgewebe/heimgeist",
       "summary_url": "https://github.com/heimgewebe/heimgeist/releases/download/integrity/summary.json",
-      "enabled": true
-    },
-    {
-      "repo": "heimgewebe/heimlern",
-      "summary_url": "https://github.com/heimgewebe/heimlern/releases/download/integrity/summary.json",
       "enabled": true
     },
     {

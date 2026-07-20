@@ -9,7 +9,8 @@ autopoetischer KI-Organismus funktioniert:
 - **semantAH** – semantischer Index und Insights
 - **chronik** – Ereignisspeicher (Event-Log, Audit)
 - **leitstand** – UI / Dashboard
-- plus weitere Organe: **aussensensor**, **heimlern**, **vault-gewebe**, **weltgewebe**, **repoground**, **sichter**, **mitschreiber**, **heimgeist**, **plexer**.
+- plus weitere aktive Organe: **aussensensor**, **vault-gewebe**, **weltgewebe**, **repoground**, **sichter**, **mitschreiber**, **heimgeist**, **plexer**.
+- **heimlern** bleibt ausschließlich als archivierte Policy-Referenz sichtbar.
 
 Dieses Dokument erklärt:
 
@@ -180,17 +181,14 @@ ohne dass jeder RSS-Feed direkt am Hirnstamm zieht.
 
 ---
 
-### 2.8 heimlern – Policies & Bandit-Logik
+### 2.8 heimlern – archivierte Policy-Referenz
 
-**Repo:** `heimgewebe/heimlern`
+**Repo:** `heimgewebe/heimlern` (archiviert)
 
-- Setzt Policy- und Bandit-Entscheidungen für hausKI und Co. um.
-- Nutzt Events/Insights aus chronik/semantAH als Feedback.
-- Ziel: aus wiederkehrenden Mustern bessere Entscheidungen machen.
-
-**Nutzen:**
-heimlern ist die **Politik** des Systems: es beschließt, welche Strategien
-langfristig „gewählt“ bleiben.
+Heimlern bewahrt die frühere Policy- und Bandit-Implementierung als historischen Beleg.
+Es besitzt keine aktive Runtime-, Routing-, Queue- oder Produktionsautorität. Neue
+Integrationen dürfen daraus keine operative Abhängigkeit ableiten; aktuelle Zuständigkeiten
+stehen im Systemkatalog.
 
 ---
 
@@ -324,8 +322,9 @@ Ergebnis: das Repo wird automatisch in Fleet-Metriken und Leitstand-Sichten auft
 - wgx führt Befehle Fleet-weit konsistent aus.
 - hausKI, semantAH, chronik bilden das Gehirn + Gedächtnis.
 - leitstand und weltgewebe sind die Augen & Anzeigen.
-- aussensensor, heimlern, vault-gewebe, sichter, mitschreiber, heimgeist, plexer
-sorgen für Wahrnehmung, Politik, Reflexion und Text.
+- aussensensor, vault-gewebe, sichter, mitschreiber, heimgeist und plexer
+sorgen für Wahrnehmung, Reflexion und Text.
+- Heimlern dokumentiert nur noch die historische Policy- und Lernschicht.
 
 Heimgewebe wird benutzbar, wenn:
 

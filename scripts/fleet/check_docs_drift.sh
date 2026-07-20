@@ -11,46 +11,27 @@ GENERATED_FILE="docs/_generated/fleet.md"
 
 echo "Running Document Drift Guard..."
 
-# 1. Check if generated doc is clean
+# 1. Check if generated doc exactly matches the canonical source.
 if [ ! -f "$GENERATED_FILE" ]; then
-  echo "❌ $GENERATED_FILE missing. Running generator..."
-  python3 "$GENERATOR"
+  echo "❌ $GENERATED_FILE missing. Run $GENERATOR and commit the result."
+  exit 1
 fi
 
-# Generate temp file to compare
-TEMP_GEN=$(mktemp)
+ORIGINAL=$(mktemp)
+trap 'rm -f "$ORIGINAL"' EXIT
+cp "$GENERATED_FILE" "$ORIGINAL"
+
 python3 "$GENERATOR" > /dev/null
-# We need to capture the output file content, but the script writes to file.
-# Let's just run it and see if git diff triggers.
-# Better: Copy current file, run gen, compare.
 
-cp "$GENERATED_FILE" "$TEMP_GEN"
-python3 "$GENERATOR"
-
-if ! cmp -s "$GENERATED_FILE" "$TEMP_GEN"; then
-  # Differs (Note: The script updates timestamp/commit hash, so it WILL differ on every run if commit changes)
-  # We should exclude the header lines with timestamp for comparison if we are in the same commit.
-  # But usually, in CI, we check if the file matches what is committed.
-  # If I run it now, it overwrites.
-  # For a Drift Guard, strictly speaking, the file in the repo should match what the script generates.
-  # However, the script puts a timestamp. This makes "git diff" dirty on every run.
-  # Mitigation: The generator should perhaps use the timestamp of the commit of repos.yml?
-  # For now, let's ignore the header lines 1-5 for comparison.
-
-  DIFF_COUNT=$(diff <(tail -n +6 "$GENERATED_FILE") <(tail -n +6 "$TEMP_GEN") | wc -l)
-  if [ "$DIFF_COUNT" -ne 0 ]; then
-    echo "❌ Drift detected in $GENERATED_FILE. Content does not match fleet/repos.yml."
-    echo "Diff:"
-    diff <(tail -n +6 "$GENERATED_FILE") <(tail -n +6 "$TEMP_GEN")
-    rm "$TEMP_GEN"
-    exit 1
-  else
-    echo "✅ Generated fleet docs are consistent."
-  fi
-else
-  echo "✅ Generated fleet docs are identical."
+if ! cmp -s "$GENERATED_FILE" "$ORIGINAL"; then
+  echo "❌ Drift detected in $GENERATED_FILE. Content does not match fleet/repos.yml."
+  echo "Diff (committed/current -> generated):"
+  diff -u "$ORIGINAL" "$GENERATED_FILE" || true
+  cp "$ORIGINAL" "$GENERATED_FILE"
+  exit 1
 fi
-rm "$TEMP_GEN"
+
+echo "✅ Generated fleet docs are identical."
 
 # 2. Check for "contracts" repo name usage (excluding archive and canonical paths)
 # We search for words "contracts" that are NOT "contracts-mirror" and NOT "contracts/" (paths).
@@ -110,6 +91,7 @@ if has_rg; then
     --glob '!docs/archive/**' \
     --glob '!tools/**' \
     --glob '!scripts/tools/**' \
+    --glob '!tests/**' \
     --glob '!scripts/fleet/check_docs_drift.sh' \
     "$LEGACY_PATTERN_RG" .
   rc=$?
@@ -132,6 +114,7 @@ else
       --exclude-dir='sync-logs' \
       --exclude-dir='archive' \
       --exclude-dir='tools' \
+      --exclude-dir='tests' \
       --exclude='check_docs_drift.sh' \
       -e "$LEGACY_PATTERN_ERE" \
       . \
