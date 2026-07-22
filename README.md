@@ -1,226 +1,170 @@
-# Metarepo – Heimgewebe Control Plane
+# Metarepo
 
-> **⚠️ SOURCE OF TRUTH NOTICE**
-> The canonical definition of the Fleet is located in `fleet/repos.yml`.
-> All lists of repositories in this documentation are derived or exemplary.
-> Do not edit repository lists manually in Markdown files.
-
-> **Zentraler Meta-Layer für die Heimgewebe-Fleet**
-> Spiegelt kanonische Templates (Workflows, Justfile, Docs, WGX-Profile) in Sub-Repos und zieht Verbesserungen zurück (dialektisches Lernen).
+> Versionierte Quelle für Fleet-Mitgliedschaft, gemeinsame Contracts, Templates und wiederverwendbare CI-Workflows.
 
 [![CI Status](https://github.com/heimgewebe/metarepo/actions/workflows/ci.yml/badge.svg)](https://github.com/heimgewebe/metarepo/actions/workflows/ci.yml)
 
-## Organismus-Kontext
+## Rolle und Wahrheitsgrenzen
 
-Dieses Repository ist Teil des **Heimgewebe-Organismus**.
+Der normative Rollenvertrag liegt in
+[`system/metarepo-role.v1.json`](system/metarepo-role.v1.json).
 
-Die übergeordnete Architektur, Achsen, Rollen und Contracts sind zentral beschrieben im
-👉 [`metarepo/docs/system/heimgewebe-organismus.md`](docs/system/heimgewebe-organismus.md)
-sowie im Zielbild
-👉 [`metarepo/docs/system/heimgewebe-zielbild.md`](docs/system/heimgewebe-zielbild.md).
+Metarepo besitzt ausschließlich folgende Wahrheitsbereiche:
 
-Alle Rollen-Definitionen, Datenflüsse und Contract-Zuordnungen dieses Repos
-sind dort verankert.
+- **Fleet-Mitgliedschaft** in [`fleet/repos.yml`](fleet/repos.yml)
+- **gemeinsame Contracts** unter [`contracts/`](contracts/)
+- **kuratierte Templates** unter [`templates/`](templates/)
+- **wiederverwendbare CI-Workflows** unter [`.github/workflows/`](.github/workflows/)
 
-## Überblick
+Metarepo ist **keine Control Plane** und keine Quelle der gesamten
+Systemarchitektur. Die Zuständigkeiten sind getrennt:
 
-Das **metarepo** ist die Quelle der Wahrheit für:
+| Information | Zuständige Quelle |
+| --- | --- |
+| Systemzwecke, Beziehungen und Einstiegspunkte | `systemkatalog` |
+| Aufgaben, Queue, Verifikation und Abschluss | `bureau` |
+| Rechnerzugriff, Leases, Audit und operative Ausführung | `grabowski` |
+| Laufzeitgesundheit | jeweiliger Dienst und seine Beobachtungsfläche |
+| zeitliche Ereignis- und Änderungsgeschichte | `chronik` |
 
-- **Templates** – Gemeinsame Workflows, Justfiles, Docs und WGX-Profile unter `templates/`
-- **Contracts** – JSON-Schemas und OpenAPI-Specs unter `contracts/`
-- **Reusable Workflows** – Wiederverwendbare CI-Pipelines unter `.github/workflows/reusable-*.yml`
-- **Fleet-Management** – Zentrale Konfiguration aller Heimgewebe-Repos in `fleet/repos.yml`
+Die Mitgliedschaft in der Metarepo-Fleet ist nicht gleichbedeutend mit der
+Zugehörigkeit zum vollständigen Operator-Ökosystem.
 
-### Heimgewebe-Fleet
+## Aktive Lieferflächen
 
-Die aktuelle Fleet wird in [`docs/_generated/fleet.md`](docs/_generated/fleet.md) (automatisch generiert aus `fleet/repos.yml`) aufgeführt.
+### Fleet
 
-Die Fleet umfasst Core-Repos wie:
-- **weltgewebe** – Externe Events und Signale (Related)
-- **hausKI** – KI-Orchestrator (Rust, GPU, Offline)
-- **hausKI-audio** – Audio-Pipeline und Telemetrie
-- **semantAH** – Wissensextraktion und Embeddings
-- **wgx** – Flottenmotor für Sync, Doctor, Metrics
-- **chronik** – Event-Ingest und Persistenz
-- **aussensensor** – Außen-Signalgeber
-- **heimlern** – Lern- und Policy-Engine
-- **lenskit** – Merger- und Scanner-Kern für Repo-Snapshots und epistemische Artefakte
-- **contracts-mirror** – Spiegel für externe API-Contracts
+[`fleet/repos.yml`](fleet/repos.yml) ist die einzige normative Quelle der
+Fleet-Mitgliedschaft. Operative Zusatzdaten wie Branch, Domain, Abhängigkeiten
+und Tooling-Overrides liegen getrennt in
+[`fleet/repo-metadata.yml`](fleet/repo-metadata.yml).
 
-(Siehe `docs/_generated/fleet.md` für die vollständige, kanonische Liste.)
+Das Top-Level-[`repos.yml`](repos.yml) ist eine **generierte, nicht normative
+Kompatibilitätsprojektion** für bestehendes WGX-, Graph- und Template-Tooling.
+Sie wird ausschließlich mit `just fleet-projection` aus den beiden kanonischen
+Fleet-Dateien erzeugt. `just fleet-projection-check` und `just validate`
+blockieren manuelle Änderungen oder vergessene Regeneration.
+
+Die gerenderte Fleet-Übersicht wird aus der Mitgliedschaftsquelle erzeugt:
+[`docs/_generated/fleet.md`](docs/_generated/fleet.md).
+
+### Contracts
+
+Unter [`contracts/`](contracts/) liegen versionierte Daten- und
+Workflowverträge. Änderungen benötigen:
+
+1. einen nachweisbaren Producer- oder Consumerbedarf;
+2. Kompatibilitätsbewertung und Versionsentscheidung;
+3. grüne Contract- und Consumer-Tests;
+4. einen dokumentierten Ablösepfad bei Breaking Changes.
+
+### Templates und wiederverwendbare Workflows
+
+- `templates/` enthält kuratierte, repoübergreifend bestimmte Vorlagen.
+- `.github/workflows/reusable-*.yml` und weitere `workflow_call`-Workflows
+  werden von mehreren Repositories eingebunden.
+- Aktive Consumer müssen vor Umbenennung oder Entfernung organisationsweit
+  inventarisiert werden.
+
+## Legacy- und Kompatibilitätsflächen
+
+Diese Flächen sind weiterhin vorhanden, aber nicht Teil der normativen
+Metarepo-Rolle:
+
+- `repos.yml` – deterministisch generierte Kompatibilitätsprojektion; nicht manuell bearbeiten
+- `wgx/` – vendierter Altstand; kanonischer Eigentümer ist das Repository `wgx`
+- `servers/local-mcp/` – lokale Legacy-Brücke; Nutzung und Ablösung werden geprüft
+- `.github/workflows/heimgewebe-command-dispatch.yml` – aktive
+  Kompatibilitätsfläche mit organisationsweiten Callern
+
+Sie dürfen erst entfernt werden, wenn ihre tatsächlichen Consumer und ein
+grüner Migrations-Readback belegt sind.
+
+## Historische Architekturdokumente
+
+Die Dokumente zum früheren „Heimgewebe-Organismus“ sind seit dem 15. Juli 2026
+hashgebunden unter `docs/archive/heimgewebe-organismus-v0.2/` archiviert. Ihre
+bisherigen Pfade bleiben als ausdrücklich historische Kompatibilitätseinstiege
+erhalten. Für die gegenwärtige Systemtopologie ist der Systemkatalog zuständig.
 
 ## Schnellstart
 
-### Installation
-
 ```bash
-# 1. Dependencies installieren
-just deps          # oder: uv sync --frozen
+# Abhängigkeiten installieren
+just deps
 
-# 2. Tooling prüfen
-just validate      # Linting, Format-Checks, actionlint
+# repos.yml aus den kanonischen Fleet-Quellen erzeugen
+just fleet-projection
+
+# lokale Validierung einschließlich Projektionsdrift, Tests und Workflow-Linting
+just validate
+
+# Contract-Prüfungen
+just contracts-validate
+
+# Fleet-Übersicht
+just list
 ```
 
-### Häufige Kommandos
+## Typische Änderungen
+
+### Contract ändern
+
+1. Producer und Consumer bestimmen.
+2. Schemaänderung und Kompatibilität prüfen.
+3. Fixtures und Consumer-Tests aktualisieren.
+4. Versionierung oder Migrationsfenster festlegen.
+
+### Template ändern
+
+1. Ziel- und Consumer-Repositories bestimmen.
+2. lokale Abweichung nicht blind überschreiben.
+3. Verbesserung kuratieren und im Metarepo testen.
+4. Rollout über PRs mit Drift- und Consumerbeleg durchführen.
+
+Beispiele für bestehendes Tooling:
 
 ```bash
-# Fleet-Übersicht
-just list          # WGX-Liste aller Repos
-
-# Templates synchronisieren
-just up            # Templates an alle Repos verteilen
-just sync          # Manuelle Sync (siehe scripts/sync-templates.sh)
-
-# Validierung
-just validate      # Lokale Checks
-just smoke         # Schneller Integrationslauf
-
-# Drift-Analyse
-scripts/wgx-doctor --repo <repo>  # Drift-Report generieren
+./scripts/sync-templates.sh --pull-from <repo> --pattern "<glob>"
+./scripts/sync-templates.sh --push-to <repo> --pattern "<glob>"
+./scripts/wgx-doctor --repo <repo> --patterns "<glob1>,<glob2>"
 ```
 
 ## Dokumentation
 
-### Kerndokumentation
-- [**Architecture**](docs/system/architecture.md) – Systemübersicht und Schichten
-- [**Vision**](docs/vision/vision.md) – Leitlinien und Roadmap
-- [**Contracts**](docs/contracts/contracts-index.md) – Schema-Versionierung und Validierung
-- [**Fleet Management**](docs/fleet/fleet.md) – Template-Sync und Push-Workflows
-- [**WGX Konzept**](docs/fleet/wgx-konzept.md) – Fleet-Motor und Kommandos
-- [**AGENTS.md**](AGENTS.md) – Leitfaden für KI-Agenten
+- [Rollenvertrag](system/metarepo-role.v1.json)
+- [Agentenleitfaden](AGENTS.md)
+- [Contracts](docs/contracts/contracts-index.md)
+- [Fleet-Management](docs/fleet/fleet.md)
+- [Reusable CI](docs/policies/ci-reusables.md)
+- [ADRs](docs/adrs/README.md)
+- [Runbooks](docs/runbooks/runbooks.md)
+- [Vollständiger Dokumentationsindex](docs/README.md)
 
-### Entwicklung & Betrieb
-- [**Troubleshooting**](docs/runbooks/troubleshooting.md) – Häufige Probleme und Lösungen
-- [**ADRs**](docs/adrs/README.md) – Architecture Decision Records
-- [**Runbooks**](docs/runbooks/runbooks.md) – Betriebsanleitungen
-- [**Environment**](docs/fleet/environment.md) – Entwicklungsumgebung einrichten
+## Projektstruktur
 
-Vollständige Dokumentation: [`docs/`](docs/) · [Vollständiger Index](docs/README.md)
-
-## Entwicklung
-
-### Template-Synchronisation
-
-```bash
-# Template aus Sub-Repo lernen (Pull)
-./scripts/sync-templates.sh --pull-from weltgewebe --pattern "templates/docs/**"
-
-# Template in Sub-Repo pushen
-./scripts/sync-templates.sh --push-to hausKI --pattern "templates/.github/workflows/*.yml"
-
-# Drift-Check durchführen
-./scripts/wgx-doctor --repo wgx --patterns "templates/.github/workflows/*.yml,templates/Justfile"
-```
-
-### Beitragen
-
-Siehe [CONTRIBUTING.md](CONTRIBUTING.md) für:
-- Setup und Grundprinzipien
-- Patch-Flow und Validierung
-- Pull Request Guidelines
-- Fleet-Push nach Merge
-
-## Projekt-Struktur
-
-```
+```text
 metarepo/
-├── templates/           # Kanonische Templates für Fleet
-│   ├── .github/workflows/
-│   ├── docs/
-│   ├── Justfile
-│   └── .wgx/profile.yml
-├── contracts/           # JSON-Schemas und OpenAPI-Specs
-├── scripts/             # Sync-, Drift- und Fleet-Tools
-├── docs/                # Projektdokumentation
-├── reports/             # Sync-Logs und Drift-Reports
-├── fleet/               # Fleet-Definition (repos.yml)
-├── repos.yml            # (Legacy) Fleet-Konfiguration für Tooling
-└── Justfile             # Haupt-Kommandos
+├── system/              # Maschinenlesbare Rollen- und Wahrheitsverträge
+├── fleet/               # Mitgliedschaft und getrennte operative Fleet-Metadaten
+├── contracts/           # Gemeinsame versionierte Contracts
+├── templates/           # Kuratierte Shared Templates
+├── .github/workflows/   # Reusable Workflows und Repo-CI
+├── scripts/             # Sync-, Prüf- und Migrationswerkzeuge
+├── docs/                # Metarepo-Dokumentation und Legacy-Material
+├── reports/             # Nicht normative Befunde und Drift-Reports
+├── repos.yml            # Generierte Kompatibilitätsprojektion; nicht normativ
+└── Justfile
 ```
 
-## Organismus-Kontext
+## Beitragen
 
-Dieses Repository ist Teil des **Heimgewebe-Organismus**.
-
-Die übergeordnete Architektur, Achsen, Rollen und Contracts sind zentral beschrieben im
-👉 [`metarepo/docs/system/heimgewebe-organismus.md`](docs/system/heimgewebe-organismus.md)
-👉 [`metarepo/docs/system/heimgewebe-zielbild.md`](docs/system/heimgewebe-zielbild.md).
-
-Alle Rollen-Definitionen, Datenflüsse und Contract-Zuordnungen dieses Repos
-sind dort verankert.
+Änderungen laufen über Pull Requests. Vor einem Merge müssen Diff,
+Validierung, Consumer-Auswirkung und Wahrheitsgrenzen geprüft sein. Weitere
+Details stehen in [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ## Lizenz
 
-Dieses Projekt steht unter der [CC0 1.0 Universal](LICENSE) Public Domain Dedication.
-
-**Hinweis:** Die actionlint-Dokumentation (`LICENSE.txt`, `man/actionlint.1`) stammt vom [actionlint-Projekt](https://github.com/rhysd/actionlint) und ist unter der MIT-Lizenz (siehe `LICENSE.txt`) verfügbar.
-
-## Contributing
-
-Contributions sind willkommen! Bitte lies [CONTRIBUTING.md](CONTRIBUTING.md) für Details zum Entwicklungsprozess.
-
-## MCP / Copilot Integration (heimgewebe-local)
-
-Dieses Repository enthält einen lokalen MCP-Server unter `servers/local-mcp/`, der von GitHub Copilot (Agent Mode) genutzt werden kann, um Werkzeuge wie `git`, `wgx` und einfache Dateizugriffe auszuführen.
-
-### Schnellstart
-
-1. Einmalig die MCP-Abhängigkeiten installieren:
-
-   ```bash
-   tools/mcp-local-setup.sh
-   ```
-
-2. Sicherstellen, dass im Repo-Root eine Datei `.mcp/registry.json` existiert, die den lokalen Server einträgt, zum Beispiel:
-
-   ```json
-   {
-     "version": "1.0",
-     "servers": {
-       "heimgewebe-local": {
-         "type": "process",
-         "command": "node",
-         "args": ["servers/local-mcp/index.js"],
-         "tools": [
-           "git",
-           "wgx",
-           "fs_read",
-           "fs_write",
-           "wgx_guard",
-           "wgx_smoke"
-         ]
-       }
-     }
-   }
-   ```
-
-3. In deiner IDE (z. B. VS Code mit GitHub Copilot Agent Mode) die MCP-Konfiguration so setzen, dass diese Registry-Datei verwendet wird.
-
-4. In Copilot Chat kannst du dann z. B. schreiben:
-   „Nutze das Tool wgx_guard, prüfe dieses Repo und erkläre mir alle Fehler verständlich.“
-
-### Kurz erklärt „für Dummies“
-- Der MCP-Server ist eine kleine Brücke zwischen Copilot und deinen lokalen Werkzeugen.
-- Du gibst im Chat einen Auftrag (zum Beispiel „starte wgx_guard“).
-- Copilot ruft intern eines der Tools im MCP-Server auf (z. B. wgx_guard, git, fs_read).
-- Der MCP-Server führt den Befehl lokal im Repo aus und gibt das Ergebnis zurück.
-- Copilot übersetzt dieses Ergebnis in normale Sprache und kann dir Zusammenfassungen, Erklärungen oder nächste Schritte vorschlagen.
-
-### Typische Stolperfallen (Fehlerprävention)
-
-**Worauf du achten solltest:**
-
-1. **Skript im falschen Ordner ausführen**
-   - Problem: `git rev-parse --show-toplevel` schlägt fehl oder zeigt ein anderes Repo.
-   - Lösung: Skript immer aus einem Verzeichnis innerhalb des metarepo ausführen.
-
-2. **Node oder Paketmanager fehlen**
-   - Wenn `node`, `pnpm` und `npm` fehlen, bricht das Skript sauber mit Fehlermeldung ab.
-   - Lösung: Node installieren (empfohlen Version 20+), und mindestens `npm` im PATH haben.
-
-3. **`servers/local-mcp` noch nicht vorhanden**
-   - Dann sagt das Skript dir explizit, dass der MCP-Server-Ordner fehlt → zuerst den vorherigen Patch mit `servers/local-mcp` und `.mcp/registry.json` einspielen.
-
-4. **Falsche `registry.json`**
-   - Wenn du Tools in der Registry einträgst, die im MCP-Server noch nicht existieren (z. B. `wgx_guard`), ist das harmlos – Copilot kann sie dann nur nicht aufrufen.
-   - Problematisch wird es nur, wenn du die Datei syntaktisch zerschießt (dann meckert Copilot in der MCP-Konfiguration).
+Dieses Projekt steht unter der [CC0 1.0 Universal](LICENSE) Public Domain
+Dedication. Die mitgelieferte actionlint-Dokumentation stammt vom
+actionlint-Projekt und steht unter der MIT-Lizenz; siehe `LICENSE.txt`.

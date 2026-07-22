@@ -23,7 +23,7 @@ jobs:
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: Set up Python
-        uses: actions/setup-python@4f41a90a1f38628c7ccc608d05fbafe701bc20ae # v6.2.0
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v6.2.0
         with:
           python-version: "3.12"
 
@@ -47,7 +47,7 @@ jobs:
           fi
 
       - name: Publish sources.v1.json to Release
-        uses: softprops/action-gh-release@718ea10b132b3b2eba29c1007bb80653f286566b # v3.0.1
+        uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228 # v3.0.2
         with:
           tag_name: integrity
           files: reports/integrity/sources.v1.json

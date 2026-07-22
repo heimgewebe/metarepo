@@ -22,6 +22,7 @@ help:
     @printf "  just smoke         # Schneller Fleet-Integrationslauf\n"
     @printf "  just log-sync      # Report-Vorlage unter reports/sync-logs/\n"
     @printf "  just fleet         # Fleet Readiness & Repos List generieren\n"
+    @printf "  just fleet-projection # repos.yml aus kanonischen Fleet-Quellen erzeugen\n"
     @printf "  just doctor        # Fleet Diagnose (Health Check)\n"
     @printf "\nWeitere Ziele: just --list\n"
 
@@ -108,6 +109,14 @@ fleet-check:
         --matrix docs/repo-matrix.md \
         --fleet fleet/repos.txt
 
+# Generate the legacy repos.yml compatibility projection from canonical inputs
+fleet-projection:
+    @uv run python scripts/fleet/generate_repos_projection.py
+
+# Fail when repos.yml was edited manually or canonical inputs were not projected
+fleet-projection-check:
+    @uv run python scripts/fleet/generate_repos_projection.py --check
+
 # Diagnose current fleet readiness from reports/heimgewebe-readiness.json
 doctor:
     @[ -f reports/heimgewebe-readiness.json ] || just fleet
@@ -149,6 +158,7 @@ fleet-push-all:
 # Local CI
 validate: yq_ensure lint
     just fleet-check
+    just fleet-projection-check
     scripts/ci/validate-local.sh
     @if [ -d tests ] && [ -f pyproject.toml ] && grep -q "pytest" pyproject.toml; then echo "Running python tests..."; uv run pytest tests/; fi
     @printf "Running shell regression tests...\n"
@@ -166,17 +176,15 @@ ci:
 contracts-validate:
     @scripts/validate-contracts.sh
 
+# Historische Kompatibilitätsnamen; alle drei Rezepte brechen fail-closed ab.
 e2e-dry:
-    set -a; [ -f scripts/e2e/.env ] && . scripts/e2e/.env || true; set +a
-    DRY_RUN=1 bash scripts/e2e/run_aussen_to_heimlern.sh
+    @bash scripts/e2e/run_aussen_to_heimlern.sh
 
 e2e:
-    set -a; [ -f scripts/e2e/.env ] && . scripts/e2e/.env || true; set +a
-    DRY_RUN=0 bash scripts/e2e/run_aussen_to_heimlern.sh
-    bash scripts/e2e/report.sh
+    @bash scripts/e2e/run_aussen_to_heimlern.sh
 
 e2e-report:
-    bash scripts/e2e/report.sh
+    @bash scripts/e2e/report.sh
 
 # --- Interne Rezepte ----------------------------------------------------------
 _wgx *args:

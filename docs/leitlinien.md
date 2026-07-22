@@ -12,8 +12,11 @@
 - semantAH → `insights.schema.json`
 - wgx → `metrics.snapshot.schema.json`
 - hausKI JSONL Event-Log → `event.line.schema.json`
-- heimlern Decisions → `policy.decision.schema.json`
-- heimlern Ingest-Status → `heimlern.ingest.state.schema.json`
+- historische Heimlern-Decisions → `policy.decision.schema.json`
+- historischer Heimlern-Ingest-Status → `heimlern.ingest.state.schema.json`
+
+Die Heimlern-Schemas bleiben als normative historische Belege erhalten. Sie begründen keine
+aktive Runtime-, Ingest-, Queue-, Routing- oder Produktionsautorität.
 
 ## Security
 - Ingest lokal; optional Shared-Secret via Header `x-auth`.

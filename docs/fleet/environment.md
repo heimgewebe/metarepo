@@ -16,10 +16,6 @@ Weitere Tools (z. B. `wgx`, `uv`) werden in den jeweiligen Repos erklärt.
 
 | Variable | Zweck | Wo genutzt |
 | --- | --- | --- |
-| `AUSSENSENSOR_DIR` | Pfad zum `aussensensor`-Repo für End-to-End-Läufe | [`scripts/e2e/run_aussen_to_heimlern.sh`](../../scripts/e2e/run_aussen_to_heimlern.sh) |
-| `CHRONIK_INGEST_URL` | HTTP-Endpunkt des Chronik-Ingests | [`scripts/e2e/run_aussen_to_heimlern.sh`](../../scripts/e2e/run_aussen_to_heimlern.sh) |
-| `CHRONIK_TOKEN` | Authentisierungstoken für Chronik-Ingest | [`scripts/e2e/run_aussen_to_heimlern.sh`](../../scripts/e2e/run_aussen_to_heimlern.sh) |
-| `HEIMLERN_INGEST_URL` | HTTP-Endpunkt für Policy-Feedback | [`scripts/e2e/run_aussen_to_heimlern.sh`](../../scripts/e2e/run_aussen_to_heimlern.sh) |
 | `GH_TOKEN` | GitHub-PAT für `wgx`/CI sowie HTTPS-Clones | [`scripts/wgx`](../../scripts/wgx) |
 | `GITHUB_OWNER` / `WGX_OWNER` | Überschreibt den Owner für `wgx`-Kommandos | [`scripts/wgx`](../../scripts/wgx) |
 
@@ -37,8 +33,9 @@ Weitere Variablen entnimmst du den Sub-Repo-Dokumentationen (siehe
 
 ## Troubleshooting
 
-- Fehlende Variablen führen zu Abbrüchen mit hilfreichen Fehlermeldungen (z. B. im
-  [E2E-Skript](../../scripts/e2e/run_aussen_to_heimlern.sh)).
+- Der historische direkte Heimlern-E2E-Pfad ist bedingungslos stillgelegt. Sein
+  [Tombstone-Skript](../../scripts/e2e/run_aussen_to_heimlern.sh) bricht unabhängig von
+  Umgebungsvariablen mit Exit-Code 64 ab.
 - `wgx` meldet fehlende Authentisierung, wenn `GH_TOKEN` nicht gesetzt ist.
 - Bei mehreren Accounts empfiehlt sich ein dediziertes `.env` pro Umgebung.
 

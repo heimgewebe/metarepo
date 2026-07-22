@@ -1,50 +1,83 @@
 ---
 ai_context_version: 1.1
 
-# Repo-specific AI context.
-# Do NOT copy this file unchanged into other repos; adjust project.name/role/paths first.
+# Repo-specific AI context. The normative role contract is
+# system/metarepo-role.v1.json.
 
 project:
   name: metarepo
-  summary: Architecture source + internal contract constitution + templates/policies.
-  role: control_plane
+  summary: Versioned Fleet membership, shared contracts, templates, and reusable CI workflows.
+  role: shared_asset_registry
   primary_language: mixed
   visibility: internal
 
 heimgewebe:
-  axis: [Contracts, Motorik, Decisions]
+  axis: [Contracts, Fleet, Templates]
   fleet:
     enabled: true
+    authoritative_source: fleet/repos.yml
   wgx:
     profile_expected: true
     guard_smoke_expected: true
+    canonical_owner: wgx
 
 interfaces:
   consumes:
-    - "fleet state (reports/findings)"
+    - "system catalog references from systemkatalog"
+    - "consumer usage evidence from repository and GitHub caller scans"
+    - "fleet tooling from wgx"
   produces:
-    - "internal contracts (contracts/*.schema.json)"
-    - "CI templates (wgx-guard.yml, wgx-smoke.yml)"
-    - "architecture docs / ADRs"
+    - "Fleet membership (fleet/repos.yml)"
+    - "shared contracts (contracts/)"
+    - "shared templates (templates/)"
+    - "reusable CI workflows (.github/workflows/)"
 
 contracts:
+  role_contract:
+    path: "system/metarepo-role.v1.json"
+    note: "Normative scope and truth boundaries for this repository."
   schemas:
     - path: "contracts/*.schema.json"
-      note: "Internal canonical contracts live here."
+      note: "Only contracts published by metarepo are canonical here."
 
 dependencies:
   internal:
+    - name: systemkatalog
+      relationship: references
+      interface: [system_purpose, system_relationships, entrypoints]
+    - name: bureau
+      relationship: delegates_truth
+      interface: [tasks, queue, completion]
+    - name: grabowski
+      relationship: delegates_execution
+      interface: [operator_execution, leases, audit, recovery]
     - name: wgx
       relationship: uses
-      interface: [reusable_workflows]
+      interface: [fleet_tooling, reusable_workflows]
   external:
-    - name: markdown
+    - name: github_actions
 
 boundaries:
   not_responsible_for:
-    - "External protobuf APIs (contracts-mirror)."
+    - "ecosystem-wide system architecture or topology"
+    - "task, queue, verification, or completion truth"
+    - "operator execution, machine access, leases, audit, or recovery"
+    - "runtime health of consumer systems"
+    - "ecosystem event history"
+    - "external protobuf APIs owned by contracts-mirror"
   dangerous_assumptions:
-    - "Assume docs reflect reality; verify via fleet scans."
+    - "Fleet membership equals membership in the complete operator ecosystem."
+    - "Legacy organism documents describe the current architecture."
+    - "A shared asset can be removed without proving all active consumers."
+    - "Top-level repos.yml is normative; fleet/repos.yml is the authoritative source."
+
+compatibility:
+  non_authoritative_surfaces:
+    - repos.yml
+    - wgx/
+    - servers/local-mcp/
+  active_surface_requiring_consumer_migration:
+    - .github/workflows/heimgewebe-command-dispatch.yml
 
 conventions:
   branching: "main, feature/*"
@@ -52,11 +85,18 @@ conventions:
   ci_platform: github_actions
 
 documentation:
-  adr: docs/adr/
-  runbook: docs/runbook.md
+  role_contract: system/metarepo-role.v1.json
+  adr: docs/adrs/
+  runbooks: docs/runbooks/
 
 ai_guidance:
   do:
+    - read system/metarepo-role.v1.json before planning changes
+    - verify live consumers before changing contracts, templates, or reusable workflows
+    - treat systemkatalog, bureau, and grabowski as separate truth owners
     - prefer workflow_call for reuse and pin external actions
   dont:
-    - duplicate shared logic across repos
+    - describe metarepo as a control plane
+    - use legacy organism documents as current architecture truth
+    - duplicate task or runtime status in metarepo
+    - remove compatibility surfaces without migration evidence

@@ -1,0 +1,20 @@
+{
+  "nodes": [
+    { "id": "wgx", "type": "text", "text": "wgx\n(metrics.snapshot.json)", "x": -200, "y": -160, "width": 260, "height": 120, "color": "5" },
+    { "id": "hauski", "type": "text", "text": "hausKI\n(events.jsonl)", "x": -200, "y": 0, "width": 260, "height": 120, "color": "3" },
+    { "id": "semantah", "type": "text", "text": "semantAH\n(insights/today.json)", "x": -200, "y": 160, "width": 260, "height": 120, "color": "5" },
+    { "id": "audio", "type": "text", "text": "hausKI-audio\n(audio.events)", "x": -200, "y": 320, "width": 260, "height": 120, "color": "5" },
+    { "id": "aussen", "type": "text", "text": "aussensensor\n(feed.jsonl)", "x": -200, "y": 480, "width": 260, "height": 120, "color": "3" },
+
+    { "id": "chronik", "type": "text", "text": "chronik\n/data/{domain}.jsonl", "x": 220, "y": 160, "width": 260, "height": 120, "color": "3" },
+    { "id": "leitstand", "type": "text", "text": "leitstand\nUI/Dashboard", "x": 520, "y": 160, "width": 260, "height": 120, "color": "4" }
+  ],
+  "edges": [
+    { "id": "d1", "fromNode": "wgx", "fromSide": "right", "toNode": "chronik", "toSide": "left", "label": "metrics.snapshot.json" },
+    { "id": "d2", "fromNode": "hauski", "fromSide": "right", "toNode": "chronik", "toSide": "left", "label": "events.jsonl" },
+    { "id": "d3", "fromNode": "semantah", "fromSide": "right", "toNode": "chronik", "toSide": "left", "label": "insights/today.json" },
+    { "id": "d4", "fromNode": "audio", "fromSide": "right", "toNode": "chronik", "toSide": "left", "label": "audio.events" },
+    { "id": "d5", "fromNode": "aussen", "fromSide": "right", "toNode": "chronik", "toSide": "left", "label": "feed.jsonl /ingest/aussen" },
+    { "id": "d6", "fromNode": "chronik", "fromSide": "right", "toNode": "leitstand", "toSide": "left", "label": "Events" }
+  ]
+}

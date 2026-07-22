@@ -11,46 +11,27 @@ GENERATED_FILE="docs/_generated/fleet.md"
 
 echo "Running Document Drift Guard..."
 
-# 1. Check if generated doc is clean
+# 1. Check if generated doc exactly matches the canonical source.
 if [ ! -f "$GENERATED_FILE" ]; then
-  echo "❌ $GENERATED_FILE missing. Running generator..."
-  python3 "$GENERATOR"
+  echo "❌ $GENERATED_FILE missing. Run $GENERATOR and commit the result."
+  exit 1
 fi
 
-# Generate temp file to compare
-TEMP_GEN=$(mktemp)
+ORIGINAL=$(mktemp)
+trap 'rm -f "$ORIGINAL"' EXIT
+cp "$GENERATED_FILE" "$ORIGINAL"
+
 python3 "$GENERATOR" > /dev/null
-# We need to capture the output file content, but the script writes to file.
-# Let's just run it and see if git diff triggers.
-# Better: Copy current file, run gen, compare.
 
-cp "$GENERATED_FILE" "$TEMP_GEN"
-python3 "$GENERATOR"
-
-if ! cmp -s "$GENERATED_FILE" "$TEMP_GEN"; then
-  # Differs (Note: The script updates timestamp/commit hash, so it WILL differ on every run if commit changes)
-  # We should exclude the header lines with timestamp for comparison if we are in the same commit.
-  # But usually, in CI, we check if the file matches what is committed.
-  # If I run it now, it overwrites.
-  # For a Drift Guard, strictly speaking, the file in the repo should match what the script generates.
-  # However, the script puts a timestamp. This makes "git diff" dirty on every run.
-  # Mitigation: The generator should perhaps use the timestamp of the commit of repos.yml?
-  # For now, let's ignore the header lines 1-5 for comparison.
-
-  DIFF_COUNT=$(diff <(tail -n +6 "$GENERATED_FILE") <(tail -n +6 "$TEMP_GEN") | wc -l)
-  if [ "$DIFF_COUNT" -ne 0 ]; then
-    echo "❌ Drift detected in $GENERATED_FILE. Content does not match fleet/repos.yml."
-    echo "Diff:"
-    diff <(tail -n +6 "$GENERATED_FILE") <(tail -n +6 "$TEMP_GEN")
-    rm "$TEMP_GEN"
-    exit 1
-  else
-    echo "✅ Generated fleet docs are consistent."
-  fi
-else
-  echo "✅ Generated fleet docs are identical."
+if ! cmp -s "$GENERATED_FILE" "$ORIGINAL"; then
+  echo "❌ Drift detected in $GENERATED_FILE. Content does not match fleet/repos.yml."
+  echo "Diff (committed/current -> generated):"
+  diff -u "$ORIGINAL" "$GENERATED_FILE" || true
+  cp "$ORIGINAL" "$GENERATED_FILE"
+  exit 1
 fi
-rm "$TEMP_GEN"
+
+echo "✅ Generated fleet docs are identical."
 
 # 2. Check for "contracts" repo name usage (excluding archive and canonical paths)
 # We search for words "contracts" that are NOT "contracts-mirror" and NOT "contracts/" (paths).
@@ -90,36 +71,33 @@ if [ "$ERRORS" -eq 1 ]; then
   exit 1
 fi
 
-# 3. Guard against stale repo-identity references to legacy repo name "tools"
-# Allowlist rules (exclusion semantics vary by implementation):
-# - reports/sync-logs/** may contain historical names by design.
-#   (rg: path-scoped glob; grep fallback: basename "sync-logs")
-# - tools/** is a local toolchain tree, not repo identity.
-#   (rg: path-scoped glob; grep fallback: basename "tools" matches all tools dirs)
-# - scripts/tools/** contains local helper scripts, not repo identity.
-#   (rg: path-scoped glob; grep fallback: covered by basename "tools")
-# - scripts/fleet/check_docs_drift.sh contains the guard patterns itself.
-#   (rg: path-scoped glob; grep fallback: basename "check_docs_drift.sh")
-# Note: docs/archive/** was migrated (tools→lenskit) in commit 7038fdd, so no exclusion needed.
-# Implementation note: rg globs are path-scoped and precise; grep fallback uses basename
-# exclusions for portability across GNU/BSD/busybox variants.
+# 3. Guard against stale active repo identities "tools" and "lenskit"
+# Allowlist rules:
+# - reports/sync-logs/** and docs/archive/** are immutable historical evidence.
+# - tools/** and scripts/tools/** are local toolchain trees, not repo identity.
+# - the command-dispatch workflow intentionally recognizes legacy aliases so it
+#   can direct callers to RepoGround; the patterns below target active identity
+#   declarations and allowlists, not that explicit compatibility branch.
+# - this script contains the guard patterns itself.
 
-echo "Scanning for stale repo-identity references (tools -> lenskit)..."
+echo "Scanning for stale repo identities (tools/lenskit -> repoground)..."
 
-LEGACY_PATTERN_PCRE='(github\.com/heimgewebe/tools|heimgewebe/tools|^\s*-\s*name:\s*tools\s*$|ALLOWED_TARGET_REPOS:.*\btools\b)'
-LEGACY_PATTERN_ERE='(github\.com/heimgewebe/tools|heimgewebe/tools|^[[:space:]]*-[[:space:]]*name:[[:space:]]*tools[[:space:]]*$|ALLOWED_TARGET_REPOS:.*(^|[^[:alnum:]_])tools([^[:alnum:]_]|$))'
+LEGACY_PATTERN_RG='(github\.com/heimgewebe/(tools|lenskit)(\.git)?|heimgewebe/(tools|lenskit)\b|^\s*-\s*name:\s*(tools|lenskit)\s*$|^\s*name:\s*(tools|lenskit)\s*$|ALLOWED_TARGET_REPOS:.*\b(tools|lenskit)\b)'
+LEGACY_PATTERN_ERE='(github\.com/heimgewebe/(tools|lenskit)(\.git)?|heimgewebe/(tools|lenskit)([^[:alnum:]_.-]|$)|^[[:space:]]*-[[:space:]]*name:[[:space:]]*(tools|lenskit)[[:space:]]*$|^[[:space:]]*name:[[:space:]]*(tools|lenskit)[[:space:]]*$|ALLOWED_TARGET_REPOS:.*(^|[^[:alnum:]_])(tools|lenskit)([^[:alnum:]_]|$))'
 if has_rg; then
   set +e
-  rg -n --pcre2 \
+  rg -n \
     --glob '!reports/sync-logs/**' \
+    --glob '!docs/archive/**' \
     --glob '!tools/**' \
     --glob '!scripts/tools/**' \
+    --glob '!tests/**' \
     --glob '!scripts/fleet/check_docs_drift.sh' \
-    "$LEGACY_PATTERN_PCRE" .
+    "$LEGACY_PATTERN_RG" .
   rc=$?
   set -e
   if [ "$rc" -eq 0 ]; then
-    echo "❌ Found stale repo-identity reference(s) to 'tools'. Use 'lenskit' instead."
+    echo "❌ Found stale active repo identity. Use 'repoground' instead."
     exit 1
   elif [ "$rc" -eq 1 ]; then
     :
@@ -134,7 +112,9 @@ else
     grep -r -I -n -E \
       --exclude-dir='.git' \
       --exclude-dir='sync-logs' \
+      --exclude-dir='archive' \
       --exclude-dir='tools' \
+      --exclude-dir='tests' \
       --exclude='check_docs_drift.sh' \
       -e "$LEGACY_PATTERN_ERE" \
       . \
@@ -144,15 +124,12 @@ else
   set -e
 
   if [ "$rc" -eq 0 ]; then
-    # Matches found
     echo "$GREP_OUT"
-    echo "❌ Found stale repo-identity reference(s) to 'tools'. Use 'lenskit' instead."
+    echo "❌ Found stale active repo identity. Use 'repoground' instead."
     exit 1
   elif [ "$rc" -eq 1 ]; then
-    # No matches - clean
     :
   else
-    # grep error (exit 2+)
     if [ -n "$GREP_OUT" ]; then
       echo "$GREP_OUT" >&2
     fi

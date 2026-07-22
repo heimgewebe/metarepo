@@ -9,13 +9,13 @@ Diese Events erfassen den **unmittelbaren Nutzungskontext** am Rechner (OS-Ebene
 -   **`os.context.text.embed`**: Text-Repräsentation des Zustands.
 
 ## Datenfluss
-🪶 **mitschreiber** (OS-Kontext-Daemon) → **chronik** → **semantAH** / **hausKI** / **heimlern**.
+🪶 **mitschreiber** (OS-Kontext-Daemon) → **chronik** → **semantAH** / **hausKI**.
 
 ## Anwendungsfälle
 -   **Proaktive Assistenz**: `hausKI` erkennt wiederkehrende Muster.
 -   **Automatisierung**: sich wiederholende Aktionen.
 -   **Wissens-Graph**: `semantAH` verknüpft Kontext mit Dokumenten.
--   **Lernen**: `heimlern` nutzt Kontext als Feature für Entscheidungen.
+-   **Historische Lernreferenz**: frühere Heimlern-Kopplungen bleiben nur in Contract-Evidenz nachvollziehbar.
 
 ## Sicherheit & Privacy
 -   **Sensibel**: `mitschreiber`-Events sind hochsensibel (Tastatureingaben, Bildschirminhalte).

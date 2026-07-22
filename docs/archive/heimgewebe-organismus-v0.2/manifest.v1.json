@@ -1,0 +1,161 @@
+{
+  "schema_version": 1,
+  "kind": "metarepo_legacy_architecture_archive",
+  "id": "heimgewebe-organismus-v0.2",
+  "status": "historical_non_normative",
+  "valid_through": "2026-07-14",
+  "superseded_on": "2026-07-15",
+  "archived_from_commit": "0a0f6ddd25aeb634dbee7060c650923fe7b709ea",
+  "current_sources": {
+    "metarepo_role": "system/metarepo-role.v1.json",
+    "system_catalog_repository": "https://github.com/heimgewebe/systemkatalog",
+    "system_catalog_rendered": "rendered/system-catalog.md",
+    "system_catalog_inventory": "registry/ecosystem/nodes.json",
+    "system_catalog_verified_commit": "ac0e7cc8862c97125862b1475068832d8d517475"
+  },
+  "files": [
+    {
+      "archive_path": "system/heimgewebe-organismus.md",
+      "former_path": "docs/system/heimgewebe-organismus.md",
+      "sha256": "e81a4c71f01b9fe7a2af1a4f23ed142267bc87df4cb2993a37d510c5b25f9566"
+    },
+    {
+      "archive_path": "system/heimgewebe-zielbild.md",
+      "former_path": "docs/system/heimgewebe-zielbild.md",
+      "sha256": "094ac2dc4f5460b61b74b50856fa1eb62ce35154d9440241ae3215ac583d1272"
+    },
+    {
+      "archive_path": "system/architecture.md",
+      "former_path": "docs/system/architecture.md",
+      "sha256": "3a1e5ba60256f8a6476b1537097603276d020554fef8ef5f02016a0e503ec9bc"
+    },
+    {
+      "archive_path": "system/heimgewebe-architektur.mmd",
+      "former_path": "docs/system/heimgewebe-architektur.mmd",
+      "sha256": "ddaae3034b2227671d0c6331bb12edbff96fa5e8f399bedd7e0d27e6d478e008"
+    },
+    {
+      "archive_path": "system/heimgewebe-dataflow.mmd",
+      "former_path": "docs/system/heimgewebe-dataflow.mmd",
+      "sha256": "28875afd082f0aebc25a8dd3bf8d8776c541aedd21231e70b1bd468f087409b3"
+    },
+    {
+      "archive_path": "vision/vision.md",
+      "former_path": "docs/vision/vision.md",
+      "sha256": "7ee312977ec0cdfa1bb1bc51d7fbbd7a507013941dfe2f696e535dd9d76ab248"
+    },
+    {
+      "archive_path": "vision/heimgewebe-capability-plan.md",
+      "former_path": "docs/vision/heimgewebe-capability-plan.md",
+      "sha256": "5eed543dc08da05e532cb99e089af2981845be8828c66a8a9ffe6a875229d9b9"
+    },
+    {
+      "archive_path": "roadmaps/heimgewebe-capabilities-2026.md",
+      "former_path": "docs/roadmaps/heimgewebe-capabilities-2026.md",
+      "sha256": "0cbe2d41aed777a6bcbf95d827e8706f32dc0f3c83a6ca2c58744692b1eadaa6"
+    },
+    {
+      "archive_path": "canvas/heimgewebe-architektur.canvas",
+      "former_path": "docs/canvas/heimgewebe-architektur.canvas",
+      "sha256": "499643176e705c366a0076fbaea080df971024f81c2b48e149a747aa978112c5"
+    },
+    {
+      "archive_path": "canvas/heimgewebe-dataflow.canvas",
+      "former_path": "docs/canvas/heimgewebe-dataflow.canvas",
+      "sha256": "a1ad9ae8ec528d3052adba868b731533c83835bab37b5ea1d1b20bf860fb004e"
+    },
+    {
+      "archive_path": "architecture/integrity-neurose.md",
+      "former_path": "docs/architecture/integrity-neurose.md",
+      "sha256": "95720682af0f94c836a32aa2f049813ae937d0c48faf975099b81a1f582f0f2e"
+    },
+    {
+      "archive_path": "architecture/pipeline-channels.md",
+      "former_path": "docs/architecture/pipeline-channels.md",
+      "sha256": "561ed2c690888cc544cca49ef7f83f03d51270381a43ae17779948b38c77e023"
+    },
+    {
+      "archive_path": "system/plexer-eventmodel.md",
+      "former_path": "docs/system/plexer-eventmodel.md",
+      "sha256": "d66543bef33b89a8ee2f067dc629f10d26dc26316cb1583f35e7b8d77ae6b5e8"
+    },
+    {
+      "archive_path": "system/heimgeist_vs_hauski.md",
+      "former_path": "docs/system/heimgeist_vs_hauski.md",
+      "sha256": "5ec9ae957e86885e6191a511fbcec2a628307063f2f47ca3cf8e0faa0c3ed961"
+    },
+    {
+      "archive_path": "vision/leitwerk-blueprint",
+      "former_path": "docs/vision/leitwerk-blueprint",
+      "sha256": "4311b52ff2e72cccb6fc9193ec69b2104915e9cddeb3d70a035cf98c9ac53b7e"
+    },
+    {
+      "archive_path": "vision/README.md",
+      "former_path": "docs/vision/README.md",
+      "sha256": "da01c3420bd13b3d069625902a3baecb77b4cf191f564f3ef4a130b1b79c1db5"
+    },
+    {
+      "archive_path": "project/README.md",
+      "former_path": "heimgewebe/README.md",
+      "sha256": "06a219b479aaadc1bd4cf2dcccf19015121e7231f31be6941b24d1aee881ab3e"
+    },
+    {
+      "archive_path": "project/PROJECT.md",
+      "former_path": "heimgewebe/PROJECT.md",
+      "sha256": "1599d97f515ef04dc1d05bc123aeacb12e0f1cad64d9d447166aa8fcbc1e18f0"
+    }
+  ],
+  "compatibility_link_anchors": [
+    {
+      "path": "archive/system-overview.md",
+      "target": "docs/archive/system-overview.md"
+    },
+    {
+      "path": "repo-matrix.md",
+      "target": "docs/repo-matrix.md"
+    },
+    {
+      "path": "contracts/contracts-index.md",
+      "target": "docs/contracts/contracts-index.md"
+    },
+    {
+      "path": "contracts/contract-versioning.md",
+      "target": "docs/contracts/contract-versioning.md"
+    },
+    {
+      "path": "archive/heimgewebe-gesamt.md",
+      "target": "docs/archive/heimgewebe-gesamt.md"
+    },
+    {
+      "path": "konzept-kern.md",
+      "target": "docs/konzept-kern.md"
+    },
+    {
+      "path": "adrs/README.md",
+      "target": "docs/adrs/README.md"
+    },
+    {
+      "path": "vision/heimgewebe-evolution-maximaleffizienz.md",
+      "target": "docs/vision/heimgewebe-evolution-maximaleffizienz.md"
+    },
+    {
+      "path": "vision/heimgewebe-v2-detailed.md",
+      "target": "docs/vision/heimgewebe-v2-detailed.md"
+    },
+    {
+      "path": "vision/heimgewebe-autopoiesis.md",
+      "target": "docs/vision/heimgewebe-autopoiesis.md"
+    },
+    {
+      "path": "fleet/push-to-fleet.md",
+      "target": "docs/fleet/push-to-fleet.md"
+    }
+  ],
+  "repository_compatibility_link_anchors": [
+    {
+      "path": "docs/archive/contracts/README.md",
+      "directory_target": "docs/archive/contracts",
+      "target": "contracts/"
+    }
+  ]
+}

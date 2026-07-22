@@ -12,11 +12,10 @@ Diese Repositories bilden den Organismus und unterliegen den Fleet-Policies (CI,
 | contracts-mirror  | Schema-Definitionen für Events/Tools| yes   |
 | hausKI            | KI-Orchestrator (Rust)              | yes   |
 | hausKI-audio      | Audio-Schicht                       | yes   |
-| heimlern          | Lern-/Policy-Schicht                | yes   |
 | semantAH          | Embeddings / Wissensschicht         | yes   |
 | aussensensor      | Außenwelt-Events                    | yes   |
 | chronik           | Persistenz/Audit                    | yes   |
-| lenskit          | Merger & Scanner für Repo-Artefakte | yes   |
+| repoground       | Verifizierbarer Codebase-Kontext    | yes   |
 | mitschreiber      | Dialog-/Schreibschicht              | yes   |
 | sichter           | Review-Agent / Semantic Checks      | yes   |
 | heimgeist         | Meta-Agent / Beobachtung            | yes   |
@@ -32,3 +31,10 @@ Externe Werkzeuge oder Wissensspeicher. Keine Fleet-Policies erforderlich.
 |-------------------|----------------------------|-------|
 | weltgewebe        | Web/Doku/Externe Signale   | no    |
 | icf-tool          | ICF-Katalog & Browser      | no    |
+
+## Archived References (Non-Fleet)
+Historische Repositories ohne aktive Betriebs-, Runtime-, Routing- oder Produktionsautorität.
+
+| Repo              | Rolle                                                   | Fleet |
+|-------------------|---------------------------------------------------------|-------|
+| heimlern          | Archivierte Policy- und Lernreferenz                    | no    |

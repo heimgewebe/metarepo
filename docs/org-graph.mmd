@@ -6,10 +6,13 @@ graph TD
     contracts_mirror["contracts-mirror\n(contracts › schema)"]
     hausKI["hausKI\n(assistant › policy)"]
     hausKI_audio["hausKI-audio\n(audio › events)"]
-    heimlern["heimlern\n(policy › library)"]
-    lenskit["lenskit\n(epistemic › scanner-merger)"]
+    repoground["repoground\n(epistemic › codebase-context)"]
     semantAH["semantAH\n(insights › export)"]
     vault_gewebe["vault-gewebe\n(vault › content)"]
     weltgewebe["weltgewebe\n(aussen › events)"]
     wgx["wgx\n(platform › metrics)"]
     hausKI --> hausKI_audio
+    subgraph archived_references["Archived References"]
+        archived_heimlern["heimlern\n(archived-reference; non-operational)"]
+        style archived_heimlern stroke-dasharray: 5 5
+    end

@@ -35,8 +35,10 @@ Kurzer Spickzettel für die häufigsten Stolpersteine rund um Fleet-Sync & WGX.
   Ohne Drift wird kein Abschnitt erzeugt – dennoch entsteht eine leere Report-Datei. CI-Artefakte gezielt einsammeln.
 
 ## 8. `scripts/sync-templates.sh` meldet „Keine Repos in Datei“
-- Symptom: `--repos-from` liefert keine Ziele.
-- Fix: In `repos.yml` müssen unter `repos:` oder `static.include:` Einträge mit mindestens `name:` vorhanden sein (Kommentare zählen nicht).
+- Symptom: `--repos-from repos.yml` liefert keine Ziele.
+- Fix: `repos.yml` nicht manuell bearbeiten. Mitgliedschaft in `fleet/repos.yml`
+  und benötigte operative Daten in `fleet/repo-metadata.yml` prüfen, danach
+  `just fleet-projection` und `just fleet-projection-check` ausführen.
 
 ## 9. SSH statt HTTPS erwartet
 - Symptom: `scripts/wgx up` schlägt beim Klonen fehl.
@@ -44,7 +46,8 @@ Kurzer Spickzettel für die häufigsten Stolpersteine rund um Fleet-Sync & WGX.
 
 ## 10. Fehlende Owner-Angabe
 - Symptom: `scripts/wgx` gibt `owner=` leer aus.
-- Fix: `github.owner` in `repos.yml` setzen oder `GITHUB_OWNER` exportieren.
+- Fix: `github.owner` in `fleet/repo-metadata.yml` setzen, `just fleet-projection`
+  ausführen oder für einen einzelnen Lauf `GITHUB_OWNER` exportieren.
 
 ## 11. Bats-Testregressionen nach Template-Updates
 > Bats läuft bei uns mit Bash sowie `set -euo pipefail`. Fehlende Defaults schlagen daher sofort durch – die folgenden Snippets zeigen robuste Muster.
