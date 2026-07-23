@@ -1,0 +1,11 @@
+[Unit]
+Description=Run Heimgewebe Fleet Renovate daily
+
+[Timer]
+OnCalendar=*-*-* 05:17:00
+Persistent=true
+RandomizedDelaySec=15m
+Unit=renovate-fleet.service
+
+[Install]
+WantedBy=timers.target

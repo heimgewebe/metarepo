@@ -327,17 +327,19 @@ def validate_policy(policy: dict[str, Any], *, active_fleet: set[str]) -> list[d
             "provider",
             "automerge",
             "duplicate_producer_policy",
-            "hosted_app_repository_selection",
+            "runtime_mode",
+            "credential_source",
+            "scope_selector",
             "all_repositories_allowed",
-            "minimum_observed_cycles_before_expansion",
         },
         required={
             "provider",
             "automerge",
             "duplicate_producer_policy",
-            "hosted_app_repository_selection",
+            "runtime_mode",
+            "credential_source",
+            "scope_selector",
             "all_repositories_allowed",
-            "minimum_observed_cycles_before_expansion",
         },
         label="version_update_defaults",
     )
@@ -345,9 +347,10 @@ def validate_policy(policy: dict[str, Any], *, active_fleet: set[str]) -> list[d
         "provider": "renovate",
         "automerge": False,
         "duplicate_producer_policy": "fail-closed",
-        "hosted_app_repository_selection": "selected",
+        "runtime_mode": "self-hosted-heim-pc",
+        "credential_source": "gh-auth-token-transient",
+        "scope_selector": "active-fleet",
         "all_repositories_allowed": False,
-        "minimum_observed_cycles_before_expansion": 2,
     }
     if defaults != expected_defaults:
         raise PolicyError("version_update_defaults do not match the reviewed Renovate V1 safety contract")
@@ -453,6 +456,7 @@ def build_scope_projection(
     *,
     policy: dict[str, Any],
     waves: list[dict[str, Any]],
+    active_fleet: set[str],
     fleet_path: Path,
     policy_path: Path,
 ) -> dict[str, Any]:
@@ -462,25 +466,42 @@ def build_scope_projection(
     ownership: list[dict[str, Any]] = []
     projected_waves: list[dict[str, Any]] = []
     selectors: list[str] = []
+    explicit_names = {
+        repo["name"]
+        for wave in waves
+        for repo in wave["repositories"]
+    }
+
+    def add_repo(name: str, dependabot_state: str, renovate_state: str) -> None:
+        full_name = f"{owner}/{name}"
+        if renovate_state == "prepared":
+            prepared.append(full_name)
+        elif renovate_state == "enabled":
+            enabled.append(full_name)
+        ownership.append(
+            {
+                "repository": full_name,
+                "dependabot_version_updates": dependabot_state,
+                "renovate_version_updates": renovate_state,
+            }
+        )
+
     for wave in waves:
         repo_names: list[str] = []
-        if wave["selector"] is not None:
-            selectors.append(wave["selector"])
         for repo in wave["repositories"]:
             name = repo["name"]
             repo_names.append(name)
-            renovate_state = repo["renovate_version_updates"]
-            if renovate_state == "prepared":
-                prepared.append(f"{owner}/{name}")
-            elif renovate_state == "enabled":
-                enabled.append(f"{owner}/{name}")
-            ownership.append(
-                {
-                    "repository": f"{owner}/{name}",
-                    "dependabot_version_updates": repo["dependabot_version_updates"],
-                    "renovate_version_updates": renovate_state,
-                }
+            add_repo(
+                name,
+                repo["dependabot_version_updates"],
+                repo["renovate_version_updates"],
             )
+        if wave["selector"] is not None:
+            selectors.append(wave["selector"])
+            derived = sorted(active_fleet - explicit_names)
+            repo_names.extend(derived)
+            for name in derived:
+                add_repo(name, "none", "enabled")
         projected_waves.append(
             {
                 "id": wave["id"],
@@ -489,9 +510,16 @@ def build_scope_projection(
                 "selector": wave["selector"],
             }
         )
+
+    enabled = sorted(set(enabled))
+    if set(enabled) != {f"{owner}/{name}" for name in active_fleet}:
+        raise PolicyError("direct-cutover projection must enable Renovate for the complete active Fleet")
+
     return {
         "schema_version": 1,
         "kind": "renovate-fleet-scope-projection",
+        "runtime_mode": policy["version_update_defaults"]["runtime_mode"],
+        "credential_source": policy["version_update_defaults"]["credential_source"],
         "sources": {
             "fleet": {"path": "fleet/repos.yml", "sha256": _sha256(fleet_path)},
             "policy": {
@@ -499,14 +527,15 @@ def build_scope_projection(
                 "sha256": _sha256(policy_path),
             },
         },
-        "expected_hosted_app_repositories": sorted(enabled),
-        "prepared_repositories": sorted(prepared),
+        "expected_renovate_repositories": enabled,
+        "expected_hosted_app_repositories": [],
+        "prepared_repositories": sorted(set(prepared)),
         "version_update_ownership": sorted(ownership, key=lambda item: item["repository"]),
         "waves": projected_waves,
         "deferred_selectors": selectors,
         "nonclaims": [
             "This projection is not Fleet membership truth.",
-            "Prepared repositories are not proof that the Renovate GitHub App is installed or active.",
+            "The self-hosted runtime target list is derived from fleet/repos.yml and this policy.",
             "An empty expected hosted-app scope is not proof that no external app installation exists.",
             "This projection grants no merge, queue, claim, deployment or task-verification authority.",
         ],
@@ -552,6 +581,7 @@ def validate_all(
     projection = build_scope_projection(
         policy=policy,
         waves=waves,
+        active_fleet=active,
         fleet_path=fleet_path,
         policy_path=policy_path,
     )
@@ -607,6 +637,9 @@ def main(argv: list[str] | None = None) -> int:
                 "status": "ok",
                 "active_fleet_count": summary["active_fleet_count"],
                 "explicit_rollout_count": summary["explicit_rollout_count"],
+                "expected_renovate_repositories": projection[
+                    "expected_renovate_repositories"
+                ],
                 "expected_hosted_app_repositories": projection[
                     "expected_hosted_app_repositories"
                 ],

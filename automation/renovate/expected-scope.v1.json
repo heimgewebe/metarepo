@@ -1,23 +1,38 @@
 {
+  "credential_source": "gh-auth-token-transient",
   "deferred_selectors": [
     "remaining-eligible-active-fleet"
   ],
   "expected_hosted_app_repositories": [],
+  "expected_renovate_repositories": [
+    "heimgewebe/aussensensor",
+    "heimgewebe/chronik",
+    "heimgewebe/contracts-mirror",
+    "heimgewebe/hausKI",
+    "heimgewebe/hausKI-audio",
+    "heimgewebe/heim-pc",
+    "heimgewebe/heimgeist",
+    "heimgewebe/konvergenzregelkreis",
+    "heimgewebe/leitstand",
+    "heimgewebe/metarepo",
+    "heimgewebe/mitschreiber",
+    "heimgewebe/plexer",
+    "heimgewebe/repoground",
+    "heimgewebe/semantAH",
+    "heimgewebe/sichter",
+    "heimgewebe/vault-gewebe",
+    "heimgewebe/weltgewebe",
+    "heimgewebe/wgx"
+  ],
   "kind": "renovate-fleet-scope-projection",
   "nonclaims": [
     "This projection is not Fleet membership truth.",
-    "Prepared repositories are not proof that the Renovate GitHub App is installed or active.",
+    "The self-hosted runtime target list is derived from fleet/repos.yml and this policy.",
     "An empty expected hosted-app scope is not proof that no external app installation exists.",
     "This projection grants no merge, queue, claim, deployment or task-verification authority."
   ],
-  "prepared_repositories": [
-    "heimgewebe/hausKI",
-    "heimgewebe/hausKI-audio",
-    "heimgewebe/metarepo",
-    "heimgewebe/mitschreiber",
-    "heimgewebe/repoground",
-    "heimgewebe/weltgewebe"
-  ],
+  "prepared_repositories": [],
+  "runtime_mode": "self-hosted-heim-pc",
   "schema_version": 1,
   "sources": {
     "fleet": {
@@ -26,87 +41,132 @@
     },
     "policy": {
       "path": "automation/renovate/dependency-updates.v1.yml",
-      "sha256": "5b41a2b5eca3778688b5129a719e1af4d7d3d8dbf7abd9de53ac4454a48fb80a"
+      "sha256": "0934e2b7131c8712296892cd15cdae25ca6e424e6baad3799971481f84a40a3b"
     }
   },
   "version_update_ownership": [
     {
-      "dependabot_version_updates": "enabled",
-      "renovate_version_updates": "prepared",
+      "dependabot_version_updates": "none",
+      "renovate_version_updates": "enabled",
+      "repository": "heimgewebe/aussensensor"
+    },
+    {
+      "dependabot_version_updates": "none",
+      "renovate_version_updates": "enabled",
+      "repository": "heimgewebe/chronik"
+    },
+    {
+      "dependabot_version_updates": "none",
+      "renovate_version_updates": "enabled",
+      "repository": "heimgewebe/contracts-mirror"
+    },
+    {
+      "dependabot_version_updates": "disabled",
+      "renovate_version_updates": "enabled",
       "repository": "heimgewebe/hausKI"
     },
     {
-      "dependabot_version_updates": "enabled",
-      "renovate_version_updates": "prepared",
+      "dependabot_version_updates": "disabled",
+      "renovate_version_updates": "enabled",
       "repository": "heimgewebe/hausKI-audio"
     },
     {
-      "dependabot_version_updates": "enabled",
-      "renovate_version_updates": "prepared",
+      "dependabot_version_updates": "none",
+      "renovate_version_updates": "enabled",
+      "repository": "heimgewebe/heim-pc"
+    },
+    {
+      "dependabot_version_updates": "none",
+      "renovate_version_updates": "enabled",
+      "repository": "heimgewebe/heimgeist"
+    },
+    {
+      "dependabot_version_updates": "none",
+      "renovate_version_updates": "enabled",
+      "repository": "heimgewebe/konvergenzregelkreis"
+    },
+    {
+      "dependabot_version_updates": "none",
+      "renovate_version_updates": "enabled",
+      "repository": "heimgewebe/leitstand"
+    },
+    {
+      "dependabot_version_updates": "disabled",
+      "renovate_version_updates": "enabled",
       "repository": "heimgewebe/metarepo"
     },
     {
       "dependabot_version_updates": "none",
-      "renovate_version_updates": "prepared",
+      "renovate_version_updates": "enabled",
       "repository": "heimgewebe/mitschreiber"
     },
     {
-      "dependabot_version_updates": "enabled",
-      "renovate_version_updates": "prepared",
+      "dependabot_version_updates": "none",
+      "renovate_version_updates": "enabled",
+      "repository": "heimgewebe/plexer"
+    },
+    {
+      "dependabot_version_updates": "disabled",
+      "renovate_version_updates": "enabled",
       "repository": "heimgewebe/repoground"
     },
     {
-      "dependabot_version_updates": "enabled",
-      "renovate_version_updates": "prepared",
+      "dependabot_version_updates": "none",
+      "renovate_version_updates": "enabled",
+      "repository": "heimgewebe/semantAH"
+    },
+    {
+      "dependabot_version_updates": "none",
+      "renovate_version_updates": "enabled",
+      "repository": "heimgewebe/sichter"
+    },
+    {
+      "dependabot_version_updates": "none",
+      "renovate_version_updates": "enabled",
+      "repository": "heimgewebe/vault-gewebe"
+    },
+    {
+      "dependabot_version_updates": "disabled",
+      "renovate_version_updates": "enabled",
       "repository": "heimgewebe/weltgewebe"
+    },
+    {
+      "dependabot_version_updates": "none",
+      "renovate_version_updates": "enabled",
+      "repository": "heimgewebe/wgx"
     }
   ],
   "waves": [
     {
-      "id": "custom-manager-pilot",
+      "id": "direct-cutover",
       "order": 1,
       "repositories": [
-        "mitschreiber"
-      ],
-      "selector": null
-    },
-    {
-      "id": "volume-pilot",
-      "order": 2,
-      "repositories": [
+        "mitschreiber",
         "hausKI",
-        "hausKI-audio"
-      ],
-      "selector": null
-    },
-    {
-      "id": "signal-quality-pilot",
-      "order": 3,
-      "repositories": [
-        "repoground"
-      ],
-      "selector": null
-    },
-    {
-      "id": "multi-ecosystem-pilot",
-      "order": 4,
-      "repositories": [
-        "weltgewebe"
-      ],
-      "selector": null
-    },
-    {
-      "id": "control-plane-cutover",
-      "order": 5,
-      "repositories": [
+        "hausKI-audio",
+        "repoground",
+        "weltgewebe",
         "metarepo"
       ],
       "selector": null
     },
     {
-      "id": "fleet-expansion",
-      "order": 6,
-      "repositories": [],
+      "id": "active-fleet",
+      "order": 2,
+      "repositories": [
+        "aussensensor",
+        "chronik",
+        "contracts-mirror",
+        "heim-pc",
+        "heimgeist",
+        "konvergenzregelkreis",
+        "leitstand",
+        "plexer",
+        "semantAH",
+        "sichter",
+        "vault-gewebe",
+        "wgx"
+      ],
       "selector": "remaining-eligible-active-fleet"
     }
   ]

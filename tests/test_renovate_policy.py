@@ -30,15 +30,31 @@ def _inputs():
 def test_current_policy_preset_baseline_and_projection_are_valid() -> None:
     projection, summary = renovate_policy.validate_all()
     assert summary == {"active_fleet_count": 18, "explicit_rollout_count": 6}
+    assert projection["runtime_mode"] == "self-hosted-heim-pc"
+    assert projection["credential_source"] == "gh-auth-token-transient"
     assert projection["expected_hosted_app_repositories"] == []
-    assert projection["prepared_repositories"] == [
+    assert projection["prepared_repositories"] == []
+    assert len(projection["expected_renovate_repositories"]) == 18
+    assert set(projection["expected_renovate_repositories"]) == {
+        "heimgewebe/weltgewebe",
+        "heimgewebe/metarepo",
+        "heimgewebe/wgx",
+        "heimgewebe/contracts-mirror",
         "heimgewebe/hausKI",
         "heimgewebe/hausKI-audio",
-        "heimgewebe/metarepo",
-        "heimgewebe/mitschreiber",
+        "heimgewebe/semantAH",
+        "heimgewebe/aussensensor",
+        "heimgewebe/chronik",
         "heimgewebe/repoground",
-        "heimgewebe/weltgewebe",
-    ]
+        "heimgewebe/konvergenzregelkreis",
+        "heimgewebe/mitschreiber",
+        "heimgewebe/sichter",
+        "heimgewebe/leitstand",
+        "heimgewebe/heimgeist",
+        "heimgewebe/plexer",
+        "heimgewebe/heim-pc",
+        "heimgewebe/vault-gewebe",
+    }
     committed = json.loads(
         (ROOT / "automation/renovate/expected-scope.v1.json").read_text(encoding="utf-8")
     )
@@ -59,11 +75,11 @@ def test_archived_or_non_fleet_repository_is_rejected() -> None:
 def test_repository_cannot_appear_in_multiple_waves() -> None:
     fleet, policy, _ = _inputs()
     mutated = copy.deepcopy(policy)
-    mutated["rollout"]["waves"][1]["repositories"].append(
+    mutated["rollout"]["waves"][0]["repositories"].append(
         {
             "name": "mitschreiber",
             "dependabot_version_updates": "none",
-            "renovate_version_updates": "prepared",
+            "renovate_version_updates": "enabled",
         }
     )
     with pytest.raises(renovate_policy.PolicyError, match="more than one wave"):
@@ -76,7 +92,7 @@ def test_repository_cannot_appear_in_multiple_waves() -> None:
 def test_two_active_version_update_producers_fail_closed() -> None:
     fleet, policy, _ = _inputs()
     mutated = copy.deepcopy(policy)
-    repo = mutated["rollout"]["waves"][1]["repositories"][0]
+    repo = mutated["rollout"]["waves"][0]["repositories"][1]
     repo["dependabot_version_updates"] = "enabled"
     repo["renovate_version_updates"] = "enabled"
     with pytest.raises(renovate_policy.PolicyError, match="duplicate active"):
