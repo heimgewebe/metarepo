@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "required_checks": [
+    "ci (ubuntu-latest)",
+    "ci (macos-latest)"
+  ]
+}

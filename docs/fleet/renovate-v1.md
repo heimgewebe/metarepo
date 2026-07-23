@@ -4,93 +4,64 @@ Stand: 2026-07-23
 
 ## Zweck
 
-Renovate V1 ist ein Fleet-gebundener Dependency-Sensor und PR-Produzent. Es ist
-keine neue Control Plane. Fleet-Mitgliedschaft bleibt ausschließlich in
-`fleet/repos.yml`; die Renovate-Policy beschreibt nur operative Rollout- und
-Provider-Zustände für eine Teilmenge dieser Fleet.
+Renovate V1 ist der Fleet-weite Produzent regulärer Dependency-Version-Update-PRs.
+Fleet-Mitgliedschaft bleibt ausschließlich in `fleet/repos.yml`; die Renovate-Policy
+projiziert daraus den aktiven Runtime-Scope und definiert keine zweite Fleet.
 
-Renovate darf in V1:
+Renovate darf Dependencies erkennen sowie Update-Branches und Pull Requests erzeugen.
+Renovate darf nicht automatisch mergen, Bureau-Tasks oder Queue-Zustand erzeugen,
+Deployments ausführen oder GitHub-/CI-/Grabowski-Merge-Gates ersetzen.
 
-- bekannte Dependency-Manager auswerten;
-- kompatible Patch-/Minor-Updates managerweise gruppieren;
-- Update-Branches und Pull Requests erzeugen.
+## Direkter Cutover
 
-Renovate darf in V1 nicht:
+Die frühere Pilotstaffelung ist aufgehoben. Die selbst gehostete Renovate-Runtime auf
+dem Heim-PC verwaltet alle 18 aktiven Fleet-Repositories. Der Scope wird deterministisch
+aus `fleet/repos.yml` und `automation/renovate/dependency-updates.v1.yml` erzeugt.
+Archivierte Referenzen und `fleet: false` bleiben ausgeschlossen.
 
-- automatisch mergen;
-- Bureau-Tasks, Queue-Einträge oder Claims erzeugen;
-- Deployments oder Task-Verifikation ausführen;
-- eine eigene Fleet-Mitgliedschaft definieren;
-- GitHub-/CI- oder Grabowski-Head-/Diff-/Review-Gates ersetzen.
+Für die fünf Repositories mit bestehenden Dependabot-Version-Updates gilt die
+Cutover-Reihenfolge weiterhin fail-closed:
+
+1. Renovate-Lookup im Dry-Run für den vollständigen Fleet-Scope belegen.
+2. Überlappende Dependabot-Version-Update-Einträge entfernen bzw. deaktivieren.
+3. Den Single-Producer-Zustand live verifizieren.
+4. Erst danach Renovate ohne Dry-Run starten.
+
+Mitschreiber hat keine Dependabot-Version-Updates; seine bestehende Renovate-Konfiguration
+wird vor dem ersten schreibenden Fleet-Lauf auf den aktuellen Custom-Manager-Vertrag
+umgestellt und sämtliches Automerge entfernt.
+
+Dependabot Security Updates und Security Alerts bleiben ein getrennter Security-Pfad.
+Der Versions-Cutover behauptet nicht, diesen Pfad zu ersetzen oder abzuschalten.
 
 ## Kanonische Dateien
 
 - `fleet/repos.yml`: einzige normative Fleet-Mitgliedschaft.
-- `automation/renovate/dependency-updates.v1.yml`: versionierte operative
-  Rollout-Policy; keine zweite Fleet-Liste.
-- `automation/renovate/default.json`: gemeinsamer Renovate-V1-Preset.
-- `automation/renovate/expected-scope.v1.json`: deterministisch erzeugte,
-  nicht-authoritative Scope-Projektion.
-- `automation/renovate/baseline-2026-06-23_2026-07-23.json`: unveränderliche
-  Vorher-Baseline für die Pilotbewertung.
-- `scripts/fleet/renovate_policy.py`: fail-closed Validierung und Projektion.
+- `automation/renovate/dependency-updates.v1.yml`: operative Provider- und Cutover-Policy.
+- `automation/renovate/default.json`: gemeinsamer Renovate-Preset mit `automerge: false`.
+- `automation/renovate/expected-scope.v1.json`: deterministische, nicht-authoritative Scope-Projektion.
+- `automation/renovate/runtime-config.cjs`: self-hosted Renovate-Konfiguration; liest die Scope-Projektion.
+- `automation/renovate/run-fleet.sh`: gepinnter Runtime-Wrapper.
+- `automation/renovate/install-local-runtime.sh`: commitgebundene lokale Runtime-Installation.
+- `automation/renovate/systemd/renovate-fleet.{service,timer}`: täglicher Fleet-Lauf.
+- `scripts/fleet/renovate_policy.py`: fail-closed Policy- und Scope-Validierung.
 
-Ein Consumer kann den zentralen Preset später beispielsweise über einen
-Repo-gehosteten Preset-Pfad referenzieren. Der konkrete Consumer-Cutover ist
-bewusst nicht Teil dieses Foundation-Tasks und benötigt eigene Repo-Claims,
-Leases, Review- und Rollback-Evidenz.
+## Runtime und Zugang
 
-## Single-Producer-Vertrag
+Die Runtime läuft lokal auf dem Heim-PC und nutzt den vorhandenen `gh`-Login nur zur
+Laufzeit. `run-fleet.sh` liest `gh auth token`, exportiert den Wert ausschließlich in die
+Renovate-Prozessumgebung und persistiert den Token weder im Repository noch in der
+Renovate-Konfiguration. Der aktuelle Runtime-Pfad ist auf eine immutable Release-Kopie
+unter `~/.local/share/renovate-fleet/releases/<commit>` gebunden; `current` ist nur ein
+atomar umschaltbarer Symlink.
 
-Pro Repository und Dependency-Scope darf genau ein aktiver Produzent regulärer
-Version-Update-PRs existieren.
+Der Runtime-Scope ist eine explizite `repositories`-Liste aus
+`expected_renovate_repositories`; `autodiscover` und Renovate-Onboarding sind deaktiviert.
+Damit kann ein Organisation-weites GitHub-Token nicht automatisch Repositories außerhalb
+der kanonischen Fleet in den Update-Scope ziehen.
 
-Der Cutover ist daher strikt geordnet:
-
-1. Renovate-Abdeckung im Zielrepo belegen.
-2. Überlappende Dependabot-Version-Updates deaktivieren.
-3. Per Readback bestätigen, dass nur ein Version-Update-Produzent aktiv ist.
-
-`renovate_version_updates: prepared` bedeutet ausdrücklich **nicht aktiv**. Der
-Foundation-Stand markiert alle geplanten Pilot-Repositories nur als `prepared`;
-die erwartete aktive Hosted-App-Scope-Projektion ist deshalb leer.
-
-Dependabot Security Updates bleiben in V1 als separater Security-Pfad bestehen.
-Eine Version-Update-Migration behauptet nicht, Security Alerts oder
-Security-Update-Verhalten zu deaktivieren oder zu ersetzen.
-
-## Rollout-Wellen
-
-1. `mitschreiber`: bestehende Custom-Pin-Erkennung modernisieren und ohne
-   Automerge validieren.
-2. `hausKI`, `hausKI-audio`: Volumenpilot gegen die 30-Tage-Baseline.
-3. `repoground`: Signalqualität und Closed-unmerged-Verhalten untersuchen.
-4. `weltgewebe`: Multi-Ecosystem-Pilot erst nach bestandenen früheren Wellen.
-5. `metarepo`: Control-Plane-Cutover zuletzt, damit die Policy sich nicht selbst
-   freigibt.
-6. Restliche geeignete aktive Fleet-Repositories werden erst nach den Piloten
-   bewertet; sie werden nicht als zweite vollständige Liste in der Policy
-   dupliziert.
-
-Zwischen automatischer Erweiterung zweier Wellen verlangt der Vertrag
-mindestens zwei beobachtete Update-Zyklen. Die konkrete Freigabe bleibt an die
-jeweiligen Repo-, Review-, CI- und Operator-Gates gebunden.
-
-## Hosted-App-Scope
-
-Für einen Mend-hosted Renovate-Pfad verlangt V1 GitHubs Auswahlmodus
-`Select repositories`. Eine All-Repositories-Installation ist im V1-Vertrag
-nicht zulässig.
-
-`expected-scope.v1.json` enthält nur Repositories mit
-`renovate_version_updates: enabled` als erwarteten aktiven App-Scope. Ein
-beobachteter App-Scope kann mit `renovate_policy.py check --observed-app-scope`
-gegen diese Git-autorisierte Erwartung geprüft werden. Eine Abweichung ist ein
-fail-closed Driftbefund.
-
-Die Projektion beweist weder, dass eine GitHub App installiert ist, noch dass
-keine externe Installation existiert. Der tatsächliche GitHub-App-Zustand muss
-live gelesen werden.
+Renovate ist auf Version `42.99.0` gepinnt. Eine spätere Versionsanhebung ist eine
+reviewte Änderung dieses Wrappers.
 
 ## Preset-Grenzen
 
@@ -100,57 +71,56 @@ Der gemeinsame Preset:
 - setzt `automerge: false`;
 - begrenzt PR-, Branch- und Stundenparallelität auf höchstens zwei;
 - hält Major-Updates getrennt;
-- gruppiert zentral nur Patch-/Minor-Updates für GitHub Actions; npm-/Cargo-Gruppen werden wegen Monorepo- und Verzeichnisgrenzen erst repo-spezifisch im jeweiligen Pilot definiert;
+- gruppiert zentral nur Patch-/Minor-Updates für GitHub Actions;
 - enthält keine Post-Upgrade-Command-Ausführung.
 
-Die lokale Validierung lehnt Automerge, gruppierte Major-Updates, zu hohe
-Parallelität und unbekannte Policy-Felder fail-closed ab.
+Repo-spezifische Konfiguration darf diese Sicherheitsgrenzen nicht durch Automerge
+unterlaufen. Vor dem ersten schreibenden Lauf werden bekannte lokale Abweichungen wie
+die alte Mitschreiber-Konfiguration korrigiert.
 
-## Baseline und Messung
+## Single-Producer-Vertrag
 
-Die eingefrorene Vergleichsbasis vom 23. Juni bis 23. Juli 2026 enthält 51
-Dependabot-PRs: 40 gemergt und 11 ohne Merge geschlossen. Die per Repository
-gespeicherten Zähler werden beim Policy-Check gegen die reviewte Baseline
-verifiziert.
+Pro Repository und Dependency-Scope darf genau ein aktiver Produzent regulärer
+Version-Update-PRs existieren. Die sechs expliziten Cutover-Repositories modellieren den
+bekannten vorherigen Producer-Zustand; der Selector `remaining-eligible-active-fleet`
+leitet die übrigen aktiven Fleet-Repositories direkt aus `fleet/repos.yml` ab. Eine
+explizite zweite Vollkopie der Fleet bleibt verboten.
 
-Diese Zahlen beweisen weder eine Ursache für Merge-/Close-Entscheidungen noch
-einen künftigen Vorteil von Renovate. Spätere Pilot-Auswertungen sollen unter
-anderem PR-Zahl, Merge-Rate, Closed-unmerged-Anteil, stale PRs,
-Duplicate-Producer-Vorfälle, Automerge-Vorfälle, Merge-Gate-Bypässe und echte
-Bureau-Eskalationen vergleichen.
+Die Scope-Projektion muss alle 18 aktiven Fleet-Repositories in
+`expected_renovate_repositories` enthalten und darf für die selbst gehostete Runtime
+keinen Hosted-App-Scope behaupten.
+
+## Scheduling
+
+Nach dem ersten erfolgreichen schreibenden Cutover-Lauf wird `renovate-fleet.timer`
+aktiviert. Der Timer läuft täglich um 05:17 Uhr mit bis zu 15 Minuten Randomisierung.
+Ein Lauf ist `oneshot`, hat ein Vier-Stunden-Limit und besitzt keine Merge-Autorität.
 
 ## Validierung
 
-`just renovate-policy-check` prüft:
+`just renovate-policy-check` prüft unter anderem:
 
 - Policy gegen die aktive Fleet aus `fleet/repos.yml`;
-- keine archivierten oder `fleet: false` Repositories;
-- keine Repo-Duplikate über Wellen;
-- keine zwei gleichzeitig aktiven Version-Update-Produzenten;
-- keinen vollständigen zweiten Fleet-Abzug in der Rollout-Policy;
-- zentrale Preset-Sicherheitsgrenzen;
-- unveränderte Baseline;
+- Ausschluss archivierter und `fleet: false` Repositories;
+- keine explizite zweite vollständige Fleet-Liste;
+- keine zwei gleichzeitig als aktiv deklarierten Version-Update-Produzenten;
+- vollständige abgeleitete Renovate-Projektion für alle 18 aktiven Fleet-Repositories;
+- `automerge: false`, Major-Isolation und begrenzte Parallelität;
+- unveränderte 30-Tage-Baseline;
 - bytegenaue Reproduzierbarkeit der Scope-Projektion.
 
-`just renovate-policy` regeneriert ausschließlich die deterministische
-Scope-Projektion. `just validate` führt den Check automatisch aus.
+Vor dem echten Cutover ist zusätzlich ein Renovate-Lookup-Dry-Run erforderlich. Danach
+werden die betroffenen Dependabot-Konfigurationen PR-gebunden geändert und der
+Single-Producer-Zustand erneut live gelesen.
 
 ## Rollback
 
-Dieser Foundation-Slice verändert keine Consumer-Dependabot-Konfiguration und
-keine GitHub-App-Berechtigung. Er ist daher durch Revert des Metarepo-Commits
-rückrollbar.
+Die lokale Runtime kann durch Stoppen/Deaktivieren von `renovate-fleet.timer` und
+`renovate-fleet.service` sofort angehalten werden. Der vorherige Runtime-Release bleibt
+unter `~/.local/share/renovate-fleet/releases/` erhalten und kann durch Rücksetzen des
+`current`-Symlinks wieder aktiviert werden.
 
-Jeder spätere Consumer-Cutover braucht zusätzlich einen eigenen Rollback:
-Renovate für das betroffene Repository stoppen, den vorherigen reviewten
-Dependabot-Version-Update-Stand wiederherstellen und anschließend live prüfen,
-dass wieder exakt ein Version-Update-Produzent aktiv ist.
-
-Bureau-, Chronik- und Git-Historie werden dabei nicht umgeschrieben.
-
-## Bekannte Folgegrenze
-
-`repo.mitschreiber` ist zum Stand dieser Entscheidung nicht als Bureau-
-Repository-Resource registriert. T046 erfindet deshalb keinen Claim. Die
-Resource-Katalog-Erweiterung und der Mitschreiber-Cutover müssen über den
-operator-native Bureau-Intake als getrennte Folgearbeit registriert werden.
+Für Repositories, deren Dependabot-Version-Updates bereits entfernt wurden, besteht der
+Rollback aus dem Revert des jeweiligen reviewten Cutover-Commits. Anschließend muss live
+belegt werden, dass wieder exakt ein Version-Update-Produzent aktiv ist. Bureau-,
+Chronik- und Git-Historie werden nicht umgeschrieben.

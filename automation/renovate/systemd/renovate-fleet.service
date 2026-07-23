@@ -1,0 +1,15 @@
+[Unit]
+Description=Heimgewebe Fleet Renovate dependency update run
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+Environment=PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+WorkingDirectory=%h/.local/share/renovate-fleet/current
+ExecStart=%h/.local/share/renovate-fleet/current/automation/renovate/run-fleet.sh
+TimeoutStartSec=4h
+Nice=10
+
+[Install]
+WantedBy=default.target
