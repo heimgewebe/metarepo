@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "kind": "dependabot-pr-baseline",
+  "window": {
+    "start": "2026-06-23",
+    "end": "2026-07-23"
+  },
+  "source": {
+    "kind": "github-search",
+    "observed_on": "2026-07-23",
+    "query": "gh search prs --owner heimgewebe --author app/dependabot --created >=2026-06-23 --limit 100"
+  },
+  "repositories": {
+    "hausKI": {
+      "total": 11,
+      "merged": 10,
+      "closed_unmerged": 1,
+      "open": 0
+    },
+    "hausKI-audio": {
+      "total": 10,
+      "merged": 9,
+      "closed_unmerged": 1,
+      "open": 0
+    },
+    "metarepo": {
+      "total": 5,
+      "merged": 3,
+      "closed_unmerged": 2,
+      "open": 0
+    },
+    "repoground": {
+      "total": 6,
+      "merged": 1,
+      "closed_unmerged": 5,
+      "open": 0
+    },
+    "weltgewebe": {
+      "total": 19,
+      "merged": 17,
+      "closed_unmerged": 2,
+      "open": 0
+    }
+  },
+  "totals": {
+    "total": 51,
+    "merged": 40,
+    "closed_unmerged": 11,
+    "open": 0
+  },
+  "nonclaims": [
+    "The baseline does not prove Dependabot caused a PR to merge or close without merge.",
+    "The baseline does not prove every PR was a routine version update rather than security-related maintenance.",
+    "The baseline does not predict Renovate PR volume, merge rate or convergence quality."
+  ]
+}
