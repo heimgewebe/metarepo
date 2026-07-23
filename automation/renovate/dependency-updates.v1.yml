@@ -1,0 +1,73 @@
+---
+schema_version: 1
+kind: renovate-fleet-policy
+fleet_source: fleet/repos.yml
+github_owner: heimgewebe
+
+security_updates:
+  provider: dependabot
+  version_update_cutover_changes_security_updates: false
+
+version_update_defaults:
+  provider: renovate
+  automerge: false
+  duplicate_producer_policy: fail-closed
+  hosted_app_repository_selection: selected
+  all_repositories_allowed: false
+  minimum_observed_cycles_before_expansion: 2
+
+cutover_sequence:
+  - prove-renovate-coverage
+  - disable-overlapping-dependabot-version-updates
+  - verify-single-version-update-producer
+
+rollout:
+  waves:
+    - id: custom-manager-pilot
+      order: 1
+      purpose: Modernize and validate the existing Mitschreiber custom pin manager before standard package-manager rollout.
+      repositories:
+        - name: mitschreiber
+          dependabot_version_updates: none
+          renovate_version_updates: prepared
+
+    - id: volume-pilot
+      order: 2
+      purpose: Measure PR-volume and convergence changes on repositories with recent high Dependabot activity.
+      repositories:
+        - name: hausKI
+          dependabot_version_updates: enabled
+          renovate_version_updates: prepared
+        - name: hausKI-audio
+          dependabot_version_updates: enabled
+          renovate_version_updates: prepared
+
+    - id: signal-quality-pilot
+      order: 3
+      purpose: Measure whether grouped Renovate updates improve the unusually low recent merge ratio without assuming the bot caused it.
+      repositories:
+        - name: repoground
+          dependabot_version_updates: enabled
+          renovate_version_updates: prepared
+
+    - id: multi-ecosystem-pilot
+      order: 4
+      purpose: Prove the bounded model on the complex npm, Cargo and GitHub Actions update surface after earlier waves pass.
+      repositories:
+        - name: weltgewebe
+          dependabot_version_updates: enabled
+          renovate_version_updates: prepared
+
+    - id: control-plane-cutover
+      order: 5
+      purpose: Migrate Metarepo only after the consumer pilots prove the shared policy and prevent a self-approval loop.
+      repositories:
+        - name: metarepo
+          dependabot_version_updates: enabled
+          renovate_version_updates: prepared
+
+    - id: fleet-expansion
+      order: 6
+      purpose: Evaluate remaining eligible active Fleet repositories after all bounded pilots pass their acceptance gates.
+      selector: remaining-eligible-active-fleet
+      repositories: []

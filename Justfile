@@ -23,6 +23,7 @@ help:
     @printf "  just log-sync      # Report-Vorlage unter reports/sync-logs/\n"
     @printf "  just fleet         # Fleet Readiness & Repos List generieren\n"
     @printf "  just fleet-projection # repos.yml aus kanonischen Fleet-Quellen erzeugen\n"
+    @printf "  just renovate-policy-check # Renovate-V1-Policy und Scope-Projektion prüfen\n"
     @printf "  just doctor        # Fleet Diagnose (Health Check)\n"
     @printf "\nWeitere Ziele: just --list\n"
 
@@ -117,6 +118,14 @@ fleet-projection:
 fleet-projection-check:
     @uv run python scripts/fleet/generate_repos_projection.py --check
 
+# Generate the bounded Renovate V1 scope projection from Fleet truth and policy
+renovate-policy:
+    @uv run python scripts/fleet/renovate_policy.py generate
+
+# Fail closed on Renovate policy, preset, baseline or scope drift
+renovate-policy-check:
+    @uv run python scripts/fleet/renovate_policy.py check
+
 # Diagnose current fleet readiness from reports/heimgewebe-readiness.json
 doctor:
     @[ -f reports/heimgewebe-readiness.json ] || just fleet
@@ -159,6 +168,7 @@ fleet-push-all:
 validate: yq_ensure lint
     just fleet-check
     just fleet-projection-check
+    just renovate-policy-check
     scripts/ci/validate-local.sh
     @if [ -d tests ] && [ -f pyproject.toml ] && grep -q "pytest" pyproject.toml; then echo "Running python tests..."; uv run pytest tests/; fi
     @printf "Running shell regression tests...\n"
