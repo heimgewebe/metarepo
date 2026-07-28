@@ -27,10 +27,8 @@ repositories:
     scope: policy
     metrics:
       enable: true
-  hausKI-audio:
+  audio:
     default_branch: main
-    depends_on:
-      - hausKI
     domain: audio
     scope: events
     metrics:

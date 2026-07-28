@@ -15,7 +15,7 @@ from wgx import repo_config
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "fleet" / "generate_repos_projection.py"
-PROJECTION_SEMANTIC_SHA256 = "17681403a785f75c270dbf51e26c8fd1ade1d76dcd7cf042d247252c5edbfaaf"
+PROJECTION_SEMANTIC_SHA256 = "03e9d987ec8ed3119c223a0e8406e241e16e3743b9ad1f9545046b5f400bc29c"
 SPEC = importlib.util.spec_from_file_location("generate_repos_projection", SCRIPT)
 assert SPEC and SPEC.loader
 MODULE = importlib.util.module_from_spec(SPEC)
@@ -66,7 +66,7 @@ def test_projection_preserves_legacy_consumer_shape() -> None:
         "contracts-mirror",
         "weltgewebe",
         "hausKI",
-        "hausKI-audio",
+        "audio",
         "semantAH",
         "wgx",
         "repoground",

@@ -34,7 +34,7 @@ rollout:
         - name: hausKI
           dependabot_version_updates: disabled
           renovate_version_updates: enabled
-        - name: hausKI-audio
+        - name: audio
           dependabot_version_updates: disabled
           renovate_version_updates: enabled
         - name: repoground

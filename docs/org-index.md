@@ -6,11 +6,11 @@ Quelle: [`repos.yml`](../repos.yml).
 
 | Repo | Default Branch | Domain | Scope | Metrics | Depends On |
 | --- | --- | --- | --- | --- | --- |
+| [audio](https://github.com/heimgewebe/audio) | main | audio | events | – | – |
 | [aussensensor](https://github.com/heimgewebe/aussensensor) | main | aussen | events | – | – |
 | [chronik](https://github.com/heimgewebe/chronik) | main | chronik | ingest | – | – |
 | [contracts-mirror](https://github.com/heimgewebe/contracts-mirror) | main | contracts | schema | – | – |
 | [hausKI](https://github.com/heimgewebe/hausKI) | main | assistant | policy | ✅ | – |
-| [hausKI-audio](https://github.com/heimgewebe/hausKI-audio) | main | audio | events | – | hausKI |
 | [repoground](https://github.com/heimgewebe/repoground) | main | epistemic | codebase-context | – | – |
 | [semantAH](https://github.com/heimgewebe/semantAH) | main | insights | export | – | – |
 | [vault-gewebe](https://github.com/heimgewebe/vault-gewebe) | main | vault | content | – | – |

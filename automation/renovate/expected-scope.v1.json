@@ -5,11 +5,11 @@
   ],
   "expected_hosted_app_repositories": [],
   "expected_renovate_repositories": [
+    "heimgewebe/audio",
     "heimgewebe/aussensensor",
     "heimgewebe/chronik",
     "heimgewebe/contracts-mirror",
     "heimgewebe/hausKI",
-    "heimgewebe/hausKI-audio",
     "heimgewebe/heim-pc",
     "heimgewebe/heimgeist",
     "heimgewebe/konvergenzregelkreis",
@@ -37,14 +37,19 @@
   "sources": {
     "fleet": {
       "path": "fleet/repos.yml",
-      "sha256": "ea9f6285be9556105ff0ed208766946f3c951a8392d59b3066bb4d8c9f476bc8"
+      "sha256": "37e966516be8a6eef4b0e38a19f380c388b9795e61e4eb6a7354ab7cfbcd7e11"
     },
     "policy": {
       "path": "automation/renovate/dependency-updates.v1.yml",
-      "sha256": "0934e2b7131c8712296892cd15cdae25ca6e424e6baad3799971481f84a40a3b"
+      "sha256": "695172cb0913564840d969d83f755298c78c5d32e8fb0bcff523677bc02b44ab"
     }
   },
   "version_update_ownership": [
+    {
+      "dependabot_version_updates": "disabled",
+      "renovate_version_updates": "enabled",
+      "repository": "heimgewebe/audio"
+    },
     {
       "dependabot_version_updates": "none",
       "renovate_version_updates": "enabled",
@@ -64,11 +69,6 @@
       "dependabot_version_updates": "disabled",
       "renovate_version_updates": "enabled",
       "repository": "heimgewebe/hausKI"
-    },
-    {
-      "dependabot_version_updates": "disabled",
-      "renovate_version_updates": "enabled",
-      "repository": "heimgewebe/hausKI-audio"
     },
     {
       "dependabot_version_updates": "none",
@@ -143,7 +143,7 @@
       "repositories": [
         "mitschreiber",
         "hausKI",
-        "hausKI-audio",
+        "audio",
         "repoground",
         "weltgewebe",
         "metarepo"
