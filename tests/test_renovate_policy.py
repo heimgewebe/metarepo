@@ -41,7 +41,7 @@ def test_current_policy_preset_baseline_and_projection_are_valid() -> None:
         "heimgewebe/wgx",
         "heimgewebe/contracts-mirror",
         "heimgewebe/hausKI",
-        "heimgewebe/hausKI-audio",
+        "heimgewebe/audio",
         "heimgewebe/semantAH",
         "heimgewebe/aussensensor",
         "heimgewebe/chronik",

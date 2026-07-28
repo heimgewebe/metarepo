@@ -25,11 +25,9 @@ repos:
     scope: policy
     metrics:
       enable: true
-  - name: hausKI-audio
-    url: https://github.com/heimgewebe/hausKI-audio
+  - name: audio
+    url: https://github.com/heimgewebe/audio
     default_branch: main
-    depends_on:
-      - hausKI
     domain: audio
     scope: events
     metrics:

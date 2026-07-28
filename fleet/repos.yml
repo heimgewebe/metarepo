@@ -7,6 +7,10 @@ static:
     - name: vault-privat
       status: related
       fleet: false
+    - name: hausKI-audio
+      url: "https://github.com/heimgewebe/hausKI-audio"
+      status: related
+      fleet: false
     - name: heimlern
       url: "https://github.com/heimgewebe/heimlern"
       status: archived-reference
@@ -21,7 +25,7 @@ repos:
   - name: wgx
   - name: contracts-mirror
   - name: hausKI
-  - name: hausKI-audio
+  - name: audio
   - name: semantAH
   - name: aussensensor
   - name: chronik
