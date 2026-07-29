@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "kind": "canonical_audio_transition_consumer_audit",
+  "task_id": "OPERATOR-ECOSYSTEM-REDUNDANCY-V1-T070",
+  "run_id": "BUR-RUN-20260728T210134Z-f5684f8748",
+  "observed_at": "2026-07-29T04:45:00Z",
+  "source_revisions": {
+    "heimgewebe/metarepo": "64d9193621af6e43ac2260023e7c8429c96e95b2",
+    "heimgewebe/audio": "9ddefba90679adaf20be2e7e152f4d4aea068e77",
+    "heimgewebe/hausKI-audio": "4f2b4bdbfaa6419725aba02acd71347ac1e9da02",
+    "heimgewebe/chronik": "4eb6ff5b2ef1a85e02047148c27a8c71b031a6b9",
+    "heimgewebe/hausKI": "ac48c9f158aed5c114e5d03213777ee933ab39fe"
+  },
+  "producer_consumer_assessment": {
+    "contract": "contracts/audio.events.schema.json",
+    "lifecycle": "historical",
+    "current_producers": [],
+    "current_consumers": [],
+    "organization_code_search": {
+      "audio.session_": {
+        "total": 5,
+        "current_implementation_matches": 0
+      },
+      "audio.latency_ms": {
+        "total": 5,
+        "current_implementation_matches": 0
+      },
+      "audio.events": {
+        "total": 14,
+        "current_producer_matches": 0
+      }
+    },
+    "decision": "preserve payload schema, clear active producer/consumer claims, retain exact historical bindings",
+    "does_not_establish": [
+      "organization-wide semantic absence beyond searched terms",
+      "runtime delivery absence",
+      "future producer migration readiness"
+    ]
+  },
+  "references": [
+    {
+      "path": "contracts/audio.events.schema.json",
+      "class": "historical-contract",
+      "decision": "retain payload; mark historical and producerless"
+    },
+    {
+      "path": "reports/integrity/sources.v1.json",
+      "class": "generated-operational-consumer",
+      "decision": "replace donor with canonical audio; keep audio disabled until integrity release exists"
+    },
+    {
+      "path": "scripts/fleet/renovate_policy.py",
+      "class": "time-bound-historical-baseline-pin",
+      "decision": "preserve unchanged"
+    },
+    {
+      "path": "ai-contexts/hausKI-audio.ai-context.yml",
+      "class": "agent-context",
+      "decision": "classify historical donor and disable Fleet/WGX authority"
+    },
+    {
+      "path": "ai-contexts/audio.ai-context.yml",
+      "class": "agent-context",
+      "decision": "create conservative canonical product context without legacy event claims"
+    },
+    {
+      "path": "fleet/repos.txt",
+      "class": "generated-fleet-view",
+      "decision": "regenerate from fleet/repos.yml; include audio and exclude donor"
+    },
+    {
+      "path": "fleet/repos.yml",
+      "class": "canonical-fleet-source",
+      "decision": "retain donor as historical-donor with fleet false"
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/rollout.md",
+      "class": "operational-rollout-consumer",
+      "decision": "route current checks to audio; preserve explicit historical contract warning"
+    },
+    {
+      "path": "docs/vision/IDEal_Blueprint.mmd",
+      "class": "historical-vision",
+      "decision": "preserve text and add historical-non-normative marker"
+    },
+    {
+      "path": "docs/vision/heimgewebe-v2-detailed.md",
+      "class": "historical-vision",
+      "decision": "preserve text and add historical-non-normative marker"
+    },
+    {
+      "path": "docs/repo-matrix.md",
+      "class": "human-readable-fleet-view",
+      "decision": "generate from canonical Fleet and metadata sources"
+    },
+    {
+      "path": "docs/_generated/fleet.md",
+      "class": "generated-fleet-view",
+      "decision": "regenerate with historical donor classification"
+    },
+    {
+      "path": "Makefile",
+      "class": "operator-cli-compatibility-surface",
+      "decision": "migrate fleet and matrix targets to canonical Fleet CLI options; retain make and just parity"
+    }
+  ],
+  "truth_boundaries": {
+    "fleet": "fleet/repos.yml",
+    "fleet_metadata": "fleet/repo-metadata.yml",
+    "current_audio_product": "heimgewebe/audio",
+    "historical_donor": "heimgewebe/hausKI-audio",
+    "legacy_event_contract": "contracts/audio.events.schema.json"
+  },
+  "does_not_establish": [
+    "audio runtime readiness",
+    "hardware presence",
+    "event producer availability",
+    "event consumer availability",
+    "merge or deployment authority"
+  ]
+}

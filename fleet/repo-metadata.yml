@@ -30,9 +30,13 @@ repositories:
   audio:
     default_branch: main
     domain: audio
-    scope: events
+    scope: configuration-and-experiments
     metrics:
       enable: false
+    wgx:
+      profile_expected: false
+    integrity:
+      enabled: false
   semantAH:
     default_branch: main
     domain: insights

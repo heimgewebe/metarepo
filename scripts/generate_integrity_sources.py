@@ -25,6 +25,8 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
+from wgx import repo_config
+
 
 def load_yaml(yaml_mod: Any, path: Path) -> Any:
     with open(path, "r", encoding="utf-8") as f:
@@ -79,36 +81,10 @@ def main():
 
     fleet_data = load_yaml(yaml, fleet_repos_file)
 
-    fleet_list = []
-
-    # Robust parsing of fleet/repos.yml
-    if "repos" in fleet_data:
-        repos_node = fleet_data["repos"]
-
-        if isinstance(repos_node, list):
-            for entry in repos_node:
-                if isinstance(entry, dict):
-                    name = entry.get("name")
-                    if not name:
-                        continue
-                    # Check for explicit fleet: false in list items
-                    if entry.get("fleet") is False:
-                        continue
-                    fleet_list.append(name)
-                elif isinstance(entry, str):
-                    fleet_list.append(entry)
-
-        elif isinstance(repos_node, dict):
-            # Dict form: { "repo_name": { ... metadata ... } }
-            for name, meta in repos_node.items():
-                if isinstance(meta, dict):
-                    # Filter out if fleet is explicitly false
-                    if meta.get("fleet") is False:
-                        continue
-                    fleet_list.append(name)
-                else:
-                    # Treat simple key as valid repo
-                    fleet_list.append(name)
+    try:
+        fleet_list = repo_config.active_fleet_names(fleet_data)
+    except ValueError as exc:
+        sys.exit(f"Error: {exc}")
 
     # Load Repo Configs (for overrides/owner)
     repo_configs = {}

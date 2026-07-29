@@ -1,7 +1,12 @@
 {
   "apiVersion": "integrity.sources.v1",
-  "generated_at": "2026-07-20T14:56:46Z",
+  "generated_at": "2026-07-29T04:45:00Z",
   "sources": [
+    {
+      "repo": "heimgewebe/audio",
+      "summary_url": "https://github.com/heimgewebe/audio/releases/download/integrity/summary.json",
+      "enabled": false
+    },
     {
       "repo": "heimgewebe/aussensensor",
       "summary_url": "https://github.com/heimgewebe/aussensensor/releases/download/integrity/summary.json",
@@ -20,11 +25,6 @@
     {
       "repo": "heimgewebe/hausKI",
       "summary_url": "https://github.com/heimgewebe/hausKI/releases/download/integrity/summary.json",
-      "enabled": true
-    },
-    {
-      "repo": "heimgewebe/hausKI-audio",
-      "summary_url": "https://github.com/heimgewebe/hausKI-audio/releases/download/integrity/summary.json",
       "enabled": true
     },
     {
@@ -80,6 +80,11 @@
     {
       "repo": "heimgewebe/vault-gewebe",
       "summary_url": "https://github.com/heimgewebe/vault-gewebe/releases/download/integrity/summary.json",
+      "enabled": true
+    },
+    {
+      "repo": "heimgewebe/weltgewebe",
+      "summary_url": "https://github.com/heimgewebe/weltgewebe/releases/download/integrity/summary.json",
       "enabled": true
     },
     {

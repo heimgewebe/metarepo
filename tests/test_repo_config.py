@@ -7,6 +7,10 @@ from wgx import repo_config
 
 
 class ParseSimpleYamlTests(unittest.TestCase):
+    def test_ignores_yaml_document_markers(self) -> None:
+        parsed = repo_config.parse_simple_yaml("---\nkey: value\n...\n")
+        self.assertEqual(parsed, {"key": "value"})
+
     def test_preserves_hash_characters_inside_quotes(self) -> None:
         yaml_text = textwrap.dedent(
             """
@@ -135,6 +139,39 @@ class CliParserTests(unittest.TestCase):
             repo_config.cmd_repos(data, ordered=False, as_json=True)
 
         self.assertEqual(buffer.getvalue().strip(), '["alpha", "beta"]')
+
+
+class ActiveFleetTruthTests(unittest.TestCase):
+    def test_active_fleet_uses_core_and_projectable_static_entries(self) -> None:
+        data = {
+            "repos": [
+                {"name": "core"},
+                {"name": "disabled", "fleet": False},
+            ],
+            "static": {
+                "include": [
+                    {"name": "related", "status": "related"},
+                    {"name": "donor", "status": "historical-donor", "fleet": False},
+                ]
+            },
+        }
+        self.assertEqual(repo_config.active_fleet_names(data), ["core", "related"])
+
+    def test_active_fleet_rejects_duplicate_identity(self) -> None:
+        data = {
+            "repos": [{"name": "same"}],
+            "static": {"include": [{"name": "same", "fleet": False}]},
+        }
+        with self.assertRaisesRegex(ValueError, "Duplicate Fleet repository"):
+            repo_config.active_fleet_names(data)
+
+    def test_archived_reference_must_be_non_fleet(self) -> None:
+        data = {
+            "repos": [],
+            "static": {"include": [{"name": "old", "status": "archived-reference"}]},
+        }
+        with self.assertRaisesRegex(ValueError, "must set fleet: false"):
+            repo_config.active_fleet_names(data)
 
 
 if __name__ == "__main__":

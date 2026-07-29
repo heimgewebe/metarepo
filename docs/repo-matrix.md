@@ -1,40 +1,49 @@
 # Repo-Matrix
 
-Diese Matrix definiert die Struktur des Heimgewebes. Sie ist die **Single Source of Truth** für Fleet-Mitgliedschaft und Rollen.
+<!-- GENERATED FILE - DO NOT EDIT -->
+<!-- Canonical source: fleet/repos.yml -->
+<!-- Fleet SHA-256: d0da05a86332b8ab7d0fde6e82a48c683b2c604c604287037e9fbd9d0b4b4398 -->
+<!-- Metadata SHA-256: b21375a4869fe25425109ac1038e782493bba76bd3afca49723ab0e469e7d89c -->
 
-## Core-Fleet
-Diese Repositories bilden den Organismus und unterliegen den Fleet-Policies (CI, WGX-Profil, Contracts).
+Diese Matrix ist eine menschenlesbare Projektion. Die normative Fleet-Mitgliedschaft liegt ausschließlich in `fleet/repos.yml`; operative Zusatzdaten liegen in `fleet/repo-metadata.yml`.
 
-| Repo              | Rolle                               | Fleet |
-|-------------------|-------------------------------------|-------|
-| metarepo          | Control-Plane, Templates, Contracts | yes   |
-| wgx               | Fleet-CLI / Motorik                 | yes   |
-| contracts-mirror  | Schema-Definitionen für Events/Tools| yes   |
-| hausKI            | KI-Orchestrator (Rust)              | yes   |
-| hausKI-audio      | Audio-Schicht                       | yes   |
-| semantAH          | Embeddings / Wissensschicht         | yes   |
-| aussensensor      | Außenwelt-Events                    | yes   |
-| chronik           | Persistenz/Audit                    | yes   |
-| repoground       | Verifizierbarer Codebase-Kontext    | yes   |
-| mitschreiber      | Dialog-/Schreibschicht              | yes   |
-| sichter           | Review-Agent / Semantic Checks      | yes   |
-| heimgeist         | Meta-Agent / Beobachtung            | yes   |
-| plexer            | Agent-Routing / Orchestrierung      | yes   |
-| leitstand         | Observer / UI                       | yes   |
-| heim-pc       | Orientierungssystem / Tooling       | yes   |
-| vault-gewebe      | Privater Obsidian-Vault             | yes   |
+## Aktive Fleet
 
-## Related / Satellites (Non-Fleet)
-Externe Werkzeuge oder Wissensspeicher. Keine Fleet-Policies erforderlich.
+| Repo | Rolle | Fleet |
+| --- | --- | --- |
+| metarepo | Aktives Fleet-Mitglied | yes |
+| wgx | platform / metrics | yes |
+| contracts-mirror | contracts / schema | yes |
+| hausKI | assistant / policy | yes |
+| audio | audio / configuration-and-experiments | yes |
+| semantAH | insights / export | yes |
+| aussensensor | aussen / events | yes |
+| chronik | chronik / ingest | yes |
+| repoground | epistemic / codebase-context | yes |
+| konvergenzregelkreis | Aktives Fleet-Mitglied | yes |
+| mitschreiber | Aktives Fleet-Mitglied | yes |
+| sichter | Aktives Fleet-Mitglied | yes |
+| leitstand | Aktives Fleet-Mitglied | yes |
+| heimgeist | Aktives Fleet-Mitglied | yes |
+| plexer | Aktives Fleet-Mitglied | yes |
+| heim-pc | Aktives Fleet-Mitglied | yes |
+| vault-gewebe | vault / content | yes |
+| weltgewebe | aussen / events | yes |
 
-| Repo              | Rolle                      | Fleet |
-|-------------------|----------------------------|-------|
-| weltgewebe        | Web/Doku/Externe Signale   | no    |
-| icf-tool          | ICF-Katalog & Browser      | no    |
+## Historische Spender (Non-Fleet)
 
-## Archived References (Non-Fleet)
-Historische Repositories ohne aktive Betriebs-, Runtime-, Routing- oder Produktionsautorität.
+| Repo | Rolle | Fleet |
+| --- | --- | --- |
+| hausKI-audio | Historischer Spender; keine aktive Produkt-, Fleet- oder Runtime-Autorität | no |
 
-| Repo              | Rolle                                                   | Fleet |
-|-------------------|---------------------------------------------------------|-------|
-| heimlern          | Archivierte Policy- und Lernreferenz                    | no    |
+## Archivierte Referenzen (Non-Fleet)
+
+| Repo | Rolle | Fleet |
+| --- | --- | --- |
+| heimlern | Archivierte Referenz; keine aktive Betriebs- oder Entwicklungsautorität | no |
+
+## Weitere Referenzen (Non-Fleet)
+
+| Repo | Rolle | Fleet |
+| --- | --- | --- |
+| vault-privat | Zugehörige Non-Fleet-Referenz | no |

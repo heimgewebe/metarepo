@@ -7,14 +7,22 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'docs/repo-matrix.md'
+      - 'fleet/repos.yml'
+      - 'fleet/repo-metadata.yml'
       - 'fleet/repos.txt'
+      - 'docs/repo-matrix.md'
+      - 'wgx/repo_config.py'
+      - 'scripts/fleet/generate_repo_matrix.py'
       - 'scripts/fleet/verify_generated_repos_txt.py'
       - '.github/workflows/fleet-generated-check.yml'
   pull_request:
     paths:
-      - 'docs/repo-matrix.md'
+      - 'fleet/repos.yml'
+      - 'fleet/repo-metadata.yml'
       - 'fleet/repos.txt'
+      - 'docs/repo-matrix.md'
+      - 'wgx/repo_config.py'
+      - 'scripts/fleet/generate_repo_matrix.py'
       - 'scripts/fleet/verify_generated_repos_txt.py'
       - '.github/workflows/fleet-generated-check.yml'
 
@@ -29,5 +37,6 @@ jobs:
         with:
           python-version: '3.x'
       - name: Verify fleet/repos.txt is generated exactly
-        run: |
-          python scripts/fleet/verify_generated_repos_txt.py --matrix docs/repo-matrix.md --fleet fleet/repos.txt
+        run: python scripts/fleet/verify_generated_repos_txt.py --source fleet/repos.yml --fleet fleet/repos.txt
+      - name: Verify human-readable Fleet matrix
+        run: python scripts/fleet/generate_repo_matrix.py --check

@@ -1,38 +1,21 @@
 #!/usr/bin/env python3
-"""
-Generate a machine-readable readiness report for the Heimgewebe fleet.
-
-Source of truth:
-  - docs/repo-matrix.md   (Fleet=yes rows)
-
-Derived artifacts:
-  - fleet/repos.txt      (generated, never edited manually)
-  - reports/heimgewebe-readiness.json
-
-Design principles:
-  - One truth, many exports
-  - No crashes on missing repos
-  - Explicit exceptions (NO_PROFILE) instead of fake profiles
-"""
-
+"""Generate a read-only Fleet readiness report from canonical Fleet truth."""
 from __future__ import annotations
 
 import argparse
 import json
 import os
 import sys
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, List, Dict, Literal
+from typing import Any, Dict, List, Literal
 
-# Ensure the repository root is in the path for wgx imports
-_REPO_ROOT = Path(__file__).resolve().parents[2]
-if str(_REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(_REPO_ROOT))
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from wgx import repo_config
-
 
 WgxProfileKind = Literal["profile", "no_profile", "missing"]
 
@@ -45,36 +28,10 @@ def detect_org_root() -> Path:
     env = os.environ.get("HG_ROOT") or os.environ.get("HEIMGEWEBE_ROOT")
     if env:
         return Path(env).expanduser().resolve()
-    # assume: <org_root>/metarepo/scripts/fleet/generate_readiness.py
     return Path(__file__).resolve().parents[3]
 
 
-def parse_repo_matrix(path: Path) -> List[str]:
-    """
-    Minimal parser:
-    - expects a markdown table
-    - includes rows where column 'Fleet' == 'yes'
-    """
-    repos: List[str] = []
-    lines = path.read_text(encoding="utf-8").splitlines()
-    headers = []
-    for line in lines:
-        if "|" not in line:
-            continue
-        cells = [c.strip() for c in line.strip("|").split("|")]
-        if not headers:
-            headers = cells
-            continue
-        if len(cells) != len(headers):
-            continue
-        row = dict(zip(headers, cells))
-        if row.get("Fleet", "").lower() == "yes":
-            repos.append(row["Repo"])
-    return repos
-
-
 def load_repo_configs(path: Path) -> Dict[str, Dict[str, Any]]:
-    """Load repos.yml and return a dict of name -> config."""
     if not path.exists():
         return {}
     data = repo_config.load_config(path)
@@ -87,26 +44,19 @@ def wgx_profile_kind(repo: Path, config: Dict[str, Any]) -> WgxProfileKind:
         return "profile"
     if (repo / ".wgx" / "NO_PROFILE").exists():
         return "no_profile"
-
-    # Check config for exception
     wgx_config = config.get("wgx", {})
-    if wgx_config.get("profile_expected") is False:
+    if isinstance(wgx_config, dict) and wgx_config.get("profile_expected") is False:
         return "no_profile"
-
     return "missing"
 
 
 def has_ci(repo: Path) -> bool:
-    wf = repo / ".github" / "workflows"
-    return wf.exists() and any(p.suffix == ".yml" for p in wf.iterdir())
+    workflows = repo / ".github" / "workflows"
+    return workflows.exists() and any(path.suffix in {".yml", ".yaml"} for path in workflows.iterdir())
 
 
 def has_contracts_marker(repo: Path) -> bool:
-    return (
-        (repo / "contracts").exists()
-        or (repo / ".contracts").exists()
-        or (repo / "CONTRACTS.md").exists()
-    )
+    return (repo / "contracts").exists() or (repo / ".contracts").exists() or (repo / "CONTRACTS.md").exists()
 
 
 @dataclass
@@ -121,62 +71,48 @@ class RepoReadiness:
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--matrix", default="docs/repo-matrix.md")
-    ap.add_argument("--repos-yml", default="repos.yml")
-    ap.add_argument("--out-json", default="reports/heimgewebe-readiness.json")
-    ap.add_argument("--write-repos-txt", default="fleet/repos.txt")
-    args = ap.parse_args()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--fleet-file", default="fleet/repos.yml")
+    parser.add_argument("--repos-yml", default="repos.yml")
+    parser.add_argument("--out-json", default="reports/heimgewebe-readiness.json")
+    parser.add_argument("--write-repos-txt", default="fleet/repos.txt")
+    args = parser.parse_args()
 
-    metarepo_root = Path(__file__).resolve().parents[2]
+    metarepo_root = ROOT
     org_root = detect_org_root()
-
-    fleet = parse_repo_matrix(metarepo_root / args.matrix)
+    fleet_data = repo_config.load_config(metarepo_root / args.fleet_file)
+    fleet = repo_config.active_fleet_names(fleet_data)
     repo_configs = load_repo_configs(metarepo_root / args.repos_yml)
 
-    # write derived repos.txt
     if args.write_repos_txt:
-        out = metarepo_root / args.write_repos_txt
-        out.parent.mkdir(parents=True, exist_ok=True)
-        out.write_text("\n".join(fleet) + "\n", encoding="utf-8")
+        output = metarepo_root / args.write_repos_txt
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text("\n".join(fleet) + "\n", encoding="utf-8")
 
     repos: List[RepoReadiness] = []
     for name in fleet:
-        if name == "metarepo":
-            rp = metarepo_root
-        else:
-            rp = org_root / name
-
-        if not rp.exists():
-            repos.append(
-                RepoReadiness(
-                    name=name,
-                    path=str(rp),
-                    missing_repo=True,
-                    has_wgx_profile=False,
-                    wgx_profile_kind="missing",
-                    has_ci=False,
-                    has_contracts_marker=False,
-                )
-            )
+        repo_path = metarepo_root if name == "metarepo" else org_root / name
+        if not repo_path.exists():
+            repos.append(RepoReadiness(name, str(repo_path), True, False, "missing", False, False))
             continue
-
-        config = repo_configs.get(name, {})
-        kind = wgx_profile_kind(rp, config)
-        repos.append(
-            RepoReadiness(
-                name=name,
-                path=str(rp),
-                missing_repo=False,
-                has_wgx_profile=(kind != "missing"),
-                wgx_profile_kind=kind,
-                has_ci=has_ci(rp),
-                has_contracts_marker=has_contracts_marker(rp),
-            )
-        )
+        kind = wgx_profile_kind(repo_path, repo_configs.get(name, {}))
+        repos.append(RepoReadiness(
+            name=name,
+            path=str(repo_path),
+            missing_repo=False,
+            has_wgx_profile=kind != "missing",
+            wgx_profile_kind=kind,
+            has_ci=has_ci(repo_path),
+            has_contracts_marker=has_contracts_marker(repo_path),
+        ))
 
     report = {
         "generated_at": utc_now_iso(),
+        "source": {
+            "kind": "canonical_fleet_membership",
+            "path": args.fleet_file,
+            "does_not_establish": ["runtime health", "repository availability outside this observation"],
+        },
         "defaults": {
             "profile": "dev",
             "render": "combined",
@@ -191,13 +127,11 @@ def main() -> int:
                 "ai_heatmap": True,
             },
         },
-        "repos": [asdict(r) for r in repos],
+        "repos": [asdict(repo) for repo in repos],
     }
-
     out_json = metarepo_root / args.out_json
     out_json.parent.mkdir(parents=True, exist_ok=True)
     out_json.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
-
     print("✅ readiness written:", out_json)
     return 0
 

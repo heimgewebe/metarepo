@@ -15,7 +15,7 @@ from wgx import repo_config
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "fleet" / "generate_repos_projection.py"
-PROJECTION_SEMANTIC_SHA256 = "03e9d987ec8ed3119c223a0e8406e241e16e3743b9ad1f9545046b5f400bc29c"
+PROJECTION_SEMANTIC_SHA256 = "83f538bc47134368102c32ffb31a10dbb92f52d377e25e3110d44ce8674a9864"
 SPEC = importlib.util.spec_from_file_location("generate_repos_projection", SCRIPT)
 assert SPEC and SPEC.loader
 MODULE = importlib.util.module_from_spec(SPEC)

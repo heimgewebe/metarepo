@@ -64,6 +64,12 @@ def test_docs_drift_guard_rejects_and_preserves_stale_content(tmp_path: Path) ->
     assert generated_path.read_bytes() == stale
 
 
+def test_historical_donor_remains_non_fleet_in_generated_docs(tmp_path: Path) -> None:
+    worktree = _fixture(tmp_path)
+    output = _generate(worktree).decode("utf-8")
+    assert "**hausKI-audio** (historical-donor) (Non-Fleet)" in output
+
+
 def test_archived_reference_remains_non_fleet_in_generated_docs(tmp_path: Path) -> None:
     worktree = _fixture(tmp_path)
     output = _generate(worktree).decode("utf-8")

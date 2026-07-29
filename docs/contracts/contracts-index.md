@@ -31,7 +31,8 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
 - `aussen.event.schema.json`
   - Zweck: standardisierte Außen-Events, bevor sie in die interne Event-Landschaft aufgenommen werden.
 - `audio.events.schema.json`
-  - Zweck: Audio-bezogene Ereignisse (z. B. Aufnahmen, Transkriptionen, TTS).
+  - Status: historischer, derzeit producer- und consumerloser Payload-Vertrag aus `hausKI-audio`.
+  - Grenze: Er ist nicht an das kanonische Repository `audio` gebunden und belegt keine aktuelle Eventzustellung.
 - `intent.event.schema.json`
   - Zweck: Intent-Events aus Audio/Text für chronik/hausKI (Intent-Erkennung mit Confidence).
 

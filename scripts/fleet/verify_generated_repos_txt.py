@@ -1,97 +1,44 @@
 #!/usr/bin/env python3
-"""
-Verify that fleet/repos.txt is exactly the generated output from docs/repo-matrix.md.
-
-This is stronger than set-equality drift checks:
-- order must match
-- whitespace and trailing newline must match
-
-If it fails, CI prints a fix hint.
-"""
-
+"""Verify fleet/repos.txt against canonical fleet/repos.yml byte-for-byte."""
 from __future__ import annotations
 
 import argparse
 import difflib
-import sys
 from pathlib import Path
-from typing import List
+import sys
+
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from wgx import repo_config
 
 
-def parse_repo_matrix_fleet_yes(matrix_path: Path) -> List[str]:
-    import re
-
-    if not matrix_path.exists():
-        raise FileNotFoundError(f"Missing file: {matrix_path}")
-
-    lines = matrix_path.read_text(encoding="utf-8").splitlines()
-    header_idx = None
-    for i, line in enumerate(lines):
-        if re.match(r"^\|\s*Repo\s*\|\s*Rolle\s*\|\s*Fleet\s*\|\s*$", line.strip()):
-            header_idx = i
-            break
-    if header_idx is None:
-        raise ValueError(f"Could not find repo-matrix header row in {matrix_path}")
-
-    repos_yes: List[str] = []
-    for line in lines[header_idx + 2 :]:
-        s = line.strip()
-        if not s.startswith("|"):
-            break
-        cols = [c.strip() for c in s.strip("|").split("|")]
-        if len(cols) < 3:
-            continue
-        repo, _rolle, fleet = cols[0], cols[1], cols[2]
-        if fleet.lower() == "yes":
-            repos_yes.append(repo)
-
-    if not repos_yes:
-        raise ValueError(f"No 'Fleet yes' repos parsed from {matrix_path}")
-    return repos_yes
-
-
-def expected_repos_txt_content(repos: List[str]) -> str:
-    # Deterministic: one repo per line + trailing newline.
-    return "\n".join(repos) + "\n"
+def expected_content(source: Path) -> str:
+    names = repo_config.active_fleet_names(repo_config.load_config(source))
+    if not names:
+        raise ValueError(f"No active Fleet repositories in {source}")
+    return "\n".join(names) + "\n"
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--matrix", default="docs/repo-matrix.md")
-    ap.add_argument("--fleet", default="fleet/repos.txt")
-    args = ap.parse_args()
-
-    repo_root = Path(__file__).resolve().parents[2]  # metarepo root
-    matrix_path = (repo_root / args.matrix).resolve()
-    fleet_path = (repo_root / args.fleet).resolve()
-
-    repos = parse_repo_matrix_fleet_yes(matrix_path)
-    expected = expected_repos_txt_content(repos)
-
-    if not fleet_path.exists():
-        print(f"❌ Missing derived file: {fleet_path}")
-        print("Fix: run the generator or create fleet/repos.txt from docs/repo-matrix.md.")
-        return 1
-
-    actual = fleet_path.read_text(encoding="utf-8")
-
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--source", default="fleet/repos.yml")
+    parser.add_argument("--fleet", default="fleet/repos.txt")
+    args = parser.parse_args()
+    source = (ROOT / args.source).resolve()
+    output = (ROOT / args.fleet).resolve()
+    expected = expected_content(source)
+    actual = output.read_text(encoding="utf-8") if output.exists() else ""
     if actual == expected:
-        print("✅ fleet/repos.txt matches generated output exactly.")
+        print("✅ fleet/repos.txt matches canonical fleet/repos.yml exactly.")
         return 0
-
-    print("❌ fleet/repos.txt does not match generated output.")
-    print("Diff (expected -> actual):")
-    diff = difflib.unified_diff(
-        expected.splitlines(keepends=True),
-        actual.splitlines(keepends=True),
-        fromfile="expected (generated)",
-        tofile="actual (committed)",
-    )
-    sys.stdout.writelines(diff)
-    print()
-    print("Fix:")
-    print("  - Update docs/repo-matrix.md OR")
-    print("  - Regenerate fleet/repos.txt using scripts/fleet/generate_readiness.py with --write-repos-txt fleet/repos.txt")
+    print("❌ fleet/repos.txt does not match canonical fleet/repos.yml.")
+    sys.stdout.writelines(difflib.unified_diff(
+        expected.splitlines(keepends=True), actual.splitlines(keepends=True),
+        fromfile="expected (fleet/repos.yml)", tofile=str(output),
+    ))
+    print("Fix: run `just fleet`.")
     return 1
 
 

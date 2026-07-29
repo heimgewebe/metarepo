@@ -235,7 +235,7 @@ def test_generate_integrity_sources_duplicate(tmp_path):
     result = run_script(env)
 
     assert result.returncode == 1
-    assert "Duplicate repo detected" in result.stderr
+    assert "Duplicate Fleet repository" in result.stderr
 
 def test_generate_integrity_sources_override_enabled(tmp_path):
     # Test integrity.enabled override

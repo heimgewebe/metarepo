@@ -2,7 +2,7 @@ UV ?= uv
 REPOS_YML := repos.yml
 ORG_GENERATOR := $(UV) run scripts/generate_org_assets.py --repos-file $(REPOS_YML)
 
-.PHONY: all deps index graph linkcheck fleet fleet-check doctor doctor-ci
+.PHONY: all deps index graph linkcheck fleet fleet-check repo-matrix repo-matrix-check doctor doctor-ci
 
 all: index graph
 
@@ -21,15 +21,22 @@ linkcheck:
 fleet:
 	@echo "→ Generating Heimgewebe fleet readiness and repos list"
 	@python scripts/fleet/generate_readiness.py \
-		--matrix docs/repo-matrix.md \
+		--fleet-file fleet/repos.yml \
+		--repos-yml repos.yml \
 		--out-json reports/heimgewebe-readiness.json \
 		--write-repos-txt fleet/repos.txt
 	@echo "✓ Done."
 
 fleet-check:
 	@python scripts/fleet/verify_generated_repos_txt.py \
-		--matrix docs/repo-matrix.md \
+		--source fleet/repos.yml \
 		--fleet fleet/repos.txt
+
+repo-matrix:
+	@python scripts/fleet/generate_repo_matrix.py
+
+repo-matrix-check:
+	@python scripts/fleet/generate_repo_matrix.py --check
 
 doctor:
 	@[ -f reports/heimgewebe-readiness.json ] || $(MAKE) fleet
