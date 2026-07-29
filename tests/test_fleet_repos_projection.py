@@ -15,7 +15,7 @@ from wgx import repo_config
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "fleet" / "generate_repos_projection.py"
-PROJECTION_SEMANTIC_SHA256 = "83f538bc47134368102c32ffb31a10dbb92f52d377e25e3110d44ce8674a9864"
+PROJECTION_SEMANTIC_SHA256 = "2f909925299d7c686f47c4f4f0aa568c23689fd2041a258cd212a773dec47f3c"
 SPEC = importlib.util.spec_from_file_location("generate_repos_projection", SCRIPT)
 assert SPEC and SPEC.loader
 MODULE = importlib.util.module_from_spec(SPEC)
@@ -41,7 +41,10 @@ def test_projection_is_loadable_by_existing_legacy_consumers() -> None:
     assert projection["mode"] == "static"
     assert projection["github"]["owner"] == "heimgewebe"
     assert len(projection["repos"]) == 10
-    assert [item["name"] for item in projection["archived_references"]] == ["heimlern"]
+    assert [item["name"] for item in projection["archived_references"]] == [
+        "heimlern",
+        "leitwerk",
+    ]
 
 
 def test_projection_pins_complete_compatibility_semantics() -> None:
@@ -285,9 +288,23 @@ def test_archived_reference_is_separate_and_exactly_bound() -> None:
             "content_sha256": (
                 "bbf1d19865812b9584a3645ecd031f0854ee6110849d249692b4ac62d8f8d1e0"
             ),
-        }
+        },
+        {
+            "name": "leitwerk",
+            "url": "https://github.com/heimgewebe/leitwerk",
+            "status": "archived-reference",
+            "fleet": False,
+            "default_branch": "main",
+            "source_commit": "1449145af543b78c0d3813942f1d6d95ddb33c4a",
+            "locator": "archive/leitwerk.freeze.v1.json",
+            "content_sha256": (
+                "1cf39dc5c311d1cf8d1f91b536354b887d25e810dac215dbb60700148f09948f"
+            ),
+        },
     ]
-    assert "heimlern" not in [item["name"] for item in projection["repos"]]
+    active_names = [item["name"] for item in projection["repos"]]
+    assert "heimlern" not in active_names
+    assert "leitwerk" not in active_names
 
 
 def test_archived_reference_cannot_be_projectable() -> None:

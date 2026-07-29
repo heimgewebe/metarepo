@@ -24,3 +24,4 @@ Historische Repositories ohne aktive Fleet-, Runtime- oder Routing-Autorität.
 | Repo | Status | Bound Commit | Evidence |
 | --- | --- | --- | --- |
 | [heimlern](https://github.com/heimgewebe/heimlern) | archived-reference | `f74579cbe46d5f5f7b95c4c3431da03efb67cc85` | `docs/archive-readiness.v1.json` |
+| [leitwerk](https://github.com/heimgewebe/leitwerk) | archived-reference | `1449145af543b78c0d3813942f1d6d95ddb33c4a` | `archive/leitwerk.freeze.v1.json` |
