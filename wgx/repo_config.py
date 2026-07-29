@@ -82,7 +82,8 @@ def preprocess_lines(text: str) -> List[Tuple[int, str]]:
     lines: List[Tuple[int, str]] = []
     for raw_line in text.splitlines():
         without_comment = strip_comments(raw_line)
-        if not without_comment.strip():
+        stripped = without_comment.strip()
+        if not stripped or stripped in {"---", "..."}:
             continue
         indent = len(without_comment) - len(without_comment.lstrip(" "))
         lines.append((indent, without_comment.strip()))
@@ -230,6 +231,68 @@ def gather_repos(data: Dict[str, Any]) -> List[Dict[str, Any]]:
                 seen[name] = repo
     repos.extend(seen.values())
     return repos
+
+
+def active_fleet_repos(data: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """Return active Fleet members in canonical declaration order.
+
+    ``fleet/repos.yml`` may declare core repositories under ``repos`` and
+    projectable related repositories under ``static.include``. Entries with
+    ``fleet: false`` are retained as references but are not active members.
+    """
+
+    active: List[Dict[str, Any]] = []
+    seen: set[str] = set()
+
+    raw_repos = data.get("repos", [])
+    if isinstance(raw_repos, dict):
+        repo_entries: List[Any] = []
+        for name, config in raw_repos.items():
+            if not isinstance(name, str) or not name.strip():
+                raise ValueError("Fleet repository names must be non-empty strings")
+            if config is None:
+                config = {}
+            if not isinstance(config, dict):
+                raise ValueError(f"Fleet metadata for {name!r} must be a mapping")
+            repo_entries.append({"name": name, **config})
+    elif isinstance(raw_repos, list):
+        repo_entries = list(raw_repos)
+    else:
+        raise ValueError("fleet repos must be a list or mapping")
+
+    static = data.get("static", {}) or {}
+    if not isinstance(static, dict):
+        raise ValueError("fleet static must be a mapping")
+    static_entries = static.get("include", []) or []
+    if not isinstance(static_entries, list):
+        raise ValueError("fleet static.include must be a list")
+
+    for raw in [*repo_entries, *static_entries]:
+        repo = to_repo_object(raw)
+        name = repo.get("name")
+        if not isinstance(name, str) or not name.strip():
+            raise ValueError("Fleet entries require a non-empty name")
+        name = name.strip()
+        if name in seen:
+            raise ValueError(f"Duplicate Fleet repository: {name}")
+        seen.add(name)
+        if repo.get("fleet") is False:
+            continue
+        if repo.get("status") == "archived-reference":
+            raise ValueError(
+                f"Archived Fleet reference {name} must set fleet: false"
+            )
+        normalized = dict(repo)
+        normalized["name"] = name
+        active.append(normalized)
+
+    return active
+
+
+def active_fleet_names(data: Dict[str, Any]) -> List[str]:
+    """Return active Fleet names in canonical declaration order."""
+
+    return [repo["name"] for repo in active_fleet_repos(data)]
 
 
 def ordered_repo_names(repos: List[Dict[str, Any]]) -> List[str]:

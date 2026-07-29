@@ -9,7 +9,7 @@ static:
       fleet: false
     - name: hausKI-audio
       url: "https://github.com/heimgewebe/hausKI-audio"
-      status: related
+      status: historical-donor
       fleet: false
     - name: heimlern
       url: "https://github.com/heimgewebe/heimlern"

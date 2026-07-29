@@ -16,7 +16,8 @@ labels: ["contracts-v1", "fleet"]
 - [ ] **wgx** – `wgx metrics snapshot --json` erzeugt gültiges Artefakt (`metrics.snapshot.schema.json`)
 - [ ] **wgx** – Optionaler POST (`--post $INGEST_URL`) funktioniert
 - [ ] **semantAH** – `vault/.gewebe/insights/today.json` (≤10 KB) validiert gegen `insights.schema.json`
-- [ ] **hausKI-audio** – Events `audio.session_*`, `audio.latency_ms` validieren gegen `audio.events.schema.json`
+- [ ] **audio** – `just check` sowie die relevanten Doctor-, Profil- und Labor-Gates am exakten Audio-Head ausführen
+- [ ] **historischer Vertrag** – `audio.events.schema.json` nicht als aktuellen Producervertrag behandeln; `hausKI-audio` bleibt nur als revisionsgebundener Spenderbeleg sichtbar
 - [ ] **aussensensor/weltgewebe** – `export/feed.jsonl` folgt `aussen.event.schema.json`
 
 ## Consumer-Aufgaben

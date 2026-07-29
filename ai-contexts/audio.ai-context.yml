@@ -1,0 +1,65 @@
+---
+ai_context_version: 1.1
+
+project:
+  name: audio
+  summary: Canonical Heim-PC repository for audio configuration, playback, recording, instruments, measurements, and bounded music experiments.
+  role: capability_audio
+  primary_language: mixed
+  visibility: internal
+
+heimgewebe:
+  axis: [Audio, Measurement, Experiments]
+  fleet:
+    enabled: true
+  wgx:
+    profile_expected: false
+    guard_smoke_expected: false
+
+interfaces:
+  consumes:
+    - live ALSA, PipeWire, and MIDI observations
+    - configured defaults and physical verification evidence
+  produces:
+    - read-only audio doctors and truth snapshots
+    - profile plans, laboratory gates, and measurement evidence
+    - bounded playback, recording, piano, and whale-voice experiments
+
+contracts:
+  schemas: []
+  note: The historical audio.events schema has no current producer binding to this repository.
+
+dependencies:
+  internal: []
+  external: []
+
+boundaries:
+  not_responsible_for:
+    - Legacy hausKI-audio event production or implicit Chronik/HausKI delivery.
+    - Claiming physical device presence from stored defaults.
+    - Applying routing, service, volume, or hardware changes from a read-only plan.
+  dangerous_assumptions:
+    - Treat a planned profile as executable.
+    - Treat an installed or configured device as physically present without live observation.
+
+conventions:
+  branching: main, feature/*, fix/*
+  commit_prefix: audio
+  ci_platform: github_actions
+
+documentation:
+  repository: https://github.com/heimgewebe/audio
+  readme: README.md
+
+source_binding:
+  repository: heimgewebe/audio
+  commit: 9ddefba90679adaf20be2e7e152f4d4aea068e77
+  observed_at: '2026-07-29T04:45:00Z'
+
+ai_guidance:
+  do:
+    - Read live device and runtime truth before asserting readiness.
+    - Keep experiments bounded, stoppable, and fail-closed.
+  dont:
+    - Recreate legacy event or orchestration claims without producer and consumer evidence.
+    - Mutate audio routing or hardware state from this context alone.

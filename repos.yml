@@ -29,9 +29,13 @@ repos:
     url: https://github.com/heimgewebe/audio
     default_branch: main
     domain: audio
-    scope: events
+    scope: configuration-and-experiments
     metrics:
       enable: false
+    wgx:
+      profile_expected: false
+    integrity:
+      enabled: false
   - name: semantAH
     url: https://github.com/heimgewebe/semantAH
     default_branch: main

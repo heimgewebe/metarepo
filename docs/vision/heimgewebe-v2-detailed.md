@@ -1,5 +1,7 @@
 # Heimgewebe v2 – Detaillierte Vision
 
+> **Status: historisch und nicht normativ.** Dieses Visionsdokument bewahrt ein früheres Zielbild. Namentliche Rollen, Eventflüsse und Repositoryzuordnungen sind keine aktuelle Fleet-, Produkt-, Contract- oder Runtime-Wahrheit.
+
 > **Fokus:** `assist`-Loop (Kontext → Vorschlag → Aktion)
 
 ## Komponenten & Rollen (v2)

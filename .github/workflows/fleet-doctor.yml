@@ -8,7 +8,9 @@ on:
     paths:
       - 'scripts/fleet/doctor.py'
       - 'scripts/fleet/generate_readiness.py'
-      - 'docs/repo-matrix.md'
+      - 'fleet/repos.yml'
+      - 'fleet/repo-metadata.yml'
+      - 'repos.yml'
       - 'fleet/repos.txt'
       - 'reports/heimgewebe-readiness.json'
       - '.github/workflows/fleet-doctor.yml'
@@ -16,7 +18,9 @@ on:
     paths:
       - 'scripts/fleet/doctor.py'
       - 'scripts/fleet/generate_readiness.py'
-      - 'docs/repo-matrix.md'
+      - 'fleet/repos.yml'
+      - 'fleet/repo-metadata.yml'
+      - 'repos.yml'
       - 'fleet/repos.txt'
       - 'reports/heimgewebe-readiness.json'
       - '.github/workflows/fleet-doctor.yml'
@@ -37,15 +41,11 @@ jobs:
           HG_ROOT: ${{ github.workspace }}/..
         run: |
           python scripts/fleet/generate_readiness.py \
-            --matrix docs/repo-matrix.md \
+            --fleet-file fleet/repos.yml \
+            --repos-yml repos.yml \
             --out-json reports/heimgewebe-readiness.json \
             --write-repos-txt fleet/repos.txt
       - name: Display readiness report
-        run: |
-          echo "=== Readiness Report ==="
-          cat reports/heimgewebe-readiness.json
-          echo ""
+        run: cat reports/heimgewebe-readiness.json
       - name: Run hg-doctor (CI mode)
-        run: |
-          set -x
-          python scripts/fleet/doctor.py --report reports/heimgewebe-readiness.json --ci
+        run: python scripts/fleet/doctor.py --report reports/heimgewebe-readiness.json --ci

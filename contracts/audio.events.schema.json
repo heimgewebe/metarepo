@@ -1,39 +1,113 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.heimgewebe.org/contracts/audio.events.schema.json",
-  "title": "hausKI-audio events",
-  "x-producers": ["hausKI-audio"],
-  "x-consumers": ["hausKI", "chronik"],
+  "title": "Historical hausKI-audio events",
+  "x-producers": [],
+  "x-consumers": [],
   "oneOf": [
     {
       "type": "object",
-      "required": ["ts", "kind", "session_id"],
+      "required": [
+        "ts",
+        "kind",
+        "session_id"
+      ],
       "properties": {
-        "ts": { "type": "integer" },
-        "kind": { "const": "audio.session_started" },
-        "session_id": { "type": "string" },
-        "bpm": { "type": "number" },
-        "routing": { "type": "string" }
+        "ts": {
+          "type": "integer"
+        },
+        "kind": {
+          "const": "audio.session_started"
+        },
+        "session_id": {
+          "type": "string"
+        },
+        "bpm": {
+          "type": "number"
+        },
+        "routing": {
+          "type": "string"
+        }
       }
     },
     {
       "type": "object",
-      "required": ["ts", "kind", "session_id"],
+      "required": [
+        "ts",
+        "kind",
+        "session_id"
+      ],
       "properties": {
-        "ts": { "type": "integer" },
-        "kind": { "const": "audio.session_ended" },
-        "session_id": { "type": "string" },
-        "duration_ms": { "type": "integer", "minimum": 0 }
+        "ts": {
+          "type": "integer"
+        },
+        "kind": {
+          "const": "audio.session_ended"
+        },
+        "session_id": {
+          "type": "string"
+        },
+        "duration_ms": {
+          "type": "integer",
+          "minimum": 0
+        }
       }
     },
     {
       "type": "object",
-      "required": ["ts", "kind", "latency_ms"],
+      "required": [
+        "ts",
+        "kind",
+        "latency_ms"
+      ],
       "properties": {
-        "ts": { "type": "integer" },
-        "kind": { "const": "audio.latency_ms" },
-        "latency_ms": { "type": "number", "minimum": 0 }
+        "ts": {
+          "type": "integer"
+        },
+        "kind": {
+          "const": "audio.latency_ms"
+        },
+        "latency_ms": {
+          "type": "number",
+          "minimum": 0
+        }
       }
     }
+  ],
+  "x-lifecycle": "historical",
+  "x-historical-bindings": {
+    "producer": {
+      "repository": "heimgewebe/hausKI-audio",
+      "commit": "4f2b4bdbfaa6419725aba02acd71347ac1e9da02",
+      "evidence": [
+        ".github/workflows/validate-audio-events.yml"
+      ],
+      "assessment": "validation-only; no current event producer observed"
+    },
+    "claimed_consumers": [
+      {
+        "repository": "heimgewebe/hausKI",
+        "commit": "ac48c9f158aed5c114e5d03213777ee933ab39fe",
+        "assessment": "no current consumer observed"
+      },
+      {
+        "repository": "heimgewebe/chronik",
+        "commit": "4eb6ff5b2ef1a85e02047148c27a8c71b031a6b9",
+        "assessment": "no current consumer observed"
+      }
+    ],
+    "canonical_audio_repository": {
+      "repository": "heimgewebe/audio",
+      "commit": "9ddefba90679adaf20be2e7e152f4d4aea068e77",
+      "assessment": "no producer binding observed"
+    },
+    "observed_at": "2026-07-29T04:45:00Z",
+    "method": "exact default-branch revision readback plus organization code search"
+  },
+  "x-does-not-establish": [
+    "current producer or consumer availability",
+    "binding of this schema to heimgewebe/audio",
+    "runtime event delivery",
+    "migration readiness"
   ]
 }

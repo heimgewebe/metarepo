@@ -23,6 +23,7 @@ help:
     @printf "  just log-sync      # Report-Vorlage unter reports/sync-logs/\n"
     @printf "  just fleet         # Fleet Readiness & Repos List generieren\n"
     @printf "  just fleet-projection # repos.yml aus kanonischen Fleet-Quellen erzeugen\n"
+    @printf "  just repo-matrix     # menschenlesbare Fleet-Projektion erzeugen\n"
     @printf "  just renovate-policy-check # Renovate-V1-Policy und Scope-Projektion prüfen\n"
     @printf "  just doctor        # Fleet Diagnose (Health Check)\n"
     @printf "\nWeitere Ziele: just --list\n"
@@ -97,18 +98,26 @@ log-sync *args:
 fleet:
     @echo "→ Generating Heimgewebe fleet readiness and repos list"
     @python scripts/fleet/generate_readiness.py \
-        --matrix docs/repo-matrix.md \
+        --fleet-file fleet/repos.yml \
+        --repos-yml repos.yml \
         --out-json reports/heimgewebe-readiness.json \
         --write-repos-txt fleet/repos.txt
     @echo "✓ Done. See:"
     @echo "  - reports/heimgewebe-readiness.json"
     @echo "  - fleet/repos.txt"
 
-# Verify that fleet/repos.txt matches generated output exactly
+# Verify that fleet/repos.txt matches canonical Fleet truth exactly
 fleet-check:
     @python scripts/fleet/verify_generated_repos_txt.py \
-        --matrix docs/repo-matrix.md \
+        --source fleet/repos.yml \
         --fleet fleet/repos.txt
+
+# Generate/check the human-readable Fleet matrix projection
+repo-matrix:
+    @python scripts/fleet/generate_repo_matrix.py
+
+repo-matrix-check:
+    @python scripts/fleet/generate_repo_matrix.py --check
 
 # Generate the legacy repos.yml compatibility projection from canonical inputs
 fleet-projection:
@@ -167,6 +176,7 @@ fleet-push-all:
 # Local CI
 validate: yq_ensure lint
     just fleet-check
+    just repo-matrix-check
     just fleet-projection-check
     just renovate-policy-check
     scripts/ci/validate-local.sh

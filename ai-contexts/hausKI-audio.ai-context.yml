@@ -3,57 +3,59 @@ ai_context_version: 1.1
 
 project:
   name: hausKI-audio
-  summary: Audio sidecar for hausKI; emits audio.event.* and related artifacts.
-  role: capability_audio
+  summary: Historical donor repository retained for ideas, behavior, and validation evidence; not the current Audio product.
+  role: historical_donor
   primary_language: mixed
   visibility: internal
 
 heimgewebe:
-  axis: [Decisions, Events]
+  axis: [Historical Audio Evidence]
   fleet:
-    enabled: true
+    enabled: false
   wgx:
-    profile_expected: true
-    guard_smoke_expected: true
+    profile_expected: false
+    guard_smoke_expected: false
 
 interfaces:
   consumes:
-    - "audio inputs"
-    - "hausKI intents"
+    - historical repository evidence only
   produces:
-    - "audio.event.*"
-    - "artifacts for downstream agents"
+    - none (historical donor)
 
 contracts:
   schemas:
-    - path: "contracts/*.schema.json"
-      note: "Audio events must remain contract-valid."
+    - path: contracts/*.schema.json
+      note: Historical validation material does not establish a current producer.
 
 dependencies:
-  internal:
-    - name: chronik
-      relationship: writes
-      interface: [event_line_append]
+  internal: []
   external: []
-  # NOTE: 'external: []' means "not verified from metarepo context".
-  # Prefer 'unknown' over false precision; verify in repo before asserting tech stack.
 
 boundaries:
   not_responsible_for:
-    - "Canonical orchestration (hausKI does that)."
+    - Current audio configuration, playback, recording, instruments, or music experiments.
+    - Fleet rollout, runtime execution, event delivery, or current producer claims.
   dangerous_assumptions:
-    - "Write events without chronik validation."
+    - Treat this donor repository as the canonical Audio product.
+    - Infer a live audio.events producer from a validation workflow.
 
 conventions:
-  branching: "main, feature/*"
-  commit_prefix: "hausKI-audio"
+  branching: historical donor; no new product work
+  commit_prefix: hausKI-audio
   ci_platform: github_actions
 
 documentation:
-  runbook: docs/runbook.md
+  repository: https://github.com/heimgewebe/hausKI-audio
+
+source_binding:
+  repository: heimgewebe/hausKI-audio
+  commit: 4f2b4bdbfaa6419725aba02acd71347ac1e9da02
+  observed_at: '2026-07-29T04:45:00Z'
 
 ai_guidance:
   do:
-    - emit small, well-formed JSONL chunks
+    - Use exact revisions when extracting historical requirements or tests.
+    - Reimplement useful behavior against the canonical audio contracts.
   dont:
-    - buffer giant payloads before send
+    - Route new implementation, Fleet, Integrity, or runtime work to this repository.
+    - Claim that its old event schema has current producers or consumers.

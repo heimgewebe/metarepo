@@ -86,9 +86,9 @@ def test_retired_direct_e2e_paths_always_fail_closed(tmp_path: Path) -> None:
 
 def test_active_projection_docs_do_not_describe_heimlern_as_fleet() -> None:
     matrix = (ROOT / "docs/repo-matrix.md").read_text(encoding="utf-8")
-    active_section = matrix.split("## Archived References", 1)[0]
+    active_section = matrix.split("## Historische Spender", 1)[0]
     assert "heimlern" not in active_section
-    assert "Archivierte Policy- und Lernreferenz" in matrix
+    assert "| heimlern | Archivierte Referenz" in matrix
 
 
 def test_active_ai_context_is_disabled_and_historical() -> None:

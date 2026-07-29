@@ -6,7 +6,7 @@ Quelle: [`repos.yml`](../repos.yml).
 
 | Repo | Default Branch | Domain | Scope | Metrics | Depends On |
 | --- | --- | --- | --- | --- | --- |
-| [audio](https://github.com/heimgewebe/audio) | main | audio | events | – | – |
+| [audio](https://github.com/heimgewebe/audio) | main | audio | configuration-and-experiments | – | – |
 | [aussensensor](https://github.com/heimgewebe/aussensensor) | main | aussen | events | – | – |
 | [chronik](https://github.com/heimgewebe/chronik) | main | chronik | ingest | – | – |
 | [contracts-mirror](https://github.com/heimgewebe/contracts-mirror) | main | contracts | schema | – | – |
