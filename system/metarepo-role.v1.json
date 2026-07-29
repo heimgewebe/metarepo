@@ -168,7 +168,8 @@
     "Historische Organismus-Dokumente und Diagramme müssen über das hashgebundene Archivmanifest auffindbar bleiben; ihre bisherigen Pfade dürfen keine aktuelle Architektur behaupten.",
     "Aktive Ökosystemsemantik wird aus dem Systemkatalog referenziert und nicht im Metarepo dupliziert.",
     "repos.yml darf nicht manuell geändert werden und muss bytegenau aus fleet/repos.yml sowie fleet/repo-metadata.yml reproduzierbar sein.",
-    "Einträge mit fleet: false dürfen nicht in repos.yml projiziert oder allein aufgrund ihrer Erwähnung als Fleet-Ziel behandelt werden."
+    "Einträge mit fleet: false dürfen nicht in repos.yml projiziert oder allein aufgrund ihrer Erwähnung als Fleet-Ziel behandelt werden.",
+    "Der gemeinsame Vertrag contracts/operator/agent-change-boundaries.v1.json bewahrt nur providerneutrale Änderungsgrenzen und überträgt keine Leitwerk-Runtime-, Task- oder Policy-Autorität."
   ],
   "entrypoints": {
     "human": "README.md",
@@ -192,5 +193,13 @@
       "Entfernbarkeit einer Compatibility Surface ohne Consumer-Migration",
       "vollständige Migration externer Verweise auf historische Organismus-Pfade"
     ]
-  }
+  },
+  "active_shared_contracts": [
+    {
+      "path": "contracts/operator/agent-change-boundaries.v1.json",
+      "scope": "provider-neutral boundary between agent proposals and effects",
+      "provenance": "heimgewebe/leitwerk@c241244d8e7613f6d4eaff7a6686c841444f1ade",
+      "inventory": "docs/archive/leitwerk-normative-freeze.v1.json"
+    }
+  ]
 }

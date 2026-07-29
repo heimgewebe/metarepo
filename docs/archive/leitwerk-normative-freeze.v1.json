@@ -1,0 +1,605 @@
+{
+  "schema_version": 1,
+  "kind": "leitwerk_normative_freeze",
+  "status": "migration_ready",
+  "generated_at": "2026-07-29T10:24:00+02:00",
+  "bureau_task_id": "OPERATOR-ECOSYSTEM-REDUNDANCY-V1-T037",
+  "source": {
+    "repository": "heimgewebe/leitwerk",
+    "commit": "c241244d8e7613f6d4eaff7a6686c841444f1ade",
+    "default_branch": "main",
+    "open_pull_requests": 0
+  },
+  "decision_semantics": {
+    "keep": "Preserve as historical provenance in the archived source; never active authority.",
+    "migrate": "Transfer only the identified semantic subset to the canonical destination; source becomes historical.",
+    "retire": "End active authority or automation; preserve bytes only as archived history."
+  },
+  "canonical_transfer": {
+    "contract": "contracts/operator/agent-change-boundaries.v1.json",
+    "owner": "repo:metarepo",
+    "scope": "provider-neutral boundary between agent proposals and effects",
+    "excluded_authority": [
+      "Leitwerk runtime",
+      "Leitwerk task or claim state",
+      "ACS control authority",
+      "WGX authority inherited from Leitwerk",
+      "Leitwerk agent dispatch",
+      "Leitwerk event namespace",
+      "Leitwerk Phase-1 artifact schemas"
+    ]
+  },
+  "targeted_consumer_scan": {
+    "repositories": [
+      "heimgewebe/grabowski",
+      "heimgewebe/bureau",
+      "heimgewebe/metarepo",
+      "heimgewebe/systemkatalog",
+      "heimgewebe/konvergenzregelkreis",
+      "heimgewebe/leitstand",
+      "heimgewebe/chronik",
+      "heimgewebe/agent-control-surface",
+      "heimgewebe/heimgeist"
+    ],
+    "result": "catalog_archive_or_task_reference_only",
+    "runtime_schema_consumers_found": 0,
+    "observed_at": "2026-07-29"
+  },
+  "guard_classification": [
+    {
+      "path": ".github/workflows/guard-branch-only.yml",
+      "decision": "retire_on_archive",
+      "replacement": "repository-specific GitHub rulesets and current operator/review gates"
+    },
+    {
+      "path": ".github/workflows/guard-contracts-mirror.yml",
+      "decision": "retire_on_archive",
+      "replacement": "no mirror remains active; canonical shared contracts live in Metarepo"
+    },
+    {
+      "path": "scripts/guard_contracts_mirror.sh",
+      "decision": "retire_on_archive",
+      "replacement": "no mirror remains active"
+    },
+    {
+      "path": "scripts/test_guard_contracts_mirror_functions.sh",
+      "decision": "retire_on_archive",
+      "replacement": "no active mirror guard remains to test"
+    },
+    {
+      "path": "github-default-codeql",
+      "decision": "ceases_with_repository_archive",
+      "replacement": "not applicable to a read-only archived reference"
+    }
+  ],
+  "schema_classification": {
+    "paths": [
+      "contracts/artifacts/context.bundle.v1.schema.json",
+      "contracts/artifacts/execution.log.v1.schema.json",
+      "contracts/artifacts/guard.report.v1.schema.json",
+      "contracts/artifacts/patch.v1.schema.json",
+      "contracts/artifacts/plan.v1.schema.json",
+      "contracts/artifacts/pr.manifest.v1.schema.json",
+      "contracts/artifacts/rationale.v1.schema.json",
+      "contracts/artifacts/uncertainty.report.v1.schema.json",
+      "contracts/events/leitwerk.events.v1.schema.json",
+      "contracts/fragments/artifact.header.v1.schema.json"
+    ],
+    "decision": "retire_legacy_phase1_suite",
+    "reason": "No current runtime consumer was found. The suite also contains an algorithm-insensitive minimum-length digest pattern in contracts/fragments/artifact.header.v1.schema.json, so it must not be promoted as a current shared contract.",
+    "replacement": "current producer-owned contracts and the bounded agent-change contract above"
+  },
+  "remote_branch_classification": [
+    {
+      "ref": "origin/codex/add-branch-only-guard-6276431067932352961",
+      "merged_into_main": true,
+      "terminal_classification": "merged_history",
+      "open_pull_request": false,
+      "action": "retain_as_archived_history"
+    },
+    {
+      "ref": "origin/codex/create-follow-up-pr-for-contracts-mirroring",
+      "merged_into_main": false,
+      "terminal_classification": "closed_or_abandoned_unmerged_history",
+      "open_pull_request": false,
+      "action": "retain_as_archived_history"
+    },
+    {
+      "ref": "origin/codex/create-follow-up-pr-for-contracts-mirroring-pl9f73",
+      "merged_into_main": true,
+      "terminal_classification": "merged_history",
+      "open_pull_request": false,
+      "action": "retain_as_archived_history"
+    },
+    {
+      "ref": "origin/codex/create-initial-repo-skeleton-for-leitwerk",
+      "merged_into_main": true,
+      "terminal_classification": "merged_history",
+      "open_pull_request": false,
+      "action": "retain_as_archived_history"
+    },
+    {
+      "ref": "origin/codex/document-current-progress-steps",
+      "merged_into_main": true,
+      "terminal_classification": "merged_history",
+      "open_pull_request": false,
+      "action": "retain_as_archived_history"
+    },
+    {
+      "ref": "origin/codex/harden-contracts/mirror-enforcement",
+      "merged_into_main": true,
+      "terminal_classification": "merged_history",
+      "open_pull_request": false,
+      "action": "retain_as_archived_history"
+    },
+    {
+      "ref": "origin/docs/phase-1-checklist-3641033802401986240",
+      "merged_into_main": true,
+      "terminal_classification": "merged_history",
+      "open_pull_request": false,
+      "action": "retain_as_archived_history"
+    },
+    {
+      "ref": "origin/fix-git-diff-fail-open-862940975048748224",
+      "merged_into_main": false,
+      "terminal_classification": "closed_or_abandoned_unmerged_history",
+      "open_pull_request": false,
+      "action": "retain_as_archived_history"
+    },
+    {
+      "ref": "origin/fix-unused-sync-found-values-3469406776984756255",
+      "merged_into_main": false,
+      "terminal_classification": "closed_or_abandoned_unmerged_history",
+      "open_pull_request": false,
+      "action": "retain_as_archived_history"
+    },
+    {
+      "ref": "origin/fix/ci-policy-compliance-12335170261544430826",
+      "merged_into_main": true,
+      "terminal_classification": "merged_history",
+      "open_pull_request": false,
+      "action": "retain_as_archived_history"
+    },
+    {
+      "ref": "origin/fix/guard-mirror-regex-13588359581769689315",
+      "merged_into_main": false,
+      "terminal_classification": "closed_or_abandoned_unmerged_history",
+      "open_pull_request": false,
+      "action": "retain_as_archived_history"
+    },
+    {
+      "ref": "origin/jules-15184732271908539224-be856445",
+      "merged_into_main": false,
+      "terminal_classification": "closed_or_abandoned_unmerged_history",
+      "open_pull_request": false,
+      "action": "retain_as_archived_history"
+    },
+    {
+      "ref": "origin/jules-optimize-diff-filtering-15181583843530707428",
+      "merged_into_main": false,
+      "terminal_classification": "closed_or_abandoned_unmerged_history",
+      "open_pull_request": false,
+      "action": "retain_as_archived_history"
+    },
+    {
+      "ref": "origin/optimize-diff-filtering-4058297349626104665",
+      "merged_into_main": false,
+      "terminal_classification": "closed_or_abandoned_unmerged_history",
+      "open_pull_request": false,
+      "action": "retain_as_archived_history"
+    },
+    {
+      "ref": "origin/perf-optimize-git-log-5527529030441212109",
+      "merged_into_main": true,
+      "terminal_classification": "merged_history",
+      "open_pull_request": false,
+      "action": "retain_as_archived_history"
+    },
+    {
+      "ref": "origin/perf-optimize-grep-invocation-13889406394502924765",
+      "merged_into_main": false,
+      "terminal_classification": "closed_or_abandoned_unmerged_history",
+      "open_pull_request": false,
+      "action": "retain_as_archived_history"
+    },
+    {
+      "ref": "origin/perf-optimize-sync-source-3824760759510113002",
+      "merged_into_main": false,
+      "terminal_classification": "closed_or_abandoned_unmerged_history",
+      "open_pull_request": false,
+      "action": "retain_as_archived_history"
+    },
+    {
+      "ref": "origin/perf/guard-contracts-mirror-python-opt-15567373378097379027",
+      "merged_into_main": false,
+      "terminal_classification": "closed_or_abandoned_unmerged_history",
+      "open_pull_request": false,
+      "action": "retain_as_archived_history"
+    },
+    {
+      "ref": "origin/refactor-guard-contracts-mirror-sourcable-68078308538878259",
+      "merged_into_main": false,
+      "terminal_classification": "closed_or_abandoned_unmerged_history",
+      "open_pull_request": false,
+      "action": "retain_as_archived_history"
+    },
+    {
+      "ref": "origin/refactor-sync-source-filenames-3723135912101322253",
+      "merged_into_main": false,
+      "terminal_classification": "closed_or_abandoned_unmerged_history",
+      "open_pull_request": false,
+      "action": "retain_as_archived_history"
+    },
+    {
+      "ref": "origin/refactor/guard-contracts-early-exit-10888359007445494878",
+      "merged_into_main": false,
+      "terminal_classification": "closed_or_abandoned_unmerged_history",
+      "open_pull_request": false,
+      "action": "retain_as_archived_history"
+    },
+    {
+      "ref": "origin/security-fix-workflow-injection-17247921894066540969",
+      "merged_into_main": false,
+      "terminal_classification": "closed_or_abandoned_unmerged_history",
+      "open_pull_request": false,
+      "action": "retain_as_archived_history"
+    },
+    {
+      "ref": "origin/testing-improvement-guard-contracts-mirror-bash-functions-15725004166587515056",
+      "merged_into_main": false,
+      "terminal_classification": "closed_or_abandoned_unmerged_history",
+      "open_pull_request": false,
+      "action": "retain_as_archived_history"
+    },
+    {
+      "ref": "origin/update-schemas-phase1-17320306713310434182",
+      "merged_into_main": true,
+      "terminal_classification": "merged_history",
+      "open_pull_request": false,
+      "action": "retain_as_archived_history"
+    }
+  ],
+  "files": [
+    {
+      "path": ".github/workflows/guard-branch-only.yml",
+      "sha256": "fc2193179cc58aed4676165212d2389225b84a0cec4c0f061a39fed13b39a4a3",
+      "decision": "retire",
+      "destination": "github:heimgewebe/leitwerk@c241244d8e7613f6d4eaff7a6686c841444f1ade:.github/workflows/guard-branch-only.yml",
+      "reason": "No current runtime consumer was found in the targeted control-plane scan, or the content assigns authority to superseded Leitwerk/ACS/WGX concepts.",
+      "preservation": "historical bytes remain in archived Leitwerk"
+    },
+    {
+      "path": ".github/workflows/guard-contracts-mirror.yml",
+      "sha256": "06488e67cb0b336f09cdcae1e5be6329fb758764b8d9a425702d46251300fc8d",
+      "decision": "retire",
+      "destination": "github:heimgewebe/leitwerk@c241244d8e7613f6d4eaff7a6686c841444f1ade:.github/workflows/guard-contracts-mirror.yml",
+      "reason": "No current runtime consumer was found in the targeted control-plane scan, or the content assigns authority to superseded Leitwerk/ACS/WGX concepts.",
+      "preservation": "historical bytes remain in archived Leitwerk"
+    },
+    {
+      "path": ".gitignore",
+      "sha256": "e9ded537ce2dcc1669b5155b173216296cda59391089e85bf6daae111f18c85d",
+      "decision": "keep",
+      "destination": "github:heimgewebe/leitwerk@c241244d8e7613f6d4eaff7a6686c841444f1ade:.gitignore",
+      "reason": "Historical provenance only; not an active policy or runtime source.",
+      "preservation": "historical bytes remain in archived Leitwerk"
+    },
+    {
+      "path": "README.md",
+      "sha256": "91405a1beaaa68768ad5c1d5df764bb1de0f3690a3f730c7e91963187afcfffb",
+      "decision": "keep",
+      "destination": "github:heimgewebe/leitwerk@c241244d8e7613f6d4eaff7a6686c841444f1ade:README.md",
+      "reason": "Historical provenance only; not an active policy or runtime source.",
+      "preservation": "historical bytes remain in archived Leitwerk"
+    },
+    {
+      "path": "contracts/README.md",
+      "sha256": "26975510101d38f22013ba2a30fc15472f9cf9742fe5bb4565933e3a838ffec9",
+      "decision": "retire",
+      "destination": "github:heimgewebe/leitwerk@c241244d8e7613f6d4eaff7a6686c841444f1ade:contracts/README.md",
+      "reason": "No current runtime consumer was found in the targeted control-plane scan, or the content assigns authority to superseded Leitwerk/ACS/WGX concepts.",
+      "preservation": "historical bytes remain in archived Leitwerk"
+    },
+    {
+      "path": "contracts/artifacts/context.bundle.v1.schema.json",
+      "sha256": "9713b39afb3271acf6f2fdd3cfb40d5f0758993abb34250a114227b531482bcc",
+      "decision": "retire",
+      "destination": "github:heimgewebe/leitwerk@c241244d8e7613f6d4eaff7a6686c841444f1ade:contracts/artifacts/context.bundle.v1.schema.json",
+      "reason": "No current runtime consumer was found in the targeted control-plane scan, or the content assigns authority to superseded Leitwerk/ACS/WGX concepts.",
+      "preservation": "historical bytes remain in archived Leitwerk"
+    },
+    {
+      "path": "contracts/artifacts/execution.log.v1.schema.json",
+      "sha256": "3d0f715c8f6b3b76f4a1f307bfe8125b33ff15389a8c72272a3b50fd3b0457ac",
+      "decision": "retire",
+      "destination": "github:heimgewebe/leitwerk@c241244d8e7613f6d4eaff7a6686c841444f1ade:contracts/artifacts/execution.log.v1.schema.json",
+      "reason": "No current runtime consumer was found in the targeted control-plane scan, or the content assigns authority to superseded Leitwerk/ACS/WGX concepts.",
+      "preservation": "historical bytes remain in archived Leitwerk"
+    },
+    {
+      "path": "contracts/artifacts/guard.report.v1.schema.json",
+      "sha256": "f64ce984f4a9f927a6771d67c9a6a0989dfec7a28b7233cba173b0368091b4d1",
+      "decision": "retire",
+      "destination": "github:heimgewebe/leitwerk@c241244d8e7613f6d4eaff7a6686c841444f1ade:contracts/artifacts/guard.report.v1.schema.json",
+      "reason": "No current runtime consumer was found in the targeted control-plane scan, or the content assigns authority to superseded Leitwerk/ACS/WGX concepts.",
+      "preservation": "historical bytes remain in archived Leitwerk"
+    },
+    {
+      "path": "contracts/artifacts/patch.v1.schema.json",
+      "sha256": "2d4d7da33e17a3d4e185db29e2254be901e8a1fabc12f7c531ab30679a3a1b27",
+      "decision": "retire",
+      "destination": "github:heimgewebe/leitwerk@c241244d8e7613f6d4eaff7a6686c841444f1ade:contracts/artifacts/patch.v1.schema.json",
+      "reason": "No current runtime consumer was found in the targeted control-plane scan, or the content assigns authority to superseded Leitwerk/ACS/WGX concepts.",
+      "preservation": "historical bytes remain in archived Leitwerk"
+    },
+    {
+      "path": "contracts/artifacts/plan.v1.schema.json",
+      "sha256": "63261b1b98f62a1a1988536285a65d3c41d0f7b6d6072bc2a52f72a7b078a000",
+      "decision": "retire",
+      "destination": "github:heimgewebe/leitwerk@c241244d8e7613f6d4eaff7a6686c841444f1ade:contracts/artifacts/plan.v1.schema.json",
+      "reason": "No current runtime consumer was found in the targeted control-plane scan, or the content assigns authority to superseded Leitwerk/ACS/WGX concepts.",
+      "preservation": "historical bytes remain in archived Leitwerk"
+    },
+    {
+      "path": "contracts/artifacts/pr.manifest.v1.schema.json",
+      "sha256": "2b463af7b8d157bbf7fc7a8dcaf3eb10e66016bc8b86b3efcd725adb18b38df4",
+      "decision": "retire",
+      "destination": "github:heimgewebe/leitwerk@c241244d8e7613f6d4eaff7a6686c841444f1ade:contracts/artifacts/pr.manifest.v1.schema.json",
+      "reason": "No current runtime consumer was found in the targeted control-plane scan, or the content assigns authority to superseded Leitwerk/ACS/WGX concepts.",
+      "preservation": "historical bytes remain in archived Leitwerk"
+    },
+    {
+      "path": "contracts/artifacts/rationale.v1.schema.json",
+      "sha256": "3bb873412d30ad49ba0ee8ea6aa40231617e39e3096aaacb5f9ec247d7560820",
+      "decision": "retire",
+      "destination": "github:heimgewebe/leitwerk@c241244d8e7613f6d4eaff7a6686c841444f1ade:contracts/artifacts/rationale.v1.schema.json",
+      "reason": "No current runtime consumer was found in the targeted control-plane scan, or the content assigns authority to superseded Leitwerk/ACS/WGX concepts.",
+      "preservation": "historical bytes remain in archived Leitwerk"
+    },
+    {
+      "path": "contracts/artifacts/uncertainty.report.v1.schema.json",
+      "sha256": "a00b98de273e1768f429e9848634fc3cb47451fdaacfdf222870175cf5442abc",
+      "decision": "retire",
+      "destination": "github:heimgewebe/leitwerk@c241244d8e7613f6d4eaff7a6686c841444f1ade:contracts/artifacts/uncertainty.report.v1.schema.json",
+      "reason": "No current runtime consumer was found in the targeted control-plane scan, or the content assigns authority to superseded Leitwerk/ACS/WGX concepts.",
+      "preservation": "historical bytes remain in archived Leitwerk"
+    },
+    {
+      "path": "contracts/events/leitwerk.events.v1.schema.json",
+      "sha256": "2bb9d5c34fa9714efa212e60889a44ae49ca581c0f10f3b1d3efb30c9aada441",
+      "decision": "retire",
+      "destination": "github:heimgewebe/leitwerk@c241244d8e7613f6d4eaff7a6686c841444f1ade:contracts/events/leitwerk.events.v1.schema.json",
+      "reason": "No current runtime consumer was found in the targeted control-plane scan, or the content assigns authority to superseded Leitwerk/ACS/WGX concepts.",
+      "preservation": "historical bytes remain in archived Leitwerk"
+    },
+    {
+      "path": "contracts/fragments/artifact.header.v1.schema.json",
+      "sha256": "de016221907b68833b6f129ef8cba8234cac4cd17a10aa588c484e7837aef2b4",
+      "decision": "retire",
+      "destination": "github:heimgewebe/leitwerk@c241244d8e7613f6d4eaff7a6686c841444f1ade:contracts/fragments/artifact.header.v1.schema.json",
+      "reason": "No current runtime consumer was found in the targeted control-plane scan, or the content assigns authority to superseded Leitwerk/ACS/WGX concepts.",
+      "preservation": "historical bytes remain in archived Leitwerk"
+    },
+    {
+      "path": "docs/agentik.md",
+      "sha256": "3c4a90cde68dc0fcc6db80cd278c924cd2ef668fc8b81733f9acc61514e18753",
+      "decision": "keep",
+      "destination": "github:heimgewebe/leitwerk@c241244d8e7613f6d4eaff7a6686c841444f1ade:docs/agentik.md",
+      "reason": "Historical provenance only; not an active policy or runtime source.",
+      "preservation": "historical bytes remain in archived Leitwerk"
+    },
+    {
+      "path": "docs/begriffe.md",
+      "sha256": "b242547e1c6fab7d70bc081632314d12574792f9c489b9947d6ee0fcd1d61169",
+      "decision": "keep",
+      "destination": "github:heimgewebe/leitwerk@c241244d8e7613f6d4eaff7a6686c841444f1ade:docs/begriffe.md",
+      "reason": "Historical provenance only; not an active policy or runtime source.",
+      "preservation": "historical bytes remain in archived Leitwerk"
+    },
+    {
+      "path": "docs/entscheidungslogik.md",
+      "sha256": "d58bf695daa8921a38b76cd4e852b762b0c9cf6046ee6e55c70dfdd1ec20f615",
+      "decision": "retire",
+      "destination": "github:heimgewebe/leitwerk@c241244d8e7613f6d4eaff7a6686c841444f1ade:docs/entscheidungslogik.md",
+      "reason": "No current runtime consumer was found in the targeted control-plane scan, or the content assigns authority to superseded Leitwerk/ACS/WGX concepts.",
+      "preservation": "historical bytes remain in archived Leitwerk"
+    },
+    {
+      "path": "docs/entwicklung.md",
+      "sha256": "52de2f4b541c66ae34afd37f46d7fdc3bb3c70178d600f080bd7774e24d37edf",
+      "decision": "keep",
+      "destination": "github:heimgewebe/leitwerk@c241244d8e7613f6d4eaff7a6686c841444f1ade:docs/entwicklung.md",
+      "reason": "Historical provenance only; not an active policy or runtime source.",
+      "preservation": "historical bytes remain in archived Leitwerk"
+    },
+    {
+      "path": "docs/grenzen.md",
+      "sha256": "493fb5d2b7e59531d2ce699b2bec3828ebd53a650af8a7a7129849b9e1fee8ad",
+      "decision": "retire",
+      "destination": "github:heimgewebe/leitwerk@c241244d8e7613f6d4eaff7a6686c841444f1ade:docs/grenzen.md",
+      "reason": "No current runtime consumer was found in the targeted control-plane scan, or the content assigns authority to superseded Leitwerk/ACS/WGX concepts.",
+      "preservation": "historical bytes remain in archived Leitwerk"
+    },
+    {
+      "path": "docs/leitwerk-konsum-landkarte.md",
+      "sha256": "58a601fd4d08e7746570c329aad1ee6bca70ca139d3b2a3513cff535d1c52b21",
+      "decision": "retire",
+      "destination": "github:heimgewebe/leitwerk@c241244d8e7613f6d4eaff7a6686c841444f1ade:docs/leitwerk-konsum-landkarte.md",
+      "reason": "No current runtime consumer was found in the targeted control-plane scan, or the content assigns authority to superseded Leitwerk/ACS/WGX concepts.",
+      "preservation": "historical bytes remain in archived Leitwerk"
+    },
+    {
+      "path": "docs/leitwerk-vs-heimgeist.md",
+      "sha256": "bff7d85aa3b5ea8417851a1f4e6bef43e0c5b887a313f8e9adf45aef068af4cf",
+      "decision": "retire",
+      "destination": "github:heimgewebe/leitwerk@c241244d8e7613f6d4eaff7a6686c841444f1ade:docs/leitwerk-vs-heimgeist.md",
+      "reason": "No current runtime consumer was found in the targeted control-plane scan, or the content assigns authority to superseded Leitwerk/ACS/WGX concepts.",
+      "preservation": "historical bytes remain in archived Leitwerk"
+    },
+    {
+      "path": "docs/leitwerk.md",
+      "sha256": "9840d5b4abcba0f8b17eacfd65d2d3fa0bc16ca74deaeaa2abe67031716ec9ce",
+      "decision": "migrate",
+      "destination": "contracts/operator/agent-change-boundaries.v1.json",
+      "reason": "Provider-neutral change-boundary semantics are transferred; Leitwerk-specific authority is not.",
+      "preservation": "source bytes remain in archived Leitwerk history"
+    },
+    {
+      "path": "examples/sample-plan.json",
+      "sha256": "1a9f60dca3affd4a859325c14c7e92a81acce6a9e4f37a9864db2d3fa50cc8bd",
+      "decision": "keep",
+      "destination": "github:heimgewebe/leitwerk@c241244d8e7613f6d4eaff7a6686c841444f1ade:examples/sample-plan.json",
+      "reason": "Historical provenance only; not an active policy or runtime source.",
+      "preservation": "historical bytes remain in archived Leitwerk"
+    },
+    {
+      "path": "examples/sample-pr-manifest.json",
+      "sha256": "5c70c034b92d645b26807a824335ffaf8a02eda42d91dcd528557ff1eff442d0",
+      "decision": "keep",
+      "destination": "github:heimgewebe/leitwerk@c241244d8e7613f6d4eaff7a6686c841444f1ade:examples/sample-pr-manifest.json",
+      "reason": "Historical provenance only; not an active policy or runtime source.",
+      "preservation": "historical bytes remain in archived Leitwerk"
+    },
+    {
+      "path": "examples/sample-sync-note.md",
+      "sha256": "0dc6e0409126c5e60d39d35175fe2bedcdcbe5a2fcae2a270af919eedb7c7b20",
+      "decision": "keep",
+      "destination": "github:heimgewebe/leitwerk@c241244d8e7613f6d4eaff7a6686c841444f1ade:examples/sample-sync-note.md",
+      "reason": "Historical provenance only; not an active policy or runtime source.",
+      "preservation": "historical bytes remain in archived Leitwerk"
+    },
+    {
+      "path": "examples/sample-task.md",
+      "sha256": "ad88e6fe489e8b6140f98b8bd574718d610c6c9634c92986e2a95910b70134df",
+      "decision": "keep",
+      "destination": "github:heimgewebe/leitwerk@c241244d8e7613f6d4eaff7a6686c841444f1ade:examples/sample-task.md",
+      "reason": "Historical provenance only; not an active policy or runtime source.",
+      "preservation": "historical bytes remain in archived Leitwerk"
+    },
+    {
+      "path": "interfaces/acs.md",
+      "sha256": "7b9a40f51dea229d1de5bbcc8d4d6437905c7cc349b7116bd8639080a89ea44b",
+      "decision": "retire",
+      "destination": "github:heimgewebe/leitwerk@c241244d8e7613f6d4eaff7a6686c841444f1ade:interfaces/acs.md",
+      "reason": "No current runtime consumer was found in the targeted control-plane scan, or the content assigns authority to superseded Leitwerk/ACS/WGX concepts.",
+      "preservation": "historical bytes remain in archived Leitwerk"
+    },
+    {
+      "path": "interfaces/agent.md",
+      "sha256": "79c956daa1c4dff44ea9e380f12c27508a444a2b67b399a148339c4b10caded7",
+      "decision": "migrate",
+      "destination": "contracts/operator/agent-change-boundaries.v1.json",
+      "reason": "Provider-neutral change-boundary semantics are transferred; Leitwerk-specific authority is not.",
+      "preservation": "source bytes remain in archived Leitwerk history"
+    },
+    {
+      "path": "interfaces/wgx.md",
+      "sha256": "eb0bc02ec94afba7bb5175e11898de7cec764cfdfa335efc7af7a5354e683849",
+      "decision": "retire",
+      "destination": "github:heimgewebe/leitwerk@c241244d8e7613f6d4eaff7a6686c841444f1ade:interfaces/wgx.md",
+      "reason": "No current runtime consumer was found in the targeted control-plane scan, or the content assigns authority to superseded Leitwerk/ACS/WGX concepts.",
+      "preservation": "historical bytes remain in archived Leitwerk"
+    },
+    {
+      "path": "notes/entscheidungen.md",
+      "sha256": "aaf600fc965c265f1d3a437fb45f7ac66b6fa5047f46372223f6e661d6eb9390",
+      "decision": "keep",
+      "destination": "github:heimgewebe/leitwerk@c241244d8e7613f6d4eaff7a6686c841444f1ade:notes/entscheidungen.md",
+      "reason": "Historical provenance only; not an active policy or runtime source.",
+      "preservation": "historical bytes remain in archived Leitwerk"
+    },
+    {
+      "path": "notes/leitwerk-progress.md",
+      "sha256": "c14cc60b13d05f16db03192922b40bcb47ec759d147fe05917f60de19eb6199c",
+      "decision": "keep",
+      "destination": "github:heimgewebe/leitwerk@c241244d8e7613f6d4eaff7a6686c841444f1ade:notes/leitwerk-progress.md",
+      "reason": "Historical provenance only; not an active policy or runtime source.",
+      "preservation": "historical bytes remain in archived Leitwerk"
+    },
+    {
+      "path": "notes/offene-fragen.md",
+      "sha256": "99156112d329f63a403b4942086a37ada2d0d56f7509c6e10c5237af96f3fff4",
+      "decision": "keep",
+      "destination": "github:heimgewebe/leitwerk@c241244d8e7613f6d4eaff7a6686c841444f1ade:notes/offene-fragen.md",
+      "reason": "Historical provenance only; not an active policy or runtime source.",
+      "preservation": "historical bytes remain in archived Leitwerk"
+    },
+    {
+      "path": "notes/phase-1-checklist.md",
+      "sha256": "16c8ff4a950cdc4200cc30d3ec5c4b41d710364267e4361563d6d032461e6123",
+      "decision": "keep",
+      "destination": "github:heimgewebe/leitwerk@c241244d8e7613f6d4eaff7a6686c841444f1ade:notes/phase-1-checklist.md",
+      "reason": "Historical provenance only; not an active policy or runtime source.",
+      "preservation": "historical bytes remain in archived Leitwerk"
+    },
+    {
+      "path": "notes/risiken.md",
+      "sha256": "0303e24e05f779a8c7f297e188ac0e897427c3551ee0c18927cd4310f360d4aa",
+      "decision": "keep",
+      "destination": "github:heimgewebe/leitwerk@c241244d8e7613f6d4eaff7a6686c841444f1ade:notes/risiken.md",
+      "reason": "Historical provenance only; not an active policy or runtime source.",
+      "preservation": "historical bytes remain in archived Leitwerk"
+    },
+    {
+      "path": "policies/agent-boundaries.md",
+      "sha256": "58fad5eaf6ed9ba1f4c85213589982c8e56d933f027e11b293140b09e236844f",
+      "decision": "migrate",
+      "destination": "contracts/operator/agent-change-boundaries.v1.json",
+      "reason": "Provider-neutral change-boundary semantics are transferred; Leitwerk-specific authority is not.",
+      "preservation": "source bytes remain in archived Leitwerk history"
+    },
+    {
+      "path": "policies/invariants.md",
+      "sha256": "700cf15e1978d7bb3e6a8d2aee9557c07c95f77fb7ea01041a1a5c6dd5b18e63",
+      "decision": "migrate",
+      "destination": "contracts/operator/agent-change-boundaries.v1.json",
+      "reason": "Provider-neutral change-boundary semantics are transferred; Leitwerk-specific authority is not.",
+      "preservation": "source bytes remain in archived Leitwerk history"
+    },
+    {
+      "path": "policies/write-gates.md",
+      "sha256": "19497413a0a6703902ee73fc6fa76ef1908df43d768ddf2812a8fcf1818c957a",
+      "decision": "migrate",
+      "destination": "contracts/operator/agent-change-boundaries.v1.json",
+      "reason": "Provider-neutral change-boundary semantics are transferred; Leitwerk-specific authority is not.",
+      "preservation": "source bytes remain in archived Leitwerk history"
+    },
+    {
+      "path": "scripts/guard_contracts_mirror.sh",
+      "sha256": "4eaee7ffbd7bc25b889e17f3c781965f023d03dd1493f720736fe3bc33a90ea6",
+      "decision": "retire",
+      "destination": "github:heimgewebe/leitwerk@c241244d8e7613f6d4eaff7a6686c841444f1ade:scripts/guard_contracts_mirror.sh",
+      "reason": "No current runtime consumer was found in the targeted control-plane scan, or the content assigns authority to superseded Leitwerk/ACS/WGX concepts.",
+      "preservation": "historical bytes remain in archived Leitwerk"
+    },
+    {
+      "path": "scripts/test_guard_contracts_mirror_functions.sh",
+      "sha256": "ad4247928b562966646eaac69737f18fc75a98442a6a109fcd1bf1931c8e9f44",
+      "decision": "retire",
+      "destination": "github:heimgewebe/leitwerk@c241244d8e7613f6d4eaff7a6686c841444f1ade:scripts/test_guard_contracts_mirror_functions.sh",
+      "reason": "No current runtime consumer was found in the targeted control-plane scan, or the content assigns authority to superseded Leitwerk/ACS/WGX concepts.",
+      "preservation": "historical bytes remain in archived Leitwerk"
+    }
+  ],
+  "counts": {
+    "files": 40,
+    "keep": 14,
+    "migrate": 5,
+    "retire": 21,
+    "remote_branches": 24
+  },
+  "archive_gates": [
+    "canonical contract merged and green in Metarepo",
+    "Leitwerk freeze notice merged and green",
+    "no open Leitwerk pull request",
+    "no active Leitwerk lease or consumer",
+    "GitHub archive readback confirms archived=true",
+    "Systemkatalog and Bureau projections updated after archival"
+  ],
+  "does_not_establish": [
+    "runtime absence outside the targeted consumer scan",
+    "permission to delete historical branches",
+    "automatic authority inheritance by Bureau, Grabowski or Konvergenzregelkreis",
+    "archive completion before GitHub readback"
+  ]
+}

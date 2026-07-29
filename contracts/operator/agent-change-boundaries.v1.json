@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "kind": "agent_change_boundaries",
+  "id": "urn:heimgewebe:contracts:operator:agent-change-boundaries:v1",
+  "status": "active",
+  "authority": {
+    "owner": "repo:metarepo",
+    "domain": "shared_contracts",
+    "source": "contracts/operator/agent-change-boundaries.v1.json"
+  },
+  "purpose": "Provider-neutral boundary between agent proposals and repository or runtime effects.",
+  "principles": [
+    {
+      "id": "proposal-not-effect",
+      "requirement": "Agent output is proposal and evidence until a separately authorized, owner-bound execution path applies an effect."
+    },
+    {
+      "id": "isolated-repository-change",
+      "requirement": "Repository changes use an isolated branch or worktree and never write directly to a protected default branch."
+    },
+    {
+      "id": "gate-precedence",
+      "requirement": "Current repository policy, CI, review and safety gates outrank agent preference and historical documentation."
+    },
+    {
+      "id": "evidence-bound-effect",
+      "requirement": "A mutation records exact scope, relevant pre-state, revision-bound review evidence and authoritative post-state readback."
+    },
+    {
+      "id": "ambiguous-outcome-fails-closed",
+      "requirement": "Transport failure or an ambiguous mutation result is not reported as success until authoritative readback proves the effect."
+    },
+    {
+      "id": "material-uncertainty-explicit",
+      "requirement": "Material uncertainty, missing evidence and interpolation are explicit; absence of evidence is not evidence of success."
+    }
+  ],
+  "truth_ownership": [
+    {
+      "domain": "tasks_claims_completion",
+      "owner": "repo:bureau"
+    },
+    {
+      "domain": "local_execution_leases_recovery",
+      "owner": "repo:grabowski"
+    },
+    {
+      "domain": "repositories_branches_pull_requests_reviews",
+      "owner": "github"
+    },
+    {
+      "domain": "technical_checks",
+      "owner": "ci_and_repository_gates"
+    },
+    {
+      "domain": "ecosystem_semantics",
+      "owner": "repo:systemkatalog"
+    },
+    {
+      "domain": "event_history",
+      "owner": "repo:chronik"
+    }
+  ],
+  "legacy_migration": {
+    "source_repository": "heimgewebe/leitwerk",
+    "source_commit": "c241244d8e7613f6d4eaff7a6686c841444f1ade",
+    "source_inventory": "docs/archive/leitwerk-normative-freeze.v1.json",
+    "migrated_semantic_sources": [
+      "docs/leitwerk.md",
+      "policies/invariants.md",
+      "policies/agent-boundaries.md",
+      "policies/write-gates.md",
+      "interfaces/agent.md"
+    ],
+    "migration_rule": "Only the provider-neutral change boundaries above survive. Leitwerk-specific runtime, WGX, ACS, agent-dispatch, event and artifact-schema authority is retired."
+  },
+  "does_not_establish": [
+    "leitwerk_runtime_authority",
+    "leitwerk_policy_authority",
+    "leitwerk_task_or_claim_authority",
+    "automatic_agent_execution",
+    "automatic_commit_or_merge",
+    "automatic_authority_transfer_to_bureau",
+    "automatic_authority_transfer_to_grabowski",
+    "automatic_authority_transfer_to_konvergenzregelkreis",
+    "replacement_for_repository_specific_policy_or_gates"
+  ]
+}
