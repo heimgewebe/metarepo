@@ -140,7 +140,7 @@ jobs:
 
             // Archivierte Repositories bleiben auch dann gesperrt, wenn eine
             // Repository-Variable sie versehentlich wieder in die Whitelist aufnimmt.
-            const archivedRepos = new Set(["heimlern"]);
+            const archivedRepos = new Set(["heimlern", "leitwerk"]);
             if (archivedRepos.has(targetRepo)) {
               await reply(
                 `⚠️ Das Ziel-Repo **${targetRepo}** ist eine archivierte Referenz ohne Dispatch-Autorität.\n\n` +
