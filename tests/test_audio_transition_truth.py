@@ -119,5 +119,6 @@ def test_audit_is_revision_bound_and_classifies_every_current_reference() -> Non
         "docs/vision/heimgewebe-v2-detailed.md",
         "docs/repo-matrix.md",
         "docs/_generated/fleet.md",
+        "Makefile",
     }
     assert required <= paths

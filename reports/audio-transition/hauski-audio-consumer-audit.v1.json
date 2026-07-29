@@ -97,6 +97,11 @@
       "path": "docs/_generated/fleet.md",
       "class": "generated-fleet-view",
       "decision": "regenerate with historical donor classification"
+    },
+    {
+      "path": "Makefile",
+      "class": "operator-cli-compatibility-surface",
+      "decision": "migrate fleet and matrix targets to canonical Fleet CLI options; retain make and just parity"
     }
   ],
   "truth_boundaries": {
