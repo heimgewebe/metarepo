@@ -18,8 +18,32 @@ if [ ! -f "$GENERATED_FILE" ]; then
 fi
 
 ORIGINAL=$(mktemp)
-trap 'rm -f "$ORIGINAL"' EXIT
+BACKUP_READY=0
+
+# Invoked indirectly by the EXIT trap below.
+# shellcheck disable=SC2317
+restore_generated_file() {
+  rc=$?
+  trap - EXIT
+
+  if [ "$BACKUP_READY" -eq 1 ] && { [ ! -f "$GENERATED_FILE" ] || ! cmp -s "$ORIGINAL" "$GENERATED_FILE"; }; then
+    if ! cp "$ORIGINAL" "$GENERATED_FILE"; then
+      echo "❌ Failed to restore $GENERATED_FILE after drift check." >&2
+      rc=1
+    fi
+  fi
+
+  if ! rm -f "$ORIGINAL"; then
+    echo "❌ Failed to remove temporary drift-check backup." >&2
+    rc=1
+  fi
+
+  exit "$rc"
+}
+
+trap restore_generated_file EXIT
 cp "$GENERATED_FILE" "$ORIGINAL"
+BACKUP_READY=1
 
 python3 "$GENERATOR" > /dev/null
 
@@ -27,7 +51,6 @@ if ! cmp -s "$GENERATED_FILE" "$ORIGINAL"; then
   echo "❌ Drift detected in $GENERATED_FILE. Content does not match fleet/repos.yml."
   echo "Diff (committed/current -> generated):"
   diff -u "$ORIGINAL" "$GENERATED_FILE" || true
-  cp "$ORIGINAL" "$GENERATED_FILE"
   exit 1
 fi
 
