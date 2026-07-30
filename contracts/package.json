@@ -13,7 +13,7 @@
     "README.md"
   ],
   "scripts": {
-    "validate": "ajv compile -s '**/*.schema.json' -r '**/*.schema.json' -c ajv-formats --spec=draft2020 --strict=log"
+    "validate": "bash ../scripts/validate-contracts.sh"
   },
   "keywords": [
     "heimgewebe",
@@ -23,7 +23,7 @@
   "author": "Heimgewebe Fleet",
   "license": "MIT",
   "devDependencies": {
-    "ajv-cli": "^5.0.0",
-    "ajv-formats": "^3.0.1"
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1"
   }
 }

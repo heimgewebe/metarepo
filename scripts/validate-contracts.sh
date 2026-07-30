@@ -1,12 +1,19 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+ROOT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+cd "$ROOT_DIR"
+
 if [[ ! -d contracts ]]; then
   echo "contracts directory not found – nothing to validate"
   exit 0
 fi
 if ! command -v npm > /dev/null 2>&1; then
   echo "::error::npm is required to validate contracts"
+  exit 1
+fi
+if ! command -v node > /dev/null 2>&1; then
+  echo "::error::node is required to validate contracts"
   exit 1
 fi
 
@@ -16,34 +23,49 @@ if ! command -v python3 > /dev/null 2>&1; then
 fi
 python3 scripts/check-contract-json.py contracts
 
-# --- Optimization: Setup local AJV ---
+# --- Setup direct AJV runtime ---
 echo "::group::Setup Validator"
 # Robust mktemp for Linux/macOS/BSD
 TMP_DIR=$(mktemp -d 2> /dev/null || mktemp -d -t 'ajv')
 trap 'rm -rf "$TMP_DIR"' EXIT
 
-echo "Installing ajv-cli@5 and ajv-formats..."
+AJV_VERSION=8.20.0
+AJV_FORMATS_VERSION=3.0.1
+AJV_MODULES="$TMP_DIR/node_modules"
+AJV_RUNNER="$ROOT_DIR/scripts/contracts/ajv_validate.cjs"
+AJV_PACKAGE_JSON="$ROOT_DIR/contracts/package.json"
+AJV_PACKAGE_LOCK="$ROOT_DIR/contracts/package-lock.json"
+
+for validator_input in "$AJV_RUNNER" "$AJV_PACKAGE_JSON" "$AJV_PACKAGE_LOCK"; do
+  if [[ ! -f "$validator_input" ]]; then
+    echo "::error::Required validator input not found at $validator_input"
+    exit 1
+  fi
+done
+
+echo "Installing lock-bound AJV runtime..."
+cp "$AJV_PACKAGE_JSON" "$TMP_DIR/package.json"
+cp "$AJV_PACKAGE_LOCK" "$TMP_DIR/package-lock.json"
 # --loglevel error suppresses warnings but keeps errors
 # --ignore-scripts prevents execution of malicious/unnecessary lifecycle scripts
 # --no-fund hides funding messages
-# --no-package-lock prevents lockfile generation (IO reduction)
-# Pinned versions: ajv-cli@5.0.0, ajv-formats@3.0.1 (ensure determinism)
-if ! npm install --prefix "$TMP_DIR" --no-save --no-audit --ignore-scripts --no-fund --no-package-lock --loglevel error ajv-cli@5.0.0 ajv-formats@3.0.1; then
-  echo "::error::Failed to install ajv-cli"
+if ! npm ci --prefix "$TMP_DIR" --no-audit --ignore-scripts --no-fund --loglevel error; then
+  echo "::error::Failed to install lock-bound AJV runtime"
   exit 1
 fi
 
-AJV="$TMP_DIR/node_modules/.bin/ajv"
-if [[ ! -x "$AJV" ]]; then
-  echo "::error::Validator binary not found or not executable at $AJV"
+actual_ajv=$(node -p 'require(process.argv[1]).version' "$AJV_MODULES/ajv/package.json")
+actual_formats=$(node -p 'require(process.argv[1]).version' "$AJV_MODULES/ajv-formats/package.json")
+if [[ "$actual_ajv" != "$AJV_VERSION" || "$actual_formats" != "$AJV_FORMATS_VERSION" ]]; then
+  echo "::error::Installed AJV runtime does not match pinned versions"
+  echo "Expected ajv=$AJV_VERSION ajv-formats=$AJV_FORMATS_VERSION"
+  echo "Found ajv=$actual_ajv ajv-formats=$actual_formats"
   exit 1
 fi
 
-echo "Validator installed at $AJV"
-# ajv-cli v5 does not support --version, so we list the package instead
-npm list --prefix "$TMP_DIR" ajv-cli --depth=0 || true
+echo "Direct validator ready: ajv=$actual_ajv ajv-formats=$actual_formats"
 echo "::endgroup::"
-# -------------------------------------
+# ----------------------------------
 
 shopt -s nullglob globstar 2> /dev/null || true
 
@@ -108,14 +130,13 @@ else
       fi
     done
 
-    # Construct args array
-    args=("--strict=log" "--spec=draft2020" "-c" "ajv-formats" "-s" "${schema}")
+    # Construct args array for the direct, pinned AJV runner.
+    args=("compile" "--modules" "$AJV_MODULES" "--strict" "log" "--schema" "${schema}")
     for r in "${refs[@]}"; do
-      args+=("-r" "$r")
+      args+=("--ref" "$r")
     done
 
-    # Optimized: use local AJV binary
-    if ! output=$("$AJV" compile "${args[@]}" 2>&1); then
+    if ! output=$(node "$AJV_RUNNER" "${args[@]}" 2>&1); then
       echo "::error::Validation failed for schema: ${schema}"
       echo "Command args: ${args[*]}"
       echo "$output"
@@ -231,13 +252,12 @@ else
         fi
       done
 
-      args=("--strict=false" "--spec=draft2020" "-c" "ajv-formats" "-s" "${schema}" "-d" "${example}")
+      args=("validate" "--modules" "$AJV_MODULES" "--strict" "false" "--schema" "${schema}" "--data" "${example}")
       for r in "${refs[@]}"; do
-        args+=("-r" "$r")
+        args+=("--ref" "$r")
       done
 
-      # Optimized call
-      "$AJV" validate "${args[@]}"
+      node "$AJV_RUNNER" "${args[@]}"
     else
       echo "::notice::No matching schema found for $example (searched contracts/**/${filename}.schema.json)"
     fi
@@ -287,13 +307,12 @@ if ((${#fixtures[@]} > 0)); then
         fi
       done
 
-      args=("--strict=log" "--spec=draft2020" "-c" "ajv-formats" "--errors=line" "--all-errors" "-s" "${schema}" "-d" "${fixture}")
+      args=("validate" "--modules" "$AJV_MODULES" "--strict" "log" "--all-errors" "--schema" "${schema}" "--data" "${fixture}")
       for r in "${refs[@]}"; do
-        args+=("-r" "$r")
+        args+=("--ref" "$r")
       done
 
-      # Optimized call
-      "$AJV" validate "${args[@]}"
+      node "$AJV_RUNNER" "${args[@]}"
     elif ((${#found[@]} > 1)); then
       echo "::error::Ambiguous schema match for ${fixture}. Found multiple candidates:"
       printf '  - %s\n' "${found[@]}"
