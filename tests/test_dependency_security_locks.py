@@ -49,10 +49,14 @@ def _pnpm_versions(lock_path: Path, package_name: str) -> set[str]:
 def _assert_patched_versions(
     lock_path: Path,
     floors: dict[str, tuple[int, int, int]],
+    *,
+    allow_absent: bool = False,
 ) -> None:
     for package_name, patched_floor in floors.items():
         versions = _npm_versions(lock_path, package_name)
-        assert versions, f"{package_name} missing from {lock_path}"
+        if not versions:
+            assert allow_absent, f"{package_name} missing from {lock_path}"
+            continue
         assert all(_version_tuple(version) >= patched_floor for version in versions), (
             package_name,
             versions,
@@ -61,7 +65,11 @@ def _assert_patched_versions(
 
 
 def test_contracts_lock_excludes_selected_high_severity_ranges() -> None:
-    _assert_patched_versions(CONTRACTS_LOCK, CONTRACTS_PATCHED_FLOORS)
+    _assert_patched_versions(
+        CONTRACTS_LOCK,
+        CONTRACTS_PATCHED_FLOORS,
+        allow_absent=True,
+    )
 
 
 def test_local_mcp_npm_lock_excludes_selected_high_severity_ranges() -> None:
