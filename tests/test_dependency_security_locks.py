@@ -40,7 +40,7 @@ def _npm_versions(lock_path: Path, package_name: str) -> set[str]:
 def _pnpm_versions(lock_path: Path, package_name: str) -> set[str]:
     text = lock_path.read_text(encoding="utf-8")
     pattern = re.compile(
-        rf"^  {re.escape(package_name)}@(\d+\.\d+\.\d+):$",
+        rf"^  '?{re.escape(package_name)}@(\d+\.\d+\.\d+)'?:$",
         re.MULTILINE,
     )
     return set(pattern.findall(text))
@@ -76,3 +76,13 @@ def test_local_mcp_npm_and_pnpm_locks_resolve_same_security_versions() -> None:
         assert pnpm_versions, f"{package_name} missing from {LOCAL_MCP_PNPM_LOCK}"
         assert npm_versions == pnpm_versions
         assert all(_version_tuple(version) >= patched_floor for version in pnpm_versions)
+
+
+def test_local_mcp_locks_preserve_node_18_server_compatibility() -> None:
+    package_name = "@hono/node-server"
+    npm_versions = _npm_versions(LOCAL_MCP_NPM_LOCK, package_name)
+    pnpm_versions = _pnpm_versions(LOCAL_MCP_PNPM_LOCK, package_name)
+
+    assert npm_versions == pnpm_versions
+    assert npm_versions
+    assert all(_version_tuple(version) < (2, 0, 0) for version in npm_versions)
