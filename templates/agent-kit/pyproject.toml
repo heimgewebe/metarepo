@@ -5,10 +5,11 @@ description = "LangGraph-basierter Agent-Skeleton für heimgewebe"
 requires-python = ">=3.11"
 dependencies = [
   # Pins are aligned with Python 3.11 support in LangGraph/LangChain; the lockfile captures the
-  # exact resolution while keeping the template lightweight.
+  # exact resolution while keeping the template lightweight. The langchain-core floor excludes
+  # GHSA-c67j-w6g6-q2cm / CVE-2025-68664.
   "langgraph==0.2.32",
-  "langchain==0.3.7",
-  "langchain-core<0.4.0",
+  "langchain==0.3.30",
+  "langchain-core>=0.3.81,<0.4.0",
   "pydantic>=2.6,<3",
 ]
 
