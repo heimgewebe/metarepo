@@ -74,7 +74,7 @@ Die früheren Organismus-, Zielbild-, Rollen- und Diagrammdokumente sind keine a
 
 - Fremde Dirty-States, Worktrees, Branches, Prozesse und Leases nie resetten oder übernehmen.
 - Änderungen in einem isolierten, sauberen Worktree ausführen.
-- Vor nichttrivialem Merge vollständigen Diff bereitstellen und an Head sowie Diff-SHA-256 binden.
+- Vor nichttrivialem Merge den exakten Head intern an vollständigen Diff-SHA-256, Review und grüne Pflichtchecks binden. Ein benutzerseitiges Diff-Artefakt ist optional und nur auf ausdrücklichen Wunsch oder bei begründetem Sonderrisiko bereitzustellen.
 - Kein Shared Asset ohne belegte Consumer-Auswirkung mergen.
 - Keine Secrets in Templates, Fixtures, Reports oder Workflow-Ausgaben schreiben.
 
