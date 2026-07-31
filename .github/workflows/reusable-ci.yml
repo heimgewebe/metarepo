@@ -21,6 +21,11 @@ defaults:
         required: false
         default: true
         type: boolean
+      just_version:
+        description: "Exact Just version for callers without a repository-local pin"
+        required: false
+        default: "1.43.0"
+        type: string
 
 jobs:
   reusable-ci:
@@ -30,11 +35,28 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Setup Just
+      - name: Setup Just from caller repository pin
+        if: ${{ hashFiles('scripts/tools/just-pin.sh') != '' && hashFiles('scripts/lib/semver.sh') != '' && hashFiles('scripts/lib/installer.bash') != '' && hashFiles('toolchain.versions.yml') != '' }}
         run: |
           chmod +x scripts/tools/just-pin.sh
           scripts/tools/just-pin.sh ensure
           echo "${PWD}/tools/bin" >> "$GITHUB_PATH"
+
+      - name: Verify preinstalled Just in Agent Mode
+        if: ${{ !(hashFiles('scripts/tools/just-pin.sh') != '' && hashFiles('scripts/lib/semver.sh') != '' && hashFiles('scripts/lib/installer.bash') != '' && hashFiles('toolchain.versions.yml') != '') && env.AGENT_MODE != '' }}
+        run: |
+          command -v just >/dev/null
+          actual_version="$(just --version | awk '{print $2}')"
+          test "$actual_version" = "${{ inputs.just_version }}" || {
+            echo "::error::Just version mismatch: expected ${{ inputs.just_version }}, got $actual_version"
+            exit 1
+          }
+
+      - name: Setup Just fallback
+        if: ${{ !(hashFiles('scripts/tools/just-pin.sh') != '' && hashFiles('scripts/lib/semver.sh') != '' && hashFiles('scripts/lib/installer.bash') != '' && hashFiles('toolchain.versions.yml') != '') && env.AGENT_MODE == '' }}
+        uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3  # v4.0.0
+        with:
+          just-version: ${{ inputs.just_version }}
 
       - name: Install Dependencies (optional)
         if: ${{ env.AGENT_MODE == '' }}
