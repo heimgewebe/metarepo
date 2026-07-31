@@ -6,6 +6,7 @@ Minimaler Multi-Agent-Skeleton mit LangGraph für heimgewebe-Repos.
 - Lokaler, reproduzierbarer Start mit `uv`.
 - Klarer State-Graph: **supervisor → spezial-Agenten → tools**.
 - Tool-Calls über strikt definierte JSON-Contracts (`contracts/*.schema.json`).
+- Checkpoint-Persistenz ist standardmäßig deaktiviert; Aktivierung erfordert eine separat geprüfte Serializer- und Vertrauensgrenzen-Policy.
 
 ## Quickstart
 ```bash
