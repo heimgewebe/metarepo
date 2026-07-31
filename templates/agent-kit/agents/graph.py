@@ -12,10 +12,12 @@ except ModuleNotFoundError:  # Lightweight fallback so the template is runnable 
             entry: str,
             nodes: Dict[str, Callable[["AssistantState"], Dict[str, Any]]],
             conditional_edges: Dict[str, tuple[Callable[["AssistantState"], str], Dict[str, str]]],
+            checkpointer: object | None,
         ) -> None:
             self._entry = entry
             self._nodes = nodes
             self._edges = conditional_edges
+            self.checkpointer = checkpointer
 
         def invoke(self, state: "AssistantState") -> Dict[str, Any]:
             current = self._entry
@@ -61,10 +63,12 @@ except ModuleNotFoundError:  # Lightweight fallback so the template is runnable 
         def set_entry_point(self, name: str):
             self._entry = name
 
-        def compile(self) -> _CompiledGraph:
+        def compile(self, *, checkpointer: object | None = None) -> _CompiledGraph:
             if self._entry is None:
                 raise ValueError("entry point not set")
-            return _CompiledGraph(self._entry, self._nodes, self._edges)
+            if checkpointer is not None:
+                raise ValueError("fallback graph does not support checkpoint persistence")
+            return _CompiledGraph(self._entry, self._nodes, self._edges, checkpointer)
 
 from .state import AssistantState
 from .tools import _require
@@ -111,7 +115,9 @@ def build_graph():
         "done": END,
     })
     g.set_entry_point("supervisor")
-    return g.compile()
+    # Checkpoint persistence is deliberately disabled. Enabling it requires a separately
+    # reviewed serializer and trust-boundary policy rather than LangGraph defaults.
+    return g.compile(checkpointer=None)
 
 
 if __name__ == "__main__":

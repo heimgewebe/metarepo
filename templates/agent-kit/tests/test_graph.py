@@ -6,6 +6,11 @@ def test_build_graph_compiles():
     assert graph is not None
 
 
+def test_checkpoint_persistence_is_disabled_by_default():
+    graph = build_graph()
+    assert graph.checkpointer is None
+
+
 def test_supervisor_registered_node():
     graph = build_graph()
     out = graph.invoke({"messages": [], "current_task": ""})
