@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608  # v4.1.0
 
       - name: Setup Node
-        uses: actions/setup-node@5e221d4786ffb21088b21dfc9c80efb16b52cd3b  # v4.0.2
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8  # v4.0.2
 
       - name: Install tools
         if: ${{ env.AGENT_MODE == '' }}
