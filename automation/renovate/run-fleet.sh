@@ -5,6 +5,21 @@ RENOVATE_VERSION="42.99.0"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONFIG_FILE="${SCRIPT_DIR}/runtime-config.cjs"
 NPX_BIN="${RENOVATE_NPX_BIN:-/usr/bin/npx}"
+DEFAULT_TOOL_PATH="${HOME}/.cargo/bin:${HOME}/.local/bin:${HOME}/.bun/bin:/usr/local/bin:/usr/bin:/bin"
+export PATH="${RENOVATE_TOOL_PATH:-${DEFAULT_TOOL_PATH}}"
+
+RUNTIME_DIR="${RENOVATE_XDG_RUNTIME_DIR:-${XDG_RUNTIME_DIR:-/run/user/$(id -u)}}"
+if [[ -d "${RUNTIME_DIR}" ]]; then
+  export XDG_RUNTIME_DIR="${RUNTIME_DIR}"
+  export DBUS_SESSION_BUS_ADDRESS="unix:path=${RUNTIME_DIR}/bus"
+fi
+
+# Renovate runs in fresh clones. Host-wide hooks are workstation policy for
+# interactive checkouts and must not interfere with the bot's own branch
+# lifecycle, especially remote branch cleanup.
+export GIT_CONFIG_COUNT=1
+export GIT_CONFIG_KEY_0=core.hooksPath
+export GIT_CONFIG_VALUE_0=/dev/null
 
 command -v gh > /dev/null 2>&1 || {
   echo "gh is required" >&2
