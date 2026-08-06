@@ -21,12 +21,12 @@ export GIT_CONFIG_COUNT=1
 export GIT_CONFIG_KEY_0=core.hooksPath
 export GIT_CONFIG_VALUE_0=/dev/null
 
-command -v gh > /dev/null 2>&1 || {
-  echo "gh is required" >&2
-  exit 2
-}
 [[ "${NPX_BIN}" == /* && -x "${NPX_BIN}" ]] || {
   echo "RENOVATE_NPX_BIN must name an executable absolute path: ${NPX_BIN}" >&2
+  exit 2
+}
+command -v gh > /dev/null 2>&1 || {
+  echo "gh is required" >&2
   exit 2
 }
 [[ -f "${CONFIG_FILE}" ]] || {
