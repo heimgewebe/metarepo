@@ -62,6 +62,7 @@ jobs:
         shell: bash
         env:
           VERIFY_MODE: ${{ inputs.mode }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           runner="$GITHUB_WORKSPACE/.repo-verification-runner/wgx"

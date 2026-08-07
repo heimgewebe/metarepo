@@ -55,5 +55,12 @@ def test_reusable_workflow_is_policy_owner_not_wgx_workflow_proxy() -> None:
     )
     assert "repository: heimgewebe/wgx" in workflow
     assert "heimgewebe/wgx/.github/workflows/" not in workflow
+
+
+def test_reusable_workflow_passes_read_token_to_repository_verifier() -> None:
+    workflow = (ROOT / ".github" / "workflows" / "reusable-repo-verify.yml").read_text(
+        encoding="utf-8"
+    )
+    assert "GITHUB_TOKEN: ${{ github.token }}" in workflow
     assert "guard|smoke" in workflow
     assert "quick|full" in workflow
