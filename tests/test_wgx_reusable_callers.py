@@ -3,6 +3,11 @@ from pathlib import Path
 from scripts.ci.check_wgx_reusable_callers import WGX_RUNNER_REF, check_callers
 
 ROOT = Path(__file__).resolve().parents[1]
+METAREPO_VERIFY_REF = "65db582ee20fe77c49cc052be14b4fe3349eed57"
+METAREPO_VERIFY_USES = (
+    "uses: heimgewebe/metarepo/.github/workflows/reusable-repo-verify.yml@"
+    f"{METAREPO_VERIFY_REF}"
+)
 
 
 def _write_workflows(root: Path, *, guard: str, smoke: str, reusable: str) -> None:
@@ -23,6 +28,16 @@ def _good_reusable() -> str:
 
 def test_repository_wgx_callers_match_declared_contracts() -> None:
     assert check_callers(ROOT) == []
+
+
+def test_metarepo_templates_do_not_reintroduce_wgx_workflow_ownership() -> None:
+    templates = ROOT / "templates" / ".github" / "workflows"
+    for filename, mode in (("wgx-guard.yml", "guard"), ("wgx-smoke.yml", "smoke")):
+        text = (templates / filename).read_text(encoding="utf-8")
+        assert METAREPO_VERIFY_USES in text
+        assert f"mode: {mode}" in text
+        assert "heimgewebe/wgx/.github/workflows/" not in text
+        assert "@main" not in text
 
 
 def test_direct_wgx_workflow_ownership_is_rejected(tmp_path: Path) -> None:
