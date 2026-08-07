@@ -7,8 +7,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-WGX_GUARD_MERGE = "3d823f9d26be276eef97742335dee857a64e1715"
-VERIFIED_WGX_SMOKE_MERGE = "b3b358f5bb8d26f087fcdaf25d308d439b22f583"
+WGX_GUARD_MERGE = "a1c1cc6daf07cf23ade1d3e02ae5551fcf6641e2"
+VERIFIED_WGX_SMOKE_MERGE = "a1c1cc6daf07cf23ade1d3e02ae5551fcf6641e2"
 
 
 def check_callers(root: Path = ROOT) -> list[str]:
