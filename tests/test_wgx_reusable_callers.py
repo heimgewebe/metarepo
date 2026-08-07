@@ -40,6 +40,13 @@ def test_metarepo_templates_do_not_reintroduce_wgx_workflow_ownership() -> None:
         assert "@main" not in text
 
 
+def test_metarepo_smoke_template_self_triggers_workflow_changes() -> None:
+    smoke = (
+        ROOT / "templates" / ".github" / "workflows" / "wgx-smoke.yml"
+    ).read_text(encoding="utf-8")
+    assert '- ".github/workflows/wgx-smoke.yml"' in smoke
+
+
 def test_direct_wgx_workflow_ownership_is_rejected(tmp_path: Path) -> None:
     _write_workflows(
         tmp_path,
