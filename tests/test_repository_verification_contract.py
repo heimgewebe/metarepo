@@ -38,6 +38,17 @@ def test_active_and_template_profiles_match_contract() -> None:
         assert "smoke" in tasks
 
 
+def test_metarepo_guard_is_deterministic_and_repo_owned() -> None:
+    payload = yaml.safe_load((ROOT / ".wgx" / "profile.yml").read_text(encoding="utf-8"))
+    guard = payload["wgx"]["tasks"]["guard"]
+    assert "scripts/ci/check_wgx_reusable_callers.py" in guard
+    assert "scripts/check-contracts-index.sh" in guard
+    assert "git diff --check" in guard
+    assert "command -v" not in guard
+    assert "yamllint ." not in guard
+    assert ".repo-verification-runner" not in guard
+
+
 def test_reusable_workflow_is_policy_owner_not_wgx_workflow_proxy() -> None:
     workflow = (ROOT / ".github" / "workflows" / "reusable-repo-verify.yml").read_text(
         encoding="utf-8"

@@ -30,28 +30,11 @@ wgx:
       echo "All workflows valid."
 
     guard: |
-      echo "Running meta-guard checks..."
-      if [ -x "wgx/guards/decision-preimage.bash" ]; then
-        echo "Running decision-preimage guard (warn-only)..."
-        ./wgx/guards/decision-preimage.bash || true
-      else
-        echo "decision-preimage guard not found; skipping."
-      fi
-
-      if command -v shellcheck >/dev/null 2>&1; then
-        echo "Running shellcheck on wgx/**/*.bash..."
-        shellcheck -s bash wgx/**/*.bash || exit 1
-      else
-        echo "shellcheck not found; skipping shell lint."
-      fi
-
-      if command -v yamllint >/dev/null 2>&1; then
-        echo "Running yamllint..."
-        yamllint . || exit 1
-      else
-        echo "yamllint not found; skipping YAML lint."
-      fi
-
+      set -euo pipefail
+      echo "Running deterministic Metarepo verification guard..."
+      python3 scripts/ci/check_wgx_reusable_callers.py
+      bash scripts/check-contracts-index.sh
+      git diff --check
       echo "Guard OK."
 
     metrics: |
