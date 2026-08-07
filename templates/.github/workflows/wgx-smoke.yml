@@ -7,6 +7,7 @@ name: wgx-smoke
     paths:
       - ".wgx/**"
       - "docs/wgx-konzept.md"
+      - ".github/workflows/wgx-smoke.yml"
 
 permissions:
   contents: read
