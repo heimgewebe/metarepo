@@ -1,0 +1,15 @@
+{
+  "wgx": {
+    "apiVersion": "v1",
+    "requiredWgx": "^2.0",
+    "repoKind": "generic",
+    "validate": {
+      "quick": ["smoke"],
+      "full": ["guard", "smoke"]
+    },
+    "tasks": {
+      "guard": "git diff --check",
+      "smoke": "git rev-parse --is-inside-work-tree >/dev/null"
+    }
+  }
+}

@@ -1,0 +1,115 @@
+---
+name: Reusable repository verification
+
+"on":
+  workflow_call:
+    inputs:
+      mode:
+        description: "Verification mode: guard, smoke, quick, or full."
+        required: false
+        type: string
+        default: guard
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout target repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          persist-credentials: false
+
+      - name: Checkout pinned verification runner
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          repository: heimgewebe/wgx
+          ref: 03da8c71fa5bb30827a1a8e91e2a48bacaf3140c
+          path: .repo-verification-runner
+          persist-credentials: false
+
+      - name: Setup Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+        with:
+          python-version: "3.12"
+
+      - name: Install hash-bound profile parser dependency
+        shell: bash
+        run: |
+          set -euo pipefail
+          requirements_file="${RUNNER_TEMP}/repo-verification-requirements.txt"
+          cat >"$requirements_file" <<'EOF'
+          PyYAML==6.0.3 \
+            --hash=sha256:ba1cc08a7ccde2d2ec775841541641e4548226580ab850948cbfda66a1befcdc
+          EOF
+          python3 -m pip install \
+            --disable-pip-version-check \
+            --only-binary=:all: \
+            --require-hashes \
+            --requirement "$requirements_file"
+
+      - name: Validate profile contract through pinned runner
+        shell: bash
+        run: |
+          set -euo pipefail
+          chmod +x .repo-verification-runner/wgx .repo-verification-runner/cli/wgx
+          .repo-verification-runner/wgx validate
+
+      - name: Execute repository-owned verification front door
+        shell: bash
+        env:
+          VERIFY_MODE: ${{ inputs.mode }}
+        run: |
+          set -euo pipefail
+          runner="$GITHUB_WORKSPACE/.repo-verification-runner/wgx"
+          export WGX_TARGET_ROOT="$GITHUB_WORKSPACE"
+
+          case "$VERIFY_MODE" in
+            guard|smoke)
+              tasks_json="$($runner tasks --json)"
+              has_task() {
+                TASKS_JSON="$tasks_json" TASK_NAME="$1" python3 - <<'PY'
+          import json
+          import os
+
+          payload = json.loads(os.environ["TASKS_JSON"])
+          wanted = os.environ["TASK_NAME"]
+          raise SystemExit(
+              0
+              if any(
+                  isinstance(item, dict) and item.get("name") == wanted
+                  for item in payload.get("tasks", [])
+              )
+              else 1
+          )
+          PY
+              }
+
+              if [[ "$VERIFY_MODE" == "guard" ]]; then
+                if has_task guard; then
+                  "$runner" task guard
+                elif has_task smoke; then
+                  echo "::notice::guard task absent; using declared smoke fallback"
+                  "$runner" task smoke
+                else
+                  echo "::error::repository declares neither guard nor smoke task"
+                  exit 2
+                fi
+              elif has_task smoke; then
+                "$runner" task smoke
+              else
+                echo "::error::repository does not declare required smoke task"
+                exit 2
+              fi
+              ;;
+            quick|full)
+              "$runner" validate --profile "$VERIFY_MODE" --json
+              ;;
+            *)
+              echo "::error::unsupported repository verification mode: $VERIFY_MODE"
+              exit 2
+              ;;
+          esac

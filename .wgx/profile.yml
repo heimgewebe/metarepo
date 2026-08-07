@@ -1,60 +1,48 @@
 ---
-class: meta
+wgx:
+  apiVersion: v1
+  requiredWgx: "^2.0"
+  repoKind: meta
+  validate:
+    quick:
+      - smoke
+    full:
+      - guard
+      - smoke
+    ciOnly:
+      metrics: "generated only by the dedicated metrics workflow"
+      snapshot: "no repository snapshot command is defined"
+  tasks:
+    smoke: |
+      echo "Running workflow validation..."
+      for f in .github/workflows/*.yml; do
+        [ -e "$f" ] || continue
+        if ! kind=$(yq eval 'kind' "$f" 2>/dev/null); then
+           echo "FAIL $f (invalid YAML)"
+           exit 1
+        fi
+        if [[ "$kind" != "map" && "$kind" != "!!map" ]]; then
+          echo "FAIL $f (root is not a map, got $kind)"
+          exit 1
+        fi
+        echo "OK   $f"
+      done
+      echo "All workflows valid."
 
-tasks:
-  smoke: |
-    echo "Running workflow validation..."
-    # Use yq for robust YAML check
-    for f in .github/workflows/*.yml; do
-      [ -e "$f" ] || continue
-      if ! kind=$(yq eval 'kind' "$f" 2>/dev/null); then
-         echo "FAIL $f (invalid YAML)"
-         exit 1
+    guard: |
+      set -euo pipefail
+      echo "Running deterministic Metarepo verification guard..."
+      python3 scripts/ci/check_wgx_reusable_callers.py
+      bash scripts/check-contracts-index.sh
+      git diff --check
+      echo "Guard OK."
+
+    metrics: |
+      if [ -x scripts/wgx-metrics-snapshot.sh ]; then
+        scripts/wgx-metrics-snapshot.sh --json
+      else
+        echo "No metrics script for metarepo, skipping."
       fi
-      if [[ "$kind" != "map" && "$kind" != "!!map" ]]; then
-         echo "FAIL $f (root is not a map, got $kind)"
-         exit 1
-      fi
-      echo "OK   $f"
-    done
-    echo "All workflows valid."
 
-  guard: |
-    echo "Running meta-guard checks..."
-
-    # decision.preimage visibility guard (warn-only)
-    # - checks for policy.decision JSON objects missing preimage_ref
-    # - does NOT fail the build (yet)
-    if [ -x "wgx/guards/decision-preimage.bash" ]; then
-      echo "Running decision-preimage guard (warn-only)..."
-      ./wgx/guards/decision-preimage.bash || true
-    else
-      echo "decision-preimage guard not found; skipping."
-    fi
-
-    if command -v shellcheck >/dev/null 2>&1; then
-      echo "Running shellcheck on wgx/**/*.bash..."
-      # bewusst fokussiert auf WGX-Bash-Module; bei Bedarf erweiterbar
-      shellcheck -s bash wgx/**/*.bash || exit 1
-    else
-      echo "shellcheck not found; skipping shell lint."
-    fi
-
-    if command -v yamllint >/dev/null 2>&1; then
-      echo "Running yamllint..."
-      yamllint . || exit 1
-    else
-      echo "yamllint not found; skipping YAML lint."
-    fi
-
-    echo "Guard OK."
-
-  metrics: |
-    if [ -x scripts/wgx-metrics-snapshot.sh ]; then
-      scripts/wgx-metrics-snapshot.sh --json
-    else
-      echo "No metrics script for metarepo, skipping."
-    fi
-
-  snapshot: |
-    # no snapshot command defined
+    snapshot: |
+      echo "No snapshot command defined."

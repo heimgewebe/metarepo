@@ -1,65 +1,76 @@
 from pathlib import Path
 
-from scripts.ci.check_wgx_reusable_callers import check_callers
+from scripts.ci.check_wgx_reusable_callers import WGX_RUNNER_REF, check_callers
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def _write_workflows(root: Path, *, guard: str, smoke: str, reusable: str) -> None:
+    workflows = root / ".github" / "workflows"
+    workflows.mkdir(parents=True)
+    (workflows / "wgx-guard.yml").write_text(guard, encoding="utf-8")
+    (workflows / "wgx-smoke.yml").write_text(smoke, encoding="utf-8")
+    (workflows / "reusable-repo-verify.yml").write_text(reusable, encoding="utf-8")
+
+
+def _good_reusable() -> str:
+    return (
+        "guard smoke quick full\n"
+        "repository: heimgewebe/wgx\n"
+        f"ref: {WGX_RUNNER_REF}\n"
+    )
 
 
 def test_repository_wgx_callers_match_declared_contracts() -> None:
     assert check_callers(ROOT) == []
 
 
-def test_undeclared_input_is_rejected(tmp_path: Path) -> None:
-    workflows = tmp_path / ".github" / "workflows"
-    workflows.mkdir(parents=True)
-    (workflows / "wgx-guard.yml").write_text(
-        "uses: heimgewebe/wgx/.github/workflows/wgx-guard.yml@"
-        "3d823f9d26be276eef97742335dee857a64e1715\n"
-        "with:\n  toolchain: stable\n",
-        encoding="utf-8",
+def test_direct_wgx_workflow_ownership_is_rejected(tmp_path: Path) -> None:
+    _write_workflows(
+        tmp_path,
+        guard=(
+            "uses: heimgewebe/wgx/.github/workflows/wgx-guard.yml@main\n"
+            "mode: guard\n"
+        ),
+        smoke=(
+            "uses: ./.github/workflows/reusable-repo-verify.yml\n"
+            "mode: smoke\n"
+        ),
+        reusable=_good_reusable(),
     )
-    (workflows / "wgx-smoke.yml").write_text(
-        "# Gepinnt auf den verifizierten WGX-Merge mit wiederverwendbarem Smoke\n"
-        "uses: heimgewebe/wgx/.github/workflows/wgx-smoke.yml@"
-        "b3b358f5bb8d26f087fcdaf25d308d439b22f583\n",
-        encoding="utf-8",
-    )
-    assert "wgx-guard caller passes undeclared input toolchain" in check_callers(tmp_path)
+    findings = check_callers(tmp_path)
+    assert "wgx-guard.yml does not route through Metarepo reusable verification" in findings
+    assert "wgx-guard.yml still delegates workflow ownership to WGX" in findings
 
 
-def test_unverified_guard_revision_is_rejected(tmp_path: Path) -> None:
-    workflows = tmp_path / ".github" / "workflows"
-    workflows.mkdir(parents=True)
-    (workflows / "wgx-guard.yml").write_text(
-        "uses: heimgewebe/wgx/.github/workflows/wgx-guard.yml@main\n",
-        encoding="utf-8",
+def test_missing_bound_mode_is_rejected(tmp_path: Path) -> None:
+    _write_workflows(
+        tmp_path,
+        guard="uses: ./.github/workflows/reusable-repo-verify.yml\n",
+        smoke=(
+            "uses: ./.github/workflows/reusable-repo-verify.yml\n"
+            "mode: smoke\n"
+        ),
+        reusable=_good_reusable(),
     )
-    (workflows / "wgx-smoke.yml").write_text(
-        "# Gepinnt auf den verifizierten WGX-Merge mit wiederverwendbarem Smoke\n"
-        "uses: heimgewebe/wgx/.github/workflows/wgx-smoke.yml@"
-        "b3b358f5bb8d26f087fcdaf25d308d439b22f583\n",
-        encoding="utf-8",
-    )
-    assert "wgx-guard caller is not bound to the verified WGX merge" in check_callers(
-        tmp_path
-    )
+    assert "wgx-guard.yml does not bind verification mode guard" in check_callers(tmp_path)
 
 
-def test_legacy_smoke_revision_is_rejected(tmp_path: Path) -> None:
-    workflows = tmp_path / ".github" / "workflows"
-    workflows.mkdir(parents=True)
-    (workflows / "wgx-guard.yml").write_text(
-        "uses: heimgewebe/wgx/.github/workflows/wgx-guard.yml@"
-        "3d823f9d26be276eef97742335dee857a64e1715\n",
-        encoding="utf-8",
+def test_moving_runner_ref_is_rejected(tmp_path: Path) -> None:
+    _write_workflows(
+        tmp_path,
+        guard=(
+            "uses: ./.github/workflows/reusable-repo-verify.yml\n"
+            "mode: guard\n"
+        ),
+        smoke=(
+            "uses: ./.github/workflows/reusable-repo-verify.yml\n"
+            "mode: smoke\n"
+        ),
+        reusable=(
+            "guard smoke quick full\n"
+            "repository: heimgewebe/wgx\n"
+            "ref: main\n"
+        ),
     )
-    (workflows / "wgx-smoke.yml").write_text(
-        "# Gepinnt auf den verifizierten WGX-Merge mit wiederverwendbarem Smoke\n"
-        "uses: heimgewebe/wgx/.github/workflows/wgx-smoke.yml@"
-        "52a12ff97c402d1aa718d534a84b0225e7718c82\n",
-        encoding="utf-8",
-    )
-    assert (
-        "wgx-smoke caller is not bound to the verified reusable smoke merge"
-        in check_callers(tmp_path)
-    )
+    assert "reusable verification runner is not revision-bound" in check_callers(tmp_path)

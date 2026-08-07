@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.heimgewebe.org/contracts/repository-verification.v2.schema.json",
+  "title": "Heimgewebe repository verification profile v2",
+  "description": "Canonical fleet contract for repository-owned verification front doors. The v2 ownership contract deliberately remains transport-compatible with the existing WGX apiVersion v1 profile while consumers migrate away from WGX-owned policy.",
+  "x-producers": ["metarepo"],
+  "x-consumers": ["wgx", "github-actions", "grabowski"],
+  "type": "object",
+  "required": ["wgx"],
+  "properties": {
+    "wgx": {
+      "type": "object",
+      "required": ["apiVersion", "tasks"],
+      "properties": {
+        "apiVersion": {"const": "v1"},
+        "requiredWgx": {"type": "string", "minLength": 1},
+        "repoKind": {"type": "string", "minLength": 1},
+        "tasks": {"$ref": "#/$defs/tasks"},
+        "validate": {"$ref": "#/$defs/validationProfiles"}
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "taskName": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$"},
+    "command": {
+      "oneOf": [
+        {"type": "string", "minLength": 1},
+        {"type": "array", "minItems": 1, "items": {"type": "string"}}
+      ]
+    },
+    "task": {
+      "oneOf": [
+        {"$ref": "#/$defs/command"},
+        {
+          "type": "object",
+          "properties": {
+            "cmd": {"$ref": "#/$defs/command"},
+            "sh": {"$ref": "#/$defs/command"},
+            "desc": {"type": "string"},
+            "safe": {"type": "boolean"},
+            "group": {"type": "string"}
+          },
+          "anyOf": [
+            {"properties": {"cmd": {}}, "required": ["cmd"]},
+            {"properties": {"sh": {}}, "required": ["sh"]}
+          ],
+          "additionalProperties": true
+        }
+      ]
+    },
+    "tasks": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {"$ref": "#/$defs/taskName"},
+      "additionalProperties": {"$ref": "#/$defs/task"}
+    },
+    "taskList": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/taskName"},
+      "uniqueItems": true
+    },
+    "skipReasons": {
+      "type": "object",
+      "propertyNames": {"$ref": "#/$defs/taskName"},
+      "additionalProperties": {"type": "string", "minLength": 1}
+    },
+    "validationProfiles": {
+      "type": "object",
+      "properties": {
+        "quick": {"$ref": "#/$defs/taskList"},
+        "full": {"$ref": "#/$defs/taskList"},
+        "unsupported": {"$ref": "#/$defs/skipReasons"},
+        "ciOnly": {"$ref": "#/$defs/skipReasons"}
+      },
+      "additionalProperties": false
+    }
+  }
+}
