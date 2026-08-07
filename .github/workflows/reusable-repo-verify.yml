@@ -36,6 +36,21 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Install hash-bound profile parser dependency
+        shell: bash
+        run: |
+          set -euo pipefail
+          requirements_file="${RUNNER_TEMP}/repo-verification-requirements.txt"
+          cat >"$requirements_file" <<'EOF'
+          PyYAML==6.0.3 \
+            --hash=sha256:ba1cc08a7ccde2d2ec775841541641e4548226580ab850948cbfda66a1befcdc
+          EOF
+          python3 -m pip install \
+            --disable-pip-version-check \
+            --only-binary=:all: \
+            --require-hashes \
+            --requirement "$requirements_file"
+
       - name: Validate profile contract through pinned runner
         shell: bash
         run: |
