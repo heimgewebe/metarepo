@@ -18,4 +18,4 @@ jobs:
     # Gepinnt auf Commit SHA für Sicherheit und Reproduzierbarkeit.
     # Gepinnt auf den verifizierten WGX-Merge mit wiederverwendbarem Smoke
     # und dauerhaft gebundenem Parser-/Security-Prerequisite.
-    uses: heimgewebe/wgx/.github/workflows/wgx-smoke.yml@b3b358f5bb8d26f087fcdaf25d308d439b22f583
+    uses: heimgewebe/wgx/.github/workflows/wgx-smoke.yml@a1c1cc6daf07cf23ade1d3e02ae5551fcf6641e2
