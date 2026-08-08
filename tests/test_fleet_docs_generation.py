@@ -44,6 +44,34 @@ def test_generated_fleet_docs_are_reproducible_and_source_bound(tmp_path: Path) 
     assert b"Generated at:" not in first
 
 
+def test_generator_can_write_candidate_without_touching_committed_output(
+    tmp_path: Path,
+) -> None:
+    worktree = _fixture(tmp_path)
+    canonical = _generate(worktree)
+    generated_path = worktree / "docs/_generated/fleet.md"
+    preserved = canonical + b"locally preserved content\n"
+    generated_path.write_bytes(preserved)
+    candidate = worktree / "candidate-fleet.md"
+
+    result = subprocess.run(
+        [
+            "python3",
+            "scripts/fleet/generate_fleet_docs.py",
+            "--output",
+            str(candidate),
+        ],
+        cwd=worktree,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert candidate.read_bytes() == canonical
+    assert generated_path.read_bytes() == preserved
+
+
 def test_docs_drift_guard_rejects_and_preserves_stale_content(tmp_path: Path) -> None:
     worktree = _fixture(tmp_path)
     generated = _generate(worktree)
