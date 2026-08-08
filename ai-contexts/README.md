@@ -6,12 +6,12 @@ Diese Dateien sind **nicht** die Lang-Doku. Sie sind der Einstieg: Wo anfangen? 
 ## Prinzipien
 - **Kurz & prüfbar**: lieber wenige Felder, die stimmen, als viele, die driften.
 - **Contracts-first**: Wenn es ein Schema/Interface gibt, verweise darauf.
-- **WGX-Erwartung sichtbar**: Fleet-Repos sollen WGX-Profil/Guard/Smoke implizieren.
+- **Verifikations-Eigentum sichtbar**: Fleet-Repos sollen ihren repository-eigenen Verifikations-Frontdoor deklarieren; Metarepo besitzt die gemeinsame Policy, WGX bleibt nur ein kompatibler Runner/Consumer.
 - **Grenzen explizit**: Was dieses Repo *nicht* macht (damit Agenten nicht “kreativ falsch” werden).
 
 ## Version
 - v1.0 hatte bereits: project / dependencies / architecture / conventions / documentation / ai_guidance.
-- v1.1 ergänzt: heimgewebe (Achse/Fleet/WGX), interfaces (produces/consumes), contracts, boundaries.
+- v1.1 ergänzt: heimgewebe (Achse/Fleet/Verifikation), interfaces (produces/consumes), contracts, boundaries.
 
 ## Rollout-Regel (wichtig)
 Dieses Verzeichnis `ai-contexts/` ist **metarepo-zentriert** gedacht: hier liegen Templates und Beispiele.
