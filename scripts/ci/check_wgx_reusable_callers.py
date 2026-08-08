@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-WGX_RUNNER_REF = "03da8c71fa5bb30827a1a8e91e2a48bacaf3140c"
+WGX_RUNNER_REF = "3dc15f262b6945039a4727cbaa5acce998fbfceb"
 LOCAL_REUSABLE = "uses: ./.github/workflows/reusable-repo-verify.yml"
 
 

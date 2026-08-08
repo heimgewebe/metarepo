@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
         with:
           repository: heimgewebe/wgx
-          ref: 03da8c71fa5bb30827a1a8e91e2a48bacaf3140c
+          ref: 3dc15f262b6945039a4727cbaa5acce998fbfceb
           path: .repo-verification-runner
           persist-credentials: false
 
