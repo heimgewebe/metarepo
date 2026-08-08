@@ -11,46 +11,38 @@ GENERATED_FILE="docs/_generated/fleet.md"
 
 echo "Running Document Drift Guard..."
 
-# 1. Check if generated doc exactly matches the canonical source.
+# 1. Check if generated doc exactly matches the canonical source without
+# mutating the committed generated artifact. A validation command must remain
+# read-only even when the generator fails or the process is interrupted.
 if [ ! -f "$GENERATED_FILE" ]; then
   echo "❌ $GENERATED_FILE missing. Run $GENERATOR and commit the result."
   exit 1
 fi
 
-ORIGINAL=$(mktemp)
-BACKUP_READY=0
+CANDIDATE=$(mktemp)
 
 # Invoked indirectly by the EXIT trap below.
 # shellcheck disable=SC2317
-restore_generated_file() {
+cleanup_candidate() {
   rc=$?
   trap - EXIT
 
-  if [ "$BACKUP_READY" -eq 1 ] && { [ ! -f "$GENERATED_FILE" ] || ! cmp -s "$ORIGINAL" "$GENERATED_FILE"; }; then
-    if ! cp "$ORIGINAL" "$GENERATED_FILE"; then
-      echo "❌ Failed to restore $GENERATED_FILE after drift check." >&2
-      rc=1
-    fi
-  fi
-
-  if ! rm -f "$ORIGINAL"; then
-    echo "❌ Failed to remove temporary drift-check backup." >&2
+  if ! rm -f "$CANDIDATE"; then
+    echo "❌ Failed to remove temporary drift-check candidate." >&2
     rc=1
   fi
 
   exit "$rc"
 }
 
-trap restore_generated_file EXIT
-cp "$GENERATED_FILE" "$ORIGINAL"
-BACKUP_READY=1
+trap cleanup_candidate EXIT
 
-python3 "$GENERATOR" > /dev/null
+python3 "$GENERATOR" --output "$CANDIDATE" > /dev/null
 
-if ! cmp -s "$GENERATED_FILE" "$ORIGINAL"; then
+if ! cmp -s "$GENERATED_FILE" "$CANDIDATE"; then
   echo "❌ Drift detected in $GENERATED_FILE. Content does not match fleet/repos.yml."
   echo "Diff (committed/current -> generated):"
-  diff -u "$ORIGINAL" "$GENERATED_FILE" || true
+  diff -u "$GENERATED_FILE" "$CANDIDATE" || true
   exit 1
 fi
 

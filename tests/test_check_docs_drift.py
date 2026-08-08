@@ -40,13 +40,14 @@ def _run_guard(repo: Path) -> subprocess.CompletedProcess[str]:
     )
 
 
-def test_generator_failure_restores_partially_written_file(tmp_path: Path) -> None:
+def test_generator_failure_never_mutates_committed_file(tmp_path: Path) -> None:
     repo, generated, original = _fixture(
         tmp_path,
         """
+        import sys
         from pathlib import Path
 
-        output = Path("docs/_generated/fleet.md")
+        output = Path(sys.argv[sys.argv.index("--output") + 1])
         output.write_text("partial regenerated content\\n", encoding="utf-8")
         raise SystemExit(7)
         """,
@@ -58,13 +59,17 @@ def test_generator_failure_restores_partially_written_file(tmp_path: Path) -> No
     assert generated.read_bytes() == original
 
 
-def test_detected_drift_is_reported_and_restored(tmp_path: Path) -> None:
+def test_detected_drift_is_reported_without_mutating_committed_file(
+    tmp_path: Path,
+) -> None:
     repo, generated, original = _fixture(
         tmp_path,
         """
+        import sys
         from pathlib import Path
 
-        Path("docs/_generated/fleet.md").write_text(
+        output = Path(sys.argv[sys.argv.index("--output") + 1])
+        output.write_text(
             "complete but different generated content\\n",
             encoding="utf-8",
         )
