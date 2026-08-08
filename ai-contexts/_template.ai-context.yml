@@ -58,7 +58,8 @@ boundaries:
   not_responsible_for:
     - "Doing network ingest without aussensensor"
   dangerous_assumptions:
-    - "Assume repo is Fleet-enabled without checking .wgx/"
+    - "Assume repo is Fleet-enabled without checking its repository verification declaration/profile."
+    - "Treat WGX as the owner of verification policy instead of a compatibility runner/consumer."
 
 conventions:
   branching: "main, feature/*"

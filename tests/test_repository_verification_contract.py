@@ -64,3 +64,14 @@ def test_reusable_workflow_passes_read_token_to_repository_verifier() -> None:
     assert "GITHUB_TOKEN: ${{ github.token }}" in workflow
     assert "guard|smoke" in workflow
     assert "quick|full" in workflow
+
+
+def test_ai_context_guidance_keeps_verification_policy_ownership_in_metarepo() -> None:
+    readme = (ROOT / "ai-contexts" / "README.md").read_text(encoding="utf-8")
+    template = (ROOT / "ai-contexts" / "_template.ai-context.yml").read_text(encoding="utf-8")
+
+    assert "Metarepo besitzt die gemeinsame Policy" in readme
+    assert "WGX bleibt nur ein kompatibler Runner/Consumer" in readme
+    assert "Fleet-Repos sollen WGX-Profil/Guard/Smoke implizieren" not in readme
+    assert "Treat WGX as the owner of verification policy" in template
+    assert "without checking .wgx/" not in template
