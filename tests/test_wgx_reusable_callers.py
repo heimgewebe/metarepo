@@ -3,7 +3,7 @@ from pathlib import Path
 from scripts.ci.check_wgx_reusable_callers import WGX_RUNNER_REF, check_callers
 
 ROOT = Path(__file__).resolve().parents[1]
-METAREPO_VERIFY_REF = "65db582ee20fe77c49cc052be14b4fe3349eed57"
+METAREPO_VERIFY_REF = "51cfb9f983e65a1f63a8c118aafedab4cce0875e"
 METAREPO_VERIFY_USES = (
     "uses: heimgewebe/metarepo/.github/workflows/reusable-repo-verify.yml@"
     f"{METAREPO_VERIFY_REF}"
