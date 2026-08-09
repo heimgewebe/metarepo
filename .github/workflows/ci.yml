@@ -19,6 +19,8 @@ env:
       - 'Justfile'
       - '.lychee.toml'
       - 'scripts/**'
+      - 'templates/.github/workflows/wgx-guard.yml'
+      - 'templates/.github/workflows/wgx-smoke.yml'
       - '.github/workflows/ci.yml'
       - 'toolchain.versions.yml'
   pull_request:
@@ -30,6 +32,8 @@ env:
       - 'Justfile'
       - '.lychee.toml'
       - 'scripts/**'
+      - 'templates/.github/workflows/wgx-guard.yml'
+      - 'templates/.github/workflows/wgx-smoke.yml'
       - '.github/workflows/ci.yml'
       - 'toolchain.versions.yml'
   workflow_dispatch:
