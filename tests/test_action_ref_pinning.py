@@ -1,7 +1,7 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-CHECKOUT_V7_SHA = "9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0"
+CHECKOUT_V7_SHA = "f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a"
 
 
 def _workflow_files():
