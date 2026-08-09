@@ -15,7 +15,8 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from wgx import repo_config
+# Import must follow the repository-root path bootstrap above.
+from wgx import repo_config  # noqa: E402
 
 WgxProfileKind = Literal["profile", "no_profile", "missing"]
 
@@ -75,7 +76,10 @@ def main() -> int:
     parser.add_argument("--fleet-file", default="fleet/repos.yml")
     parser.add_argument("--repos-yml", default="repos.yml")
     parser.add_argument("--out-json", default="reports/heimgewebe-readiness.json")
-    parser.add_argument("--write-repos-txt", default="fleet/repos.txt")
+    parser.add_argument(
+        "--write-repos-txt",
+        help="optional path for explicitly generating the fleet repos.txt projection",
+    )
     args = parser.parse_args()
 
     metarepo_root = ROOT
