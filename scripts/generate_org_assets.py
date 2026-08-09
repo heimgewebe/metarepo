@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import difflib
 import sys
 from pathlib import Path
 from typing import Dict, List, Mapping, Sequence
@@ -12,7 +13,8 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-from wgx import repo_config
+# Import must follow the repository-root path bootstrap above.
+from wgx import repo_config  # noqa: E402
 
 
 def _as_sequence(value: object) -> List[str]:
@@ -188,12 +190,40 @@ def determine_order(repos: Sequence[Mapping[str, object]]) -> List[str]:
     return repo_config.ordered_repo_names([dict(repo) for repo in repos])
 
 
-def main() -> None:
+def _write_or_check(path: Path, expected: str, *, check: bool) -> bool:
+    if check:
+        actual = path.read_text(encoding="utf-8") if path.exists() else ""
+        if actual == expected:
+            return True
+        sys.stdout.writelines(
+            difflib.unified_diff(
+                actual.splitlines(keepends=True),
+                expected.splitlines(keepends=True),
+                fromfile=str(path),
+                tofile="generated",
+            )
+        )
+        return False
+
+    _ensure_parent(path)
+    path.write_text(expected, encoding="utf-8")
+    return True
+
+
+def main() -> int:
     parser = argparse.ArgumentParser(description="Generate Org index and graph from repos.yml")
     parser.add_argument("--repos-file", default="repos.yml", help="Path to repos.yml")
     parser.add_argument("--index", dest="index_output", help="Path to write org index markdown")
     parser.add_argument("--graph", dest="graph_output", help="Path to write org dependency mermaid graph")
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="compare requested outputs without modifying them",
+    )
     args = parser.parse_args()
+
+    if args.check and not (args.index_output or args.graph_output):
+        parser.error("--check requires --index and/or --graph")
 
     repos_path = Path(args.repos_file)
     if not repos_path.exists():
@@ -202,19 +232,31 @@ def main() -> None:
     repos = load_repos(repos_path)
     archived_references = load_archived_references(repos_path)
     ordered_names = determine_order(repos)
+    outputs_current = True
 
     if args.index_output:
         index_path = Path(args.index_output)
-        _ensure_parent(index_path)
         index_content = render_index(repos, ordered_names, archived_references)
-        index_path.write_text(index_content, encoding="utf-8")
+        outputs_current = (
+            _write_or_check(index_path, index_content, check=args.check)
+            and outputs_current
+        )
 
     if args.graph_output:
         graph_path = Path(args.graph_output)
-        _ensure_parent(graph_path)
         graph_content = render_graph(repos, ordered_names, archived_references)
-        graph_path.write_text(graph_content, encoding="utf-8")
+        outputs_current = (
+            _write_or_check(graph_path, graph_content, check=args.check)
+            and outputs_current
+        )
+
+    if args.check:
+        if outputs_current:
+            print("org assets: PASS")
+            return 0
+        return 1
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
