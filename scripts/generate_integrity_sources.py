@@ -10,9 +10,11 @@ Compatibility fallback:
   - repos.yml is read only when the canonical metadata file is absent.
 
 Output:
-  - reports/integrity/sources.v1.json
+  - reports/integrity/sources.v1.json by default
+  - an alternate path with --output for read-only drift validation
 """
 
+import argparse
 import json
 import os
 import sys
@@ -25,7 +27,10 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-from wgx import repo_config
+# Import must follow the repository-root path bootstrap above.
+from wgx import repo_config  # noqa: E402
+
+DEFAULT_OUTPUT = Path("reports/integrity/sources.v1.json")
 
 
 def load_yaml(yaml_mod: Any, path: Path) -> Any:
@@ -58,7 +63,30 @@ def detect_repo_root() -> Path:
     return _REPO_ROOT
 
 
-def main():
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Generate integrity source metadata.")
+    parser.add_argument(
+        "--output",
+        type=Path,
+        help=(
+            "alternate output path; timestamp idempotence remains bound to the "
+            f"canonical {DEFAULT_OUTPUT} report"
+        ),
+    )
+    return parser.parse_args(argv)
+
+
+def selected_output(repo_root: Path, override: Path | None) -> Path:
+    if override is None:
+        return repo_root / DEFAULT_OUTPUT
+    if override.is_absolute():
+        return override
+    return repo_root / override
+
+
+def main(argv: list[str] | None = None) -> None:
+    args = parse_args(argv)
+
     try:
         import yaml
     except ModuleNotFoundError:
@@ -72,7 +100,8 @@ def main():
     fleet_repos_file = repo_root / "fleet/repos.yml"
     metadata_file = repo_root / "fleet/repo-metadata.yml"
     legacy_repos_yml_file = repo_root / "repos.yml"
-    output_file = repo_root / "reports/integrity/sources.v1.json"
+    canonical_output_file = repo_root / DEFAULT_OUTPUT
+    output_file = selected_output(repo_root, args.output)
 
     # Load Fleet Membership
     if not fleet_repos_file.exists():
@@ -168,11 +197,13 @@ def main():
             }
         )
 
-    # Check for idempotence to avoid drift in timestamps
+    # Timestamp stability is always derived from the canonical tracked report,
+    # even when --output points at a temporary candidate. This lets validators
+    # compare bytes without ever rewriting the tracked artifact.
     existing_data = None
-    if output_file.exists():
+    if canonical_output_file.exists():
         try:
-            with open(output_file, "r", encoding="utf-8") as f:
+            with open(canonical_output_file, "r", encoding="utf-8") as f:
                 existing_data = json.load(f)
         except Exception:
             pass
@@ -180,11 +211,16 @@ def main():
     new_generated_at = utc_now_iso()
 
     if existing_data and existing_data.get("sources") == sources:
-        # Content didn't change, preserve timestamp to avoid noise
+        # Content didn't change, preserve timestamp to avoid noise.
         new_generated_at = existing_data.get("generated_at", new_generated_at)
-        print(f"No changes detected for {output_file}, preserving timestamp.")
+        print(
+            f"No changes detected for {canonical_output_file}, preserving timestamp."
+        )
     else:
-        print(f"Changes detected, updating {output_file}")
+        print(
+            f"Changes detected relative to {canonical_output_file}; "
+            f"writing {output_file}"
+        )
 
     output_data = {
         "apiVersion": "integrity.sources.v1",
