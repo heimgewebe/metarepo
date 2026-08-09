@@ -43,8 +43,7 @@ jobs:
           python scripts/fleet/generate_readiness.py \
             --fleet-file fleet/repos.yml \
             --repos-yml repos.yml \
-            --out-json reports/heimgewebe-readiness.json \
-            --write-repos-txt fleet/repos.txt
+            --out-json reports/heimgewebe-readiness.json
       - name: Display readiness report
         run: cat reports/heimgewebe-readiness.json
       - name: Run hg-doctor (CI mode)
