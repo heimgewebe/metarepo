@@ -33,7 +33,7 @@ jobs:
     timeout-minutes: 40
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        uses: actions/checkout@f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a
 
       - name: Setup Just from caller repository pin
         if: ${{ hashFiles('scripts/tools/just-pin.sh') != '' && hashFiles('scripts/lib/semver.sh') != '' && hashFiles('scripts/lib/installer.bash') != '' && hashFiles('toolchain.versions.yml') != '' }}
