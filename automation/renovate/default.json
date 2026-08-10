@@ -27,6 +27,13 @@
       "groupName": "github-actions non-major updates"
     },
     {
+      "description": "Major dependency upgrades require an explicit migration path",
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "enabled": false
+    },
+    {
       "description": "Python runtime-line migrations must stay aligned with repository locks and runtime policy",
       "matchManagers": [
         "github-actions"

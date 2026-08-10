@@ -114,6 +114,7 @@ def test_shared_preset_keeps_governed_dependency_lanes_out_of_generic_renovate()
     _, _, preset = _inputs()
     rules = preset["packageRules"]
     expected = (
+        {"matchUpdateTypes": ["major"], "enabled": False},
         {"matchManagers": ["github-actions"], "matchDepNames": ["python"], "enabled": False},
         {
             "matchManagers": ["github-actions"],
@@ -180,3 +181,11 @@ def test_complete_fleet_copy_is_rejected_as_second_membership_list() -> None:
     )
     with pytest.raises(renovate_policy.PolicyError, match="complete active Fleet"):
         renovate_policy.validate_policy(mutated, active_fleet=active)
+
+
+def test_shared_preset_disables_generic_major_updates() -> None:
+    _, _, preset = _inputs()
+    assert any(
+        rule.get("matchUpdateTypes") == ["major"] and rule.get("enabled") is False
+        for rule in preset["packageRules"]
+    )
