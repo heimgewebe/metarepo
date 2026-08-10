@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 import stat
 import subprocess
@@ -9,6 +10,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 RUNNER = ROOT / "automation" / "renovate" / "run-fleet.sh"
 RUNTIME_CONFIG = ROOT / "automation" / "renovate" / "runtime-config.cjs"
+DEFAULT_PRESET = ROOT / "automation" / "renovate" / "default.json"
+SYSTEMD_TIMER = ROOT / "automation" / "renovate" / "systemd" / "renovate-fleet.timer"
 
 
 def _write_executable(path: Path, content: str) -> None:
@@ -160,3 +163,43 @@ def test_runner_rejects_path_resolved_npx_override() -> None:
     )
     assert completed.returncode == 2
     assert "must name an executable absolute path" in completed.stderr
+
+
+def test_runtime_config_inherits_central_schedule_without_duplication() -> None:
+    preset = json.loads(DEFAULT_PRESET.read_text(encoding="utf-8"))
+    completed = subprocess.run(
+        [
+            "node",
+            "-e",
+            (
+                "const config = require(process.argv[1]); "
+                "process.stdout.write(JSON.stringify({schedule: config.schedule, "
+                "timezone: config.timezone, updateNotScheduled: config.updateNotScheduled}));"
+            ),
+            str(RUNTIME_CONFIG),
+        ],
+        check=True,
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
+    resolved = json.loads(completed.stdout)
+    assert resolved == {
+        "schedule": preset["schedule"],
+        "timezone": preset["timezone"],
+        "updateNotScheduled": preset["updateNotScheduled"],
+    }
+
+    runtime_text = RUNTIME_CONFIG.read_text(encoding="utf-8")
+    assert "schedule:" not in runtime_text
+    assert "timezone:" not in runtime_text
+    assert "updateNotScheduled:" not in runtime_text
+
+
+def test_systemd_timer_runs_once_each_monday_in_weekly_window() -> None:
+    timer_text = SYSTEMD_TIMER.read_text(encoding="utf-8")
+    assert "Description=Run Heimgewebe Fleet Renovate weekly\n" in timer_text
+    assert timer_text.count("OnCalendar=") == 1
+    assert "OnCalendar=Mon *-*-* 01:17:00\n" in timer_text
+    assert "Persistent=true\n" in timer_text
+    assert "RandomizedDelaySec=15m\n" in timer_text

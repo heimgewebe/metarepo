@@ -150,6 +150,49 @@ def test_preset_cannot_enable_automerge() -> None:
         renovate_policy.validate_preset(mutated)
 
 
+def test_shared_preset_requires_exact_weekly_normal_update_schedule() -> None:
+    _, _, preset = _inputs()
+    assert preset["timezone"] == "Europe/Berlin"
+    assert preset["schedule"] == ["* 0-3 * * 1"]
+    assert preset["updateNotScheduled"] is False
+
+    missing_schedule = copy.deepcopy(preset)
+    missing_schedule.pop("schedule")
+    with pytest.raises(renovate_policy.PolicyError, match="missing required fields: schedule"):
+        renovate_policy.validate_preset(missing_schedule)
+
+    widened_schedule = copy.deepcopy(preset)
+    widened_schedule["schedule"] = ["* 0-4 * * 1"]
+    with pytest.raises(renovate_policy.PolicyError, match="exact Monday 00:00-03:59"):
+        renovate_policy.validate_preset(widened_schedule)
+
+    additional_window = copy.deepcopy(preset)
+    additional_window["schedule"].append("* 0-3 * * 2")
+    with pytest.raises(renovate_policy.PolicyError, match="exact Monday 00:00-03:59"):
+        renovate_policy.validate_preset(additional_window)
+
+    wrong_timezone = copy.deepcopy(preset)
+    wrong_timezone["timezone"] = "UTC"
+    with pytest.raises(renovate_policy.PolicyError, match="timezone=Europe/Berlin"):
+        renovate_policy.validate_preset(wrong_timezone)
+
+    missing_update_guard = copy.deepcopy(preset)
+    missing_update_guard.pop("updateNotScheduled")
+    with pytest.raises(
+        renovate_policy.PolicyError,
+        match="missing required fields: updateNotScheduled",
+    ):
+        renovate_policy.validate_preset(missing_update_guard)
+
+    updates_outside_schedule = copy.deepcopy(preset)
+    updates_outside_schedule["updateNotScheduled"] = True
+    with pytest.raises(
+        renovate_policy.PolicyError,
+        match="updateNotScheduled=false",
+    ):
+        renovate_policy.validate_preset(updates_outside_schedule)
+
+
 def test_major_updates_cannot_be_added_to_grouped_rule() -> None:
     _, _, preset = _inputs()
     mutated = copy.deepcopy(preset)
