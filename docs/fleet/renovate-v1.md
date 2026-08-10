@@ -43,7 +43,7 @@ Der Versions-Cutover behauptet nicht, diesen Pfad zu ersetzen oder abzuschalten.
 - `automation/renovate/runtime-config.cjs`: self-hosted Renovate-Konfiguration; liest die Scope-Projektion.
 - `automation/renovate/run-fleet.sh`: gepinnter Runtime-Wrapper.
 - `automation/renovate/install-local-runtime.sh`: commitgebundene lokale Runtime-Installation.
-- `automation/renovate/systemd/renovate-fleet.{service,timer}`: täglicher Fleet-Lauf; die Branch-Erzeugung wird im Preset terminiert.
+- `automation/renovate/systemd/renovate-fleet.{service,timer}`: wöchentlicher Fleet-Lauf.
 - `scripts/fleet/renovate_policy.py`: fail-closed Policy- und Scope-Validierung.
 
 ## Runtime und Zugang
@@ -70,6 +70,7 @@ Der gemeinsame Preset:
 - erweitert `config:recommended`;
 - setzt `automerge: false`;
 - terminiert normale Branch-Erzeugung mit `timezone: Europe/Berlin` exakt auf Montag 00:00–03:59 Uhr (`* 0-3 * * 1`);
+- setzt `updateNotScheduled: false`, damit bestehende normale Renovate-Branches außerhalb dieses Fensters nicht aktualisiert oder rebased werden;
 - begrenzt PR-, Branch- und Stundenparallelität auf höchstens zwei;
 - hält Major-Updates getrennt;
 - gruppiert zentral nur Patch-/Minor-Updates für GitHub Actions;
@@ -103,21 +104,20 @@ keinen Hosted-App-Scope behaupten.
 ## Scheduling
 
 Nach dem ersten erfolgreichen schreibenden Cutover-Lauf wird `renovate-fleet.timer`
-aktiviert. Der Timer bleibt bewusst täglich und startet um 01:17 Uhr mit bis zu 15 Minuten
-Randomisierung. Die zentrale Renovate-Schedule erlaubt die Erzeugung normaler
-Version-Update-Branches ausschließlich montags von 00:00 bis 03:59 Uhr in
-`Europe/Berlin`; damit liegt der automatisierte Montagslauf sicher im Wochenfenster.
-Läufe an anderen Tagen können vorhandene Zustände prüfen, erzeugen aber keine neuen
-normalen Update-Branches. Ein Lauf ist `oneshot`, hat ein Vier-Stunden-Limit und besitzt
-keine Merge-Autorität.
+aktiviert. Der Timer startet einmal wöchentlich montags um 01:17 Uhr mit bis zu 15 Minuten
+Randomisierung und liegt damit im zentralen Renovate-Fenster von Montag 00:00 bis
+03:59 Uhr in `Europe/Berlin`. `Persistent=true` bleibt gesetzt, damit ein während einer
+Auszeit verpasster Lauf nachgeholt wird. Die zentrale Schedule bleibt als Defense in
+Depth bestehen; `updateNotScheduled: false` verhindert außerhalb des Wochenfensters
+auch Aktualisierungen und Rebases bestehender normaler Renovate-Branches. Ein Lauf ist
+`oneshot`, hat ein Vier-Stunden-Limit und besitzt keine Merge-Autorität.
 
 Dependabot Security Updates und Security Alerts bleiben unabhängig von dieser
 Renovate-Schedule jederzeit wirksam und werden nicht wöchentlich gedrosselt. Manuelle
 Renovate-Dry-Runs (`--dry-run=lookup` oder `--dry-run=full`) und Diagnoseaufrufe bleiben
-an jedem Wochentag möglich; außerhalb des Wochenfensters simulieren bzw. melden sie die
-Schedule-Entscheidung, ohne schreibende Effekte auszulösen. Der täglich ausführbare
-Runner bleibt außerdem als Einstieg für künftig ausdrücklich konfigurierte Sonderläufe
-erhalten.
+an jedem Wochentag möglich. Außerhalb des Wochenfensters bleiben solche manuellen
+Aufrufe auf Dry-Run und Diagnose beschränkt und lösen keine schreibenden Renovate-Effekte
+aus.
 
 ## Validierung
 
@@ -129,7 +129,7 @@ erhalten.
 - keine zwei gleichzeitig als aktiv deklarierten Version-Update-Produzenten;
 - vollständige abgeleitete Renovate-Projektion für alle 18 aktiven Fleet-Repositories;
 - `automerge: false`, Major-Isolation und begrenzte Parallelität;
-- exakt `timezone: Europe/Berlin` und genau ein Montagsfenster 00:00–03:59 Uhr für normale Branch-Erzeugung;
+- exakt `timezone: Europe/Berlin`, genau ein Montagsfenster 00:00–03:59 Uhr und `updateNotScheduled: false` für normale Renovate-Updates;
 - unveränderte 30-Tage-Baseline;
 - bytegenaue Reproduzierbarkeit der Scope-Projektion.
 

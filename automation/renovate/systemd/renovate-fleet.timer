@@ -1,8 +1,8 @@
 [Unit]
-Description=Run Heimgewebe Fleet Renovate daily (branch schedule is config-governed)
+Description=Run Heimgewebe Fleet Renovate weekly
 
 [Timer]
-OnCalendar=*-*-* 01:17:00
+OnCalendar=Mon *-*-* 01:17:00
 Persistent=true
 RandomizedDelaySec=15m
 Unit=renovate-fleet.service

@@ -173,7 +173,8 @@ def test_runtime_config_inherits_central_schedule_without_duplication() -> None:
             "-e",
             (
                 "const config = require(process.argv[1]); "
-                "process.stdout.write(JSON.stringify({schedule: config.schedule, timezone: config.timezone}));"
+                "process.stdout.write(JSON.stringify({schedule: config.schedule, "
+                "timezone: config.timezone, updateNotScheduled: config.updateNotScheduled}));"
             ),
             str(RUNTIME_CONFIG),
         ],
@@ -186,15 +187,19 @@ def test_runtime_config_inherits_central_schedule_without_duplication() -> None:
     assert resolved == {
         "schedule": preset["schedule"],
         "timezone": preset["timezone"],
+        "updateNotScheduled": preset["updateNotScheduled"],
     }
 
     runtime_text = RUNTIME_CONFIG.read_text(encoding="utf-8")
     assert "schedule:" not in runtime_text
     assert "timezone:" not in runtime_text
+    assert "updateNotScheduled:" not in runtime_text
 
 
-def test_daily_timer_intersects_weekly_branch_window() -> None:
+def test_systemd_timer_runs_once_each_monday_in_weekly_window() -> None:
     timer_text = SYSTEMD_TIMER.read_text(encoding="utf-8")
-    assert "OnCalendar=*-*-* 01:17:00\n" in timer_text
+    assert "Description=Run Heimgewebe Fleet Renovate weekly\n" in timer_text
+    assert timer_text.count("OnCalendar=") == 1
+    assert "OnCalendar=Mon *-*-* 01:17:00\n" in timer_text
+    assert "Persistent=true\n" in timer_text
     assert "RandomizedDelaySec=15m\n" in timer_text
-    assert "OnCalendar=Mon" not in timer_text

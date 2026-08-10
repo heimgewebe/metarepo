@@ -187,6 +187,7 @@ def validate_preset(preset: dict[str, Any]) -> None:
             "dependencyDashboard",
             "timezone",
             "schedule",
+            "updateNotScheduled",
             "prConcurrentLimit",
             "branchConcurrentLimit",
             "prHourlyLimit",
@@ -200,6 +201,7 @@ def validate_preset(preset: dict[str, Any]) -> None:
             "automerge",
             "timezone",
             "schedule",
+            "updateNotScheduled",
             "prConcurrentLimit",
             "branchConcurrentLimit",
             "prHourlyLimit",
@@ -221,6 +223,8 @@ def validate_preset(preset: dict[str, Any]) -> None:
         raise PolicyError(
             "Renovate preset must keep the exact Monday 00:00-03:59 normal-update schedule"
         )
+    if preset["updateNotScheduled"] is not False:
+        raise PolicyError("Renovate preset must set updateNotScheduled=false")
     if preset["separateMajorMinor"] is not True:
         raise PolicyError("Renovate preset must keep major updates separate")
     for field in ("prConcurrentLimit", "branchConcurrentLimit", "prHourlyLimit"):
