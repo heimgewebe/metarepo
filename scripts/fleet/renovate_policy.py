@@ -234,14 +234,15 @@ def validate_preset(preset: dict[str, Any]) -> None:
                 "matchRepositories",
                 "enabled",
             },
-            required={"matchManagers"},
+            required=set(),
             label=f"packageRules[{index}]",
         )
-        managers = rule["matchManagers"]
-        if not isinstance(managers, list) or not managers or not all(
-            isinstance(item, str) and item.strip() for item in managers
-        ):
-            raise PolicyError(f"packageRules[{index}].matchManagers must be non-empty strings")
+        if "matchManagers" in rule:
+            managers = rule["matchManagers"]
+            if not isinstance(managers, list) or not managers or not all(
+                isinstance(item, str) and item.strip() for item in managers
+            ):
+                raise PolicyError(f"packageRules[{index}].matchManagers must be non-empty strings")
 
         for field in ("matchPackageNames", "matchDepNames", "matchRepositories"):
             if field not in rule:
@@ -257,15 +258,20 @@ def validate_preset(preset: dict[str, Any]) -> None:
 
         has_group_name = "groupName" in rule
         has_update_types = "matchUpdateTypes" in rule
-        if has_group_name != has_update_types:
+        if has_group_name and not has_update_types:
             raise PolicyError(
-                f"packageRules[{index}] must define groupName and matchUpdateTypes together"
+                f"packageRules[{index}] grouping rules must define matchUpdateTypes"
             )
-        if has_group_name:
+        if has_group_name and "matchManagers" not in rule:
+            raise PolicyError(
+                f"packageRules[{index}] grouping rules must define matchManagers"
+            )
+        if has_update_types:
             update_types = rule["matchUpdateTypes"]
-            group_name = rule["groupName"]
             if not isinstance(update_types, list) or not update_types:
                 raise PolicyError(f"packageRules[{index}].matchUpdateTypes must be non-empty")
+        if has_group_name:
+            group_name = rule["groupName"]
             if set(update_types) - {"minor", "patch"}:
                 raise PolicyError(
                     f"packageRules[{index}] groups unsupported update types; major updates must remain isolated"
@@ -287,6 +293,7 @@ def validate_preset(preset: dict[str, Any]) -> None:
         raise PolicyError("Renovate preset may group only GitHub Actions minor/patch updates")
 
     required_protections = (
+        {"matchUpdateTypes": ["major"], "enabled": False},
         {"matchManagers": ["github-actions"], "matchDepNames": ["python"], "enabled": False},
         {
             "matchManagers": ["github-actions"],

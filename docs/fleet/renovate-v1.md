@@ -72,6 +72,7 @@ Der gemeinsame Preset:
 - begrenzt PR-, Branch- und Stundenparallelität auf höchstens zwei;
 - hält Major-Updates getrennt;
 - gruppiert zentral nur Patch-/Minor-Updates für GitHub Actions;
+- erzeugt keine generischen Major-Upgrade-PRs; Major-Sprünge gelten als explizite Migrationen, weil sie Breaking Changes, Peer-Abhängigkeiten, Lockfiles und Runtime-Verträge koordinieren können;
 - behandelt Python-Runtime-Linien in `actions/setup-python` nicht als gewöhnliche Dependency-Updates, weil Interpreter, Locks und Runtime-Policy gemeinsam migriert werden müssen;
 - lässt `heimgewebe/metarepo`-Reusable-Workflow-Pins aus generischen Renovate-PRs heraus, solange deren Contract-/Evidenzdaten nicht atomar mitaktualisiert werden;
 - lässt GitHub-Action-Pins in WGX aus generischen Renovate-PRs heraus, solange sie an eingecheckte Capability-/Source-Evidenz gebunden sind;
