@@ -42,6 +42,8 @@ EXPECTED_CUTOVER_SEQUENCE = [
 DEPENDABOT_STATES = {"enabled", "disabled", "none"}
 RENOVATE_STATES = {"enabled", "prepared", "disabled"}
 ALLOWED_SELECTOR = "remaining-eligible-active-fleet"
+EXPECTED_RENOVATE_TIMEZONE = "Europe/Berlin"
+EXPECTED_RENOVATE_SCHEDULE = ["* 0-3 * * 1"]
 
 
 class PolicyError(ValueError):
@@ -183,6 +185,8 @@ def validate_preset(preset: dict[str, Any]) -> None:
             "extends",
             "automerge",
             "dependencyDashboard",
+            "timezone",
+            "schedule",
             "prConcurrentLimit",
             "branchConcurrentLimit",
             "prHourlyLimit",
@@ -194,6 +198,8 @@ def validate_preset(preset: dict[str, Any]) -> None:
             "$schema",
             "extends",
             "automerge",
+            "timezone",
+            "schedule",
             "prConcurrentLimit",
             "branchConcurrentLimit",
             "prHourlyLimit",
@@ -207,6 +213,14 @@ def validate_preset(preset: dict[str, Any]) -> None:
         raise PolicyError("Renovate preset must extend config:recommended")
     if preset["automerge"] is not False:
         raise PolicyError("Renovate preset must set automerge=false")
+    if preset["timezone"] != EXPECTED_RENOVATE_TIMEZONE:
+        raise PolicyError(
+            f"Renovate preset must set timezone={EXPECTED_RENOVATE_TIMEZONE}"
+        )
+    if preset["schedule"] != EXPECTED_RENOVATE_SCHEDULE:
+        raise PolicyError(
+            "Renovate preset must keep the exact Monday 00:00-03:59 normal-update schedule"
+        )
     if preset["separateMajorMinor"] is not True:
         raise PolicyError("Renovate preset must keep major updates separate")
     for field in ("prConcurrentLimit", "branchConcurrentLimit", "prHourlyLimit"):
