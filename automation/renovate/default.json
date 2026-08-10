@@ -16,7 +16,7 @@
   ],
   "packageRules": [
     {
-      "description": "Group compatible non-major GitHub Actions updates",
+      "description": "Group non-major GitHub Actions updates",
       "matchManagers": [
         "github-actions"
       ],
@@ -24,7 +24,47 @@
         "minor",
         "patch"
       ],
-      "groupName": "github-actions non-major"
+      "groupName": "github-actions non-major updates"
+    },
+    {
+      "description": "Python runtime-line migrations must stay aligned with repository locks and runtime policy",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "enabled": false,
+      "matchDepNames": [
+        "python"
+      ]
+    },
+    {
+      "description": "Metarepo reusable-workflow pins require an atomic contract and evidence refresh",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "matchPackageNames": [
+        "heimgewebe/metarepo"
+      ],
+      "enabled": false
+    },
+    {
+      "description": "WGX GitHub Action pins are bound to checked-in operator capability source evidence",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "matchRepositories": [
+        "heimgewebe/wgx"
+      ],
+      "enabled": false
+    },
+    {
+      "description": "Weltgewebe GitHub Action changes require review evidence that generic Renovate cannot supply",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "matchRepositories": [
+        "heimgewebe/weltgewebe"
+      ],
+      "enabled": false
     }
   ]
 }

@@ -217,30 +217,96 @@ def validate_preset(preset: dict[str, Any]) -> None:
     rules = preset["packageRules"]
     if not isinstance(rules, list) or not rules:
         raise PolicyError("Renovate preset packageRules must be a non-empty list")
+
+    grouping_rules: list[dict[str, Any]] = []
     for index, rule in enumerate(rules):
         if not isinstance(rule, dict):
             raise PolicyError(f"packageRules[{index}] must be an object")
         _exact_keys(
             rule,
-            allowed={"description", "matchManagers", "matchUpdateTypes", "groupName"},
-            required={"matchManagers", "matchUpdateTypes", "groupName"},
+            allowed={
+                "description",
+                "matchManagers",
+                "matchUpdateTypes",
+                "groupName",
+                "matchPackageNames",
+                "matchDepNames",
+                "matchRepositories",
+                "enabled",
+            },
+            required={"matchManagers"},
             label=f"packageRules[{index}]",
         )
         managers = rule["matchManagers"]
-        update_types = rule["matchUpdateTypes"]
-        group_name = rule["groupName"]
         if not isinstance(managers, list) or not managers or not all(
             isinstance(item, str) and item.strip() for item in managers
         ):
             raise PolicyError(f"packageRules[{index}].matchManagers must be non-empty strings")
-        if not isinstance(update_types, list) or not update_types:
-            raise PolicyError(f"packageRules[{index}].matchUpdateTypes must be non-empty")
-        if set(update_types) - {"minor", "patch"}:
+
+        for field in ("matchPackageNames", "matchDepNames", "matchRepositories"):
+            if field not in rule:
+                continue
+            values = rule[field]
+            if not isinstance(values, list) or not values or not all(
+                isinstance(item, str) and item.strip() for item in values
+            ):
+                raise PolicyError(f"packageRules[{index}].{field} must be non-empty strings")
+
+        if "enabled" in rule and not isinstance(rule["enabled"], bool):
+            raise PolicyError(f"packageRules[{index}].enabled must be boolean")
+
+        has_group_name = "groupName" in rule
+        has_update_types = "matchUpdateTypes" in rule
+        if has_group_name != has_update_types:
             raise PolicyError(
-                f"packageRules[{index}] groups unsupported update types; major updates must remain isolated"
+                f"packageRules[{index}] must define groupName and matchUpdateTypes together"
             )
-        if not isinstance(group_name, str) or not group_name.strip():
-            raise PolicyError(f"packageRules[{index}].groupName must be non-empty")
+        if has_group_name:
+            update_types = rule["matchUpdateTypes"]
+            group_name = rule["groupName"]
+            if not isinstance(update_types, list) or not update_types:
+                raise PolicyError(f"packageRules[{index}].matchUpdateTypes must be non-empty")
+            if set(update_types) - {"minor", "patch"}:
+                raise PolicyError(
+                    f"packageRules[{index}] groups unsupported update types; major updates must remain isolated"
+                )
+            if not isinstance(group_name, str) or not group_name.strip():
+                raise PolicyError(f"packageRules[{index}].groupName must be non-empty")
+            grouping_rules.append(rule)
+        elif rule.get("enabled") is not False:
+            raise PolicyError(
+                f"packageRules[{index}] non-grouping rules must be explicit enabled=false protections"
+            )
+
+    if len(grouping_rules) != 1:
+        raise PolicyError("Renovate preset must contain exactly one grouping rule")
+    grouping_rule = grouping_rules[0]
+    if grouping_rule["matchManagers"] != ["github-actions"] or grouping_rule[
+        "matchUpdateTypes"
+    ] != ["minor", "patch"]:
+        raise PolicyError("Renovate preset may group only GitHub Actions minor/patch updates")
+
+    required_protections = (
+        {"matchManagers": ["github-actions"], "matchDepNames": ["python"], "enabled": False},
+        {
+            "matchManagers": ["github-actions"],
+            "matchPackageNames": ["heimgewebe/metarepo"],
+            "enabled": False,
+        },
+        {
+            "matchManagers": ["github-actions"],
+            "matchRepositories": ["heimgewebe/wgx"],
+            "enabled": False,
+        },
+        {
+            "matchManagers": ["github-actions"],
+            "matchRepositories": ["heimgewebe/weltgewebe"],
+            "enabled": False,
+        },
+    )
+    for expected in required_protections:
+        if not any(all(rule.get(key) == value for key, value in expected.items()) for rule in rules):
+            raise PolicyError(f"Renovate preset is missing governed dependency protection: {expected}")
 
 
 def validate_baseline(baseline: dict[str, Any]) -> None:

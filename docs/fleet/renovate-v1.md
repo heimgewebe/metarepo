@@ -72,7 +72,15 @@ Der gemeinsame Preset:
 - begrenzt PR-, Branch- und Stundenparallelität auf höchstens zwei;
 - hält Major-Updates getrennt;
 - gruppiert zentral nur Patch-/Minor-Updates für GitHub Actions;
+- behandelt Python-Runtime-Linien in `actions/setup-python` nicht als gewöhnliche Dependency-Updates, weil Interpreter, Locks und Runtime-Policy gemeinsam migriert werden müssen;
+- lässt `heimgewebe/metarepo`-Reusable-Workflow-Pins aus generischen Renovate-PRs heraus, solange deren Contract-/Evidenzdaten nicht atomar mitaktualisiert werden;
+- lässt GitHub-Action-Pins in WGX aus generischen Renovate-PRs heraus, solange sie an eingecheckte Capability-/Source-Evidenz gebunden sind;
+- lässt GitHub-Action-Pins in Weltgewebe aus generischen Renovate-PRs heraus, solange Workflow-Änderungen dort R3-Review-Evidenz verlangen, die Renovate nicht selbst liefern kann;
 - enthält keine Post-Upgrade-Command-Ausführung.
+
+Diese Ausschlüsse sind kein Update-Verbot. Sie trennen semantische Runtime- bzw.
+Evidenzmigrationen von blindem Versions-Pinning: Solche Updates brauchen einen eigenen,
+reviewbaren Pfad, der die jeweils gekoppelten Verträge und Nachweise atomar aktualisiert.
 
 Repo-spezifische Konfiguration darf diese Sicherheitsgrenzen nicht durch Automerge
 unterlaufen. Vor dem ersten schreibenden Lauf werden bekannte lokale Abweichungen wie
