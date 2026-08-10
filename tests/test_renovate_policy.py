@@ -104,8 +104,35 @@ def test_two_active_version_update_producers_fail_closed() -> None:
 
 def test_shared_preset_groups_only_github_actions_non_major_updates() -> None:
     _, _, preset = _inputs()
-    assert [rule["matchManagers"] for rule in preset["packageRules"]] == [["github-actions"]]
-    assert preset["packageRules"][0]["matchUpdateTypes"] == ["minor", "patch"]
+    grouped = [rule for rule in preset["packageRules"] if "groupName" in rule]
+    assert len(grouped) == 1
+    assert grouped[0]["matchManagers"] == ["github-actions"]
+    assert grouped[0]["matchUpdateTypes"] == ["minor", "patch"]
+
+
+def test_shared_preset_keeps_governed_dependency_lanes_out_of_generic_renovate() -> None:
+    _, _, preset = _inputs()
+    rules = preset["packageRules"]
+    expected = (
+        {"matchManagers": ["github-actions"], "matchDepNames": ["python"], "enabled": False},
+        {
+            "matchManagers": ["github-actions"],
+            "matchPackageNames": ["heimgewebe/metarepo"],
+            "enabled": False,
+        },
+        {
+            "matchManagers": ["github-actions"],
+            "matchRepositories": ["heimgewebe/wgx"],
+            "enabled": False,
+        },
+        {
+            "matchManagers": ["github-actions"],
+            "matchRepositories": ["heimgewebe/weltgewebe"],
+            "enabled": False,
+        },
+    )
+    for required in expected:
+        assert any(all(rule.get(key) == value for key, value in required.items()) for rule in rules)
 
 
 def test_preset_cannot_enable_automerge() -> None:
