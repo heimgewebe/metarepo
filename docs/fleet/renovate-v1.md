@@ -133,3 +133,7 @@ Für Repositories, deren Dependabot-Version-Updates bereits entfernt wurden, bes
 Rollback aus dem Revert des jeweiligen reviewten Cutover-Commits. Anschließend muss live
 belegt werden, dass wieder exakt ein Version-Update-Produzent aktiv ist. Bureau-,
 Chronik- und Git-Historie werden nicht umgeschrieben.
+
+### Governed Weltgewebe deployment images
+
+Weltgewebe-Image-Abhängigkeiten in `apps/**/Dockerfile` und `infra/compose/**` laufen nicht über generische Renovate-PRs. Diese Pfade sind an kontrollierte OCI-Basen, Deployment-Drift-Prüfung und R3-Review-Evidenz gebunden. Ein reiner Image-Tag- oder Digest-Tausch kann diese Verträge nicht atomar erfüllen; solche Updates brauchen einen expliziten, revisionsgebundenen Migrationspfad.

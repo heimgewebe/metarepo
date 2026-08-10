@@ -72,6 +72,21 @@
         "heimgewebe/weltgewebe"
       ],
       "enabled": false
+    },
+    {
+      "description": "Weltgewebe deployment image updates require OCI, drift and R3 review evidence",
+      "matchManagers": [
+        "dockerfile",
+        "docker-compose"
+      ],
+      "matchRepositories": [
+        "heimgewebe/weltgewebe"
+      ],
+      "enabled": false,
+      "matchFileNames": [
+        "apps/**/Dockerfile",
+        "infra/compose/**"
+      ]
     }
   ]
 }

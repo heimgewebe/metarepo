@@ -232,6 +232,7 @@ def validate_preset(preset: dict[str, Any]) -> None:
                 "matchPackageNames",
                 "matchDepNames",
                 "matchRepositories",
+                "matchFileNames",
                 "enabled",
             },
             required=set(),
@@ -244,7 +245,7 @@ def validate_preset(preset: dict[str, Any]) -> None:
             ):
                 raise PolicyError(f"packageRules[{index}].matchManagers must be non-empty strings")
 
-        for field in ("matchPackageNames", "matchDepNames", "matchRepositories"):
+        for field in ("matchPackageNames", "matchDepNames", "matchRepositories", "matchFileNames"):
             if field not in rule:
                 continue
             values = rule[field]
@@ -308,6 +309,12 @@ def validate_preset(preset: dict[str, Any]) -> None:
         {
             "matchManagers": ["github-actions"],
             "matchRepositories": ["heimgewebe/weltgewebe"],
+            "enabled": False,
+        },
+        {
+            "matchManagers": ["dockerfile", "docker-compose"],
+            "matchRepositories": ["heimgewebe/weltgewebe"],
+            "matchFileNames": ["apps/**/Dockerfile", "infra/compose/**"],
             "enabled": False,
         },
     )

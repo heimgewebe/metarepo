@@ -131,6 +131,12 @@ def test_shared_preset_keeps_governed_dependency_lanes_out_of_generic_renovate()
             "matchRepositories": ["heimgewebe/weltgewebe"],
             "enabled": False,
         },
+        {
+            "matchManagers": ["dockerfile", "docker-compose"],
+            "matchRepositories": ["heimgewebe/weltgewebe"],
+            "matchFileNames": ["apps/**/Dockerfile", "infra/compose/**"],
+            "enabled": False,
+        },
     )
     for required in expected:
         assert any(all(rule.get(key) == value for key, value in required.items()) for rule in rules)
@@ -187,5 +193,16 @@ def test_shared_preset_disables_generic_major_updates() -> None:
     _, _, preset = _inputs()
     assert any(
         rule.get("matchUpdateTypes") == ["major"] and rule.get("enabled") is False
+        for rule in preset["packageRules"]
+    )
+
+
+def test_shared_preset_disables_weltgewebe_deployment_image_managers() -> None:
+    _, _, preset = _inputs()
+    assert any(
+        rule.get("matchManagers") == ["dockerfile", "docker-compose"]
+        and rule.get("matchRepositories") == ["heimgewebe/weltgewebe"]
+        and rule.get("matchFileNames") == ["apps/**/Dockerfile", "infra/compose/**"]
+        and rule.get("enabled") is False
         for rule in preset["packageRules"]
     )
