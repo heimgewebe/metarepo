@@ -14,14 +14,20 @@ contract validity, consumer compatibility or permission to publish.
 from __future__ import annotations
 
 import argparse
+from dataclasses import dataclass
 import hashlib
+import heapq
 import json
+import os
 from pathlib import Path, PurePosixPath
+import posixpath
 import re
 import shutil
+import stat
 import subprocess
 import sys
 from typing import Any, Iterable, Sequence
+from urllib.parse import urlsplit
 
 EXPECTED_REPOSITORY = "heimgewebe/metarepo"
 MANIFEST_NAME = "metarepo-contract-source.v1.json"
@@ -42,6 +48,15 @@ class ManifestError(RuntimeError):
         super().__init__(f"{code}: {detail}")
 
 
+@dataclass(frozen=True)
+class GitTreeEntry:
+    """One path pinned to an immutable object in the selected commit."""
+
+    mode: str
+    kind: str
+    object_id: str
+
+
 def _run_git(root: Path, *args: str) -> str:
     try:
         result = subprocess.run(
@@ -50,10 +65,29 @@ def _run_git(root: Path, *args: str) -> str:
             text=True,
             capture_output=True,
         )
-    except (OSError, subprocess.CalledProcessError) as exc:
+    except (OSError, subprocess.CalledProcessError, UnicodeError) as exc:
         stderr = getattr(exc, "stderr", "") or ""
         raise ManifestError("SOURCE_NOT_GIT", stderr.strip() or str(exc)) from exc
     return result.stdout.strip()
+
+
+def _run_git_bytes(
+    root: Path, *args: str, code: str = "SOURCE_NOT_GIT", detail: str = "Git read failed"
+) -> bytes:
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(root), *args],
+            check=True,
+            capture_output=True,
+        )
+    except (OSError, subprocess.CalledProcessError) as exc:
+        stderr = getattr(exc, "stderr", b"") or b""
+        if isinstance(stderr, bytes):
+            error_detail = stderr.decode("utf-8", errors="replace").strip()
+        else:
+            error_detail = str(stderr).strip()
+        raise ManifestError(code, error_detail or f"{detail}: {exc}") from exc
+    return result.stdout
 
 
 def _repository_identity(origin: str) -> str:
@@ -108,25 +142,6 @@ def _relative_path(value: str, code: str) -> str:
             code, f"must be a normalized relative POSIX path: {value!r}"
         )
     return PurePosixPath(value).as_posix()
-
-
-def _safe_join(root: Path, relative: str) -> Path:
-    try:
-        root_resolved = root.resolve(strict=True)
-        target = (root_resolved / relative).resolve(strict=True)
-    except (FileNotFoundError, OSError) as exc:
-        raise ManifestError("SCHEMA_MISSING", f"schema is unavailable: {relative}") from exc
-    try:
-        target.relative_to(root_resolved)
-    except ValueError as exc:
-        raise ManifestError(
-            "SCHEMA_PATH_ESCAPE", f"schema escapes source root: {relative}"
-        ) from exc
-    if not target.is_file():
-        raise ManifestError(
-            "SCHEMA_MISSING", f"schema is not a regular file: {relative}"
-        )
-    return target
 
 
 def resolve_source(source_path: str, expected_commit: str | None) -> tuple[Path, str]:
@@ -188,10 +203,42 @@ def resolve_source(source_path: str, expected_commit: str | None) -> tuple[Path,
     return root, head
 
 
+def _commit_tree(root: Path, commit: str) -> dict[str, GitTreeEntry]:
+    """Read the contracts tree from one commit, never from the working tree."""
+
+    raw_tree = _run_git_bytes(
+        root,
+        "ls-tree",
+        "-r",
+        "-z",
+        "--full-tree",
+        commit,
+        "--",
+        "contracts",
+        code="SOURCE_COMMIT_INVALID",
+        detail=f"cannot inspect contract tree at {commit}",
+    )
+    entries: dict[str, GitTreeEntry] = {}
+    for raw_entry in raw_tree.split(b"\0"):
+        if not raw_entry:
+            continue
+        try:
+            raw_metadata, raw_path = raw_entry.split(b"\t", 1)
+            mode, kind, object_id = raw_metadata.decode("ascii").split(" ")
+            relative = raw_path.decode("utf-8")
+        except (UnicodeDecodeError, ValueError) as exc:
+            raise ManifestError(
+                "SCHEMA_PATH_INVALID",
+                "the committed contracts tree contains an unrepresentable path",
+            ) from exc
+        entries[relative] = GitTreeEntry(mode, kind, object_id)
+    return entries
+
+
 def select_schemas(
-    root: Path, consumers: Sequence[str], schemas: Sequence[str]
+    tree: dict[str, GitTreeEntry], consumers: Sequence[str], schemas: Sequence[str]
 ) -> list[str]:
-    """Expand consumer namespaces and explicit paths into one sorted schema set."""
+    """Expand selections against paths tracked by the bound commit."""
 
     selected: set[str] = set()
 
@@ -201,17 +248,18 @@ def select_schemas(
             raise ManifestError(
                 "CONSUMER_INVALID", f"consumer must be a single path segment: {consumer!r}"
             )
-        namespace = root / "contracts" / name
-        if not namespace.is_dir():
+        namespace = f"contracts/{name}/"
+        namespace_paths = sorted(path for path in tree if path.startswith(namespace))
+        if not namespace_paths:
             raise ManifestError(
                 "CONSUMER_UNKNOWN",
                 f"no canonical contract namespace contracts/{name} in the bound source",
             )
-        found = sorted(
-            path.relative_to(root).as_posix()
-            for path in namespace.rglob("*.schema.json")
-            if path.is_file()
-        )
+        found = [
+            _relative_path(path, "SCHEMA_PATH_INVALID")
+            for path in namespace_paths
+            if path.endswith(".schema.json")
+        ]
         if not found:
             raise ManifestError(
                 "CONSUMER_EMPTY",
@@ -220,7 +268,18 @@ def select_schemas(
         selected.update(found)
 
     for schema in schemas:
-        selected.add(_relative_path(schema, "SCHEMA_PATH_INVALID"))
+        relative = _relative_path(schema, "SCHEMA_PATH_INVALID")
+        if not relative.endswith(".schema.json"):
+            raise ManifestError(
+                "SCHEMA_PATH_INVALID",
+                f"explicit selection is not a canonical schema path: {relative}",
+            )
+        if relative not in tree:
+            raise ManifestError(
+                "SCHEMA_NOT_TRACKED",
+                f"schema is not tracked by the bound commit: {relative}",
+            )
+        selected.add(relative)
 
     if not selected:
         raise ManifestError(
@@ -230,8 +289,165 @@ def select_schemas(
     return sorted(selected)
 
 
+def _read_schema_blob(
+    root: Path,
+    tree: dict[str, GitTreeEntry],
+    relative: str,
+    *,
+    referrer: str | None = None,
+) -> bytes:
+    entry = tree.get(relative)
+    if entry is None:
+        if referrer is not None:
+            raise ManifestError(
+                "SCHEMA_REF_MISSING",
+                f"{referrer} references a schema not tracked by the bound commit: {relative}",
+            )
+        raise ManifestError(
+            "SCHEMA_NOT_TRACKED",
+            f"schema is not tracked by the bound commit: {relative}",
+        )
+    if entry.kind != "blob" or entry.mode not in {"100644", "100755"}:
+        if entry.mode == "120000":
+            raise ManifestError(
+                "SCHEMA_PATH_ESCAPE",
+                f"schema is a Git symlink rather than commit-bound schema bytes: {relative}",
+            )
+        raise ManifestError(
+            "SCHEMA_NOT_REGULAR",
+            f"schema is not a regular Git blob in the bound commit: {relative}",
+        )
+    return _run_git_bytes(
+        root,
+        "cat-file",
+        "blob",
+        entry.object_id,
+        code="SCHEMA_UNREADABLE",
+        detail=f"cannot read committed schema blob {relative}",
+    )
+
+
+def _decode_schema(relative: str, data: bytes) -> Any:
+    def reject_duplicate_keys(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+        result: dict[str, Any] = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError(f"duplicate object key {key!r}")
+            result[key] = value
+        return result
+
+    def reject_constant(value: str) -> None:
+        raise ValueError(f"non-finite JSON number {value}")
+
+    try:
+        text = data.decode("utf-8")
+        return json.loads(
+            text,
+            object_pairs_hook=reject_duplicate_keys,
+            parse_constant=reject_constant,
+        )
+    except (UnicodeDecodeError, json.JSONDecodeError, ValueError) as exc:
+        raise ManifestError(
+            "SCHEMA_JSON_INVALID",
+            f"cannot inspect local references in {relative}: {exc}",
+        ) from exc
+
+
+def _schema_references(relative: str, schema: Any) -> Iterable[str]:
+    if isinstance(schema, dict):
+        for key in sorted(schema):
+            value = schema[key]
+            if key == "$ref":
+                if not isinstance(value, str):
+                    raise ManifestError(
+                        "SCHEMA_REF_INVALID",
+                        f"{relative} contains a non-string $ref",
+                    )
+                yield value
+            yield from _schema_references(relative, value)
+    elif isinstance(schema, list):
+        for value in schema:
+            yield from _schema_references(relative, value)
+
+
+def _resolve_local_reference(referrer: str, reference: str) -> str | None:
+    """Resolve a repository-local reference, or return None for an external URI."""
+
+    try:
+        parsed = urlsplit(reference)
+    except ValueError as exc:
+        raise ManifestError(
+            "SCHEMA_REF_INVALID", f"{referrer} contains an invalid $ref: {reference!r}"
+        ) from exc
+
+    # A URI with a scheme or authority is external provenance. In particular,
+    # never reinterpret its path component as a path in this checkout.
+    if parsed.scheme or parsed.netloc:
+        return None
+    if not parsed.path:
+        # Empty references and fragment-only references stay in the same blob.
+        return None
+    if parsed.query:
+        raise ManifestError(
+            "SCHEMA_REF_INVALID",
+            f"{referrer} uses a query in a local $ref: {reference!r}",
+        )
+
+    path = parsed.path
+    if path.startswith("/"):
+        raise ManifestError(
+            "SCHEMA_REF_ESCAPE",
+            f"{referrer} uses an absolute local $ref path: {reference!r}",
+        )
+    if "\\" in path or "%" in path or "\x00" in path:
+        raise ManifestError(
+            "SCHEMA_REF_INVALID",
+            f"{referrer} contains a non-canonical local $ref path: {reference!r}",
+        )
+
+    resolved = posixpath.normpath(posixpath.join(posixpath.dirname(referrer), path))
+    if resolved == "contracts" or not resolved.startswith("contracts/"):
+        raise ManifestError(
+            "SCHEMA_REF_ESCAPE",
+            f"{referrer} has a local $ref outside contracts/: {reference!r}",
+        )
+    normalized = _relative_path(resolved, "SCHEMA_REF_INVALID")
+    if not normalized.endswith(".schema.json"):
+        raise ManifestError(
+            "SCHEMA_REF_INVALID",
+            f"{referrer} does not reference a canonical schema path: {reference!r}",
+        )
+    return normalized
+
+
+def _schema_closure(
+    root: Path,
+    tree: dict[str, GitTreeEntry],
+    schema_paths: Iterable[str],
+) -> dict[str, bytes]:
+    """Return deterministic transitive local $ref closure from committed blobs."""
+
+    pending = [(relative, "") for relative in schema_paths]
+    heapq.heapify(pending)
+    payload_bytes: dict[str, bytes] = {}
+    while pending:
+        relative, referrer = heapq.heappop(pending)
+        if relative in payload_bytes:
+            continue
+        data = _read_schema_blob(root, tree, relative, referrer=referrer or None)
+        payload_bytes[relative] = data
+        schema = _decode_schema(relative, data)
+        for reference in _schema_references(relative, schema):
+            dependency = _resolve_local_reference(relative, reference)
+            if dependency is None or dependency in payload_bytes:
+                continue
+            heapq.heappush(pending, (dependency, relative))
+    return dict(sorted(payload_bytes.items()))
+
+
 def build_manifest(
     root: Path,
+    tree: dict[str, GitTreeEntry],
     commit: str,
     source_kind: str,
     content_root: str,
@@ -245,15 +461,14 @@ def build_manifest(
             f"source_kind must be one of {', '.join(SOURCE_KINDS)}",
         )
     content = _relative_path(content_root, "CONTENT_ROOT_INVALID")
-
-    payload_bytes: dict[str, bytes] = {}
-    digests: dict[str, str] = {}
-    for relative in schema_paths:
-        data = _read_bytes(
-            _safe_join(root, relative), "SCHEMA_UNREADABLE", f"cannot read {relative}"
+    if PurePosixPath(content).parts[0] == MANIFEST_NAME:
+        raise ManifestError(
+            "CONTENT_ROOT_INVALID",
+            "content root must not collide with the manifest path",
         )
-        payload_bytes[relative] = data
-        digests[relative] = _sha256(data)
+
+    payload_bytes = _schema_closure(root, tree, schema_paths)
+    digests = {relative: _sha256(data) for relative, data in payload_bytes.items()}
 
     manifest = {
         "schema_version": 1,
@@ -280,6 +495,8 @@ def _resolve_out_dir(out_dir: str, source_root: Path, create: bool) -> Path:
     if create:
         try:
             path.mkdir(parents=True, exist_ok=True)
+        except FileExistsError as exc:
+            raise ManifestError("OUT_DIR_INVALID", f"not a directory: {out_dir}") from exc
         except OSError as exc:
             raise ManifestError("OUT_DIR_UNWRITABLE", f"{out_dir}: {exc}") from exc
     try:
@@ -296,11 +513,73 @@ def _resolve_out_dir(out_dir: str, source_root: Path, create: bool) -> Path:
     return resolved
 
 
+def _resolve_content_dir(
+    out_dir: Path, content_root: str, *, error_code: str
+) -> Path:
+    """Resolve a lexical content root without following existing symlinks."""
+
+    current = out_dir
+    parts = PurePosixPath(content_root).parts
+    for index, part in enumerate(parts):
+        current /= part
+        try:
+            metadata = current.lstat()
+        except FileNotFoundError:
+            continue
+        except OSError as exc:
+            raise ManifestError(error_code, f"cannot inspect {current}: {exc}") from exc
+        if stat.S_ISLNK(metadata.st_mode):
+            raise ManifestError(
+                "CONTENT_ROOT_PATH_ESCAPE",
+                f"content root traverses a symlink: {current}",
+            )
+        if index < len(parts) - 1 and not stat.S_ISDIR(metadata.st_mode):
+            raise ManifestError(
+                "CONTENT_ROOT_INVALID_TYPE",
+                f"content root parent is not a directory: {current}",
+            )
+    return current
+
+
+def _manifest_target_for_write(out_dir: Path) -> Path:
+    manifest_path = out_dir / MANIFEST_NAME
+    try:
+        metadata = manifest_path.lstat()
+    except FileNotFoundError:
+        return manifest_path
+    except OSError as exc:
+        raise ManifestError(
+            "OUT_DIR_UNWRITABLE", f"cannot inspect {manifest_path}: {exc}"
+        ) from exc
+    if stat.S_ISLNK(metadata.st_mode) or not stat.S_ISREG(metadata.st_mode):
+        raise ManifestError(
+            "MANIFEST_INVALID_TYPE",
+            f"manifest target is not a regular non-symlink file: {manifest_path}",
+        )
+    return manifest_path
+
+
 def _materialize(
     content_dir: Path, payload_bytes: dict[str, bytes], overwrite: bool
 ) -> None:
-    if content_dir.exists():
-        if any(content_dir.iterdir()) and not overwrite:
+    try:
+        metadata = content_dir.lstat()
+    except FileNotFoundError:
+        metadata = None
+    except OSError as exc:
+        raise ManifestError("OUT_DIR_UNWRITABLE", f"{content_dir}: {exc}") from exc
+
+    if metadata is not None:
+        if stat.S_ISLNK(metadata.st_mode) or not stat.S_ISDIR(metadata.st_mode):
+            raise ManifestError(
+                "CONTENT_ROOT_INVALID_TYPE",
+                f"content root is not a regular directory: {content_dir}",
+            )
+        try:
+            has_content = next(content_dir.iterdir(), None) is not None
+        except OSError as exc:
+            raise ManifestError("OUT_DIR_UNWRITABLE", f"{content_dir}: {exc}") from exc
+        if has_content and not overwrite:
             raise ManifestError(
                 "CONTENT_ROOT_NOT_EMPTY",
                 f"{content_dir} already has content; pass --overwrite to replace it",
@@ -318,17 +597,105 @@ def _materialize(
             raise ManifestError("OUT_DIR_UNWRITABLE", f"{target}: {exc}") from exc
 
 
+def _regular_manifest_for_verify(out_dir: Path) -> Path:
+    manifest_path = out_dir / MANIFEST_NAME
+    try:
+        metadata = manifest_path.lstat()
+    except FileNotFoundError as exc:
+        raise ManifestError(
+            "MANIFEST_MISSING", f"no manifest to verify at {manifest_path}"
+        ) from exc
+    except OSError as exc:
+        raise ManifestError(
+            "MANIFEST_UNREADABLE", f"cannot inspect {manifest_path}: {exc}"
+        ) from exc
+    if stat.S_ISLNK(metadata.st_mode) or not stat.S_ISREG(metadata.st_mode):
+        raise ManifestError(
+            "MANIFEST_INVALID_TYPE",
+            f"manifest is not a regular non-symlink file: {manifest_path}",
+        )
+    return manifest_path
+
+
+def _regular_cached_schema(content_dir: Path, relative: str) -> Path:
+    current = content_dir
+    parts = PurePosixPath(relative).parts
+    for index, part in enumerate(parts):
+        current /= part
+        try:
+            metadata = current.lstat()
+        except FileNotFoundError as exc:
+            raise ManifestError(
+                "CONTENT_MISSING", f"bound schema is absent from the cache: {relative}"
+            ) from exc
+        except OSError as exc:
+            raise ManifestError(
+                "CONTENT_UNREADABLE", f"cannot inspect {relative}: {exc}"
+            ) from exc
+        is_final = index == len(parts) - 1
+        if stat.S_ISLNK(metadata.st_mode):
+            raise ManifestError(
+                "CONTENT_INVALID_TYPE",
+                f"bound schema path traverses a symlink: {relative}",
+            )
+        if is_final:
+            if not stat.S_ISREG(metadata.st_mode):
+                raise ManifestError(
+                    "CONTENT_INVALID_TYPE",
+                    f"bound schema is not a regular file: {relative}",
+                )
+        elif not stat.S_ISDIR(metadata.st_mode):
+            raise ManifestError(
+                "CONTENT_INVALID_TYPE",
+                f"bound schema parent is not a directory: {relative}",
+            )
+    return current
+
+
+def _present_cache_files(content_dir: Path) -> set[str]:
+    present: set[str] = set()
+    pending = [content_dir]
+    while pending:
+        directory = pending.pop()
+        try:
+            with os.scandir(directory) as iterator:
+                entries = sorted(iterator, key=lambda entry: entry.name)
+        except OSError as exc:
+            raise ManifestError(
+                "CONTENT_UNREADABLE", f"cannot enumerate {directory}: {exc}"
+            ) from exc
+        for entry in entries:
+            path = Path(entry.path)
+            relative = path.relative_to(content_dir).as_posix()
+            try:
+                if entry.is_symlink():
+                    raise ManifestError(
+                        "CONTENT_INVALID_TYPE",
+                        f"cache contains a symlink: {relative}",
+                    )
+                if entry.is_dir(follow_symlinks=False):
+                    pending.append(path)
+                elif entry.is_file(follow_symlinks=False):
+                    present.add(relative)
+                else:
+                    raise ManifestError(
+                        "CONTENT_INVALID_TYPE",
+                        f"cache contains a non-regular node: {relative}",
+                    )
+            except OSError as exc:
+                raise ManifestError(
+                    "CONTENT_UNREADABLE", f"cannot inspect {relative}: {exc}"
+                ) from exc
+    return present
+
+
 def _verify(
     out_dir: Path,
     content_root: str,
     manifest_bytes: bytes,
     payload_bytes: dict[str, bytes],
 ) -> None:
-    manifest_path = out_dir / MANIFEST_NAME
-    if not manifest_path.is_file():
-        raise ManifestError(
-            "MANIFEST_MISSING", f"no manifest to verify at {manifest_path}"
-        )
+    manifest_path = _regular_manifest_for_verify(out_dir)
     observed_manifest = _read_bytes(
         manifest_path, "MANIFEST_UNREADABLE", f"cannot read {manifest_path}"
     )
@@ -338,28 +705,33 @@ def _verify(
             "the stored manifest differs from the manifest the bound source produces",
         )
 
-    content_dir = out_dir / content_root
-    if not content_dir.is_dir():
+    content_dir = _resolve_content_dir(
+        out_dir, content_root, error_code="CONTENT_UNREADABLE"
+    )
+    try:
+        content_metadata = content_dir.lstat()
+    except FileNotFoundError as exc:
         raise ManifestError(
             "CONTENT_ROOT_MISSING", f"content root is unavailable: {content_dir}"
+        ) from exc
+    except OSError as exc:
+        raise ManifestError(
+            "CONTENT_UNREADABLE", f"cannot inspect content root {content_dir}: {exc}"
+        ) from exc
+    if not stat.S_ISDIR(content_metadata.st_mode):
+        raise ManifestError(
+            "CONTENT_ROOT_INVALID_TYPE",
+            f"content root is not a regular directory: {content_dir}",
         )
     for relative, data in sorted(payload_bytes.items()):
-        target = content_dir / relative
-        if not target.is_file():
-            raise ManifestError(
-                "CONTENT_MISSING", f"bound schema is absent from the cache: {relative}"
-            )
+        target = _regular_cached_schema(content_dir, relative)
         observed = _read_bytes(target, "CONTENT_UNREADABLE", f"cannot read {relative}")
         if observed != data:
             raise ManifestError(
                 "CONTENT_DRIFT", f"cached schema bytes differ from the bound source: {relative}"
             )
     bound = set(payload_bytes)
-    present = {
-        path.relative_to(content_dir).as_posix()
-        for path in content_dir.rglob("*")
-        if path.is_file()
-    }
+    present = _present_cache_files(content_dir)
     unbound = sorted(present - bound)
     if unbound:
         raise ManifestError(
@@ -396,9 +768,11 @@ def _parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--source-kind",
-        choices=SOURCE_KINDS,
         default="detached_archive",
-        help="How the emitted source is consumed. Default: detached_archive.",
+        help=(
+            "How the emitted source is consumed "
+            f"({', '.join(SOURCE_KINDS)}). Default: detached_archive."
+        ),
     )
     parser.add_argument(
         "--content-root",
@@ -426,9 +800,10 @@ def run(argv: Sequence[str] | None = None) -> int:
     args = _parser().parse_args(argv)
 
     root, commit = resolve_source(args.source, args.expected_commit)
-    schema_paths = select_schemas(root, args.consumer, args.schema)
+    tree = _commit_tree(root, commit)
+    schema_paths = select_schemas(tree, args.consumer, args.schema)
     manifest, payload_bytes = build_manifest(
-        root, commit, args.source_kind, args.content_root, schema_paths
+        root, tree, commit, args.source_kind, args.content_root, schema_paths
     )
     manifest_bytes = render_manifest(manifest)
     out_dir = _resolve_out_dir(args.out_dir, root, create=not args.verify)
@@ -436,8 +811,11 @@ def run(argv: Sequence[str] | None = None) -> int:
     if args.verify:
         _verify(out_dir, manifest["source_root"], manifest_bytes, payload_bytes)
     else:
-        _materialize(out_dir / manifest["source_root"], payload_bytes, args.overwrite)
-        manifest_path = out_dir / MANIFEST_NAME
+        content_dir = _resolve_content_dir(
+            out_dir, manifest["source_root"], error_code="OUT_DIR_UNWRITABLE"
+        )
+        manifest_path = _manifest_target_for_write(out_dir)
+        _materialize(content_dir, payload_bytes, args.overwrite)
         try:
             manifest_path.write_bytes(manifest_bytes)
         except OSError as exc:

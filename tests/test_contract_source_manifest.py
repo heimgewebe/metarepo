@@ -4,6 +4,7 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+import shutil
 import subprocess
 import sys
 
@@ -25,6 +26,8 @@ from emit_source_manifest import (  # noqa: E402
 
 ZONES_SCHEMA = "contracts/heim-pc/config/zones.schema.json"
 DRIFT_SCHEMA = "contracts/heim-pc/state/heim-pc.state.drift.schema.json"
+CHRONIK_SCHEMA = "contracts/chronik/event.batch.v1.schema.json"
+BASE_EVENT_SCHEMA = "contracts/events/base.event.schema.json"
 
 
 def _git(repo: Path, *args: str) -> str:
@@ -32,6 +35,19 @@ def _git(repo: Path, *args: str) -> str:
         ["git", "-C", str(repo), *args], check=True, text=True, capture_output=True
     )
     return result.stdout.strip()
+
+
+def _git_bytes(repo: Path, *args: str) -> bytes:
+    result = subprocess.run(
+        ["git", "-C", str(repo), *args], check=True, capture_output=True
+    )
+    return result.stdout
+
+
+def _write_schema(repo: Path, relative: str, payload: object) -> None:
+    target = repo / relative
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 
 
 def _source_repo(tmp_path: Path, origin: str = "https://github.com/heimgewebe/metarepo.git") -> Path:
@@ -139,6 +155,149 @@ def test_offline_cache_round_trip_is_deterministic_and_verifiable(tmp_path):
     )
 
 
+def test_chronik_consumer_binds_transitive_cross_namespace_reference(tmp_path):
+    repo = _source_repo(tmp_path)
+    _write_schema(repo, BASE_EVENT_SCHEMA, {"title": "base event", "type": "object"})
+    _write_schema(
+        repo,
+        CHRONIK_SCHEMA,
+        {
+            "title": "event batch",
+            "type": "array",
+            "items": {"$ref": "../events/base.event.schema.json"},
+        },
+    )
+    _git(repo, "add", "contracts")
+    _git(repo, "commit", "-m", "add chronik schema dependency")
+    out_dir = tmp_path / "chronik-archive"
+
+    assert (
+        run(
+            [
+                "--source",
+                str(repo),
+                "--out-dir",
+                str(out_dir),
+                "--consumer",
+                "chronik",
+            ]
+        )
+        == 0
+    )
+
+    manifest = json.loads((out_dir / MANIFEST_NAME).read_text(encoding="utf-8"))
+    assert set(manifest["schemas"]) == {CHRONIK_SCHEMA, BASE_EVENT_SCHEMA}
+    for relative in manifest["schemas"]:
+        committed = _git_bytes(repo, "show", f"HEAD:{relative}")
+        assert (out_dir / "content" / relative).read_bytes() == committed
+        assert manifest["schemas"][relative] == hashlib.sha256(committed).hexdigest()
+
+
+def test_local_ref_closure_handles_fragments_normalization_external_uris_and_cycles(
+    tmp_path,
+):
+    repo = _source_repo(tmp_path)
+    first = "contracts/cycle/a.schema.json"
+    second = "contracts/events/cycle-b.schema.json"
+    _write_schema(
+        repo,
+        first,
+        {
+            "$defs": {
+                "local": {"type": "string"},
+                "self": {"$ref": "#/$defs/local"},
+            },
+            "allOf": [
+                {"$ref": "../events/./cycle-b.schema.json#/$defs/value"},
+                {
+                    "$ref": "https://example.invalid/contracts/not-local.schema.json"
+                },
+            ],
+        },
+    )
+    _write_schema(
+        repo,
+        second,
+        {
+            "$defs": {"value": {"type": "integer"}},
+            "allOf": [{"$ref": "../cycle/a.schema.json"}],
+        },
+    )
+    _git(repo, "add", "contracts")
+    _git(repo, "commit", "-m", "add cyclic schema references")
+    out_dir = tmp_path / "cycle-archive"
+
+    assert (
+        run(
+            [
+                "--source",
+                str(repo),
+                "--out-dir",
+                str(out_dir),
+                "--consumer",
+                "cycle",
+            ]
+        )
+        == 0
+    )
+
+    manifest = json.loads((out_dir / MANIFEST_NAME).read_text(encoding="utf-8"))
+    assert set(manifest["schemas"]) == {first, second}
+
+
+@pytest.mark.parametrize(
+    ("reference", "code"),
+    [
+        ("../../outside.schema.json", "SCHEMA_REF_ESCAPE"),
+        ("../events/missing.schema.json", "SCHEMA_REF_MISSING"),
+        ("../events/%2e%2e/secret.schema.json", "SCHEMA_REF_INVALID"),
+        ("../events/base.event.schema.json?revision=worktree", "SCHEMA_REF_INVALID"),
+    ],
+)
+def test_invalid_missing_or_escaping_local_refs_fail_closed(tmp_path, reference, code):
+    repo = _source_repo(tmp_path)
+    _write_schema(
+        repo,
+        "contracts/broken/root.schema.json",
+        {"$ref": reference},
+    )
+    _git(repo, "add", "contracts")
+    _git(repo, "commit", "-m", "add invalid schema reference")
+
+    with pytest.raises(ManifestError) as excinfo:
+        run(
+            [
+                "--source",
+                str(repo),
+                "--out-dir",
+                str(tmp_path / "out"),
+                "--consumer",
+                "broken",
+            ]
+        )
+    assert excinfo.value.code == code
+
+
+def test_non_string_ref_fails_closed(tmp_path):
+    repo = _source_repo(tmp_path)
+    _write_schema(repo, "contracts/broken/root.schema.json", {"$ref": 42})
+    _git(repo, "add", "contracts")
+    _git(repo, "commit", "-m", "add malformed schema reference")
+
+    with pytest.raises(ManifestError) as excinfo:
+        run(
+            [
+                "--source",
+                str(repo),
+                "--out-dir",
+                str(tmp_path / "out"),
+                "--consumer",
+                "broken",
+            ]
+        )
+    assert excinfo.value.code == "SCHEMA_REF_INVALID"
+
+
 @pytest.mark.parametrize(
     ("mutate", "code"),
     [
@@ -211,6 +370,56 @@ def test_untracked_file_also_makes_the_source_dirty(tmp_path):
     assert excinfo.value.code == "SOURCE_DIRTY"
 
 
+@pytest.mark.parametrize("ignore_source", ["gitignore", "info-exclude"])
+def test_ignored_schemas_are_never_selected_or_read_from_the_worktree(
+    tmp_path, ignore_source
+):
+    repo = _source_repo(tmp_path)
+    ignored = "contracts/heim-pc/ignored.schema.json"
+    if ignore_source == "gitignore":
+        (repo / ".gitignore").write_text(f"/{ignored}\n", encoding="utf-8")
+        _git(repo, "add", ".gitignore")
+        _git(repo, "commit", "-m", "ignore generated schemas")
+    else:
+        (repo / ".git/info").mkdir(exist_ok=True)
+        (repo / ".git/info/exclude").write_text(f"/{ignored}\n", encoding="utf-8")
+    _write_schema(repo, ignored, {"title": "must not be attested"})
+
+    assert _git(repo, "status", "--porcelain=v1", "--untracked-files=all") == ""
+    assert ignored in _git(repo, "status", "--short", "--ignored")
+
+    manifest = _emit(repo, tmp_path / "consumer-archive")
+    assert ignored not in manifest["schemas"]
+    assert not (tmp_path / "consumer-archive/content" / ignored).exists()
+
+    with pytest.raises(ManifestError) as excinfo:
+        run(
+            [
+                "--source",
+                str(repo),
+                "--out-dir",
+                str(tmp_path / "explicit-archive"),
+                "--schema",
+                ignored,
+            ]
+        )
+    assert excinfo.value.code == "SCHEMA_NOT_TRACKED"
+
+
+def test_payload_bytes_come_from_head_even_when_git_hides_worktree_drift(tmp_path):
+    repo = _source_repo(tmp_path)
+    committed = _git_bytes(repo, "show", f"HEAD:{ZONES_SCHEMA}")
+    _git(repo, "update-index", "--assume-unchanged", ZONES_SCHEMA)
+    (repo / ZONES_SCHEMA).write_text('{"title":"worktree only"}\n', encoding="utf-8")
+    assert _git(repo, "status", "--porcelain=v1", "--untracked-files=all") == ""
+
+    out_dir = tmp_path / "archive"
+    manifest = _emit(repo, out_dir)
+
+    assert (out_dir / "content" / ZONES_SCHEMA).read_bytes() == committed
+    assert manifest["schemas"][ZONES_SCHEMA] == hashlib.sha256(committed).hexdigest()
+
+
 @pytest.mark.parametrize(
     "origin",
     [
@@ -266,6 +475,46 @@ def test_expected_commit_mismatch_fails_closed(tmp_path):
     assert excinfo.value.code == "EXPECTED_COMMIT_INVALID"
 
 
+def test_invalid_source_kind_has_a_typed_cli_failure(tmp_path, capsys):
+    repo = _source_repo(tmp_path)
+
+    exit_code = main(
+        [
+            "--source",
+            str(repo),
+            "--out-dir",
+            str(tmp_path / "out"),
+            "--consumer",
+            "heim-pc",
+            "--source-kind",
+            "mutable_worktree",
+        ]
+    )
+
+    assert exit_code == 2
+    assert capsys.readouterr().err.startswith("SOURCE_KIND_INVALID: ")
+
+
+def test_content_root_cannot_collide_with_manifest_path(tmp_path):
+    repo = _source_repo(tmp_path)
+
+    with pytest.raises(ManifestError) as excinfo:
+        run(
+            [
+                "--source",
+                str(repo),
+                "--out-dir",
+                str(tmp_path / "out"),
+                "--consumer",
+                "heim-pc",
+                "--content-root",
+                f"{MANIFEST_NAME}/content",
+            ]
+        )
+    assert excinfo.value.code == "CONTENT_ROOT_INVALID"
+    assert not (tmp_path / "out").exists()
+
+
 def test_a_manifest_must_bind_something_explicitly(tmp_path):
     repo = _source_repo(tmp_path)
 
@@ -293,8 +542,9 @@ def test_a_manifest_must_bind_something_explicitly(tmp_path):
         ("/etc/passwd", "SCHEMA_PATH_INVALID"),
         ("contracts/../../secret.json", "SCHEMA_PATH_INVALID"),
         ("contracts\\heim-pc\\zones.json", "SCHEMA_PATH_INVALID"),
-        ("contracts/heim-pc/absent.schema.json", "SCHEMA_MISSING"),
-        ("contracts/heim-pc", "SCHEMA_MISSING"),
+        ("contracts/heim-pc/README.md", "SCHEMA_PATH_INVALID"),
+        ("contracts/heim-pc/absent.schema.json", "SCHEMA_NOT_TRACKED"),
+        ("contracts/heim-pc", "SCHEMA_PATH_INVALID"),
     ],
 )
 def test_explicit_schema_paths_stay_inside_the_bound_source(tmp_path, schema, code):
@@ -312,6 +562,26 @@ def test_explicit_schema_paths_stay_inside_the_bound_source(tmp_path, schema, co
             ]
         )
     assert excinfo.value.code == code
+
+
+def test_consumer_selection_rejects_non_canonical_tracked_schema_path(tmp_path):
+    repo = _source_repo(tmp_path)
+    _write_schema(repo, "contracts/odd/not canonical.schema.json", {"type": "object"})
+    _git(repo, "add", "contracts")
+    _git(repo, "commit", "-m", "add non-canonical schema path")
+
+    with pytest.raises(ManifestError) as excinfo:
+        run(
+            [
+                "--source",
+                str(repo),
+                "--out-dir",
+                str(tmp_path / "out"),
+                "--consumer",
+                "odd",
+            ]
+        )
+    assert excinfo.value.code == "SCHEMA_PATH_INVALID"
 
 
 def test_symlinked_schema_escaping_the_source_is_rejected(tmp_path):
@@ -371,6 +641,81 @@ def test_existing_cache_content_is_never_silently_replaced(tmp_path):
             ]
         )
     assert excinfo.value.code == "CONTENT_ROOT_NOT_EMPTY"
+
+
+@pytest.mark.parametrize("overwrite", [False, True])
+def test_materialize_rejects_non_directory_content_root_without_traceback(
+    tmp_path, capsys, overwrite
+):
+    repo = _source_repo(tmp_path)
+    out_dir = tmp_path / "cache"
+    out_dir.mkdir()
+    (out_dir / "content").write_text("not a directory\n", encoding="utf-8")
+    argv = [
+        "--source",
+        str(repo),
+        "--out-dir",
+        str(out_dir),
+        "--consumer",
+        "heim-pc",
+    ]
+    if overwrite:
+        argv.append("--overwrite")
+
+    assert main(argv) == 2
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    assert captured.err.startswith("CONTENT_ROOT_INVALID_TYPE: ")
+    assert "Traceback" not in captured.err
+
+
+def _replace_content_root_with_file(out_dir: Path) -> None:
+    shutil.rmtree(out_dir / "content")
+    (out_dir / "content").write_text("not a directory\n", encoding="utf-8")
+
+
+def _replace_manifest_with_directory(out_dir: Path) -> None:
+    (out_dir / MANIFEST_NAME).unlink()
+    (out_dir / MANIFEST_NAME).mkdir()
+
+
+def _replace_bound_schema_with_symlink(out_dir: Path) -> None:
+    target = out_dir / "content" / ZONES_SCHEMA
+    target.unlink()
+    outside = out_dir / "outside.schema.json"
+    outside.write_text("{}\n", encoding="utf-8")
+    target.symlink_to(outside)
+
+
+@pytest.mark.parametrize(
+    ("mutate", "code"),
+    [
+        (_replace_content_root_with_file, "CONTENT_ROOT_INVALID_TYPE"),
+        (_replace_manifest_with_directory, "MANIFEST_INVALID_TYPE"),
+        (_replace_bound_schema_with_symlink, "CONTENT_INVALID_TYPE"),
+    ],
+)
+def test_verify_rejects_non_regular_cache_nodes(tmp_path, mutate, code):
+    repo = _source_repo(tmp_path)
+    out_dir = tmp_path / "cache"
+    _emit(repo, out_dir, "--source-kind", "offline_cache")
+    mutate(out_dir)
+
+    with pytest.raises(ManifestError) as excinfo:
+        run(
+            [
+                "--source",
+                str(repo),
+                "--out-dir",
+                str(out_dir),
+                "--consumer",
+                "heim-pc",
+                "--source-kind",
+                "offline_cache",
+                "--verify",
+            ]
+        )
+    assert excinfo.value.code == code
 
 
 def test_ci_style_sibling_layout_is_authoritative_only_when_named(tmp_path, monkeypatch):

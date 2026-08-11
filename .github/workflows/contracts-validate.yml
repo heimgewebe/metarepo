@@ -16,6 +16,7 @@ concurrency:
       - "scripts/validate-contracts.sh"
       - "scripts/contracts/**"
       - "tests/test_contract_consumers_registry.py"
+      - "tests/test_contract_source_manifest.py"
       - "pyproject.toml"
       - "uv.lock"
       - "contracts/**"
@@ -27,6 +28,7 @@ concurrency:
       - "scripts/validate-contracts.sh"
       - "scripts/contracts/**"
       - "tests/test_contract_consumers_registry.py"
+      - "tests/test_contract_source_manifest.py"
       - "pyproject.toml"
       - "uv.lock"
       - "contracts/**"
@@ -154,6 +156,7 @@ jobs:
             --source "${GITHUB_WORKSPACE}" \
             --out-dir "${RUNNER_TEMP}/contract-source" \
             --consumer heim-pc \
+            --consumer chronik \
             --source-kind detached_archive \
             --expected-commit "${GITHUB_SHA}" \
             --overwrite
@@ -161,6 +164,7 @@ jobs:
             --source "${GITHUB_WORKSPACE}" \
             --out-dir "${RUNNER_TEMP}/contract-source" \
             --consumer heim-pc \
+            --consumer chronik \
             --source-kind detached_archive \
             --expected-commit "${GITHUB_SHA}" \
             --verify

@@ -31,7 +31,10 @@ a `contract.source.manifest.schema.json` manifest. A sibling directory or
 environment variable is never source authority.
 
 `scripts/contracts/emit_source_manifest.py` is the reproducible producer of such
-a manifest; `--verify` re-proves an existing cache against the bound source.
+a manifest. It binds bytes from the selected `HEAD` Git objects—including the
+transitive closure of local relative `$ref` dependencies—so ignored or
+worktree-only files cannot enter the attestation. `--verify` re-proves an
+existing cache against the bound source.
 `docs/contracts/contract-source-resolution.md` documents the precedence, the
 typed failure codes and the consumer obligations.
 
