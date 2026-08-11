@@ -134,7 +134,8 @@ def test_replacement_refs_cannot_change_bound_commit_objects(tmp_path: Path) -> 
     _git(repo, "commit", "-m", "create replacement commit")
     replacement = _git(repo, "rev-parse", "HEAD")
     _git(repo, "reset", "--hard", original)
-    _git(repo, "replace", original, replacement)
+    _git(repo, "update-ref", f"refs/replace/{original}", replacement)
+    assert _git(repo, "replace", "-l") == original
 
     out_dir = tmp_path / "replacement-archive"
     manifest = _emit(repo, out_dir)
