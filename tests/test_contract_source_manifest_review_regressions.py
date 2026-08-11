@@ -165,3 +165,153 @@ def test_malformed_origin_url_is_a_typed_cli_failure(tmp_path: Path, capsys) -> 
     assert captured.out == ""
     assert captured.err.startswith("SOURCE_WRONG_REPOSITORY: ")
     assert "Traceback" not in captured.err
+
+
+def test_ambient_git_repository_overrides_do_not_change_named_source(
+    tmp_path: Path, monkeypatch
+) -> None:
+    source = _source_repo(tmp_path)
+    expected_head = _git(source, "rev-parse", "HEAD")
+    expected_bytes = _git_bytes(source, "show", f"{expected_head}:{ZONES_SCHEMA}")
+
+    ambient_parent = tmp_path / "ambient"
+    ambient_parent.mkdir()
+    ambient = _source_repo(ambient_parent)
+    (ambient / ZONES_SCHEMA).write_text(
+        '{"title":"ambient repository bytes"}\n', encoding="utf-8"
+    )
+    _git(ambient, "add", ZONES_SCHEMA)
+    _git(ambient, "commit", "-m", "change ambient repository")
+
+    monkeypatch.setenv("GIT_DIR", str(ambient / ".git"))
+    monkeypatch.setenv("GIT_WORK_TREE", str(source))
+    monkeypatch.setenv("GIT_INDEX_FILE", str(ambient / ".git" / "index"))
+    monkeypatch.setenv("GIT_CONFIG_COUNT", "1")
+    monkeypatch.setenv("GIT_CONFIG_KEY_0", "remote.origin.url")
+    monkeypatch.setenv("GIT_CONFIG_VALUE_0", "https://github.com/ambient/wrong.git")
+
+    out_dir = tmp_path / "ambient-override-archive"
+    manifest = _emit(source, out_dir)
+
+    assert manifest["commit"] == expected_head
+    assert (out_dir / "content" / ZONES_SCHEMA).read_bytes() == expected_bytes
+    assert manifest["schemas"][ZONES_SCHEMA] == hashlib.sha256(expected_bytes).hexdigest()
+
+
+def test_annotation_and_instance_values_are_not_traversed_as_subschemas(tmp_path: Path) -> None:
+    repo = _source_repo(tmp_path)
+    schema_path = "contracts/annotations/root.schema.json"
+    default_target = "contracts/resources/default-target.schema.json"
+    enum_target = "contracts/resources/enum-target.schema.json"
+    default_id = "https://schemas.example.invalid/default-target.schema.json"
+    enum_id = "https://schemas.example.invalid/enum-target.schema.json"
+    _write_schema(
+        repo,
+        schema_path,
+        {
+            "type": "object",
+            "properties": {"value": {"type": "string"}},
+            "allOf": [{"$ref": default_id}, {"$ref": enum_id}],
+            "examples": [{"$ref": "not-a-schema.schema.json"}],
+            "default": {"$id": default_id},
+            "const": {"$ref": "const-data.schema.json"},
+            "enum": [{"$id": enum_id}],
+        },
+    )
+    _write_schema(repo, default_target, {"$id": default_id, "type": "string"})
+    _write_schema(repo, enum_target, {"$id": enum_id, "type": "integer"})
+    _git(repo, "add", "contracts")
+    _git(repo, "commit", "-m", "add annotation data with schema-like keys")
+
+    out_dir = tmp_path / "annotation-archive"
+    assert (
+        run(
+            [
+                "--source",
+                str(repo),
+                "--out-dir",
+                str(out_dir),
+                "--consumer",
+                "annotations",
+            ]
+        )
+        == 0
+    )
+    manifest = json.loads((out_dir / MANIFEST_NAME).read_text(encoding="utf-8"))
+    assert set(manifest["schemas"]) == {schema_path, default_target, enum_target}
+
+
+def test_all_draft_2020_12_schema_keyword_shapes_are_traversed(tmp_path: Path) -> None:
+    repo = _source_repo(tmp_path)
+    root = "contracts/keyword-coverage/root.schema.json"
+    single_keywords = (
+        "additionalProperties",
+        "contains",
+        "contentSchema",
+        "else",
+        "if",
+        "items",
+        "not",
+        "propertyNames",
+        "then",
+        "unevaluatedItems",
+        "unevaluatedProperties",
+    )
+    array_keywords = ("allOf", "anyOf", "oneOf", "prefixItems")
+    map_keywords = ("$defs", "dependentSchemas", "patternProperties", "properties")
+    targets: set[str] = set()
+
+    def reference(keyword: str) -> dict[str, str]:
+        slug = keyword.removeprefix("$").lower()
+        target = f"contracts/resources/{slug}.schema.json"
+        targets.add(target)
+        _write_schema(repo, target, {"type": "null"})
+        return {"$ref": f"../resources/{slug}.schema.json"}
+
+    schema: dict[str, object] = {
+        keyword: reference(keyword) for keyword in single_keywords
+    }
+    schema.update({keyword: [reference(keyword)] for keyword in array_keywords})
+    schema.update({keyword: {"covered": reference(keyword)} for keyword in map_keywords})
+    _write_schema(repo, root, schema)
+    _git(repo, "add", "contracts")
+    _git(repo, "commit", "-m", "cover Draft 2020-12 schema keyword shapes")
+
+    out_dir = tmp_path / "keyword-coverage-archive"
+    assert (
+        run(
+            [
+                "--source",
+                str(repo),
+                "--out-dir",
+                str(out_dir),
+                "--consumer",
+                "keyword-coverage",
+            ]
+        )
+        == 0
+    )
+    manifest = json.loads((out_dir / MANIFEST_NAME).read_text(encoding="utf-8"))
+    assert set(manifest["schemas"]) == targets | {root}
+
+
+def test_missing_origin_is_a_repository_identity_failure(tmp_path: Path, capsys) -> None:
+    repo = _source_repo(tmp_path)
+    _git(repo, "remote", "remove", "origin")
+
+    exit_code = main(
+        [
+            "--source",
+            str(repo),
+            "--out-dir",
+            str(tmp_path / "out"),
+            "--consumer",
+            "heim-pc",
+        ]
+    )
+
+    assert exit_code == 2
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    assert captured.err.startswith("SOURCE_WRONG_REPOSITORY: ")
+    assert "Traceback" not in captured.err
