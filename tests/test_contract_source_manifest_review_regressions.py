@@ -165,3 +165,89 @@ def test_malformed_origin_url_is_a_typed_cli_failure(tmp_path: Path, capsys) -> 
     assert captured.out == ""
     assert captured.err.startswith("SOURCE_WRONG_REPOSITORY: ")
     assert "Traceback" not in captured.err
+
+
+def test_ambient_git_repository_overrides_do_not_change_named_source(
+    tmp_path: Path, monkeypatch
+) -> None:
+    source = _source_repo(tmp_path)
+    expected_head = _git(source, "rev-parse", "HEAD")
+    expected_bytes = _git_bytes(source, "show", f"{expected_head}:{ZONES_SCHEMA}")
+
+    ambient_parent = tmp_path / "ambient"
+    ambient_parent.mkdir()
+    ambient = _source_repo(ambient_parent)
+    (ambient / ZONES_SCHEMA).write_text(
+        '{"title":"ambient repository bytes"}\n', encoding="utf-8"
+    )
+    _git(ambient, "add", ZONES_SCHEMA)
+    _git(ambient, "commit", "-m", "change ambient repository")
+
+    monkeypatch.setenv("GIT_DIR", str(ambient / ".git"))
+    monkeypatch.setenv("GIT_WORK_TREE", str(source))
+    monkeypatch.setenv("GIT_INDEX_FILE", str(ambient / ".git" / "index"))
+
+    out_dir = tmp_path / "ambient-override-archive"
+    manifest = _emit(source, out_dir)
+
+    assert manifest["commit"] == expected_head
+    assert (out_dir / "content" / ZONES_SCHEMA).read_bytes() == expected_bytes
+    assert manifest["schemas"][ZONES_SCHEMA] == hashlib.sha256(expected_bytes).hexdigest()
+
+
+def test_annotation_and_instance_values_are_not_traversed_as_subschemas(tmp_path: Path) -> None:
+    repo = _source_repo(tmp_path)
+    schema_path = "contracts/annotations/root.schema.json"
+    _write_schema(
+        repo,
+        schema_path,
+        {
+            "type": "object",
+            "properties": {"value": {"type": "string"}},
+            "examples": [{"$ref": "not-a-schema.schema.json"}],
+            "default": {"$id": "also-not-a-schema"},
+            "const": {"$ref": "const-data.schema.json"},
+            "enum": [{"$id": "enum-data"}],
+        },
+    )
+    _git(repo, "add", "contracts")
+    _git(repo, "commit", "-m", "add annotation data with schema-like keys")
+
+    out_dir = tmp_path / "annotation-archive"
+    assert (
+        run(
+            [
+                "--source",
+                str(repo),
+                "--out-dir",
+                str(out_dir),
+                "--consumer",
+                "annotations",
+            ]
+        )
+        == 0
+    )
+    manifest = json.loads((out_dir / MANIFEST_NAME).read_text(encoding="utf-8"))
+    assert set(manifest["schemas"]) == {schema_path}
+
+
+def test_missing_origin_is_a_repository_identity_failure(tmp_path: Path, capsys) -> None:
+    repo = _source_repo(tmp_path)
+    _git(repo, "remote", "remove", "origin")
+
+    exit_code = main(
+        [
+            "--source",
+            str(repo),
+            "--out-dir",
+            str(tmp_path / "out"),
+            "--consumer",
+            "heim-pc",
+        ]
+    )
+
+    assert exit_code == 2
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    assert captured.err.startswith("SOURCE_WRONG_REPOSITORY: ")
+    assert "Traceback" not in captured.err
