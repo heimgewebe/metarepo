@@ -23,10 +23,22 @@ Claim status values:
 
 A `verified` claim proves repository coupling at the audited commit. It does not prove live runtime use, runtime health, delivery success, semantic correctness or future compatibility. The current evidence set covers the repositories already declared in `consumers.yaml`; it does not claim complete organization-wide discovery.
 
+## Source resolution for consumers
+
+Consumers must resolve these bytes from exactly one explicit source: a named
+Metarepo Git checkout, or an immutable archive / approved offline cache bound by
+a `contract.source.manifest.schema.json` manifest. A sibling directory or
+environment variable is never source authority.
+
+`scripts/contracts/emit_source_manifest.py` is the reproducible producer of such
+a manifest; `--verify` re-proves an existing cache against the bound source.
+`docs/contracts/contract-source-resolution.md` documents the precedence, the
+typed failure codes and the consumer obligations.
+
 ## Validation
 
 ```bash
 uv run python scripts/contracts/validate_consumers.py
-uv run pytest -q tests/test_contract_consumers_registry.py
+uv run pytest -q tests/test_contract_consumers_registry.py tests/test_contract_source_manifest.py
 scripts/validate-contracts.sh
 ```

@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.heimgewebe.org/contract.source.manifest.schema.json",
+  "title": "Contract Source Manifest",
+  "description": "Bindet eine nicht-Git-Quelle kanonischer Metarepo-Contractbytes (losgelöstes Archiv oder freigegebener Offline-Cache) an Repositoryidentität, Commit, Inhaltswurzel und SHA-256 je Schema. Das Manifest belegt Herkunft und Unveränderlichkeit der Bytes, nicht semantische Gültigkeit oder Live-Nutzung.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "repository",
+    "commit",
+    "source_kind",
+    "source_root",
+    "schemas"
+  ],
+  "properties": {
+    "schema_version": {
+      "description": "Manifestversion. Nur 1 ist definiert.",
+      "type": "integer",
+      "const": 1
+    },
+    "repository": {
+      "description": "Kanonische GitHub-Identität der Contractquelle.",
+      "type": "string",
+      "const": "heimgewebe/metarepo"
+    },
+    "commit": {
+      "description": "Exakter 40-stelliger Kleinbuchstaben-Hex-Commit, aus dem die gebundenen Bytes stammen.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "source_kind": {
+      "description": "Art der gebundenen Quelle. Ein Git-Checkout wird nie über ein Manifest gebunden, sondern direkt identitätsgeprüft.",
+      "type": "string",
+      "enum": [
+        "detached_archive",
+        "offline_cache"
+      ]
+    },
+    "source_root": {
+      "description": "Normalisierter relativer POSIX-Pfad der Inhaltswurzel unterhalb des Manifestverzeichnisses.",
+      "type": "string",
+      "pattern": "^(?!.*(^|/)\\.\\.?(/|$))[A-Za-z0-9._-]+(/[A-Za-z0-9._-]+)*$"
+    },
+    "schemas": {
+      "description": "Vollständige Bindung jedes Schemas, das ein Konsument aus dieser Quelle verwenden darf: relativer Pfad unterhalb der Inhaltswurzel auf SHA-256 der exakten Bytes.",
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "pattern": "^(?!.*(^|/)\\.\\.?(/|$))[A-Za-z0-9._-]+(/[A-Za-z0-9._-]+)*$"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      }
+    }
+  }
+}
