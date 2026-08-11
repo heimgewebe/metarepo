@@ -27,7 +27,7 @@ import stat
 import subprocess
 import sys
 from typing import Any, Iterable, Sequence
-from urllib.parse import urlsplit
+from urllib.parse import urldefrag, urljoin, urlsplit
 
 EXPECTED_REPOSITORY = "heimgewebe/metarepo"
 MANIFEST_NAME = "metarepo-contract-source.v1.json"
@@ -58,12 +58,15 @@ class GitTreeEntry:
 
 
 def _run_git(root: Path, *args: str) -> str:
+    env = os.environ.copy()
+    env["GIT_NO_REPLACE_OBJECTS"] = "1"
     try:
         result = subprocess.run(
             ["git", "-C", str(root), *args],
             check=True,
             text=True,
             capture_output=True,
+            env=env,
         )
     except (OSError, subprocess.CalledProcessError, UnicodeError) as exc:
         stderr = getattr(exc, "stderr", "") or ""
@@ -74,11 +77,14 @@ def _run_git(root: Path, *args: str) -> str:
 def _run_git_bytes(
     root: Path, *args: str, code: str = "SOURCE_NOT_GIT", detail: str = "Git read failed"
 ) -> bytes:
+    env = os.environ.copy()
+    env["GIT_NO_REPLACE_OBJECTS"] = "1"
     try:
         result = subprocess.run(
             ["git", "-C", str(root), *args],
             check=True,
             capture_output=True,
+            env=env,
         )
     except (OSError, subprocess.CalledProcessError) as exc:
         stderr = getattr(exc, "stderr", b"") or b""
@@ -99,7 +105,10 @@ def _repository_identity(origin: str) -> str:
     if "://" in raw:
         from urllib.parse import urlparse
 
-        parsed = urlparse(raw)
+        try:
+            parsed = urlparse(raw)
+        except ValueError:
+            return ""
         if (parsed.hostname or "").lower() != "github.com":
             return ""
         if parsed.scheme.lower() not in {"https", "ssh", "git"}:
@@ -193,6 +202,8 @@ def resolve_source(source_path: str, expected_commit: str | None) -> tuple[Path,
                 "SOURCE_COMMIT_MISMATCH", f"expected {expected}, observed {head}"
             )
 
+    _validate_commit_objects(root, head)
+
     if _run_git(root, "status", "--porcelain=v1", "--untracked-files=all"):
         raise ManifestError(
             "SOURCE_DIRTY",
@@ -201,6 +212,51 @@ def resolve_source(source_path: str, expected_commit: str | None) -> tuple[Path,
         )
 
     return root, head
+
+
+def _git_object_id(kind: str, data: bytes) -> str:
+    header = f"{kind} {len(data)}\0".encode("ascii")
+    return hashlib.sha1(header + data).hexdigest()
+
+
+def _validate_commit_objects(root: Path, commit: str) -> None:
+    """Validate the literal commit and root-tree objects without replacements."""
+
+    commit_data = _run_git_bytes(
+        root,
+        "cat-file",
+        "commit",
+        commit,
+        code="SOURCE_COMMIT_INVALID",
+        detail=f"cannot read commit object {commit}",
+    )
+    if _git_object_id("commit", commit_data) != commit:
+        raise ManifestError(
+            "SOURCE_COMMIT_INVALID", "HEAD does not name the unchanged commit object"
+        )
+    first_line = commit_data.split(b"\n", 1)[0]
+    if not first_line.startswith(b"tree "):
+        raise ManifestError("SOURCE_COMMIT_INVALID", "commit has no root tree")
+    try:
+        tree = first_line.removeprefix(b"tree ").decode("ascii")
+    except UnicodeDecodeError as exc:
+        raise ManifestError(
+            "SOURCE_COMMIT_INVALID", "commit has an invalid root tree"
+        ) from exc
+    if not HEX40.fullmatch(tree):
+        raise ManifestError("SOURCE_COMMIT_INVALID", "commit has an invalid root tree")
+    tree_data = _run_git_bytes(
+        root,
+        "cat-file",
+        "tree",
+        tree,
+        code="SOURCE_COMMIT_INVALID",
+        detail=f"cannot read root tree object {tree}",
+    )
+    if _git_object_id("tree", tree_data) != tree:
+        raise ManifestError(
+            "SOURCE_COMMIT_INVALID", "commit does not bind an unchanged root-tree object"
+        )
 
 
 def _commit_tree(root: Path, commit: str) -> dict[str, GitTreeEntry]:
@@ -353,69 +409,148 @@ def _decode_schema(relative: str, data: bytes) -> Any:
         ) from exc
 
 
-def _schema_references(relative: str, schema: Any) -> Iterable[str]:
+def _physical_schema_uri(relative: str) -> str:
+    return f"https://metarepo.invalid/{relative}"
+
+
+def _resolve_uri(referrer: str, base_uri: str, value: str, keyword: str) -> str:
+    try:
+        parsed = urlsplit(value)
+        resolved = urljoin(base_uri, value)
+        urlsplit(resolved)
+    except ValueError as exc:
+        raise ManifestError(
+            f"SCHEMA_{keyword}_INVALID",
+            f"{referrer} contains an invalid ${keyword.lower()}: {value!r}",
+        ) from exc
+    if not resolved or (not parsed.scheme and value.startswith("//")):
+        raise ManifestError(
+            f"SCHEMA_{keyword}_INVALID",
+            f"{referrer} contains an invalid ${keyword.lower()}: {value!r}",
+        )
+    return resolved
+
+
+def _schema_resources_and_references(
+    relative: str, schema: Any, base_uri: str
+) -> Iterable[tuple[str, str]]:
+    """Yield resource identifiers and references with their active base URI."""
+
     if isinstance(schema, dict):
+        active_base = base_uri
+        if "$id" in schema:
+            identifier = schema["$id"]
+            if not isinstance(identifier, str):
+                raise ManifestError(
+                    "SCHEMA_ID_INVALID", f"{relative} contains a non-string $id"
+                )
+            active_base = _resolve_uri(relative, base_uri, identifier, "ID")
+            document_uri, fragment = urldefrag(active_base)
+            if fragment:
+                raise ManifestError(
+                    "SCHEMA_ID_INVALID", f"{relative} contains a fragment-bearing $id"
+                )
+            yield "identifier", document_uri
         for key in sorted(schema):
             value = schema[key]
             if key == "$ref":
                 if not isinstance(value, str):
                     raise ManifestError(
-                        "SCHEMA_REF_INVALID",
-                        f"{relative} contains a non-string $ref",
+                        "SCHEMA_REF_INVALID", f"{relative} contains a non-string $ref"
                     )
-                yield value
-            yield from _schema_references(relative, value)
+                yield "reference", _resolve_uri(relative, active_base, value, "REF")
+            if key != "$id":
+                yield from _schema_resources_and_references(relative, value, active_base)
     elif isinstance(schema, list):
         for value in schema:
-            yield from _schema_references(relative, value)
+            yield from _schema_resources_and_references(relative, value, base_uri)
 
 
-def _resolve_local_reference(referrer: str, reference: str) -> str | None:
-    """Resolve a repository-local reference, or return None for an external URI."""
+def _schema_identifier_index(
+    root: Path, tree: dict[str, GitTreeEntry]
+) -> tuple[dict[str, str], dict[str, tuple[Any, bytes]]]:
+    """Index every committed schema resource identifier deterministically."""
+
+    identifiers: dict[str, str] = {}
+    schemas: dict[str, tuple[Any, bytes]] = {}
+    for relative in sorted(
+        path
+        for path in tree
+        if path.startswith("contracts/") and path.endswith(".schema.json")
+    ):
+        data = _read_schema_blob(root, tree, relative)
+        schema = _decode_schema(relative, data)
+        schemas[relative] = (schema, data)
+        physical_uri = _physical_schema_uri(relative)
+        previous = identifiers.get(physical_uri)
+        if previous is not None and previous != relative:
+            raise ManifestError(
+                "SCHEMA_ID_DUPLICATE",
+                f"schema resource identifier {physical_uri!r} is bound by both "
+                f"{previous} and {relative}",
+            )
+        identifiers[physical_uri] = relative
+        for kind, identifier in _schema_resources_and_references(
+            relative, schema, physical_uri
+        ):
+            if kind != "identifier":
+                continue
+            previous = identifiers.get(identifier)
+            if previous is not None and previous != relative:
+                raise ManifestError(
+                    "SCHEMA_ID_DUPLICATE",
+                    f"schema resource identifier {identifier!r} is bound by both "
+                    f"{previous} and {relative}",
+                )
+            identifiers[identifier] = relative
+    return identifiers, schemas
+
+
+def _resolve_local_reference(
+    referrer: str, resolved_uri: str, identifiers: dict[str, str]
+) -> str | None:
+    """Bind a resolved URI to a committed local resource, or classify it external."""
 
     try:
-        parsed = urlsplit(reference)
+        document_uri, _fragment = urldefrag(resolved_uri)
+        parsed = urlsplit(document_uri)
     except ValueError as exc:
         raise ManifestError(
-            "SCHEMA_REF_INVALID", f"{referrer} contains an invalid $ref: {reference!r}"
+            "SCHEMA_REF_INVALID", f"{referrer} contains an invalid $ref: {resolved_uri!r}"
         ) from exc
 
-    # A URI with a scheme or authority is external provenance. In particular,
-    # never reinterpret its path component as a path in this checkout.
-    if parsed.scheme or parsed.netloc:
+    indexed = identifiers.get(document_uri)
+    if indexed is not None:
+        return indexed
+
+    if parsed.scheme != "https" or parsed.netloc != "metarepo.invalid":
         return None
     if not parsed.path:
-        # Empty references and fragment-only references stay in the same blob.
         return None
     if parsed.query:
         raise ManifestError(
             "SCHEMA_REF_INVALID",
-            f"{referrer} uses a query in a local $ref: {reference!r}",
+            f"{referrer} uses a query in a local $ref: {resolved_uri!r}",
         )
 
-    path = parsed.path
-    if path.startswith("/"):
-        raise ManifestError(
-            "SCHEMA_REF_ESCAPE",
-            f"{referrer} uses an absolute local $ref path: {reference!r}",
-        )
+    path = parsed.path.removeprefix("/")
     if "\\" in path or "%" in path or "\x00" in path:
         raise ManifestError(
             "SCHEMA_REF_INVALID",
-            f"{referrer} contains a non-canonical local $ref path: {reference!r}",
+            f"{referrer} contains a non-canonical local $ref path: {resolved_uri!r}",
         )
 
-    resolved = posixpath.normpath(posixpath.join(posixpath.dirname(referrer), path))
+    resolved = posixpath.normpath(path)
     if resolved == "contracts" or not resolved.startswith("contracts/"):
         raise ManifestError(
             "SCHEMA_REF_ESCAPE",
-            f"{referrer} has a local $ref outside contracts/: {reference!r}",
+            f"{referrer} has a local $ref outside contracts/: {resolved_uri!r}",
         )
     normalized = _relative_path(resolved, "SCHEMA_REF_INVALID")
     if not normalized.endswith(".schema.json"):
         raise ManifestError(
             "SCHEMA_REF_INVALID",
-            f"{referrer} does not reference a canonical schema path: {reference!r}",
+            f"{referrer} does not reference a canonical schema path: {resolved_uri!r}",
         )
     return normalized
 
@@ -427,6 +562,7 @@ def _schema_closure(
 ) -> dict[str, bytes]:
     """Return deterministic transitive local $ref closure from committed blobs."""
 
+    identifiers, schemas = _schema_identifier_index(root, tree)
     pending = [(relative, "") for relative in schema_paths]
     heapq.heapify(pending)
     payload_bytes: dict[str, bytes] = {}
@@ -434,11 +570,19 @@ def _schema_closure(
         relative, referrer = heapq.heappop(pending)
         if relative in payload_bytes:
             continue
-        data = _read_schema_blob(root, tree, relative, referrer=referrer or None)
+        cached = schemas.get(relative)
+        if cached is None:
+            data = _read_schema_blob(root, tree, relative, referrer=referrer or None)
+            schema = _decode_schema(relative, data)
+        else:
+            schema, data = cached
         payload_bytes[relative] = data
-        schema = _decode_schema(relative, data)
-        for reference in _schema_references(relative, schema):
-            dependency = _resolve_local_reference(relative, reference)
+        for kind, resolved_uri in _schema_resources_and_references(
+            relative, schema, _physical_schema_uri(relative)
+        ):
+            if kind != "reference":
+                continue
+            dependency = _resolve_local_reference(relative, resolved_uri, identifiers)
             if dependency is None or dependency in payload_bytes:
                 continue
             heapq.heappush(pending, (dependency, relative))
