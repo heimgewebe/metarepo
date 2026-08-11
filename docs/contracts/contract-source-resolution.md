@@ -31,7 +31,10 @@ müsste, und ein weggelassenes Argument wird typisiert abgelehnt statt geraten.
 `scripts/contracts/emit_source_manifest.py` ist der reproduzierbare Produzent.
 Er liest ausschließlich aus einem explizit benannten, identitätsgeprüften und
 sauberen Metarepo-Checkout. Auswahl und Bytes kommen aus dem festgehaltenen
-`HEAD`-Tree und seinen Git-Blobs, nicht aus Arbeitsbaumdateien:
+`HEAD`-Tree und seinen Git-Blobs, nicht aus Arbeitsbaumdateien. Für alle
+provenienzrelevanten Git-Leseoperationen sind Replacement-Refs deaktiviert;
+zusätzlich werden das wörtliche Commit-Objekt und sein Root-Tree gegen ihre
+Objekt-IDs geprüft, bevor ein Manifest attestiert wird:
 
 ```bash
 python3 scripts/contracts/emit_source_manifest.py \
@@ -48,12 +51,17 @@ Ergebnis ist `metarepo-contract-source.v1.json` neben einer Inhaltswurzel
 - `--consumer NAME` bindet jedes in `HEAD` getrackte Schema unter
   `contracts/NAME/`.
 - `--schema PFAD` bindet ein einzelnes Schema zusätzlich.
-- Für jede Auswahl wird die transitive Closure lokaler relativer `$ref`s
-  gebunden. Fragment-only-Refs bleiben im selben Blob; normalisierte
-  Cross-Namespace-Refs unter `contracts/` werden verfolgt; Zyklen sind erlaubt.
-  Fehlende, ungültige oder aus `contracts/` escapende lokale Ziele brechen
-  typisiert ab. URIs mit Scheme oder Authority bleiben externe Referenzen und
-  werden niemals über ihren URI-Pfad als lokale Dateien interpretiert.
+- Für jede Auswahl wird die transitive Closure lokaler `$ref`s gebunden. Die
+  Auflösung folgt JSON Schema Draft 2020-12: ein verschachteltes `$id` ändert den
+  aktiven Basis-URI für darunterliegende Referenzen. Alle committed
+  `contracts/**/*.schema.json` werden deterministisch nach physischem Pfad und
+  deklarierten Ressourcen-IDs indexiert, sodass Cross-Namespace- und
+  identifiergebundene lokale Ressourcen vollständig archiviert werden.
+  Fragment-only-Refs bleiben in derselben Ressource; Zyklen sind erlaubt.
+  Fehlende, doppelte, ungültige oder aus `contracts/` escapende lokale Ziele
+  brechen typisiert ab. Nicht lokal gebundene externe URIs bleiben externe
+  Referenzen und werden niemals über ihren URI-Pfad als Checkout-Dateien
+  interpretiert.
 - Ohne `--consumer`/`--schema` bricht der Lauf ab; ein Manifest ohne Bindung ist
   wertlos.
 - Ein unsauberer Quellbaum bricht ab: ein Manifest behauptet unveränderliche
@@ -95,13 +103,13 @@ erscheint und Exitcode `0` gilt.
 | Code | Bedeutung |
 | --- | --- |
 | `SOURCE_MISSING`, `SOURCE_NOT_GIT`, `SOURCE_NOT_REPOSITORY_ROOT` | Die benannte Quelle ist kein auflösbarer Git-Repositorywurzelpfad. |
-| `SOURCE_WRONG_REPOSITORY` | `remote.origin.url` löst nicht auf `heimgewebe/metarepo` auf. |
-| `SOURCE_COMMIT_INVALID`, `SOURCE_COMMIT_MISMATCH`, `EXPECTED_COMMIT_INVALID` | Commitbindung fehlt oder weicht ab. |
+| `SOURCE_WRONG_REPOSITORY` | `remote.origin.url` löst nicht auf `heimgewebe/metarepo` auf oder ist keine parsebare kanonische GitHub-Remote-URL. |
+| `SOURCE_COMMIT_INVALID`, `SOURCE_COMMIT_MISMATCH`, `EXPECTED_COMMIT_INVALID` | Commitbindung fehlt, weicht ab oder das wörtliche Commit-/Root-Tree-Objekt stimmt nicht mit seiner Objekt-ID überein. |
 | `SOURCE_DIRTY` | Der Quellbaum trägt verfolgte oder nicht ignorierte ungetrackte Änderungen. |
 | `SCHEMA_SELECTION`, `CONSUMER_UNKNOWN`, `CONSUMER_EMPTY`, `CONSUMER_INVALID` | Die Auswahl bindet nichts oder benennt keinen vorhandenen Namensraum. |
 | `SOURCE_KIND_INVALID`, `CONTENT_ROOT_INVALID` | Quellenart oder relativer Inhaltswurzelpfad ist unzulässig. |
 | `SCHEMA_PATH_INVALID`, `SCHEMA_PATH_ESCAPE`, `SCHEMA_NOT_TRACKED`, `SCHEMA_NOT_REGULAR`, `SCHEMA_UNREADABLE` | Eine Auswahl ist nicht kanonisch, nicht im gebundenen Commit getrackt, kein regulärer Git-Blob oder nicht lesbar. |
-| `SCHEMA_JSON_INVALID`, `SCHEMA_REF_INVALID`, `SCHEMA_REF_ESCAPE`, `SCHEMA_REF_MISSING` | Eine lokale `$ref`-Closure kann nicht vollständig und sicher aus den gebundenen Git-Blobs gebildet werden. |
+| `SCHEMA_JSON_INVALID`, `SCHEMA_ID_INVALID`, `SCHEMA_ID_DUPLICATE`, `SCHEMA_REF_INVALID`, `SCHEMA_REF_ESCAPE`, `SCHEMA_REF_MISSING` | Eine Schemaressource oder ihre lokale `$ref`-Closure kann nicht vollständig, eindeutig und sicher aus den gebundenen Git-Blobs gebildet werden. |
 | `OUT_DIR_INSIDE_SOURCE`, `OUT_DIR_MISSING`, `OUT_DIR_INVALID`, `OUT_DIR_UNWRITABLE`, `CONTENT_ROOT_NOT_EMPTY` | Das Ausgabeziel ist unzulässig oder würde bestehenden Inhalt still ersetzen. |
 | `CONTENT_ROOT_MISSING`, `CONTENT_ROOT_INVALID_TYPE`, `CONTENT_ROOT_PATH_ESCAPE` | Die Inhaltswurzel fehlt, ist kein Verzeichnis oder traversiert einen Symlink. |
 | `MANIFEST_MISSING`, `MANIFEST_UNREADABLE`, `MANIFEST_INVALID_TYPE`, `MANIFEST_DRIFT` | Prüfung gegen ein fehlendes, nicht reguläres, unlesbares oder abweichendes Manifest. |
