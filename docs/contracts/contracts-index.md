@@ -163,6 +163,10 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
   - Aktuelle Implementierung: WGX bleibt während des v2-Cutovers ein revisionsgepinnter Kompatibilitätsrunner; der Contract überträgt WGX keine Fleet-, Task-, Git- oder Host-Autorität.
 - `tooling/toolchain.versions.schema.json`
   - Zweck: Canonical schema für `toolchain.versions.yml`, definiert required keys und Versionsformate.
+- `contract.source.manifest.schema.json`
+  - Zweck: Bindet eine nicht-Git-Quelle kanonischer Contractbytes (losgelöstes Archiv, freigegebener Offline-Cache) an Repositoryidentität, Commit, Inhaltswurzel und SHA-256 je Schema.
+  - Produzent: `scripts/contracts/emit_source_manifest.py`; Auflösungsreihenfolge und Konsumentenpflichten stehen in `docs/contracts/contract-source-resolution.md`.
+  - Belegt Herkunft und Unveränderlichkeit der Bytes, nicht semantische Gültigkeit, Live-Nutzung oder Merge-Reife.
 
 ### 1.7 Heim-PC (State & Config)
 

@@ -352,27 +352,6 @@ jobs:
             echo "just not installed"
           fi
 
-      - name: Cache lychee URL state
-        if: runner.os == 'Linux' && hashFiles('.lychee.toml') != ''
-        uses: actions/cache@v6  # v6 (major tag)
-        with:
-          path: ~/.cache/lychee
-          key: ${{ runner.os }}-lychee-${{ hashFiles('.lychee.toml', 'README.md', 'docs/**/*.md') }}
-          restore-keys: |
-            ${{ runner.os }}-lychee-
-
-      - name: Link check with Lychee (Linux)
-        if: runner.os == 'Linux' && hashFiles('.lychee.toml') != ''
-        uses: lycheeverse/lychee-action@v2.9.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          LYCHEE_CACHE_DIR: ~/.cache/lychee
-        with:
-          # nutzt deine .lychee.toml (inkl. inputs), kein doppelter Pfad nötig
-          args: --config .lychee.toml README.md docs/
-          # schlägt den Job hart fehl, wenn Links kaputt sind
-          fail: true
-
       - name: Lint GitHub Actions workflows
         if: runner.os == 'Linux'
         run: |

@@ -16,6 +16,7 @@ concurrency:
       - "scripts/validate-contracts.sh"
       - "scripts/contracts/**"
       - "tests/test_contract_consumers_registry.py"
+      - "tests/test_contract_source_manifest.py"
       - "pyproject.toml"
       - "uv.lock"
       - "contracts/**"
@@ -27,6 +28,7 @@ concurrency:
       - "scripts/validate-contracts.sh"
       - "scripts/contracts/**"
       - "tests/test_contract_consumers_registry.py"
+      - "tests/test_contract_source_manifest.py"
       - "pyproject.toml"
       - "uv.lock"
       - "contracts/**"
@@ -144,6 +146,28 @@ jobs:
 
       - name: Test producer and consumer evidence guard
         run: uv run pytest -q tests/test_contract_consumers_registry.py
+
+      - name: Test contract source manifest producer
+        run: uv run pytest -q tests/test_contract_source_manifest.py
+
+      - name: Emit and re-verify a contract source manifest from this checkout
+        run: |
+          uv run python scripts/contracts/emit_source_manifest.py \
+            --source "${GITHUB_WORKSPACE}" \
+            --out-dir "${RUNNER_TEMP}/contract-source" \
+            --consumer heim-pc \
+            --consumer chronik \
+            --source-kind detached_archive \
+            --expected-commit "${GITHUB_SHA}" \
+            --overwrite
+          uv run python scripts/contracts/emit_source_manifest.py \
+            --source "${GITHUB_WORKSPACE}" \
+            --out-dir "${RUNNER_TEMP}/contract-source" \
+            --consumer heim-pc \
+            --consumer chronik \
+            --source-kind detached_archive \
+            --expected-commit "${GITHUB_SHA}" \
+            --verify
 
       - name: Reject duplicate JSON keys and non-finite numbers
         run: python3 scripts/check-contract-json.py contracts
