@@ -186,6 +186,9 @@ def test_ambient_git_repository_overrides_do_not_change_named_source(
     monkeypatch.setenv("GIT_DIR", str(ambient / ".git"))
     monkeypatch.setenv("GIT_WORK_TREE", str(source))
     monkeypatch.setenv("GIT_INDEX_FILE", str(ambient / ".git" / "index"))
+    monkeypatch.setenv("GIT_CONFIG_COUNT", "1")
+    monkeypatch.setenv("GIT_CONFIG_KEY_0", "remote.origin.url")
+    monkeypatch.setenv("GIT_CONFIG_VALUE_0", "https://github.com/ambient/wrong.git")
 
     out_dir = tmp_path / "ambient-override-archive"
     manifest = _emit(source, out_dir)
@@ -198,18 +201,25 @@ def test_ambient_git_repository_overrides_do_not_change_named_source(
 def test_annotation_and_instance_values_are_not_traversed_as_subschemas(tmp_path: Path) -> None:
     repo = _source_repo(tmp_path)
     schema_path = "contracts/annotations/root.schema.json"
+    default_target = "contracts/resources/default-target.schema.json"
+    enum_target = "contracts/resources/enum-target.schema.json"
+    default_id = "https://schemas.example.invalid/default-target.schema.json"
+    enum_id = "https://schemas.example.invalid/enum-target.schema.json"
     _write_schema(
         repo,
         schema_path,
         {
             "type": "object",
             "properties": {"value": {"type": "string"}},
+            "allOf": [{"$ref": default_id}, {"$ref": enum_id}],
             "examples": [{"$ref": "not-a-schema.schema.json"}],
-            "default": {"$id": "also-not-a-schema"},
+            "default": {"$id": default_id},
             "const": {"$ref": "const-data.schema.json"},
-            "enum": [{"$id": "enum-data"}],
+            "enum": [{"$id": enum_id}],
         },
     )
+    _write_schema(repo, default_target, {"$id": default_id, "type": "string"})
+    _write_schema(repo, enum_target, {"$id": enum_id, "type": "integer"})
     _git(repo, "add", "contracts")
     _git(repo, "commit", "-m", "add annotation data with schema-like keys")
 
@@ -228,7 +238,61 @@ def test_annotation_and_instance_values_are_not_traversed_as_subschemas(tmp_path
         == 0
     )
     manifest = json.loads((out_dir / MANIFEST_NAME).read_text(encoding="utf-8"))
-    assert set(manifest["schemas"]) == {schema_path}
+    assert set(manifest["schemas"]) == {schema_path, default_target, enum_target}
+
+
+def test_all_draft_2020_12_schema_keyword_shapes_are_traversed(tmp_path: Path) -> None:
+    repo = _source_repo(tmp_path)
+    root = "contracts/keyword-coverage/root.schema.json"
+    single_keywords = (
+        "additionalProperties",
+        "contains",
+        "contentSchema",
+        "else",
+        "if",
+        "items",
+        "not",
+        "propertyNames",
+        "then",
+        "unevaluatedItems",
+        "unevaluatedProperties",
+    )
+    array_keywords = ("allOf", "anyOf", "oneOf", "prefixItems")
+    map_keywords = ("$defs", "dependentSchemas", "patternProperties", "properties")
+    targets: set[str] = set()
+
+    def reference(keyword: str) -> dict[str, str]:
+        slug = keyword.removeprefix("$").lower()
+        target = f"contracts/resources/{slug}.schema.json"
+        targets.add(target)
+        _write_schema(repo, target, {"type": "null"})
+        return {"$ref": f"../resources/{slug}.schema.json"}
+
+    schema: dict[str, object] = {
+        keyword: reference(keyword) for keyword in single_keywords
+    }
+    schema.update({keyword: [reference(keyword)] for keyword in array_keywords})
+    schema.update({keyword: {"covered": reference(keyword)} for keyword in map_keywords})
+    _write_schema(repo, root, schema)
+    _git(repo, "add", "contracts")
+    _git(repo, "commit", "-m", "cover Draft 2020-12 schema keyword shapes")
+
+    out_dir = tmp_path / "keyword-coverage-archive"
+    assert (
+        run(
+            [
+                "--source",
+                str(repo),
+                "--out-dir",
+                str(out_dir),
+                "--consumer",
+                "keyword-coverage",
+            ]
+        )
+        == 0
+    )
+    manifest = json.loads((out_dir / MANIFEST_NAME).read_text(encoding="utf-8"))
+    assert set(manifest["schemas"]) == targets | {root}
 
 
 def test_missing_origin_is_a_repository_identity_failure(tmp_path: Path, capsys) -> None:

@@ -38,6 +38,26 @@ DEFAULT_CONTENT_ROOT = "content"
 HEX40 = re.compile(r"^[0-9a-f]{40}$")
 RELATIVE_POSIX = re.compile(r"^(?!.*(^|/)\.\.?(/|$))[A-Za-z0-9._-]+(/[A-Za-z0-9._-]+)*$")
 
+SCHEMA_VALUE_KEYWORDS = frozenset(
+    {
+        "additionalProperties",
+        "contains",
+        "contentSchema",
+        "else",
+        "if",
+        "items",
+        "not",
+        "propertyNames",
+        "then",
+        "unevaluatedItems",
+        "unevaluatedProperties",
+    }
+)
+SCHEMA_ARRAY_KEYWORDS = frozenset({"allOf", "anyOf", "oneOf", "prefixItems"})
+SCHEMA_MAP_KEYWORDS = frozenset(
+    {"$defs", "dependentSchemas", "patternProperties", "properties"}
+)
+
 
 class ManifestError(RuntimeError):
     """Stable, typed contract source manifest failure."""
@@ -57,18 +77,30 @@ class GitTreeEntry:
     object_id: str
 
 
-def _run_git(root: Path, *args: str) -> str:
-    env = os.environ.copy()
+def _git_environment() -> dict[str, str]:
+    env = {key: value for key, value in os.environ.items() if not key.startswith("GIT_")}
     env["GIT_NO_REPLACE_OBJECTS"] = "1"
+    return env
+
+
+def _run_git(root: Path, *args: str, absent_ok: bool = False) -> str:
     try:
         result = subprocess.run(
             ["git", "-C", str(root), *args],
             check=True,
             text=True,
             capture_output=True,
-            env=env,
+            env=_git_environment(),
         )
     except (OSError, subprocess.CalledProcessError, UnicodeError) as exc:
+        if (
+            absent_ok
+            and isinstance(exc, subprocess.CalledProcessError)
+            and exc.returncode == 1
+            and not (exc.stdout or "").strip()
+            and not (exc.stderr or "").strip()
+        ):
+            return ""
         stderr = getattr(exc, "stderr", "") or ""
         raise ManifestError("SOURCE_NOT_GIT", stderr.strip() or str(exc)) from exc
     return result.stdout.strip()
@@ -77,14 +109,12 @@ def _run_git(root: Path, *args: str) -> str:
 def _run_git_bytes(
     root: Path, *args: str, code: str = "SOURCE_NOT_GIT", detail: str = "Git read failed"
 ) -> bytes:
-    env = os.environ.copy()
-    env["GIT_NO_REPLACE_OBJECTS"] = "1"
     try:
         result = subprocess.run(
             ["git", "-C", str(root), *args],
             check=True,
             capture_output=True,
-            env=env,
+            env=_git_environment(),
         )
     except (OSError, subprocess.CalledProcessError) as exc:
         stderr = getattr(exc, "stderr", b"") or b""
@@ -177,7 +207,9 @@ def resolve_source(source_path: str, expected_commit: str | None) -> tuple[Path,
             f"explicit source must be the Git repository root: {root}",
         )
 
-    origin = _run_git(root, "config", "--get", "remote.origin.url")
+    origin = _run_git(
+        root, "config", "--get", "remote.origin.url", absent_ok=True
+    )
     if _repository_identity(origin) != EXPECTED_REPOSITORY:
         raise ManifestError(
             "SOURCE_WRONG_REPOSITORY",
@@ -434,7 +466,7 @@ def _resolve_uri(referrer: str, base_uri: str, value: str, keyword: str) -> str:
 def _schema_resources_and_references(
     relative: str, schema: Any, base_uri: str
 ) -> Iterable[tuple[str, str]]:
-    """Yield resource identifiers and references with their active base URI."""
+    """Yield resources and references at Draft 2020-12 schema positions."""
 
     if isinstance(schema, dict):
         active_base = base_uri
@@ -459,11 +491,18 @@ def _schema_resources_and_references(
                         "SCHEMA_REF_INVALID", f"{relative} contains a non-string $ref"
                     )
                 yield "reference", _resolve_uri(relative, active_base, value, "REF")
-            if key != "$id":
+            elif key in SCHEMA_VALUE_KEYWORDS:
                 yield from _schema_resources_and_references(relative, value, active_base)
-    elif isinstance(schema, list):
-        for value in schema:
-            yield from _schema_resources_and_references(relative, value, base_uri)
+            elif key in SCHEMA_ARRAY_KEYWORDS and isinstance(value, list):
+                for subschema in value:
+                    yield from _schema_resources_and_references(
+                        relative, subschema, active_base
+                    )
+            elif key in SCHEMA_MAP_KEYWORDS and isinstance(value, dict):
+                for name in sorted(value):
+                    yield from _schema_resources_and_references(
+                        relative, value[name], active_base
+                    )
 
 
 def _schema_identifier_index(
