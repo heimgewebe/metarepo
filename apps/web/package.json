@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "packageManager": "npm@10.9.0",
+  "packageManager": "npm@10.9.9",
   "scripts": {
     "postinstall": "node ./scripts/verify-cookie-version.js || echo \"::notice::verify-cookie-version skipped\"",
     "dev": "svelte-kit dev --host",
