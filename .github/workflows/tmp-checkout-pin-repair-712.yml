@@ -8,7 +8,7 @@ name: tmp checkout pin repair 712
       - '.github/workflows/tmp-checkout-pin-repair-712.yml'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   repair:
@@ -16,14 +16,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Create Heimgewebe app token
-        id: app-token
-        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1
-        with:
-          app-id: ${{ secrets.HEIMGEWEBE_APP_ID }}
-          private-key: ${{ secrets.HEIMGEWEBE_APP_PRIVATE_KEY }}
-          owner: heimgewebe
-
       - name: Checkout exact repair branch
         uses: actions/checkout@f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a
         with:
@@ -83,7 +75,7 @@ jobs:
       - name: Materialize repair as server-side Git objects
         id: materialize
         env:
-          APP_TOKEN: ${{ steps.app-token.outputs.token }}
+          REPO_TOKEN: ${{ github.token }}
         run: |
           git diff --check
           python3 - <<'PY'
@@ -112,7 +104,7 @@ jobs:
           if changed != expected:
               raise SystemExit(f'expected exact 11-file diff, got {changed!r}')
 
-          token = os.environ['APP_TOKEN']
+          token = os.environ['REPO_TOKEN']
           repo = os.environ['GITHUB_REPOSITORY']
           parent = os.environ['GITHUB_SHA']
           api = f'https://api.github.com/repos/{repo}'
