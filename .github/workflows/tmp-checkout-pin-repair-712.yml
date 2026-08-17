@@ -1,0 +1,84 @@
+name: tmp checkout pin repair 712
+
+'on':
+  push:
+    branches:
+      - renovate/actions-checkout-digest
+    paths:
+      - '.github/workflows/tmp-checkout-pin-repair-712.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    if: ${{ github.repository == 'heimgewebe/metarepo' && github.ref_name == 'renovate/actions-checkout-digest' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout exact repair branch
+        uses: actions/checkout@f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Replace only the expected stale checkout-v7 pins
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          old = '9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0'
+          new = 'f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a'
+          expected = {
+              '.github/workflows/agents-ci.yml',
+              '.github/workflows/ci.yml',
+              '.github/workflows/docs-linkcheck.yml',
+              '.github/workflows/integrity-sources-release.yml',
+              '.github/workflows/linkcheck.yml',
+              '.github/workflows/metarepo-role-guard.yml',
+              '.github/workflows/net-probe.yml',
+              '.github/workflows/org-assets.yml',
+              '.github/workflows/reusable-validate-observatory.yml',
+              '.github/workflows/validate-templates.yml',
+              'tests/test_action_ref_pinning.py',
+          }
+
+          candidates = sorted(Path('.github/workflows').glob('*.yml'))
+          candidates += sorted(Path('templates/.github/workflows').glob('*.yml'))
+          candidates += [Path('tests/test_action_ref_pinning.py')]
+          changed = set()
+          for path in candidates:
+              text = path.read_text(encoding='utf-8')
+              if old not in text:
+                  continue
+              path.write_text(text.replace(old, new), encoding='utf-8')
+              changed.add(path.as_posix())
+
+          if changed != expected:
+              missing = sorted(expected - changed)
+              unexpected = sorted(changed - expected)
+              raise SystemExit(
+                  f'fail-closed stale-pin inventory mismatch: missing={missing} unexpected={unexpected}'
+              )
+
+          for path in candidates:
+              if old in path.read_text(encoding='utf-8'):
+                  raise SystemExit(f'old checkout digest remains in {path}')
+
+          print('updated exactly:', *sorted(changed), sep='\n- ')
+          PY
+
+      - name: Commit bounded repair
+        run: |
+          git add .github/workflows tests/test_action_ref_pinning.py
+          git diff --cached --check
+          changed_count="$(git diff --cached --name-only | wc -l | tr -d ' ')"
+          test "$changed_count" = 11 || {
+            echo "::error::expected 11 repaired files, got $changed_count"
+            git diff --cached --name-only
+            exit 1
+          }
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'chore(deps): align all checkout v7 pins'
+          git push origin HEAD:renovate/actions-checkout-digest
