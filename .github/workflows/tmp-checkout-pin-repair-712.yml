@@ -1,5 +1,6 @@
 name: tmp checkout pin verifier 712
 
+# Final verification pass after all 11 reviewed stale sites were updated.
 'on':
   push:
     branches:
