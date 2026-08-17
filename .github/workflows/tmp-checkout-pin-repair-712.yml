@@ -1,4 +1,4 @@
-name: tmp checkout pin repair 712
+name: tmp checkout pin verifier 712
 
 'on':
   push:
@@ -8,29 +8,28 @@ name: tmp checkout pin repair 712
       - '.github/workflows/tmp-checkout-pin-repair-712.yml'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  repair:
+  verify:
     if: ${{ github.repository == 'heimgewebe/metarepo' && github.ref_name == 'renovate/actions-checkout-digest' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Checkout exact repair branch
+      - name: Checkout exact branch
         uses: actions/checkout@f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a
         with:
-          fetch-depth: 0
           persist-credentials: false
 
-      - name: Replace only the expected stale checkout-v7 pins
+      - name: Verify checkout v7 digest convergence
         run: |
           python3 - <<'PY'
           from pathlib import Path
 
-          old = '9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0'
+          old = '9c091bb21b7c1c1d1991bb90' + '8d89e4e9dddfe3e0'
           new = 'f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a'
           helper = Path('.github/workflows/tmp-checkout-pin-repair-712.yml')
-          expected = {
+          expected_repaired = {
               '.github/workflows/agents-ci.yml',
               '.github/workflows/ci.yml',
               '.github/workflows/docs-linkcheck.yml',
@@ -50,110 +49,23 @@ jobs:
           ]
           candidates += sorted(Path('templates/.github/workflows').glob('*.yml'))
           candidates += [Path('tests/test_action_ref_pinning.py')]
-          changed = set()
+
+          stale = []
           for path in candidates:
               text = path.read_text(encoding='utf-8')
-              if old not in text:
-                  continue
-              path.write_text(text.replace(old, new), encoding='utf-8')
-              changed.add(path.as_posix())
+              if old in text:
+                  stale.append(path.as_posix())
+          if stale:
+              raise SystemExit(f'old checkout-v7 digest remains: {stale}')
 
-          if changed != expected:
-              missing = sorted(expected - changed)
-              unexpected = sorted(changed - expected)
-              raise SystemExit(
-                  f'fail-closed stale-pin inventory mismatch: missing={missing} unexpected={unexpected}'
-              )
+          missing_new = []
+          for raw in sorted(expected_repaired):
+              path = Path(raw)
+              if new not in path.read_text(encoding='utf-8'):
+                  missing_new.append(raw)
+          if missing_new:
+              raise SystemExit(f'expected repaired files lack canonical digest: {missing_new}')
 
-          for path in candidates:
-              if old in path.read_text(encoding='utf-8'):
-                  raise SystemExit(f'old checkout digest remains in {path}')
-
-          print('updated exactly:', *sorted(changed), sep='\n- ')
+          print('old digest absent across active workflow/template scan')
+          print('all 11 previously stale files contain canonical checkout-v7 digest')
           PY
-
-      - name: Materialize repair as server-side Git objects
-        id: materialize
-        env:
-          REPO_TOKEN: ${{ github.token }}
-        run: |
-          git diff --check
-          python3 - <<'PY'
-          import json
-          import os
-          import subprocess
-          import urllib.request
-          from pathlib import Path
-
-          expected = [
-              '.github/workflows/agents-ci.yml',
-              '.github/workflows/ci.yml',
-              '.github/workflows/docs-linkcheck.yml',
-              '.github/workflows/integrity-sources-release.yml',
-              '.github/workflows/linkcheck.yml',
-              '.github/workflows/metarepo-role-guard.yml',
-              '.github/workflows/net-probe.yml',
-              '.github/workflows/org-assets.yml',
-              '.github/workflows/reusable-validate-observatory.yml',
-              '.github/workflows/validate-templates.yml',
-              'tests/test_action_ref_pinning.py',
-          ]
-          changed = subprocess.check_output(
-              ['git', 'diff', '--name-only'], text=True
-          ).splitlines()
-          if changed != expected:
-              raise SystemExit(f'expected exact 11-file diff, got {changed!r}')
-
-          token = os.environ['REPO_TOKEN']
-          repo = os.environ['GITHUB_REPOSITORY']
-          parent = os.environ['GITHUB_SHA']
-          api = f'https://api.github.com/repos/{repo}'
-
-          def request(method, path, payload=None):
-              data = None if payload is None else json.dumps(payload).encode()
-              req = urllib.request.Request(
-                  api + path,
-                  data=data,
-                  method=method,
-                  headers={
-                      'Authorization': f'Bearer {token}',
-                      'Accept': 'application/vnd.github+json',
-                      'X-GitHub-Api-Version': '2022-11-28',
-                      'Content-Type': 'application/json',
-                  },
-              )
-              with urllib.request.urlopen(req) as resp:
-                  return json.load(resp)
-
-          base_commit = request('GET', f'/git/commits/{parent}')
-          entries = []
-          for path in expected:
-              blob = request('POST', '/git/blobs', {
-                  'content': Path(path).read_text(encoding='utf-8'),
-                  'encoding': 'utf-8',
-              })
-              entries.append({
-                  'path': path,
-                  'mode': '100644',
-                  'type': 'blob',
-                  'sha': blob['sha'],
-              })
-
-          tree = request('POST', '/git/trees', {
-              'base_tree': base_commit['tree']['sha'],
-              'tree': entries,
-          })
-          commit = request('POST', '/git/commits', {
-              'message': 'chore(deps): align all checkout v7 pins',
-              'tree': tree['sha'],
-              'parents': [parent],
-          })
-          print(f"SERVER_COMMIT_SHA={commit['sha']}")
-          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as out:
-              out.write(f"commit_sha={commit['sha']}\n")
-          PY
-
-      - name: Report object-only result
-        run: |
-          echo "Prepared server-side commit ${{ steps.materialize.outputs.commit_sha }}"
-          echo "Branch ref intentionally not moved by this workflow."
