@@ -29,6 +29,7 @@ jobs:
 
           old = '9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0'
           new = 'f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a'
+          helper = Path('.github/workflows/tmp-checkout-pin-repair-712.yml')
           expected = {
               '.github/workflows/agents-ci.yml',
               '.github/workflows/ci.yml',
@@ -43,7 +44,10 @@ jobs:
               'tests/test_action_ref_pinning.py',
           }
 
-          candidates = sorted(Path('.github/workflows').glob('*.yml'))
+          candidates = [
+              path for path in sorted(Path('.github/workflows').glob('*.yml'))
+              if path != helper
+          ]
           candidates += sorted(Path('templates/.github/workflows').glob('*.yml'))
           candidates += [Path('tests/test_action_ref_pinning.py')]
           changed = set()
