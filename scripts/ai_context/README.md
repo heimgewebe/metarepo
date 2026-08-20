@@ -7,7 +7,7 @@ Validiert `.ai-context.yml` (Repo-Root) und optional Templates unter `ai-context
 ### Was wird geprüft?
 - YAML parsebar
 - `project.name`, `project.summary`, `project.role` vorhanden und nicht leer
-- `ai_guidance.do` und `ai_guidance.dont` vorhanden und nicht leer
+- `ai_guidance.do` und `ai_guidance.dont` sind nicht leere Listen aus nicht leeren Strings
 - keine offensichtlichen Platzhalter: TODO / TBD / FIXME / lorem / ipsum
 
 ### Rollout-Logik (Patch in alle Repos einspeisen)

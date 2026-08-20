@@ -2,8 +2,8 @@
 from __future__ import annotations
 
 import argparse
-import sys
 import re
+import sys
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
@@ -39,22 +39,32 @@ def load_yaml(p: Path) -> Dict[str, Any]:
     return data
 
 
+def get_value(d: Dict[str, Any], path: str) -> Any:
+    cur: Any = d
+    for k in path.split("."):
+        if not isinstance(cur, dict) or k not in cur:
+            return None
+        cur = cur[k]
+    return cur
+
+
 def get_str(d: Dict[str, Any], path: str) -> str:
-    cur: Any = d
-    for k in path.split("."):
-        if not isinstance(cur, dict) or k not in cur:
-            return ""
-        cur = cur[k]
-    return cur if isinstance(cur, str) else ""
+    value = get_value(d, path)
+    return value if isinstance(value, str) else ""
 
 
-def get_list(d: Dict[str, Any], path: str) -> List[Any]:
-    cur: Any = d
-    for k in path.split("."):
-        if not isinstance(cur, dict) or k not in cur:
-            return []
-        cur = cur[k]
-    return cur if isinstance(cur, list) else []
+def validate_non_empty_string_list(d: Dict[str, Any], path: str) -> List[str]:
+    value = get_value(d, path)
+    if not isinstance(value, list):
+        return [f"{path} must be a non-empty list of non-empty strings"]
+    if not value:
+        return [f"{path} must not be empty"]
+
+    return [
+        f"{path}[{index}] must be a non-empty string"
+        for index, item in enumerate(value)
+        if not isinstance(item, str) or not item.strip()
+    ]
 
 
 def has_placeholders(obj: Any) -> bool:
@@ -84,12 +94,8 @@ def validate_one(p: Path) -> List[str]:
     if not role.strip():
         errs.append("missing project.role")
 
-    do = get_list(d, "ai_guidance.do")
-    dont = get_list(d, "ai_guidance.dont")
-    if not do:
-        errs.append("ai_guidance.do must not be empty")
-    if not dont:
-        errs.append("ai_guidance.dont must not be empty")
+    errs.extend(validate_non_empty_string_list(d, "ai_guidance.do"))
+    errs.extend(validate_non_empty_string_list(d, "ai_guidance.dont"))
 
     if has_placeholders(d):
         errs.append("contains placeholders (TODO/TBD/FIXME/lorem/ipsum)")
