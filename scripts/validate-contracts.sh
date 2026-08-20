@@ -210,9 +210,8 @@ else
         c_dir=$(dirname "$c")
         # Check if c_dir ends with rel_dir
         if [[ -z "$rel_dir" ]]; then
-          # If rel_dir is empty (root example), prefer root schema or 'contracts/events' (historical)
-          # We check if schema is in root 'contracts' or direct subfolder 'contracts/events'
-          # Simple heuristic: shorter path wins for root examples
+          # Root examples carry no directory evidence, so every same-name
+          # schema remains a candidate and ambiguity must be handled below.
           matched_candidates+=("$c")
         else
           # Check if path contains rel_dir
@@ -227,14 +226,12 @@ else
         found=("${matched_candidates[@]}")
       fi
 
-      # If still multiple, pick shortest path
       if ((${#found[@]} == 1)); then
         final_candidate="${found[0]}"
       else
-        # Sort by length
-        sorted=$(printf '%s\n' "${found[@]}" | awk '{ print length, $0 }' | sort -n | cut -d" " -f2-)
-        # Pick first
-        final_candidate=$(echo "$sorted" | head -n1)
+        echo "::error::Ambiguous schema match for ${example}. Found multiple candidates:"
+        printf '  - %s\n' "${found[@]}"
+        exit 2
       fi
     fi
 
