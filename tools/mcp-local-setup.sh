@@ -5,7 +5,7 @@
 # Dieses Skript:
 #   1. findet das Repo-Root
 #   2. prüft servers/local-mcp
-#   3. installiert Abhängigkeiten (@modelcontextprotocol/sdk)
+#   3. installiert Abhängigkeiten aus dem kanonischen npm-Lockfile
 #   4. prüft, ob Node und das SDK nutzbar sind
 #
 
@@ -38,31 +38,16 @@ if [ ! -f package.json ]; then
   exit 1
 fi
 
-PKG_MANAGER=""
-
-if command -v pnpm > /dev/null 2>&1; then
-  PKG_MANAGER="pnpm"
-elif command -v npm > /dev/null 2>&1; then
-  PKG_MANAGER="npm"
-fi
-
-if [ -z "${PKG_MANAGER}" ]; then
-  echo "error: neither pnpm nor npm found in PATH." >&2
-  echo "       Please install pnpm or npm before running this script." >&2
+if [ ! -f package-lock.json ]; then
+  echo "error: package-lock.json missing in ${SERVER_DIR}." >&2
+  echo "       The local MCP server uses npm with one canonical lockfile." >&2
   exit 1
 fi
 
-echo "-> Using package manager: ${PKG_MANAGER}"
-
-# Agent-Mode: skip installation
-if [[ "${AGENT_MODE:-}" != "" ]]; then
-  echo "Agent-Mode: skipping ${PKG_MANAGER} install"
-else
-  if [ "${PKG_MANAGER}" = "pnpm" ]; then
-    pnpm install
-  else
-    npm install
-  fi
+if ! command -v npm > /dev/null 2>&1; then
+  echo "error: npm not found in PATH." >&2
+  echo "       Please install npm before running this script." >&2
+  exit 1
 fi
 
 NODE_BIN="${NODE_BIN:-node}"
@@ -71,6 +56,15 @@ if ! command -v "${NODE_BIN}" > /dev/null 2>&1; then
   echo "error: node not found." >&2
   echo "       Please install Node.js (empfohlen: v20 oder neuer) or set NODE_BIN." >&2
   exit 1
+fi
+
+echo "-> Using package manager: npm"
+
+# Agent-Mode: skip installation
+if [[ "${AGENT_MODE:-}" != "" ]]; then
+  echo "Agent-Mode: skipping npm ci"
+else
+  npm ci
 fi
 
 echo "-> Verifying MCP SDK usability..."
