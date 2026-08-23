@@ -7,7 +7,7 @@ dependencies = [
   # The template uses LangGraph directly. LangChain remains an internal transitive detail, so
   # removing the unused direct pins avoids carrying legacy prompt-loading APIs. The exact lock
   # binds patched LangChain Core and checkpoint implementations.
-  "langgraph==1.2.10",
+  "langgraph==1.2.11",
 ]
 
 [dependency-groups]
