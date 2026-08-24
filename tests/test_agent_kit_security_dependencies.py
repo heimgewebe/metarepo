@@ -34,7 +34,7 @@ def test_agent_kit_declares_only_used_runtime_dependencies() -> None:
     dependencies = document["project"]["dependencies"]
     constraints = document["tool"]["uv"]["constraint-dependencies"]
 
-    assert dependencies == ["langgraph==1.2.10"]
+    assert dependencies == ["langgraph==1.2.11"]
     assert constraints == ["orjson>=3.11.6", "urllib3>=2.7.0"]
     assert not any(dependency.startswith("langchain") for dependency in dependencies)
 
