@@ -5,9 +5,9 @@ repo_root="$(git rev-parse --show-toplevel)"
 cd "$repo_root"
 
 origin="$(git config --get remote.origin.url || true)"
-if [[ ! "$origin" =~ ^https://([^/@]+@)?github\.com/heimgewebe/repoground(\.git)?$ ]] \
-  && [[ ! "$origin" =~ ^git@github\.com:heimgewebe/repoground(\.git)?$ ]] \
-  && [[ ! "$origin" =~ ^ssh://git@github\.com/heimgewebe/repoground(\.git)?$ ]]; then
+if [[ ! "$origin" =~ ^https://([^/@]+@)?github\.com/heimgewebe/repoground(\.git)?$ ]] &&
+  [[ ! "$origin" =~ ^git@github\.com:heimgewebe/repoground(\.git)?$ ]] &&
+  [[ ! "$origin" =~ ^ssh://git@github\.com/heimgewebe/repoground(\.git)?$ ]]; then
   echo "RepoGround lock coupling refused: current repository is not heimgewebe/repoground" >&2
   exit 2
 fi
@@ -15,7 +15,7 @@ fi
 needs_lock_refresh=false
 while IFS= read -r path; do
   case "$path" in
-    requirements*.txt|requirements/*)
+    requirements*.txt | requirements/*)
       needs_lock_refresh=true
       break
       ;;
