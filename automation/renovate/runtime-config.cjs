@@ -21,4 +21,7 @@ module.exports = {
   requireConfig: "optional",
   forkProcessing: "disabled",
   platformCommit: "enabled",
+  allowedCommands: [
+    "^bash /home/alex/\\.local/share/renovate-fleet/current/automation/renovate/repoground-lock-coupling\\.sh$",
+  ],
 };
