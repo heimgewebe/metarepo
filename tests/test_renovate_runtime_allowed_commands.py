@@ -30,17 +30,17 @@ def _runtime_command_matches(commands: list[str]) -> dict[str, object]:
 def test_runtime_allows_only_exact_repoground_post_upgrade_commands() -> None:
     commands = [
         "bash /home/alex/.local/share/renovate-fleet/current/automation/renovate/repoground-lock-coupling.sh",
+        "bash /home/alex/.local/share/renovate-fleet/current/automation/renovate/repoground-workflow-refresh.sh",
         "python3 scripts/ci/refresh_workflow_control_plane.py",
-        "python3 scripts/ci/refresh_workflow_control_plane.py --root .",
-        "python scripts/ci/refresh_workflow_control_plane.py",
-        "python3 ./scripts/ci/refresh_workflow_control_plane.py",
-        "bash -lc 'python3 scripts/ci/refresh_workflow_control_plane.py'",
+        "bash /home/alex/.local/share/renovate-fleet/current/automation/renovate/repoground-workflow-refresh.sh --root .",
+        "bash automation/renovate/repoground-workflow-refresh.sh",
+        "bash -lc '/home/alex/.local/share/renovate-fleet/current/automation/renovate/repoground-workflow-refresh.sh'",
     ]
 
     resolved = _runtime_command_matches(commands)
 
     assert resolved["allowedCommands"] == [
         r"^bash /home/alex/\.local/share/renovate-fleet/current/automation/renovate/repoground-lock-coupling\.sh$",
-        r"^python3 scripts/ci/refresh_workflow_control_plane\.py$",
+        r"^bash /home/alex/\.local/share/renovate-fleet/current/automation/renovate/repoground-workflow-refresh\.sh$",
     ]
     assert resolved["matches"] == [True, True, False, False, False, False]
