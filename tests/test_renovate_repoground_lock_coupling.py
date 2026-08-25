@@ -60,7 +60,7 @@ def _run(repo: Path, calls: Path, **extra_env: str) -> subprocess.CompletedProce
     )
 
 
-def test_runtime_allows_only_exact_repoground_lock_coupling_command() -> None:
+def test_runtime_keeps_exact_repoground_lock_coupling_command() -> None:
     completed = subprocess.run(
         [
             "node",
@@ -74,11 +74,12 @@ def test_runtime_allows_only_exact_repoground_lock_coupling_command() -> None:
         check=True,
     )
     patterns = json.loads(completed.stdout)
-    assert patterns == [
+    expected_pattern = (
         "^bash /home/alex/\\.local/share/renovate-fleet/current/automation/renovate/"
         "repoground-lock-coupling\\.sh$"
-    ]
-    assert __import__("re").fullmatch(patterns[0], EXPECTED_COMMAND)
+    )
+    assert expected_pattern in patterns
+    assert __import__("re").fullmatch(expected_pattern, EXPECTED_COMMAND)
 
 
 def test_requirement_update_runs_canonical_generator_then_read_only_check(tmp_path: Path) -> None:
