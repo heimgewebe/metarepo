@@ -23,5 +23,6 @@ module.exports = {
   platformCommit: "enabled",
   allowedCommands: [
     "^bash /home/alex/\\.local/share/renovate-fleet/current/automation/renovate/repoground-lock-coupling\\.sh$",
+    "^bash /home/alex/\\.local/share/renovate-fleet/current/automation/renovate/repoground-workflow-refresh\\.sh$",
   ],
 };
