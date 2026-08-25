@@ -23,5 +23,6 @@ module.exports = {
   platformCommit: "enabled",
   allowedCommands: [
     "^bash /home/alex/\\.local/share/renovate-fleet/current/automation/renovate/repoground-lock-coupling\\.sh$",
+    "^python3 scripts/ci/refresh_workflow_control_plane\\.py$",
   ],
 };
