@@ -22,19 +22,46 @@ def _version_tuple(value: str) -> tuple[int, ...]:
     return tuple(int(part) for part in value.split("."))
 
 
+def _agent_kit_pyproject() -> dict[str, object]:
+    return tomllib.loads((AGENT_KIT / "pyproject.toml").read_text(encoding="utf-8"))
+
+
 def _locked_packages() -> dict[str, str]:
     lock = tomllib.loads((AGENT_KIT / "uv.lock").read_text(encoding="utf-8"))
     return {package["name"]: package["version"] for package in lock["package"]}
 
 
-def test_agent_kit_declares_only_used_runtime_dependencies() -> None:
-    document = tomllib.loads(
-        (AGENT_KIT / "pyproject.toml").read_text(encoding="utf-8")
-    )
-    dependencies = document["project"]["dependencies"]
-    constraints = document["tool"]["uv"]["constraint-dependencies"]
+def _exact_langgraph_pin(document: dict[str, object]) -> str:
+    project = document["project"]
+    assert isinstance(project, dict)
+    dependencies = project["dependencies"]
+    assert isinstance(dependencies, list)
+    assert len(dependencies) == 1
 
-    assert dependencies == ["langgraph==1.2.11"]
+    requirement = dependencies[0]
+    assert isinstance(requirement, str)
+    prefix = "langgraph=="
+    assert requirement.startswith(prefix)
+
+    version = requirement.removeprefix(prefix)
+    assert version and _version_tuple(version)
+    return version
+
+
+def test_agent_kit_declares_only_used_runtime_dependencies() -> None:
+    document = _agent_kit_pyproject()
+    project = document["project"]
+    tool = document["tool"]
+    assert isinstance(project, dict)
+    assert isinstance(tool, dict)
+    uv = tool["uv"]
+    assert isinstance(uv, dict)
+
+    dependencies = project["dependencies"]
+    constraints = uv["constraint-dependencies"]
+    langgraph_version = _exact_langgraph_pin(document)
+
+    assert _locked_packages()["langgraph"] == langgraph_version
     assert constraints == ["orjson>=3.11.6", "urllib3>=2.7.0"]
     assert not any(dependency.startswith("langchain") for dependency in dependencies)
 
