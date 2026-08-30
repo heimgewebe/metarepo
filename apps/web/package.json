@@ -27,7 +27,7 @@
     "cookie": "npm:cookie@0.7.2"
   },
   "devDependencies": {
-    "@playwright/test": "1.55.1",
+    "@playwright/test": "1.62.1",
     "@sveltejs/adapter-auto": "6.1.1",
     "@sveltejs/kit": "^2.47.2",
     "@sveltejs/vite-plugin-svelte": "^5.0.0",
