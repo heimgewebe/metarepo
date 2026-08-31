@@ -56,7 +56,10 @@ def test_dispatch_hard_blocks_archived_leitwerk_even_if_allowlist_is_overridden(
     workflow = (
         ROOT / ".github/workflows/heimgewebe-command-dispatch.yml"
     ).read_text(encoding="utf-8")
-    assert 'const archivedRepos = new Set(["heimlern", "leitwerk"])' in workflow
+    archived_repos_declaration = next(
+        line for line in workflow.splitlines() if "const archivedRepos = new Set([" in line
+    )
+    assert '"leitwerk"' in archived_repos_declaration
     assert workflow.index("archivedRepos.has(targetRepo)") < workflow.index(
         "!allowedRepos.includes(targetRepo)"
     )
