@@ -45,6 +45,7 @@ def _repo(tmp_path: Path, *, origin: str = "https://github.com/heimgewebe/repogr
     )
     _git(repo, "add", ".")
     _git(repo, "commit", "-m", "baseline")
+    _git(repo, "update-ref", "refs/remotes/origin/main", "HEAD")
     return repo
 
 
@@ -58,6 +59,10 @@ def _run(repo: Path, calls: Path, **extra_env: str) -> subprocess.CompletedProce
         capture_output=True,
         check=False,
     )
+
+
+def _change_requirement(repo: Path) -> None:
+    (repo / "requirements-dev.txt").write_text("ruff==0.16.4\n", encoding="utf-8")
 
 
 def test_runtime_keeps_exact_repoground_lock_coupling_command() -> None:
@@ -82,9 +87,12 @@ def test_runtime_keeps_exact_repoground_lock_coupling_command() -> None:
     assert __import__("re").fullmatch(expected_pattern, EXPECTED_COMMAND)
 
 
-def test_invocation_runs_generator_without_secondary_git_diff_gate(tmp_path: Path) -> None:
+def test_committed_requirement_update_runs_generator_on_existing_branch(tmp_path: Path) -> None:
     repo = _repo(tmp_path)
     calls = tmp_path / "calls"
+    _change_requirement(repo)
+    _git(repo, "add", "requirements-dev.txt")
+    _git(repo, "commit", "-m", "renovate dependency update")
 
     completed = _run(repo, calls)
 
@@ -92,10 +100,10 @@ def test_invocation_runs_generator_without_secondary_git_diff_gate(tmp_path: Pat
     assert calls.read_text(encoding="utf-8").splitlines() == ["generate", "--check"]
 
 
-def test_requirement_update_runs_canonical_generator_then_read_only_check(tmp_path: Path) -> None:
+def test_uncommitted_requirement_update_runs_generator(tmp_path: Path) -> None:
     repo = _repo(tmp_path)
     calls = tmp_path / "calls"
-    (repo / "requirements-dev.txt").write_text("ruff==0.16.4\n", encoding="utf-8")
+    _change_requirement(repo)
     _git(repo, "add", "requirements-dev.txt")
 
     completed = _run(repo, calls)
@@ -104,9 +112,36 @@ def test_requirement_update_runs_canonical_generator_then_read_only_check(tmp_pa
     assert calls.read_text(encoding="utf-8").splitlines() == ["generate", "--check"]
 
 
+def test_unrelated_committed_update_does_not_run_lock_generator(tmp_path: Path) -> None:
+    repo = _repo(tmp_path)
+    calls = tmp_path / "calls"
+    (repo / "README.md").write_text("changed\n", encoding="utf-8")
+    _git(repo, "add", "README.md")
+    _git(repo, "commit", "-m", "unrelated update")
+
+    completed = _run(repo, calls)
+
+    assert completed.returncode == 0, completed.stderr
+    assert not calls.exists()
+    assert "no Python requirement change on branch" in completed.stdout
+
+
+def test_missing_origin_main_regenerates_fail_safe(tmp_path: Path) -> None:
+    repo = _repo(tmp_path)
+    calls = tmp_path / "calls"
+    _git(repo, "update-ref", "-d", "refs/remotes/origin/main")
+
+    completed = _run(repo, calls)
+
+    assert completed.returncode == 0, completed.stderr
+    assert calls.read_text(encoding="utf-8").splitlines() == ["generate", "--check"]
+    assert "origin/main unavailable" in completed.stderr
+
+
 def test_generator_failure_stops_before_read_only_check(tmp_path: Path) -> None:
     repo = _repo(tmp_path)
     calls = tmp_path / "calls"
+    _change_requirement(repo)
 
     completed = _run(repo, calls, FAIL_GENERATE="1")
 
@@ -117,6 +152,7 @@ def test_generator_failure_stops_before_read_only_check(tmp_path: Path) -> None:
 def test_missing_canonical_generator_fails_closed(tmp_path: Path) -> None:
     repo = _repo(tmp_path)
     calls = tmp_path / "calls"
+    _change_requirement(repo)
     (repo / "scripts" / "release" / "compile_dependency_locks.sh").unlink()
 
     completed = _run(repo, calls)
@@ -129,6 +165,7 @@ def test_missing_canonical_generator_fails_closed(tmp_path: Path) -> None:
 def test_non_repoground_repository_is_rejected_before_repository_code_runs(tmp_path: Path) -> None:
     repo = _repo(tmp_path, origin="https://github.com/heimgewebe/audio.git")
     calls = tmp_path / "calls"
+    _change_requirement(repo)
 
     completed = _run(repo, calls)
 
