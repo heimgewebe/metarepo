@@ -69,6 +69,30 @@
       "enabled": false
     },
     {
+      "description": "Weltgewebe allowlisted web dependency patches carry deterministic governance metadata",
+      "matchManagers": [
+        "npm"
+      ],
+      "matchRepositories": [
+        "heimgewebe/weltgewebe"
+      ],
+      "matchFileNames": [
+        "apps/web/package.json"
+      ],
+      "matchPackageNames": [
+        "eslint",
+        "postcss"
+      ],
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "prBodyNotes": [
+        "<!-- weltgewebe-risk: R2 -->",
+        "<!-- weltgewebe-attention-impact: none -->",
+        "<!-- weltgewebe-attention-rationale: Allowlisted dependency-only patch update in apps/web; no attention-domain semantics, prioritization, triggers, or user-facing attention behavior changed. -->"
+      ]
+    },
+    {
       "description": "Weltgewebe GitHub Action changes require review evidence that generic Renovate cannot supply",
       "matchManagers": [
         "github-actions"
