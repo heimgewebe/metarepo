@@ -23,7 +23,7 @@ jobs:
     env:
       # Whitelist der Ziel-Repos (kommagetrennt). Kann pro Repo via
       # Repository-Variable HEIMGEWEBE_ALLOWED_REPOS überschrieben werden.
-      ALLOWED_TARGET_REPOS: ${{ vars.HEIMGEWEBE_ALLOWED_REPOS || 'sichter,wgx,heimgeist,metarepo,hausKI,semantAH,chronik,leitstand,repoground' }}
+      ALLOWED_TARGET_REPOS: ${{ vars.HEIMGEWEBE_ALLOWED_REPOS || 'sichter,wgx,metarepo,hausKI,semantAH,chronik,leitstand,repoground' }}
 
       # Whitelist der erlaubten Kommandos (kommagetrennt). Kann via
       # Repository-Variable HEIMGEWEBE_ALLOWED_COMMANDS überschrieben werden.
@@ -76,7 +76,6 @@ jobs:
             core.info(`author_association = ${assoc}, author_type = ${authorType}`);
             core.info(`Raw comment body: ${JSON.stringify(comment)}`);
 
-            // Bot-Kommentare grundsätzlich ignorieren (Schutz vor Loops)
             if (authorType === "Bot" || (author && author.endsWith("[bot]"))) {
               core.info("Ignoring bot comment.");
               return;
@@ -87,23 +86,6 @@ jobs:
               return;
             }
 
-            // ROBUSTER ERKENNER FÜR KOMMANDOS
-            //
-            // Erlaubt u. a.:
-            // @heimgewebe/sichter quick
-            // @heimgewebe/sichter    quick
-            // @heimgewebe/sichter /quick
-            // @heimgewebe/sichter /quick extra
-            // @HEIMGEWEBE/SICHTER /QUICK
-            // @heimgewebe/sichter        / quick foo bar
-            // Hinweis: Ohne Kommando wird nicht dispatched.
-            //
-            // Strategie:
-            // 1. Finde @heimgewebe/<repo>
-            // 2. Dahinter beliebiger Whitespace
-            // 3. Optional "/" vor dem Kommando
-            // 4. Kommando
-            // 5. Rest = Args
             const tolerantPattern =
               /@heimgewebe\/([a-z0-9_.-]+)\s*(?:\/\s*)?([a-z0-9_.-]+)\b([\s\S]*)/i;
 
@@ -118,7 +100,6 @@ jobs:
             const command = (match[2] || "").trim().toLowerCase();
             const rawArgs = (match[3] || "").trim();
 
-            // Kommentar sanitisieren (eine Zeile, max. 2048 Zeichen)
             const maxCommentLen = 2048;
             let sanitizedComment = comment.replace(/[\r\n ]+/g, " ");
             if (sanitizedComment.length > maxCommentLen) {
@@ -138,18 +119,18 @@ jobs:
               });
             }
 
-            // Archivierte Repositories bleiben auch dann gesperrt, wenn eine
-            // Repository-Variable sie versehentlich wieder in die Whitelist aufnimmt.
-            const archivedRepos = new Set(["heimlern", "leitwerk"]);
+            // Archivierte beziehungsweise dekommissionierte Repositories bleiben auch dann
+            // gesperrt, wenn eine Repository-Variable sie versehentlich wieder in die
+            // Whitelist aufnimmt.
+            const archivedRepos = new Set(["heimlern", "leitwerk", "heimgeist"]);
             if (archivedRepos.has(targetRepo)) {
               await reply(
-                `⚠️ Das Ziel-Repo **${targetRepo}** ist eine archivierte Referenz ohne Dispatch-Autorität.\n\n` +
+                `⚠️ Das Ziel-Repo **${targetRepo}** ist eine archivierte oder dekommissionierte Referenz ohne Dispatch-Autorität.\n\n` +
                 `Erlaubte aktive Repos: \`${allowedRepos.filter((repo) => !archivedRepos.has(repo)).join(", ")}\`.`
               );
               return;
             }
 
-            // Whitelist-Checks
             if (["tools", "lenskit"].includes(targetRepo)) {
               await reply(
                 `⚠️ Das Ziel-Repo **${targetRepo}** ist deprecated. Bitte nutze **repoground**.\n\n` +
@@ -174,7 +155,6 @@ jobs:
               return;
             }
 
-            // Membership check nur über author_association (kein extra API-Call)
             const allowedRoles = ["OWNER", "MEMBER" ];
             if (requireOrgMembership) {
               if (!allowedRoles.includes(assoc)) {
@@ -212,7 +192,6 @@ jobs:
               client_payload: payload,
             });
 
-            // Acknowledge beim Kommentar
             if (context.payload.comment?.id) {
               try {
                 await github.rest.reactions.createForIssueComment({
