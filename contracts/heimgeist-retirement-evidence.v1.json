@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "kind": "heimgeist_retirement_evidence",
+  "observedAt": "2026-08-31T08:31:00Z",
+  "repository": "heimgewebe/heimgeist",
+  "runtimeAuthority": "retired",
+  "dispatchAuthority": "retired",
+  "eventContractDecision": {
+    "id": "event_backbone/heimgeist.insight",
+    "owner": "heimgewebe/metarepo",
+    "lifecycle": "active",
+    "purpose": "retain a stable schema so Chronik and archival readers can validate and interpret existing Heimgeist events",
+    "newHeimgeistProductionIntended": false,
+    "reason": "Repository retirement does not require deleting or misclassifying a still-useful decoding contract. The existing consumers registry remains evidence-bound to its full multi-repository audit; its Heimgeist producer entry is unverified and does not establish live production."
+  },
+  "runtimeCutover": {
+    "repository": "heimgewebe/plexer",
+    "pullRequest": 104,
+    "mergeCommit": "dad438d64a8d886a16e28ea74d535e047a5d1b64",
+    "checks": [
+      {"name": "CI", "conclusion": "success"},
+      {"name": "ai-context guard", "conclusion": "success"}
+    ],
+    "effect": "The former Heimgeist live fanout is hard-disabled. Legacy HEIMGEIST_URL and HEIMGEIST_TOKEN values cannot reactivate the consumer or create new Heimgeist delivery attempts."
+  },
+  "repositoryObservation": {
+    "head": "adaa352a18fd2396c04fb906d7f085717f62964f",
+    "repositoryDispatchReceiverObserved": false,
+    "truthOwnership": "none in the current Systemkatalog transition classification"
+  },
+  "boundaries": [
+    "Chronik may continue validating and rendering historical Heimgeist event families.",
+    "The Metarepo schema remains an active decoding contract independently of the retired Heimgeist runtime.",
+    "No current task, execution, merge, deployment, or ecosystem-semantics authority is assigned to Heimgeist by this evidence."
+  ],
+  "doesNotEstablish": [
+    "absence_of_every_external_private_reader",
+    "github_repository_archived_flag",
+    "permission_to_delete_historical_events",
+    "fresh_full_multi_repository_consumer_audit"
+  ]
+}
