@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "kind": "heimgeist_retirement_evidence",
+  "observedAt": "2026-08-31T08:24:00Z",
+  "contract": {
+    "id": "event_backbone/heimgeist.insight",
+    "schema": "contracts/events/heimgeist.insight.v1.schema.json",
+    "lifecycle": "historical",
+    "replacement": null,
+    "reason": "The Heimgeist repository is being decommissioned as an active meta-agent. The schema remains only to interpret historical events and repository fixtures."
+  },
+  "producer": {
+    "repository": "heimgewebe/heimgeist",
+    "active": false,
+    "liveRepositoryHeadObserved": "adaa352a18fd2396c04fb906d7f085717f62964f",
+    "evidence": [
+      "The repository exposes no repository_dispatch receiver for the Heimgewebe command event at the observed head.",
+      "Its former Plexer consumer path was hard-disabled and merged in heimgewebe/plexer#104."
+    ]
+  },
+  "runtimeCutover": {
+    "repository": "heimgewebe/plexer",
+    "pullRequest": 104,
+    "mergeCommit": "dad438d64a8d886a16e28ea74d535e047a5d1b64",
+    "checks": [
+      {"name": "CI", "conclusion": "success"},
+      {"name": "ai-context guard", "conclusion": "success"}
+    ],
+    "effect": "HEIMGEIST_URL and HEIMGEIST_TOKEN remain parse-compatible but no longer activate a live Plexer consumer or create new Heimgeist delivery attempts."
+  },
+  "historicalReaders": [
+    {
+      "repository": "heimgewebe/chronik",
+      "mode": "reference-only",
+      "status": "historical",
+      "reason": "Validation and documentation may retain the event family so historical ledger entries remain interpretable."
+    },
+    {
+      "repository": "heimgewebe/semantAH",
+      "mode": "reference-only",
+      "status": "historical",
+      "reason": "No active producer dependency is established; retained references are historical only."
+    },
+    {
+      "repository": "heimgewebe/leitstand",
+      "mode": "reference-only",
+      "status": "historical",
+      "reason": "Existing Heimgeist fixtures/rendering references are archival visualization data, not runtime authority."
+    }
+  ],
+  "doesNotEstablish": [
+    "runtime_health_outside_the_observed_cutover",
+    "absence_of_every_external_private_consumer",
+    "github_repository_archived_flag",
+    "permission_to_delete_historical_events"
+  ]
+}
