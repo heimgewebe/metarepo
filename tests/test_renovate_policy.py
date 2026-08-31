@@ -142,6 +142,28 @@ def test_shared_preset_keeps_governed_dependency_lanes_out_of_generic_renovate()
         assert any(all(rule.get(key) == value for key, value in required.items()) for rule in rules)
 
 
+def test_weltgewebe_allowlisted_web_patches_get_exact_governance_metadata() -> None:
+    _, _, preset = _inputs()
+    matching = [
+        rule
+        for rule in preset["packageRules"]
+        if rule.get("description")
+        == "Weltgewebe allowlisted web dependency patches carry deterministic governance metadata"
+    ]
+    assert len(matching) == 1
+    rule = matching[0]
+    assert rule["matchManagers"] == ["npm"]
+    assert rule["matchRepositories"] == ["heimgewebe/weltgewebe"]
+    assert rule["matchFileNames"] == ["apps/web/package.json"]
+    assert rule["matchPackageNames"] == ["eslint", "postcss"]
+    assert rule["matchUpdateTypes"] == ["patch"]
+    assert rule["prBodyNotes"] == [
+        "<!-- weltgewebe-risk: R2 -->",
+        "<!-- weltgewebe-attention-impact: none -->",
+        "<!-- weltgewebe-attention-rationale: Allowlisted dependency-only patch update in apps/web; no attention-domain semantics, prioritization, triggers, or user-facing attention behavior changed. -->",
+    ]
+
+
 def test_preset_cannot_enable_automerge() -> None:
     _, _, preset = _inputs()
     mutated = copy.deepcopy(preset)
