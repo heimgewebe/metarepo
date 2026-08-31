@@ -82,6 +82,16 @@ def test_runtime_keeps_exact_repoground_lock_coupling_command() -> None:
     assert __import__("re").fullmatch(expected_pattern, EXPECTED_COMMAND)
 
 
+def test_invocation_runs_generator_without_secondary_git_diff_gate(tmp_path: Path) -> None:
+    repo = _repo(tmp_path)
+    calls = tmp_path / "calls"
+
+    completed = _run(repo, calls)
+
+    assert completed.returncode == 0, completed.stderr
+    assert calls.read_text(encoding="utf-8").splitlines() == ["generate", "--check"]
+
+
 def test_requirement_update_runs_canonical_generator_then_read_only_check(tmp_path: Path) -> None:
     repo = _repo(tmp_path)
     calls = tmp_path / "calls"
@@ -94,22 +104,9 @@ def test_requirement_update_runs_canonical_generator_then_read_only_check(tmp_pa
     assert calls.read_text(encoding="utf-8").splitlines() == ["generate", "--check"]
 
 
-def test_unrelated_update_does_not_run_lock_generator(tmp_path: Path) -> None:
-    repo = _repo(tmp_path)
-    calls = tmp_path / "calls"
-    (repo / "README.md").write_text("changed\n", encoding="utf-8")
-
-    completed = _run(repo, calls)
-
-    assert completed.returncode == 0, completed.stderr
-    assert not calls.exists()
-    assert "no Python requirement change" in completed.stdout
-
-
 def test_generator_failure_stops_before_read_only_check(tmp_path: Path) -> None:
     repo = _repo(tmp_path)
     calls = tmp_path / "calls"
-    (repo / "requirements-dev.txt").write_text("ruff==0.16.4\n", encoding="utf-8")
 
     completed = _run(repo, calls, FAIL_GENERATE="1")
 
@@ -117,10 +114,21 @@ def test_generator_failure_stops_before_read_only_check(tmp_path: Path) -> None:
     assert calls.read_text(encoding="utf-8").splitlines() == ["generate"]
 
 
+def test_missing_canonical_generator_fails_closed(tmp_path: Path) -> None:
+    repo = _repo(tmp_path)
+    calls = tmp_path / "calls"
+    (repo / "scripts" / "release" / "compile_dependency_locks.sh").unlink()
+
+    completed = _run(repo, calls)
+
+    assert completed.returncode == 2
+    assert not calls.exists()
+    assert "canonical generator is missing" in completed.stderr
+
+
 def test_non_repoground_repository_is_rejected_before_repository_code_runs(tmp_path: Path) -> None:
     repo = _repo(tmp_path, origin="https://github.com/heimgewebe/audio.git")
     calls = tmp_path / "calls"
-    (repo / "requirements-dev.txt").write_text("ruff==0.16.4\n", encoding="utf-8")
 
     completed = _run(repo, calls)
 
