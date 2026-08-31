@@ -472,9 +472,11 @@ jobs:
         if: ${{ steps.webvars.outputs.enabled == 'true' }}
         uses: actions/cache@v6  # v6 (major tag)
         with:
-          path: ~/.cache/ms-playwright
-          # Version ist in devDependency gepinnt (@playwright/test 1.55.1)
-          key: ${{ runner.os }}-ms-playwright-1.55.1
+          path: |
+            ~/.cache/ms-playwright
+            ~/Library/Caches/ms-playwright
+          # Der Manifest-Hash folgt automatisch der gepinnten @playwright/test-Version.
+          key: ${{ runner.os }}-ms-playwright-${{ hashFiles('apps/web/package.json') }}
           restore-keys: |
             ${{ runner.os }}-ms-playwright-
 
