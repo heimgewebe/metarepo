@@ -12,10 +12,39 @@ if [[ ! "$origin" =~ ^https://([^/@]+@)?github\.com/heimgewebe/repoground(\.git)
   exit 2
 fi
 
-# Renovate invokes this wrapper through RepoGround's postUpgradeTasks contract.
-# That invocation is the authoritative trigger. Do not add a second git-diff gate:
-# Renovate may already have staged or otherwise normalized its dependency update,
-# while the canonical lock generator still needs to refresh derived lock artifacts.
+needs_lock_refresh=false
+changed_paths="$(git diff --name-only --diff-filter=ACMRTUXB HEAD --)"
+
+# Renovate can revisit an existing update branch whose dependency change is
+# already committed in HEAD. Compare the whole branch delta against main as
+# well as the current worktree so the hook remains self-healing across runs.
+if git show-ref --verify --quiet refs/remotes/origin/main; then
+  merge_base="$(git merge-base HEAD refs/remotes/origin/main)"
+  branch_paths="$(git diff --name-only --diff-filter=ACMRTUXB "$merge_base" HEAD --)"
+  if [[ -n "$branch_paths" ]]; then
+    changed_paths+=$'\n'"$branch_paths"
+  fi
+else
+  echo "RepoGround lock coupling: origin/main unavailable; regenerating fail-safe" >&2
+  needs_lock_refresh=true
+fi
+
+if [[ "$needs_lock_refresh" != true ]]; then
+  while IFS= read -r path; do
+    case "$path" in
+      requirements*.txt | requirements/*)
+        needs_lock_refresh=true
+        break
+        ;;
+    esac
+  done <<< "$changed_paths"
+fi
+
+if [[ "$needs_lock_refresh" != true ]]; then
+  echo "RepoGround lock coupling: no Python requirement change on branch; nothing to regenerate"
+  exit 0
+fi
+
 generator="scripts/release/compile_dependency_locks.sh"
 if [[ ! -f "$generator" ]]; then
   echo "RepoGround lock coupling refused: canonical generator is missing" >&2
