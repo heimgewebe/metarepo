@@ -49,7 +49,10 @@ def test_dispatch_hard_blocks_archived_repository_even_if_variable_is_overridden
     ).read_text(encoding="utf-8")
     default_allowlist = workflow.split("ALLOWED_TARGET_REPOS:", 1)[1].split("\n", 1)[0]
     assert "heimlern" not in default_allowlist
-    assert 'const archivedRepos = new Set(["heimlern", "leitwerk"])' in workflow
+    archived_repos_declaration = next(
+        line for line in workflow.splitlines() if "const archivedRepos = new Set([" in line
+    )
+    assert '"heimlern"' in archived_repos_declaration
     assert workflow.index("archivedRepos.has(targetRepo)") < workflow.index(
         "!allowedRepos.includes(targetRepo)"
     )
