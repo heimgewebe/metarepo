@@ -1,6 +1,6 @@
 <!-- GENERATED FILE - DO NOT EDIT -->
 <!-- Source: fleet/repos.yml -->
-<!-- Source SHA-256: 4fc8803f7acc91eb1967cf325eb25638328e31dffdca49e35aeea17f2bee8ce9 -->
+<!-- Source SHA-256: 90be7a74d7179b750879460379ebb61789ce6245536f1e1fd4c86f1807fc7c3f -->
 
 # Heimgewebe Fleet Overview
 
@@ -30,7 +30,7 @@ Repositories managed by WGX (Contracts, Templates, Policies).
 ## Related / Static
 Repositories that are part of the ecosystem but have specific roles.
 
-- **weltgewebe** (related)
+- **commonthing** (related)
 - **vault-privat** (related) (Non-Fleet)
 - **hausKI-audio** (historical-donor) (Non-Fleet)
 - **heimlern** (archived-reference) (Non-Fleet)

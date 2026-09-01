@@ -36,7 +36,7 @@ def test_current_policy_preset_baseline_and_projection_are_valid() -> None:
     assert projection["prepared_repositories"] == []
     assert len(projection["expected_renovate_repositories"]) == 18
     assert set(projection["expected_renovate_repositories"]) == {
-        "heimgewebe/weltgewebe",
+        "heimgewebe/commonthing",
         "heimgewebe/metarepo",
         "heimgewebe/wgx",
         "heimgewebe/contracts-mirror",
@@ -128,12 +128,12 @@ def test_shared_preset_keeps_governed_dependency_lanes_out_of_generic_renovate()
         },
         {
             "matchManagers": ["github-actions"],
-            "matchRepositories": ["heimgewebe/weltgewebe"],
+            "matchRepositories": ["heimgewebe/commonthing"],
             "enabled": False,
         },
         {
             "matchManagers": ["dockerfile", "docker-compose"],
-            "matchRepositories": ["heimgewebe/weltgewebe"],
+            "matchRepositories": ["heimgewebe/commonthing"],
             "matchFileNames": ["apps/**/Dockerfile", "infra/compose/**"],
             "enabled": False,
         },
@@ -244,7 +244,7 @@ def test_shared_preset_disables_weltgewebe_deployment_image_managers() -> None:
     _, _, preset = _inputs()
     assert any(
         rule.get("matchManagers") == ["dockerfile", "docker-compose"]
-        and rule.get("matchRepositories") == ["heimgewebe/weltgewebe"]
+        and rule.get("matchRepositories") == ["heimgewebe/commonthing"]
         and rule.get("matchFileNames") == ["apps/**/Dockerfile", "infra/compose/**"]
         and rule.get("enabled") is False
         for rule in preset["packageRules"]

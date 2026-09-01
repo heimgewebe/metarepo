@@ -9,7 +9,7 @@ autopoetischer KI-Organismus funktioniert:
 - **semantAH** – semantischer Index und Insights
 - **chronik** – Ereignisspeicher (Event-Log, Audit)
 - **leitstand** – UI / Dashboard
-- plus weitere aktive Organe: **aussensensor**, **vault-gewebe**, **weltgewebe**, **repoground**, **sichter**, **mitschreiber**, **heimgeist**, **plexer**.
+- plus weitere aktive Organe: **aussensensor**, **vault-gewebe**, **commonThing**, **repoground**, **sichter**, **mitschreiber**, **heimgeist**, **plexer**.
 - **heimlern** bleibt ausschließlich als archivierte Policy-Referenz sichtbar.
 
 Dieses Dokument erklärt:
@@ -206,16 +206,16 @@ aber schon mehr als eine Idee.
 
 ---
 
-### 2.10 weltgewebe – öffentliche Web-Schicht
+### 2.10 commonThing – öffentliche Web-Schicht
 
-**Repo:** `heimgewebe/weltgewebe`
+**Repo:** `heimgewebe/commonthing`
 
 - Docs-first Web-Projekt (SvelteKit + Rust/Axum + Postgres, JetStream, Caddy).
 - Dient als **öffentliche Oberfläche** für Teile des Heimgewebes, mit klaren Gates
 (A–D), welche Daten überhaupt hinaus dürfen.
 
 **Nutzen:**
-weltgewebe ist die **Haut** nach außen: nur das, was durch die Gates geht,
+commonThing ist die **Haut** nach außen: nur das, was durch die Gates geht,
 wird öffentlich sichtbar.
 
 ---
@@ -321,7 +321,7 @@ Ergebnis: das Repo wird automatisch in Fleet-Metriken und Leitstand-Sichten auft
 - metarepo definiert Contracts und Reusable CI.
 - wgx führt Befehle Fleet-weit konsistent aus.
 - hausKI, semantAH, chronik bilden das Gehirn + Gedächtnis.
-- leitstand und weltgewebe sind die Augen & Anzeigen.
+- leitstand und commonThing sind die Augen & Anzeigen.
 - aussensensor, vault-gewebe, sichter, mitschreiber, heimgeist und plexer
 sorgen für Wahrnehmung, Reflexion und Text.
 - Heimlern dokumentiert nur noch die historische Policy- und Lernschicht.

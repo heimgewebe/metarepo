@@ -8,6 +8,7 @@
     "heimgewebe/audio",
     "heimgewebe/aussensensor",
     "heimgewebe/chronik",
+    "heimgewebe/commonthing",
     "heimgewebe/contracts-mirror",
     "heimgewebe/hausKI",
     "heimgewebe/heim-pc",
@@ -21,7 +22,6 @@
     "heimgewebe/semantAH",
     "heimgewebe/sichter",
     "heimgewebe/vault-gewebe",
-    "heimgewebe/weltgewebe",
     "heimgewebe/wgx"
   ],
   "kind": "renovate-fleet-scope-projection",
@@ -37,11 +37,11 @@
   "sources": {
     "fleet": {
       "path": "fleet/repos.yml",
-      "sha256": "4fc8803f7acc91eb1967cf325eb25638328e31dffdca49e35aeea17f2bee8ce9"
+      "sha256": "90be7a74d7179b750879460379ebb61789ce6245536f1e1fd4c86f1807fc7c3f"
     },
     "policy": {
       "path": "automation/renovate/dependency-updates.v1.yml",
-      "sha256": "695172cb0913564840d969d83f755298c78c5d32e8fb0bcff523677bc02b44ab"
+      "sha256": "ac44a754a2e4a537c552247030763084240f03d49c1632eb993dab35f3004205"
     }
   },
   "version_update_ownership": [
@@ -59,6 +59,11 @@
       "dependabot_version_updates": "none",
       "renovate_version_updates": "enabled",
       "repository": "heimgewebe/chronik"
+    },
+    {
+      "dependabot_version_updates": "disabled",
+      "renovate_version_updates": "enabled",
+      "repository": "heimgewebe/commonthing"
     },
     {
       "dependabot_version_updates": "none",
@@ -126,11 +131,6 @@
       "repository": "heimgewebe/vault-gewebe"
     },
     {
-      "dependabot_version_updates": "disabled",
-      "renovate_version_updates": "enabled",
-      "repository": "heimgewebe/weltgewebe"
-    },
-    {
       "dependabot_version_updates": "none",
       "renovate_version_updates": "enabled",
       "repository": "heimgewebe/wgx"
@@ -145,7 +145,7 @@
         "hausKI",
         "audio",
         "repoground",
-        "weltgewebe",
+        "commonthing",
         "metarepo"
       ],
       "selector": null

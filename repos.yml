@@ -11,8 +11,8 @@ repos:
     scope: schema
     metrics:
       enable: false
-  - name: weltgewebe
-    url: https://github.com/heimgewebe/weltgewebe
+  - name: commonthing
+    url: https://github.com/heimgewebe/commonthing
     default_branch: main
     domain: aussen
     scope: events
