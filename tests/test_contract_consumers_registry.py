@@ -174,3 +174,11 @@ def test_evidence_must_cover_every_declared_repository() -> None:
         with pytest.raises(RegistryError, match="must cover every declared repository"):
             validate_registry(root)
 
+
+
+def test_aussen_event_schema_producers_match_audited_registry() -> None:
+    schema = json.loads((ROOT / "contracts" / "aussen.event.schema.json").read_text(encoding="utf-8"))
+    registry = _load_registry(ROOT)
+    producers = [item["repo"] for item in registry["event_backbone"]["aussen.event"]["producers"]]
+
+    assert schema["x-producers"] == producers == ["aussensensor"]
