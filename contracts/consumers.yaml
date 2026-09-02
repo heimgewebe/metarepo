@@ -56,13 +56,14 @@ event_backbone:
     status_reason: Reviewed against exact current default-branch commits for the declared repositories.
     evidence_ref: contracts/consumer-evidence.v1.json#contracts/event_backbone/event.line
     producers:
-    - repo: chronik
+    - repo: hausKI
       status: unverified
       files:
-      - README.md
-      - docs/event-contracts.md
+      - .github/workflows/validate-events.yml
+      - docs/contracts/x-repo-events.md
+      - scripts/emit_event_line.sh
       last_verified: '2026-09-02T13:00:53+00:00'
-      evidence_ref: contracts/consumer-evidence.v1.json#claims/event_backbone/event.line::producer::chronik
+      evidence_ref: contracts/consumer-evidence.v1.json#claims/event_backbone/event.line::producer::hausKI
   heimgeist.insight:
     schema: contracts/events/heimgeist.insight.v1.schema.json
     consumers:
