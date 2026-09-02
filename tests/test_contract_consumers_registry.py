@@ -101,11 +101,22 @@ def test_verified_claim_without_files_and_evidence_fails_closed() -> None:
 def test_verified_mirror_with_wrong_hash_fails_closed() -> None:
     with tempfile.TemporaryDirectory() as directory:
         root = _fixture_root(directory)
+        registry = _load_registry(root)
+        consumer = next(
+            item
+            for item in registry["event_backbone"]["aussen.event"]["consumers"]
+            if item["repo"] == "aussensensor"
+        )
+        consumer["status"] = "verified"
+        _write_registry(root, registry)
+
         evidence = _load_evidence(root)
         claim = _claim(
             evidence,
             "event_backbone/aussen.event::consumer::aussensensor",
         )
+        claim["status"] = "verified"
+        claim["mirrorChecks"][0]["matches_canonical"] = True
         claim["mirrorChecks"][0]["sha256"] = "0" * 64
         _write_evidence(root, evidence)
 
@@ -174,3 +185,11 @@ def test_evidence_must_cover_every_declared_repository() -> None:
         with pytest.raises(RegistryError, match="must cover every declared repository"):
             validate_registry(root)
 
+
+
+def test_aussen_event_schema_producers_match_audited_registry() -> None:
+    schema = json.loads((ROOT / "contracts" / "aussen.event.schema.json").read_text(encoding="utf-8"))
+    registry = _load_registry(ROOT)
+    producers = [item["repo"] for item in registry["event_backbone"]["aussen.event"]["producers"]]
+
+    assert schema["x-producers"] == producers == ["aussensensor"]

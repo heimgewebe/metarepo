@@ -1,83 +1,83 @@
 {
   "schemaVersion": 1,
   "kind": "metarepo_contract_consumer_evidence",
-  "observedAt": "2026-07-14T21:35:14+02:00",
+  "observedAt": "2026-09-02T08:37:42+00:00",
   "source": {
     "repository": "heimgewebe/metarepo",
-    "commit": "894657cef6734ecaf64813e83fc0433212d8fd5d",
-    "auditJob": "grabowski-job-f8d92a1aa443",
-    "auditFinalizationReceiptSha256": "b4543d1156de83b0e97c48aca780bb2e55085316e05c35f997ae91d6eaa9fd64",
+    "commit": "065d7aaee2d24fd205ebd64c168fd33fcdb2edc0",
+    "auditJob": "grabowski-job-26f3a9bb1134",
+    "auditFinalizationReceiptSha256": "164fc0547326962954cbd966225c109bb02dca59d450485d4bbe1169292f09a8",
     "method": "shallow_default_branch_clone_plus_fixed_string_repository_scan"
   },
   "scope": {
     "repositories": [
       {
         "repository": "heimgewebe/aussensensor",
-        "commit": "f9c75995b61ee841321420789e8e6b6374384a2a",
+        "commit": "f16228fba16f0ed298a9264eede3082cc1491c1c",
         "defaultBranch": "main"
       },
       {
         "repository": "heimgewebe/chronik",
-        "commit": "2fc65efe06cd23baa2a2bdef39f5f099c8a5540b",
+        "commit": "909cd79ed7e8ba2924695fc18dd6bea84031bc63",
         "defaultBranch": "main"
       },
       {
         "repository": "heimgewebe/hausKI",
-        "commit": "2b2e4496613c856993e028e360e76abea70c7028",
+        "commit": "92f65b361881ebaa2cd1641bbe549c37949c06b8",
         "defaultBranch": "main"
       },
       {
         "repository": "heimgewebe/heim-pc",
-        "commit": "140e84bc28d3b208a51e2edb1cb27c5946c38d49",
+        "commit": "fe16aa4a834ae4b7da4bcf224b196cb69ba6a99e",
         "defaultBranch": "main"
       },
       {
         "repository": "heimgewebe/heimgeist",
-        "commit": "2d657297e9875cf0ec12932b3391fc4c0d8a246a",
+        "commit": "8ccb7a3a5bed1c25d7d6e5afc6f22abb93ada4e1",
         "defaultBranch": "main"
       },
       {
         "repository": "heimgewebe/heimlern",
-        "commit": "8dbebea6b253f9d2f41514a15d34e5166602e792",
+        "commit": "a0a0d97e3a3dedec80ae90dfe0c094b57bcaac3a",
         "defaultBranch": "main"
       },
       {
         "repository": "heimgewebe/leitstand",
-        "commit": "a5df64b478f998973be7ba4ac2936d1d12ba3ed1",
+        "commit": "ce64cecb89c6685b5d1d50bf0980b6d92977d0a2",
         "defaultBranch": "main"
       },
       {
         "repository": "heimgewebe/mitschreiber",
-        "commit": "3680bb7e14079c4b8ec3d0758605f7023ee11097",
+        "commit": "3ef97ffc31c0112a0de030a5bd119a819f9ad3a7",
         "defaultBranch": "main"
       },
       {
         "repository": "heimgewebe/plexer",
-        "commit": "e1099df6ccf1763c7e235d844ff09b2728b24601",
+        "commit": "dad438d64a8d886a16e28ea74d535e047a5d1b64",
         "defaultBranch": "main"
       },
       {
         "repository": "heimgewebe/semantAH",
-        "commit": "c306e89105605778a382aa12c231f727c221cc74",
+        "commit": "7106795052404c17e0870e5c89289e586f61784f",
         "defaultBranch": "main"
       },
       {
         "repository": "heimgewebe/wgx",
-        "commit": "2f2aa2225838be1d029697348d9aa989ce7e62f9",
+        "commit": "be0d151363735e63f7cd5335d174929c02ccbc8e",
         "defaultBranch": "main"
       }
     ],
     "completeForDeclaredRepositories": true,
     "completeForOrganization": false,
     "githubCodeSearchComplete": false,
-    "githubCodeSearchLimitation": "The separate code-search quota was exhausted after ten exploratory queries; final evidence comes from eleven exact shallow main clones."
+    "githubCodeSearchLimitation": "Current evidence comes from exact shallow default-branch clones; GitHub code search was not used."
   },
   "contracts": [
     {
       "id": "event_backbone/aussen.event",
       "schema": "contracts/aussen.event.schema.json",
       "schemaExists": true,
-      "schemaSha256": "2410e7ccd2a94271d6b292d4e8df5a4190a111376f26ae509901c8995a888f37",
+      "schemaSha256": "b43acfd9d5345a966759cb7a4473200777ce24cd9595064df73d9c24287a040e",
       "lifecycle": "active",
       "replacement": null
     },
@@ -264,7 +264,7 @@
       "contract": "event_backbone/aussen.event",
       "role": "producer",
       "repository": "heimgewebe/aussensensor",
-      "commit": "f9c75995b61ee841321420789e8e6b6374384a2a",
+      "commit": "f16228fba16f0ed298a9264eede3082cc1491c1c",
       "status": "verified",
       "mode": null,
       "files": [
@@ -277,6 +277,31 @@
         {
           "path": ".github/workflows/contracts-drift.yml",
           "line": 21,
+          "kind": "ci_reference"
+        },
+        {
+          "path": ".github/workflows/contracts-drift.yml",
+          "line": 25,
+          "kind": "ci_reference"
+        },
+        {
+          "path": ".github/workflows/contracts-drift.yml",
+          "line": 28,
+          "kind": "ci_reference"
+        },
+        {
+          "path": ".github/workflows/contracts-drift.yml",
+          "line": 34,
+          "kind": "ci_reference"
+        },
+        {
+          "path": ".github/workflows/contracts-drift.yml",
+          "line": 38,
+          "kind": "ci_reference"
+        },
+        {
+          "path": ".github/workflows/contracts-drift.yml",
+          "line": 42,
           "kind": "ci_reference"
         },
         {
@@ -308,32 +333,17 @@
       "contract": "event_backbone/aussen.event",
       "role": "consumer",
       "repository": "heimgewebe/aussensensor",
-      "commit": "f9c75995b61ee841321420789e8e6b6374384a2a",
-      "status": "verified",
+      "commit": "f16228fba16f0ed298a9264eede3082cc1491c1c",
+      "status": "unverified",
       "mode": "mirror",
       "files": [
         "contracts/aussen.event.schema.json"
       ],
       "evidence": [
         {
-          "path": ".github/workflows/contracts-drift.yml",
-          "line": 21,
-          "kind": "ci_reference"
-        },
-        {
-          "path": ".github/workflows/fixtures-validate.yml",
-          "line": 31,
-          "kind": "ci_reference"
-        },
-        {
-          "path": ".github/workflows/validate-aussen-fixtures.yml",
-          "line": 64,
-          "kind": "ci_reference"
-        },
-        {
-          "path": ".github/workflows/validate-aussen.yml",
-          "line": 23,
-          "kind": "ci_reference"
+          "path": "contracts/aussen.event.schema.json",
+          "line": 3,
+          "kind": "documentation_or_data_reference"
         }
       ],
       "note": "Current default-branch files reference the exact schema basename; this proves repository coupling, not runtime use.",
@@ -348,7 +358,7 @@
           "path": "contracts/aussen.event.schema.json",
           "exists": true,
           "sha256": "2410e7ccd2a94271d6b292d4e8df5a4190a111376f26ae509901c8995a888f37",
-          "matches_canonical": true
+          "matches_canonical": false
         }
       ]
     },
@@ -357,7 +367,7 @@
       "contract": "event_backbone/aussen.event",
       "role": "consumer",
       "repository": "heimgewebe/chronik",
-      "commit": "2fc65efe06cd23baa2a2bdef39f5f099c8a5540b",
+      "commit": "909cd79ed7e8ba2924695fc18dd6bea84031bc63",
       "status": "verified",
       "mode": "reference-only",
       "files": [
@@ -401,7 +411,7 @@
       "contract": "event_backbone/event.line",
       "role": "producer",
       "repository": "heimgewebe/chronik",
-      "commit": "2fc65efe06cd23baa2a2bdef39f5f099c8a5540b",
+      "commit": "909cd79ed7e8ba2924695fc18dd6bea84031bc63",
       "status": "unverified",
       "mode": null,
       "files": [
@@ -433,7 +443,7 @@
       "contract": "event_backbone/event.line",
       "role": "consumer",
       "repository": "heimgewebe/chronik",
-      "commit": "2fc65efe06cd23baa2a2bdef39f5f099c8a5540b",
+      "commit": "909cd79ed7e8ba2924695fc18dd6bea84031bc63",
       "status": "verified",
       "mode": "reference-only",
       "files": [
@@ -465,7 +475,7 @@
       "contract": "event_backbone/heimgeist.insight",
       "role": "producer",
       "repository": "heimgewebe/heimgeist",
-      "commit": "2d657297e9875cf0ec12932b3391fc4c0d8a246a",
+      "commit": "8ccb7a3a5bed1c25d7d6e5afc6f22abb93ada4e1",
       "status": "unverified",
       "mode": null,
       "files": [
@@ -491,7 +501,7 @@
       "contract": "event_backbone/heimgeist.insight",
       "role": "consumer",
       "repository": "heimgewebe/chronik",
-      "commit": "2fc65efe06cd23baa2a2bdef39f5f099c8a5540b",
+      "commit": "909cd79ed7e8ba2924695fc18dd6bea84031bc63",
       "status": "verified",
       "mode": "reference-only",
       "files": [
@@ -502,7 +512,7 @@
         {
           "path": "validation.py",
           "line": 94,
-          "kind": "executable_or_test_reference"
+          "kind": "documentation_or_data_reference"
         },
         {
           "path": "docs/heimgeist_spec.md",
@@ -523,7 +533,7 @@
       "contract": "event_backbone/heimgeist.insight",
       "role": "consumer",
       "repository": "heimgewebe/semantAH",
-      "commit": "c306e89105605778a382aa12c231f727c221cc74",
+      "commit": "7106795052404c17e0870e5c89289e586f61784f",
       "status": "unverified",
       "mode": "reference-only",
       "files": [],
@@ -541,7 +551,7 @@
       "contract": "event_backbone/heimgeist.insight",
       "role": "consumer",
       "repository": "heimgewebe/leitstand",
-      "commit": "a5df64b478f998973be7ba4ac2936d1d12ba3ed1",
+      "commit": "ce64cecb89c6685b5d1d50bf0980b6d92977d0a2",
       "status": "unverified",
       "mode": "reference-only",
       "files": [],
@@ -559,7 +569,7 @@
       "contract": "fixtures/chronik-fixtures",
       "role": "consumer",
       "repository": "heimgewebe/chronik",
-      "commit": "2fc65efe06cd23baa2a2bdef39f5f099c8a5540b",
+      "commit": "909cd79ed7e8ba2924695fc18dd6bea84031bc63",
       "status": "historical",
       "mode": "reference-only",
       "files": [
@@ -591,7 +601,7 @@
       "contract": "metrics/fleet.health",
       "role": "producer",
       "repository": "heimgewebe/wgx",
-      "commit": "2f2aa2225838be1d029697348d9aa989ce7e62f9",
+      "commit": "be0d151363735e63f7cd5335d174929c02ccbc8e",
       "status": "unverified",
       "mode": null,
       "files": [],
@@ -609,7 +619,7 @@
       "contract": "metrics/fleet.health",
       "role": "consumer",
       "repository": "heimgewebe/wgx",
-      "commit": "2f2aa2225838be1d029697348d9aa989ce7e62f9",
+      "commit": "be0d151363735e63f7cd5335d174929c02ccbc8e",
       "status": "unverified",
       "mode": "reference-only",
       "files": [],
@@ -627,31 +637,11 @@
       "contract": "metrics/fleet.health",
       "role": "consumer",
       "repository": "heimgewebe/leitstand",
-      "commit": "a5df64b478f998973be7ba4ac2936d1d12ba3ed1",
-      "status": "verified",
+      "commit": "ce64cecb89c6685b5d1d50bf0980b6d92977d0a2",
+      "status": "unverified",
       "mode": "reference-only",
-      "files": [
-        "README.md",
-        "docs/blueprints/leitstand_visualization.md",
-        "docs/data-flow.md"
-      ],
-      "evidence": [
-        {
-          "path": "README.md",
-          "line": 246,
-          "kind": "documentation_or_data_reference"
-        },
-        {
-          "path": "docs/blueprints/leitstand_visualization.md",
-          "line": 219,
-          "kind": "documentation_or_data_reference"
-        },
-        {
-          "path": "docs/data-flow.md",
-          "line": 32,
-          "kind": "documentation_or_data_reference"
-        }
-      ],
+      "files": [],
+      "evidence": [],
       "note": "Current default-branch files reference the exact schema basename; this proves repository coupling, not runtime use.",
       "doesNotEstablish": [
         "runtime_use",
@@ -665,7 +655,7 @@
       "contract": "integrity/summary",
       "role": "producer",
       "repository": "heimgewebe/semantAH",
-      "commit": "c306e89105605778a382aa12c231f727c221cc74",
+      "commit": "7106795052404c17e0870e5c89289e586f61784f",
       "status": "unverified",
       "mode": null,
       "files": [],
@@ -683,7 +673,7 @@
       "contract": "integrity/summary",
       "role": "consumer",
       "repository": "heimgewebe/leitstand",
-      "commit": "a5df64b478f998973be7ba4ac2936d1d12ba3ed1",
+      "commit": "ce64cecb89c6685b5d1d50bf0980b6d92977d0a2",
       "status": "unverified",
       "mode": "reference-only",
       "files": [],
@@ -701,7 +691,7 @@
       "contract": "integrity/summary",
       "role": "consumer",
       "repository": "heimgewebe/wgx",
-      "commit": "2f2aa2225838be1d029697348d9aa989ce7e62f9",
+      "commit": "be0d151363735e63f7cd5335d174929c02ccbc8e",
       "status": "unverified",
       "mode": "reference-only",
       "files": [],
@@ -719,7 +709,7 @@
       "contract": "knowledge/insights.daily",
       "role": "producer",
       "repository": "heimgewebe/semantAH",
-      "commit": "c306e89105605778a382aa12c231f727c221cc74",
+      "commit": "7106795052404c17e0870e5c89289e586f61784f",
       "status": "verified",
       "mode": null,
       "files": [
@@ -740,14 +730,39 @@
           "kind": "ci_reference"
         },
         {
+          "path": ".github/workflows/publish-insights-daily.yml",
+          "line": 162,
+          "kind": "ci_reference"
+        },
+        {
+          "path": ".github/workflows/publish-insights-daily.yml",
+          "line": 164,
+          "kind": "ci_reference"
+        },
+        {
           "path": "scripts/diff_daily_insights.py",
           "line": 47,
-          "kind": "executable_or_test_reference"
+          "kind": "documentation_or_data_reference"
         },
         {
           "path": "scripts/export_daily_insights.py",
           "line": 9,
-          "kind": "executable_or_test_reference"
+          "kind": "documentation_or_data_reference"
+        },
+        {
+          "path": "scripts/export_daily_insights.py",
+          "line": 45,
+          "kind": "documentation_or_data_reference"
+        },
+        {
+          "path": "scripts/export_daily_insights.py",
+          "line": 52,
+          "kind": "documentation_or_data_reference"
+        },
+        {
+          "path": "scripts/export_daily_insights.py",
+          "line": 236,
+          "kind": "documentation_or_data_reference"
         }
       ],
       "note": "Current default-branch files reference the exact schema basename; this proves repository coupling, not live production.",
@@ -763,7 +778,7 @@
       "contract": "knowledge/insights.daily",
       "role": "consumer",
       "repository": "heimgewebe/semantAH",
-      "commit": "c306e89105605778a382aa12c231f727c221cc74",
+      "commit": "7106795052404c17e0870e5c89289e586f61784f",
       "status": "verified",
       "mode": "reference-only",
       "files": [
@@ -784,14 +799,39 @@
           "kind": "ci_reference"
         },
         {
+          "path": ".github/workflows/publish-insights-daily.yml",
+          "line": 162,
+          "kind": "ci_reference"
+        },
+        {
+          "path": ".github/workflows/publish-insights-daily.yml",
+          "line": 164,
+          "kind": "ci_reference"
+        },
+        {
           "path": "scripts/diff_daily_insights.py",
           "line": 47,
-          "kind": "executable_or_test_reference"
+          "kind": "documentation_or_data_reference"
         },
         {
           "path": "scripts/export_daily_insights.py",
           "line": 9,
-          "kind": "executable_or_test_reference"
+          "kind": "documentation_or_data_reference"
+        },
+        {
+          "path": "scripts/export_daily_insights.py",
+          "line": 45,
+          "kind": "documentation_or_data_reference"
+        },
+        {
+          "path": "scripts/export_daily_insights.py",
+          "line": 52,
+          "kind": "documentation_or_data_reference"
+        },
+        {
+          "path": "scripts/export_daily_insights.py",
+          "line": 236,
+          "kind": "documentation_or_data_reference"
         }
       ],
       "note": "Current default-branch files reference the exact schema basename; this proves repository coupling, not runtime use.",
@@ -807,7 +847,7 @@
       "contract": "knowledge/insights.daily",
       "role": "consumer",
       "repository": "heimgewebe/chronik",
-      "commit": "2fc65efe06cd23baa2a2bdef39f5f099c8a5540b",
+      "commit": "909cd79ed7e8ba2924695fc18dd6bea84031bc63",
       "status": "verified",
       "mode": "reference-only",
       "files": [
@@ -818,11 +858,16 @@
         {
           "path": "validation.py",
           "line": 83,
-          "kind": "executable_or_test_reference"
+          "kind": "documentation_or_data_reference"
         },
         {
           "path": "docs/insights.daily.schema.json",
           "line": 3,
+          "kind": "documentation_or_data_reference"
+        },
+        {
+          "path": "docs/insights.daily.schema.json",
+          "line": 4,
           "kind": "documentation_or_data_reference"
         }
       ],
@@ -839,31 +884,11 @@
       "contract": "knowledge/insights.daily",
       "role": "consumer",
       "repository": "heimgewebe/leitstand",
-      "commit": "a5df64b478f998973be7ba4ac2936d1d12ba3ed1",
-      "status": "verified",
+      "commit": "ce64cecb89c6685b5d1d50bf0980b6d92977d0a2",
+      "status": "unverified",
       "mode": "reference-only",
-      "files": [
-        "README.md",
-        "docs/blueprints/leitstand_visualization.md",
-        "docs/data-flow.md"
-      ],
-      "evidence": [
-        {
-          "path": "README.md",
-          "line": 247,
-          "kind": "documentation_or_data_reference"
-        },
-        {
-          "path": "docs/blueprints/leitstand_visualization.md",
-          "line": 282,
-          "kind": "documentation_or_data_reference"
-        },
-        {
-          "path": "docs/data-flow.md",
-          "line": 46,
-          "kind": "documentation_or_data_reference"
-        }
-      ],
+      "files": [],
+      "evidence": [],
       "note": "Current default-branch files reference the exact schema basename; this proves repository coupling, not runtime use.",
       "doesNotEstablish": [
         "runtime_use",
@@ -877,7 +902,7 @@
       "contract": "knowledge/insights.daily.published",
       "role": "producer",
       "repository": "heimgewebe/semantAH",
-      "commit": "c306e89105605778a382aa12c231f727c221cc74",
+      "commit": "7106795052404c17e0870e5c89289e586f61784f",
       "status": "compatibility",
       "mode": null,
       "files": [],
@@ -895,7 +920,7 @@
       "contract": "knowledge/insights.daily.published.v1",
       "role": "producer",
       "repository": "heimgewebe/semantAH",
-      "commit": "c306e89105605778a382aa12c231f727c221cc74",
+      "commit": "7106795052404c17e0870e5c89289e586f61784f",
       "status": "unverified",
       "mode": null,
       "files": [],
@@ -913,7 +938,7 @@
       "contract": "knowledge/insights.daily.published.v1",
       "role": "consumer",
       "repository": "heimgewebe/plexer",
-      "commit": "e1099df6ccf1763c7e235d844ff09b2728b24601",
+      "commit": "dad438d64a8d886a16e28ea74d535e047a5d1b64",
       "status": "unverified",
       "mode": "notification-only",
       "files": [],
@@ -931,7 +956,7 @@
       "contract": "knowledge/insights.daily.published.v1",
       "role": "consumer",
       "repository": "heimgewebe/chronik",
-      "commit": "2fc65efe06cd23baa2a2bdef39f5f099c8a5540b",
+      "commit": "909cd79ed7e8ba2924695fc18dd6bea84031bc63",
       "status": "unverified",
       "mode": "reference-only",
       "files": [],
@@ -949,7 +974,7 @@
       "contract": "knowledge/insights.daily.published.v1",
       "role": "consumer",
       "repository": "heimgewebe/leitstand",
-      "commit": "a5df64b478f998973be7ba4ac2936d1d12ba3ed1",
+      "commit": "ce64cecb89c6685b5d1d50bf0980b6d92977d0a2",
       "status": "unverified",
       "mode": "reference-only",
       "files": [],
@@ -967,7 +992,7 @@
       "contract": "knowledge/insights.daily.published.v1",
       "role": "consumer",
       "repository": "heimgewebe/hausKI",
-      "commit": "2b2e4496613c856993e028e360e76abea70c7028",
+      "commit": "92f65b361881ebaa2cd1641bbe549c37949c06b8",
       "status": "unverified",
       "mode": "reference-only",
       "files": [],
@@ -985,7 +1010,7 @@
       "contract": "knowledge/observatory",
       "role": "producer",
       "repository": "heimgewebe/semantAH",
-      "commit": "c306e89105605778a382aa12c231f727c221cc74",
+      "commit": "7106795052404c17e0870e5c89289e586f61784f",
       "status": "verified",
       "mode": null,
       "files": [
@@ -1011,9 +1036,24 @@
           "kind": "ci_reference"
         },
         {
+          "path": ".github/workflows/publish-knowledge-observatory.yml",
+          "line": 65,
+          "kind": "ci_reference"
+        },
+        {
+          "path": ".github/workflows/publish-knowledge-observatory.yml",
+          "line": 141,
+          "kind": "ci_reference"
+        },
+        {
+          "path": ".github/workflows/publish-knowledge-observatory.yml",
+          "line": 143,
+          "kind": "ci_reference"
+        },
+        {
           "path": "scripts/observatory_diff.py",
           "line": 51,
-          "kind": "executable_or_test_reference"
+          "kind": "documentation_or_data_reference"
         }
       ],
       "note": "Current default-branch files reference the exact schema basename; this proves repository coupling, not live production.",
@@ -1029,7 +1069,7 @@
       "contract": "knowledge/observatory",
       "role": "consumer",
       "repository": "heimgewebe/leitstand",
-      "commit": "a5df64b478f998973be7ba4ac2936d1d12ba3ed1",
+      "commit": "ce64cecb89c6685b5d1d50bf0980b6d92977d0a2",
       "status": "verified",
       "mode": "reference-only",
       "files": [
@@ -1041,11 +1081,16 @@
         {
           "path": "scripts/vendor-contracts.mjs",
           "line": 14,
-          "kind": "executable_or_test_reference"
+          "kind": "documentation_or_data_reference"
         },
         {
           "path": "vendor/contracts/_pin.json",
           "line": 5,
+          "kind": "documentation_or_data_reference"
+        },
+        {
+          "path": "vendor/contracts/_pin.json",
+          "line": 7,
           "kind": "documentation_or_data_reference"
         },
         {
@@ -1067,7 +1112,7 @@
       "contract": "knowledge/observatory",
       "role": "consumer",
       "repository": "heimgewebe/hausKI",
-      "commit": "2b2e4496613c856993e028e360e76abea70c7028",
+      "commit": "92f65b361881ebaa2cd1641bbe549c37949c06b8",
       "status": "unverified",
       "mode": "reference-only",
       "files": [],
@@ -1085,7 +1130,7 @@
       "contract": "knowledge/knowledge.observatory.published.v1",
       "role": "producer",
       "repository": "heimgewebe/semantAH",
-      "commit": "c306e89105605778a382aa12c231f727c221cc74",
+      "commit": "7106795052404c17e0870e5c89289e586f61784f",
       "status": "unverified",
       "mode": null,
       "files": [],
@@ -1103,7 +1148,7 @@
       "contract": "knowledge/knowledge.observatory.published.v1",
       "role": "consumer",
       "repository": "heimgewebe/leitstand",
-      "commit": "a5df64b478f998973be7ba4ac2936d1d12ba3ed1",
+      "commit": "ce64cecb89c6685b5d1d50bf0980b6d92977d0a2",
       "status": "unverified",
       "mode": "reference-only",
       "files": [],
@@ -1121,7 +1166,7 @@
       "contract": "knowledge/knowledge.observatory.published.v1",
       "role": "consumer",
       "repository": "heimgewebe/hausKI",
-      "commit": "2b2e4496613c856993e028e360e76abea70c7028",
+      "commit": "92f65b361881ebaa2cd1641bbe549c37949c06b8",
       "status": "verified",
       "mode": "reference-only",
       "files": [
@@ -1132,12 +1177,27 @@
         {
           "path": "crates/core/src/events.rs",
           "line": 297,
-          "kind": "executable_or_test_reference"
+          "kind": "documentation_or_data_reference"
         },
         {
           "path": "crates/core/src/events_tests.rs",
           "line": 312,
-          "kind": "executable_or_test_reference"
+          "kind": "documentation_or_data_reference"
+        },
+        {
+          "path": "crates/core/src/events_tests.rs",
+          "line": 351,
+          "kind": "documentation_or_data_reference"
+        },
+        {
+          "path": "crates/core/src/events_tests.rs",
+          "line": 388,
+          "kind": "documentation_or_data_reference"
+        },
+        {
+          "path": "crates/core/src/events_tests.rs",
+          "line": 580,
+          "kind": "documentation_or_data_reference"
         }
       ],
       "note": "Current default-branch files reference the exact schema basename; this proves repository coupling, not runtime use.",
@@ -1153,7 +1213,7 @@
       "contract": "knowledge/knowledge.observatory.published.v1",
       "role": "consumer",
       "repository": "heimgewebe/plexer",
-      "commit": "e1099df6ccf1763c7e235d844ff09b2728b24601",
+      "commit": "dad438d64a8d886a16e28ea74d535e047a5d1b64",
       "status": "unverified",
       "mode": "notification-only",
       "files": [],
@@ -1171,14 +1231,13 @@
       "contract": "os_context/state",
       "role": "consumer",
       "repository": "heimgewebe/mitschreiber",
-      "commit": "3680bb7e14079c4b8ec3d0758605f7023ee11097",
+      "commit": "3ef97ffc31c0112a0de030a5bd119a819f9ad3a7",
       "status": "verified",
       "mode": "reference-only",
       "files": [
         ".github/workflows/validate.yml",
         "docs/ci.md",
-        "docs/contracts.md",
-        "renovate.json"
+        "docs/contracts.md"
       ],
       "evidence": [
         {
@@ -1192,13 +1251,18 @@
           "kind": "documentation_or_data_reference"
         },
         {
+          "path": "docs/ci.md",
+          "line": 48,
+          "kind": "documentation_or_data_reference"
+        },
+        {
           "path": "docs/contracts.md",
           "line": 7,
           "kind": "documentation_or_data_reference"
         },
         {
-          "path": "renovate.json",
-          "line": 132,
+          "path": "docs/contracts.md",
+          "line": 28,
           "kind": "documentation_or_data_reference"
         }
       ],
@@ -1215,7 +1279,7 @@
       "contract": "os_context/text.embed",
       "role": "consumer",
       "repository": "heimgewebe/semantAH",
-      "commit": "c306e89105605778a382aa12c231f727c221cc74",
+      "commit": "7106795052404c17e0870e5c89289e586f61784f",
       "status": "verified",
       "mode": "reference-only",
       "files": [
@@ -1228,16 +1292,26 @@
         {
           "path": "crates/indexd/src/api.rs",
           "line": 290,
-          "kind": "executable_or_test_reference"
+          "kind": "documentation_or_data_reference"
         },
         {
           "path": "scripts/observatory_mvp.py",
           "line": 155,
-          "kind": "executable_or_test_reference"
+          "kind": "documentation_or_data_reference"
         },
         {
           "path": "IMPLEMENTATION_SUMMARY.md",
           "line": 12,
+          "kind": "documentation_or_data_reference"
+        },
+        {
+          "path": "IMPLEMENTATION_SUMMARY.md",
+          "line": 191,
+          "kind": "documentation_or_data_reference"
+        },
+        {
+          "path": "IMPLEMENTATION_SUMMARY.md",
+          "line": 240,
           "kind": "documentation_or_data_reference"
         },
         {
@@ -1259,7 +1333,7 @@
       "contract": "policy/decision",
       "role": "producer",
       "repository": "heimgewebe/heimlern",
-      "commit": "8dbebea6b253f9d2f41514a15d34e5166602e792",
+      "commit": "a0a0d97e3a3dedec80ae90dfe0c094b57bcaac3a",
       "status": "historical",
       "mode": null,
       "files": [
@@ -1275,18 +1349,48 @@
           "kind": "ci_reference"
         },
         {
-          "path": "scripts/validate_json.py",
-          "line": 75,
-          "kind": "executable_or_test_reference"
+          "path": ".github/workflows/validate-policy-decisions.yml",
+          "line": 45,
+          "kind": "ci_reference"
         },
         {
-          "path": "README.md",
-          "line": 94,
+          "path": ".github/workflows/validate-policy-decisions.yml",
+          "line": 46,
+          "kind": "ci_reference"
+        },
+        {
+          "path": ".github/workflows/validate-policy-decisions.yml",
+          "line": 48,
+          "kind": "ci_reference"
+        },
+        {
+          "path": ".github/workflows/validate-policy-decisions.yml",
+          "line": 49,
+          "kind": "ci_reference"
+        },
+        {
+          "path": ".github/workflows/validate-policy-decisions.yml",
+          "line": 53,
+          "kind": "ci_reference"
+        },
+        {
+          "path": ".github/workflows/validate-policy-decisions.yml",
+          "line": 54,
+          "kind": "ci_reference"
+        },
+        {
+          "path": ".github/workflows/validate-policy-decisions.yml",
+          "line": 67,
+          "kind": "ci_reference"
+        },
+        {
+          "path": "scripts/validate_json.py",
+          "line": 75,
           "kind": "documentation_or_data_reference"
         },
         {
-          "path": "contracts/README.md",
-          "line": 19,
+          "path": "README.md",
+          "line": 96,
           "kind": "documentation_or_data_reference"
         }
       ],
@@ -1303,7 +1407,7 @@
       "contract": "policy/decision",
       "role": "consumer",
       "repository": "heimgewebe/heimlern",
-      "commit": "8dbebea6b253f9d2f41514a15d34e5166602e792",
+      "commit": "a0a0d97e3a3dedec80ae90dfe0c094b57bcaac3a",
       "status": "historical",
       "mode": "reference-only",
       "files": [
@@ -1319,18 +1423,48 @@
           "kind": "ci_reference"
         },
         {
-          "path": "scripts/validate_json.py",
-          "line": 75,
-          "kind": "executable_or_test_reference"
+          "path": ".github/workflows/validate-policy-decisions.yml",
+          "line": 45,
+          "kind": "ci_reference"
         },
         {
-          "path": "README.md",
-          "line": 94,
+          "path": ".github/workflows/validate-policy-decisions.yml",
+          "line": 46,
+          "kind": "ci_reference"
+        },
+        {
+          "path": ".github/workflows/validate-policy-decisions.yml",
+          "line": 48,
+          "kind": "ci_reference"
+        },
+        {
+          "path": ".github/workflows/validate-policy-decisions.yml",
+          "line": 49,
+          "kind": "ci_reference"
+        },
+        {
+          "path": ".github/workflows/validate-policy-decisions.yml",
+          "line": 53,
+          "kind": "ci_reference"
+        },
+        {
+          "path": ".github/workflows/validate-policy-decisions.yml",
+          "line": 54,
+          "kind": "ci_reference"
+        },
+        {
+          "path": ".github/workflows/validate-policy-decisions.yml",
+          "line": 67,
+          "kind": "ci_reference"
+        },
+        {
+          "path": "scripts/validate_json.py",
+          "line": 75,
           "kind": "documentation_or_data_reference"
         },
         {
-          "path": "contracts/README.md",
-          "line": 19,
+          "path": "README.md",
+          "line": 96,
           "kind": "documentation_or_data_reference"
         }
       ],
@@ -1347,7 +1481,7 @@
       "contract": "policy/decision",
       "role": "consumer",
       "repository": "heimgewebe/hausKI",
-      "commit": "2b2e4496613c856993e028e360e76abea70c7028",
+      "commit": "92f65b361881ebaa2cd1641bbe549c37949c06b8",
       "status": "historical",
       "mode": "reference-only",
       "files": [],
@@ -1365,7 +1499,7 @@
       "contract": "policy/feedback",
       "role": "producer",
       "repository": "heimgewebe/heimlern",
-      "commit": "8dbebea6b253f9d2f41514a15d34e5166602e792",
+      "commit": "a0a0d97e3a3dedec80ae90dfe0c094b57bcaac3a",
       "status": "historical",
       "mode": null,
       "files": [
@@ -1377,7 +1511,7 @@
       "evidence": [
         {
           "path": ".github/workflows/rust.yml",
-          "line": 64,
+          "line": 66,
           "kind": "ci_reference"
         },
         {
@@ -1388,12 +1522,12 @@
         {
           "path": "scripts/validate_json.py",
           "line": 77,
-          "kind": "executable_or_test_reference"
+          "kind": "documentation_or_data_reference"
         },
         {
           "path": "tests/validate_feedback_schema.py",
           "line": 14,
-          "kind": "executable_or_test_reference"
+          "kind": "documentation_or_data_reference"
         }
       ],
       "note": "The repository explicitly declares a historical-only role.",
@@ -1409,7 +1543,7 @@
       "contract": "policy/feedback",
       "role": "consumer",
       "repository": "heimgewebe/heimlern",
-      "commit": "8dbebea6b253f9d2f41514a15d34e5166602e792",
+      "commit": "a0a0d97e3a3dedec80ae90dfe0c094b57bcaac3a",
       "status": "historical",
       "mode": "reference-only",
       "files": [
@@ -1421,7 +1555,7 @@
       "evidence": [
         {
           "path": ".github/workflows/rust.yml",
-          "line": 64,
+          "line": 66,
           "kind": "ci_reference"
         },
         {
@@ -1432,12 +1566,12 @@
         {
           "path": "scripts/validate_json.py",
           "line": 77,
-          "kind": "executable_or_test_reference"
+          "kind": "documentation_or_data_reference"
         },
         {
           "path": "tests/validate_feedback_schema.py",
           "line": 14,
-          "kind": "executable_or_test_reference"
+          "kind": "documentation_or_data_reference"
         }
       ],
       "note": "The contract or its only implementation is historical; this claim is retained for audit, not active routing.",
@@ -1453,7 +1587,7 @@
       "contract": "policy/snapshot",
       "role": "producer",
       "repository": "heimgewebe/heimlern",
-      "commit": "8dbebea6b253f9d2f41514a15d34e5166602e792",
+      "commit": "a0a0d97e3a3dedec80ae90dfe0c094b57bcaac3a",
       "status": "historical",
       "mode": null,
       "files": [
@@ -1466,21 +1600,31 @@
         {
           "path": "crates/heimlern-bandits/README.md",
           "line": 5,
-          "kind": "executable_or_test_reference"
+          "kind": "documentation_or_data_reference"
         },
         {
           "path": "crates/heimlern-bandits/src/lib.rs",
           "line": 53,
-          "kind": "executable_or_test_reference"
+          "kind": "documentation_or_data_reference"
         },
         {
           "path": "scripts/validate_json.py",
           "line": 6,
-          "kind": "executable_or_test_reference"
+          "kind": "documentation_or_data_reference"
+        },
+        {
+          "path": "scripts/validate_json.py",
+          "line": 27,
+          "kind": "documentation_or_data_reference"
+        },
+        {
+          "path": "scripts/validate_json.py",
+          "line": 76,
+          "kind": "documentation_or_data_reference"
         },
         {
           "path": "Justfile",
-          "line": 25,
+          "line": 27,
           "kind": "documentation_or_data_reference"
         }
       ],
@@ -1497,7 +1641,7 @@
       "contract": "policy/snapshot",
       "role": "consumer",
       "repository": "heimgewebe/heimlern",
-      "commit": "8dbebea6b253f9d2f41514a15d34e5166602e792",
+      "commit": "a0a0d97e3a3dedec80ae90dfe0c094b57bcaac3a",
       "status": "historical",
       "mode": "reference-only",
       "files": [
@@ -1510,21 +1654,31 @@
         {
           "path": "crates/heimlern-bandits/README.md",
           "line": 5,
-          "kind": "executable_or_test_reference"
+          "kind": "documentation_or_data_reference"
         },
         {
           "path": "crates/heimlern-bandits/src/lib.rs",
           "line": 53,
-          "kind": "executable_or_test_reference"
+          "kind": "documentation_or_data_reference"
         },
         {
           "path": "scripts/validate_json.py",
           "line": 6,
-          "kind": "executable_or_test_reference"
+          "kind": "documentation_or_data_reference"
+        },
+        {
+          "path": "scripts/validate_json.py",
+          "line": 27,
+          "kind": "documentation_or_data_reference"
+        },
+        {
+          "path": "scripts/validate_json.py",
+          "line": 76,
+          "kind": "documentation_or_data_reference"
         },
         {
           "path": "Justfile",
-          "line": 25,
+          "line": 27,
           "kind": "documentation_or_data_reference"
         }
       ],
@@ -1541,7 +1695,7 @@
       "contract": "policy/heimlern.ingest.state.v1",
       "role": "producer",
       "repository": "heimgewebe/heimlern",
-      "commit": "8dbebea6b253f9d2f41514a15d34e5166602e792",
+      "commit": "a0a0d97e3a3dedec80ae90dfe0c094b57bcaac3a",
       "status": "historical",
       "mode": null,
       "files": [],
@@ -1559,7 +1713,7 @@
       "contract": "policy/heimlern.ingest.state.v1",
       "role": "consumer",
       "repository": "heimgewebe/heimlern",
-      "commit": "8dbebea6b253f9d2f41514a15d34e5166602e792",
+      "commit": "a0a0d97e3a3dedec80ae90dfe0c094b57bcaac3a",
       "status": "historical",
       "mode": "mirror",
       "files": [],
@@ -1570,15 +1724,14 @@
         "runtime_health",
         "semantic_correctness",
         "future_compatibility"
-      ],
-      "mirrorChecks": []
+      ]
     },
     {
       "id": "policy/heimlern.ingest.state.v1::consumer::leitstand",
       "contract": "policy/heimlern.ingest.state.v1",
       "role": "consumer",
       "repository": "heimgewebe/leitstand",
-      "commit": "a5df64b478f998973be7ba4ac2936d1d12ba3ed1",
+      "commit": "ce64cecb89c6685b5d1d50bf0980b6d92977d0a2",
       "status": "historical",
       "mode": "reference-only",
       "files": [],
@@ -1596,7 +1749,7 @@
       "contract": "policy/heimlern.ingest.state.v1",
       "role": "consumer",
       "repository": "heimgewebe/heimgeist",
-      "commit": "2d657297e9875cf0ec12932b3391fc4c0d8a246a",
+      "commit": "8ccb7a3a5bed1c25d7d6e5afc6f22abb93ada4e1",
       "status": "historical",
       "mode": "reference-only",
       "files": [],
@@ -1614,7 +1767,7 @@
       "contract": "heim-pc/state.index",
       "role": "producer",
       "repository": "heimgewebe/heim-pc",
-      "commit": "140e84bc28d3b208a51e2edb1cb27c5946c38d49",
+      "commit": "fe16aa4a834ae4b7da4bcf224b196cb69ba6a99e",
       "status": "historical",
       "mode": null,
       "files": [],
@@ -1632,7 +1785,7 @@
       "contract": "heim-pc/state.index",
       "role": "consumer",
       "repository": "heimgewebe/heim-pc",
-      "commit": "140e84bc28d3b208a51e2edb1cb27c5946c38d49",
+      "commit": "fe16aa4a834ae4b7da4bcf224b196cb69ba6a99e",
       "status": "historical",
       "mode": "mirror",
       "files": [],
@@ -1643,15 +1796,14 @@
         "runtime_health",
         "semantic_correctness",
         "future_compatibility"
-      ],
-      "mirrorChecks": []
+      ]
     },
     {
       "id": "heim-pc/state.repos::producer::heim-pc",
       "contract": "heim-pc/state.repos",
       "role": "producer",
       "repository": "heimgewebe/heim-pc",
-      "commit": "140e84bc28d3b208a51e2edb1cb27c5946c38d49",
+      "commit": "fe16aa4a834ae4b7da4bcf224b196cb69ba6a99e",
       "status": "historical",
       "mode": null,
       "files": [],
@@ -1669,7 +1821,7 @@
       "contract": "heim-pc/state.repos",
       "role": "consumer",
       "repository": "heimgewebe/heim-pc",
-      "commit": "140e84bc28d3b208a51e2edb1cb27c5946c38d49",
+      "commit": "fe16aa4a834ae4b7da4bcf224b196cb69ba6a99e",
       "status": "historical",
       "mode": "mirror",
       "files": [],
@@ -1680,15 +1832,14 @@
         "runtime_health",
         "semantic_correctness",
         "future_compatibility"
-      ],
-      "mirrorChecks": []
+      ]
     },
     {
       "id": "heim-pc/state.uncertainties::producer::heim-pc",
       "contract": "heim-pc/state.uncertainties",
       "role": "producer",
       "repository": "heimgewebe/heim-pc",
-      "commit": "140e84bc28d3b208a51e2edb1cb27c5946c38d49",
+      "commit": "fe16aa4a834ae4b7da4bcf224b196cb69ba6a99e",
       "status": "historical",
       "mode": null,
       "files": [],
@@ -1706,7 +1857,7 @@
       "contract": "heim-pc/state.uncertainties",
       "role": "consumer",
       "repository": "heimgewebe/heim-pc",
-      "commit": "140e84bc28d3b208a51e2edb1cb27c5946c38d49",
+      "commit": "fe16aa4a834ae4b7da4bcf224b196cb69ba6a99e",
       "status": "historical",
       "mode": "mirror",
       "files": [],
@@ -1717,15 +1868,14 @@
         "runtime_health",
         "semantic_correctness",
         "future_compatibility"
-      ],
-      "mirrorChecks": []
+      ]
     },
     {
       "id": "heim-pc/state.insights::producer::heim-pc",
       "contract": "heim-pc/state.insights",
       "role": "producer",
       "repository": "heimgewebe/heim-pc",
-      "commit": "140e84bc28d3b208a51e2edb1cb27c5946c38d49",
+      "commit": "fe16aa4a834ae4b7da4bcf224b196cb69ba6a99e",
       "status": "historical",
       "mode": null,
       "files": [],
@@ -1743,7 +1893,7 @@
       "contract": "heim-pc/state.insights",
       "role": "consumer",
       "repository": "heimgewebe/heim-pc",
-      "commit": "140e84bc28d3b208a51e2edb1cb27c5946c38d49",
+      "commit": "fe16aa4a834ae4b7da4bcf224b196cb69ba6a99e",
       "status": "historical",
       "mode": "mirror",
       "files": [],
@@ -1754,15 +1904,14 @@
         "runtime_health",
         "semantic_correctness",
         "future_compatibility"
-      ],
-      "mirrorChecks": []
+      ]
     },
     {
       "id": "heim-pc/state.drift::producer::heim-pc",
       "contract": "heim-pc/state.drift",
       "role": "producer",
       "repository": "heimgewebe/heim-pc",
-      "commit": "140e84bc28d3b208a51e2edb1cb27c5946c38d49",
+      "commit": "fe16aa4a834ae4b7da4bcf224b196cb69ba6a99e",
       "status": "historical",
       "mode": null,
       "files": [],
@@ -1780,7 +1929,7 @@
       "contract": "heim-pc/state.drift",
       "role": "consumer",
       "repository": "heimgewebe/heim-pc",
-      "commit": "140e84bc28d3b208a51e2edb1cb27c5946c38d49",
+      "commit": "fe16aa4a834ae4b7da4bcf224b196cb69ba6a99e",
       "status": "historical",
       "mode": "mirror",
       "files": [],
@@ -1791,15 +1940,14 @@
         "runtime_health",
         "semantic_correctness",
         "future_compatibility"
-      ],
-      "mirrorChecks": []
+      ]
     },
     {
       "id": "heim-pc/config.zones::producer::heim-pc",
       "contract": "heim-pc/config.zones",
       "role": "producer",
       "repository": "heimgewebe/heim-pc",
-      "commit": "140e84bc28d3b208a51e2edb1cb27c5946c38d49",
+      "commit": "fe16aa4a834ae4b7da4bcf224b196cb69ba6a99e",
       "status": "compatibility",
       "mode": null,
       "files": [
@@ -1808,8 +1956,8 @@
       "evidence": [
         {
           "path": "scripts/validate_contracts.py",
-          "line": 97,
-          "kind": "executable_or_test_reference"
+          "line": 270,
+          "kind": "documentation_or_data_reference"
         }
       ],
       "note": "The repository retains a compatibility or migration reference; active production is not established.",
@@ -1825,25 +1973,18 @@
       "contract": "heim-pc/config.zones",
       "role": "consumer",
       "repository": "heimgewebe/heim-pc",
-      "commit": "140e84bc28d3b208a51e2edb1cb27c5946c38d49",
+      "commit": "fe16aa4a834ae4b7da4bcf224b196cb69ba6a99e",
       "status": "compatibility",
       "mode": "mirror",
       "files": [],
-      "evidence": [
-        {
-          "path": "scripts/validate_contracts.py",
-          "line": 97,
-          "kind": "executable_or_test_reference"
-        }
-      ],
+      "evidence": [],
       "note": "The claim is retained as a bounded compatibility relationship and does not establish active runtime use.",
       "doesNotEstablish": [
         "runtime_use",
         "runtime_health",
         "semantic_correctness",
         "future_compatibility"
-      ],
-      "mirrorChecks": []
+      ]
     }
   ],
   "doesNotEstablish": [
