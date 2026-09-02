@@ -15,7 +15,7 @@ from wgx import repo_config
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "fleet" / "generate_repos_projection.py"
-PROJECTION_SEMANTIC_SHA256 = "2f909925299d7c686f47c4f4f0aa568c23689fd2041a258cd212a773dec47f3c"
+PROJECTION_SEMANTIC_SHA256 = "99398024409a257dcb339da0debded644a52554a91a044abf457e5b57e826a63"
 SPEC = importlib.util.spec_from_file_location("generate_repos_projection", SCRIPT)
 assert SPEC and SPEC.loader
 MODULE = importlib.util.module_from_spec(SPEC)
@@ -67,7 +67,7 @@ def test_projection_preserves_legacy_consumer_shape() -> None:
     names = [item["name"] for item in projection["repos"]]
     assert names == [
         "contracts-mirror",
-        "weltgewebe",
+        "commonthing",
         "hausKI",
         "audio",
         "semantAH",

@@ -326,12 +326,12 @@ def validate_preset(preset: dict[str, Any]) -> None:
         },
         {
             "matchManagers": ["github-actions"],
-            "matchRepositories": ["heimgewebe/weltgewebe"],
+            "matchRepositories": ["heimgewebe/commonthing"],
             "enabled": False,
         },
         {
             "matchManagers": ["dockerfile", "docker-compose"],
-            "matchRepositories": ["heimgewebe/weltgewebe"],
+            "matchRepositories": ["heimgewebe/commonthing"],
             "matchFileNames": ["apps/**/Dockerfile", "infra/compose/**"],
             "enabled": False,
         },

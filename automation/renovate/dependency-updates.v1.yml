@@ -40,7 +40,7 @@ rollout:
         - name: repoground
           dependabot_version_updates: disabled
           renovate_version_updates: enabled
-        - name: weltgewebe
+        - name: commonthing
           dependabot_version_updates: disabled
           renovate_version_updates: enabled
         - name: metarepo

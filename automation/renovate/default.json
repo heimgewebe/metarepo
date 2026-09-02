@@ -74,7 +74,7 @@
         "github-actions"
       ],
       "matchRepositories": [
-        "heimgewebe/weltgewebe"
+        "heimgewebe/commonthing"
       ],
       "enabled": false
     },
@@ -85,7 +85,7 @@
         "docker-compose"
       ],
       "matchRepositories": [
-        "heimgewebe/weltgewebe"
+        "heimgewebe/commonthing"
       ],
       "enabled": false,
       "matchFileNames": [

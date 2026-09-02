@@ -1,8 +1,8 @@
 ---
 static:
   include:
-    - name: weltgewebe
-      url: "https://github.com/heimgewebe/weltgewebe"
+    - name: commonthing
+      url: "https://github.com/heimgewebe/commonthing"
       status: related
     - name: vault-privat
       status: related

@@ -15,7 +15,7 @@ repositories:
     scope: schema
     metrics:
       enable: false
-  weltgewebe:
+  commonthing:
     default_branch: main
     domain: aussen
     scope: events
