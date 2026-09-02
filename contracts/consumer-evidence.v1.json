@@ -1,19 +1,19 @@
 {
   "schemaVersion": 1,
   "kind": "metarepo_contract_consumer_evidence",
-  "observedAt": "2026-09-02T08:37:42+00:00",
+  "observedAt": "2026-09-02T13:00:53+00:00",
   "source": {
     "repository": "heimgewebe/metarepo",
-    "commit": "065d7aaee2d24fd205ebd64c168fd33fcdb2edc0",
-    "auditJob": "grabowski-job-26f3a9bb1134",
-    "auditFinalizationReceiptSha256": "164fc0547326962954cbd966225c109bb02dca59d450485d4bbe1169292f09a8",
+    "commit": "a2979835341fbd673898b03489d8db7d89d0d7f3",
+    "auditJob": "grabowski-job-71767076a9b8",
+    "auditFinalizationReceiptSha256": "d6ba4002375fd57fb773a6fcf9900962c1ec8b9b3764f5cb345d27a08cba1570",
     "method": "shallow_default_branch_clone_plus_fixed_string_repository_scan"
   },
   "scope": {
     "repositories": [
       {
         "repository": "heimgewebe/aussensensor",
-        "commit": "f16228fba16f0ed298a9264eede3082cc1491c1c",
+        "commit": "a15c1a86a45b4180ce8ff49a16fae6987aeae565",
         "defaultBranch": "main"
       },
       {
@@ -28,7 +28,7 @@
       },
       {
         "repository": "heimgewebe/heim-pc",
-        "commit": "fe16aa4a834ae4b7da4bcf224b196cb69ba6a99e",
+        "commit": "b0c1745b077dcdc0bea0381cbf2dc247994e5dc9",
         "defaultBranch": "main"
       },
       {
@@ -264,7 +264,7 @@
       "contract": "event_backbone/aussen.event",
       "role": "producer",
       "repository": "heimgewebe/aussensensor",
-      "commit": "f16228fba16f0ed298a9264eede3082cc1491c1c",
+      "commit": "a15c1a86a45b4180ce8ff49a16fae6987aeae565",
       "status": "verified",
       "mode": null,
       "files": [
@@ -333,8 +333,8 @@
       "contract": "event_backbone/aussen.event",
       "role": "consumer",
       "repository": "heimgewebe/aussensensor",
-      "commit": "f16228fba16f0ed298a9264eede3082cc1491c1c",
-      "status": "unverified",
+      "commit": "a15c1a86a45b4180ce8ff49a16fae6987aeae565",
+      "status": "verified",
       "mode": "mirror",
       "files": [
         "contracts/aussen.event.schema.json"
@@ -357,8 +357,8 @@
         {
           "path": "contracts/aussen.event.schema.json",
           "exists": true,
-          "sha256": "2410e7ccd2a94271d6b292d4e8df5a4190a111376f26ae509901c8995a888f37",
-          "matches_canonical": false
+          "sha256": "b43acfd9d5345a966759cb7a4473200777ce24cd9595064df73d9c24287a040e",
+          "matches_canonical": true
         }
       ]
     },
@@ -1767,7 +1767,7 @@
       "contract": "heim-pc/state.index",
       "role": "producer",
       "repository": "heimgewebe/heim-pc",
-      "commit": "fe16aa4a834ae4b7da4bcf224b196cb69ba6a99e",
+      "commit": "b0c1745b077dcdc0bea0381cbf2dc247994e5dc9",
       "status": "historical",
       "mode": null,
       "files": [],
@@ -1785,7 +1785,7 @@
       "contract": "heim-pc/state.index",
       "role": "consumer",
       "repository": "heimgewebe/heim-pc",
-      "commit": "fe16aa4a834ae4b7da4bcf224b196cb69ba6a99e",
+      "commit": "b0c1745b077dcdc0bea0381cbf2dc247994e5dc9",
       "status": "historical",
       "mode": "mirror",
       "files": [],
@@ -1803,7 +1803,7 @@
       "contract": "heim-pc/state.repos",
       "role": "producer",
       "repository": "heimgewebe/heim-pc",
-      "commit": "fe16aa4a834ae4b7da4bcf224b196cb69ba6a99e",
+      "commit": "b0c1745b077dcdc0bea0381cbf2dc247994e5dc9",
       "status": "historical",
       "mode": null,
       "files": [],
@@ -1821,7 +1821,7 @@
       "contract": "heim-pc/state.repos",
       "role": "consumer",
       "repository": "heimgewebe/heim-pc",
-      "commit": "fe16aa4a834ae4b7da4bcf224b196cb69ba6a99e",
+      "commit": "b0c1745b077dcdc0bea0381cbf2dc247994e5dc9",
       "status": "historical",
       "mode": "mirror",
       "files": [],
@@ -1839,7 +1839,7 @@
       "contract": "heim-pc/state.uncertainties",
       "role": "producer",
       "repository": "heimgewebe/heim-pc",
-      "commit": "fe16aa4a834ae4b7da4bcf224b196cb69ba6a99e",
+      "commit": "b0c1745b077dcdc0bea0381cbf2dc247994e5dc9",
       "status": "historical",
       "mode": null,
       "files": [],
@@ -1857,7 +1857,7 @@
       "contract": "heim-pc/state.uncertainties",
       "role": "consumer",
       "repository": "heimgewebe/heim-pc",
-      "commit": "fe16aa4a834ae4b7da4bcf224b196cb69ba6a99e",
+      "commit": "b0c1745b077dcdc0bea0381cbf2dc247994e5dc9",
       "status": "historical",
       "mode": "mirror",
       "files": [],
@@ -1875,7 +1875,7 @@
       "contract": "heim-pc/state.insights",
       "role": "producer",
       "repository": "heimgewebe/heim-pc",
-      "commit": "fe16aa4a834ae4b7da4bcf224b196cb69ba6a99e",
+      "commit": "b0c1745b077dcdc0bea0381cbf2dc247994e5dc9",
       "status": "historical",
       "mode": null,
       "files": [],
@@ -1893,7 +1893,7 @@
       "contract": "heim-pc/state.insights",
       "role": "consumer",
       "repository": "heimgewebe/heim-pc",
-      "commit": "fe16aa4a834ae4b7da4bcf224b196cb69ba6a99e",
+      "commit": "b0c1745b077dcdc0bea0381cbf2dc247994e5dc9",
       "status": "historical",
       "mode": "mirror",
       "files": [],
@@ -1911,7 +1911,7 @@
       "contract": "heim-pc/state.drift",
       "role": "producer",
       "repository": "heimgewebe/heim-pc",
-      "commit": "fe16aa4a834ae4b7da4bcf224b196cb69ba6a99e",
+      "commit": "b0c1745b077dcdc0bea0381cbf2dc247994e5dc9",
       "status": "historical",
       "mode": null,
       "files": [],
@@ -1929,7 +1929,7 @@
       "contract": "heim-pc/state.drift",
       "role": "consumer",
       "repository": "heimgewebe/heim-pc",
-      "commit": "fe16aa4a834ae4b7da4bcf224b196cb69ba6a99e",
+      "commit": "b0c1745b077dcdc0bea0381cbf2dc247994e5dc9",
       "status": "historical",
       "mode": "mirror",
       "files": [],
@@ -1947,7 +1947,7 @@
       "contract": "heim-pc/config.zones",
       "role": "producer",
       "repository": "heimgewebe/heim-pc",
-      "commit": "fe16aa4a834ae4b7da4bcf224b196cb69ba6a99e",
+      "commit": "b0c1745b077dcdc0bea0381cbf2dc247994e5dc9",
       "status": "compatibility",
       "mode": null,
       "files": [
@@ -1973,7 +1973,7 @@
       "contract": "heim-pc/config.zones",
       "role": "consumer",
       "repository": "heimgewebe/heim-pc",
-      "commit": "fe16aa4a834ae4b7da4bcf224b196cb69ba6a99e",
+      "commit": "b0c1745b077dcdc0bea0381cbf2dc247994e5dc9",
       "status": "compatibility",
       "mode": "mirror",
       "files": [],
