@@ -8,7 +8,7 @@
 - Gerätestate (SQLite) wird **nicht** zwischen Geräten gesynct; stattdessen Events replizieren.
 
 ## Events & Schemas (Contracts v1)
-- aussensensor → `aussen.event.schema.json`
+- aussensensor/weltgewebe → `aussen.event.schema.json`
 - semantAH → `insights.schema.json`
 - wgx → `metrics.snapshot.schema.json`
 - hausKI JSONL Event-Log → `event.line.schema.json`
