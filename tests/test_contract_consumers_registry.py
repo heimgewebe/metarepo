@@ -193,3 +193,14 @@ def test_aussen_event_schema_producers_match_audited_registry() -> None:
     producers = [item["repo"] for item in registry["event_backbone"]["aussen.event"]["producers"]]
 
     assert schema["x-producers"] == producers == ["aussensensor"]
+
+
+
+def test_event_line_schema_producers_match_audited_registry() -> None:
+    schema = json.loads((ROOT / "contracts" / "event.line.schema.json").read_text(encoding="utf-8"))
+    registry = _load_registry(ROOT)
+    producer_claims = registry["event_backbone"]["event.line"]["producers"]
+    producers = [item["repo"] for item in producer_claims]
+
+    assert schema["x-producers"] == producers == ["hausKI"]
+    assert producer_claims[0]["status"] == "unverified"

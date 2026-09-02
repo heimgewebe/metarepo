@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "kind": "metarepo_contract_consumer_evidence",
-  "observedAt": "2026-09-02T13:00:53+00:00",
+  "observedAt": "2026-09-02T14:33:51+00:00",
   "source": {
     "repository": "heimgewebe/metarepo",
-    "commit": "a2979835341fbd673898b03489d8db7d89d0d7f3",
-    "auditJob": "grabowski-job-71767076a9b8",
-    "auditFinalizationReceiptSha256": "d6ba4002375fd57fb773a6fcf9900962c1ec8b9b3764f5cb345d27a08cba1570",
+    "commit": "1e1ebbe19ad96718e00d7397381ed8cee5f3309a",
+    "auditJob": "grabowski-job-72175aaa4844",
+    "auditFinalizationReceiptSha256": "fc0d586e33d7ddfb6382e8b4c3d483d37f75422e1f3af653bd2f1df3e0cf0de3",
     "method": "shallow_default_branch_clone_plus_fixed_string_repository_scan"
   },
   "scope": {
@@ -407,30 +407,36 @@
       ]
     },
     {
-      "id": "event_backbone/event.line::producer::chronik",
+      "id": "event_backbone/event.line::producer::hausKI",
       "contract": "event_backbone/event.line",
       "role": "producer",
-      "repository": "heimgewebe/chronik",
-      "commit": "909cd79ed7e8ba2924695fc18dd6bea84031bc63",
+      "repository": "heimgewebe/hausKI",
+      "commit": "92f65b361881ebaa2cd1641bbe549c37949c06b8",
       "status": "unverified",
       "mode": null,
       "files": [
-        "README.md",
-        "docs/event-contracts.md"
+        ".github/workflows/validate-events.yml",
+        "docs/contracts/x-repo-events.md",
+        "scripts/emit_event_line.sh"
       ],
       "evidence": [
         {
-          "path": "README.md",
-          "line": 22,
+          "path": ".github/workflows/validate-events.yml",
+          "line": 32,
+          "kind": "ci_reference"
+        },
+        {
+          "path": "docs/contracts/x-repo-events.md",
+          "line": 11,
           "kind": "documentation_or_data_reference"
         },
         {
-          "path": "docs/event-contracts.md",
-          "line": 11,
+          "path": "docs/contracts/x-repo-events.md",
+          "line": 122,
           "kind": "documentation_or_data_reference"
         }
       ],
-      "note": "The producer relationship remains a review target and is not established by current repository evidence.",
+      "note": "hausKI contains scripts/emit_event_line.sh that emits the event.line field shape; current fixed-string audit proves declared files exist and schema references, but does not establish producer execution, so status remains unverified.",
       "doesNotEstablish": [
         "runtime_use",
         "runtime_health",
