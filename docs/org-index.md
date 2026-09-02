@@ -9,12 +9,12 @@ Quelle: [`repos.yml`](../repos.yml).
 | [audio](https://github.com/heimgewebe/audio) | main | audio | configuration-and-experiments | – | – |
 | [aussensensor](https://github.com/heimgewebe/aussensensor) | main | aussen | events | – | – |
 | [chronik](https://github.com/heimgewebe/chronik) | main | chronik | ingest | – | – |
+| [commonthing](https://github.com/heimgewebe/commonthing) | main | aussen | events | – | – |
 | [contracts-mirror](https://github.com/heimgewebe/contracts-mirror) | main | contracts | schema | – | – |
 | [hausKI](https://github.com/heimgewebe/hausKI) | main | assistant | policy | ✅ | – |
 | [repoground](https://github.com/heimgewebe/repoground) | main | epistemic | codebase-context | – | – |
 | [semantAH](https://github.com/heimgewebe/semantAH) | main | insights | export | – | – |
 | [vault-gewebe](https://github.com/heimgewebe/vault-gewebe) | main | vault | content | – | – |
-| [weltgewebe](https://github.com/heimgewebe/weltgewebe) | main | aussen | events | – | – |
 | [wgx](https://github.com/heimgewebe/wgx) | main | platform | metrics | ✅ | – |
 
 ## Archived References

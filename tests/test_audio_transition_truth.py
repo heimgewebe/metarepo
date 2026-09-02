@@ -72,7 +72,7 @@ def test_generated_consumers_use_audio_but_do_not_claim_integrity() -> None:
     source_map = {entry["repo"]: entry for entry in sources}
     assert "heimgewebe/hausKI-audio" not in source_map
     assert source_map["heimgewebe/audio"]["enabled"] is False
-    assert "heimgewebe/weltgewebe" in source_map
+    assert "heimgewebe/commonthing" in source_map
 
 
 def test_human_views_are_source_bound_and_historical_views_are_marked() -> None:

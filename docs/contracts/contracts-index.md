@@ -288,9 +288,9 @@ Zweck:
 - strukturiertes Decision- und Feedback-Logging,
 - Grundlage für lernende Policies.
 
-### 3.5 weltgewebe
+### 3.5 commonThing
 
-Repository: **heimgewebe/weltgewebe**
+Repository: **heimgewebe/commonthing**
 
 - `contracts/domain/conversation.schema.json`
 - `contracts/domain/message.schema.json`
