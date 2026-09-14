@@ -21,12 +21,6 @@ repositories:
     scope: events
     metrics:
       enable: false
-  hausKI:
-    default_branch: main
-    domain: assistant
-    scope: policy
-    metrics:
-      enable: true
   audio:
     default_branch: main
     domain: audio

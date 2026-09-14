@@ -3,64 +3,60 @@ ai_context_version: 1.1
 
 project:
   name: hauski
-  summary: Orchestration core for intentions/decisions; integrates with semantAH + chronik.
-  role: decision_orchestrator
+  summary: Archived historical reference for the former local AI orchestration and policy experiments; not a current operator product.
+  role: archived_reference
   primary_language: mixed
   visibility: internal
 
 heimgewebe:
-  axis: [Decisions, Commands]
+  axis: [Historical AI Orchestration Evidence]
   fleet:
-    enabled: true
+    enabled: false
   wgx:
-    profile_expected: true
-    guard_smoke_expected: true
+    profile_expected: false
+    guard_smoke_expected: false
 
 interfaces:
   consumes:
-    - "event.line (chronik)"
-    - "insights.* (semantAH)"
-    - "fleet.health (wgx)"
+    - historical repository evidence only
   produces:
-    - "hausKI decisions"
-    - "policy.decision / policy.feedback"
+    - none (archived reference)
 
 contracts:
   schemas:
     - path: "contracts/*.schema.json"
-      note: "Do not change decision/policy payload shape ad-hoc."
+      note: "Historical schemas do not establish a current producer or consumer."
 
 dependencies:
-  internal:
-    - name: semantah
-      relationship: uses
-      interface:
-        - insights_api
-    - name: chronik
-      relationship: uses
-      interface:
-        - event_query
+  internal: []
   external: []
-  # NOTE: 'external: []' means "not verified from metarepo context".
-  # Prefer 'unknown' over false precision; verify in repo before asserting tech stack.
 
 boundaries:
   not_responsible_for:
-    - "Outside-world ingest (aussensensor)."
-    - "Embedding/meaning generation (semantAH)."
+    - "Current operator execution, routing, task, claim, memory, policy, or system truth."
+    - "Current Fleet rollout, runtime health, deployment, or required repository-context paths."
   dangerous_assumptions:
-    - "Treat commands as events; commands must remain separate."
+    - "Treat HausKI as a current orchestration gateway."
+    - "Infer an active service or required consumer from historical metrics, event, or policy adapters."
 
 conventions:
-  branching: "main, feature/*"
+  branching: "archived reference; no new product work"
   commit_prefix: "hauski"
   ci_platform: github_actions
 
 documentation:
-  runbook: docs/runbook.md
+  repository: https://github.com/heimgewebe/hausKI
+  retirement_evidence: docs/archive-readiness.v1.json
+
+source_binding:
+  repository: heimgewebe/hausKI
+  commit: a265afce24b6f7106c524da71ddd87ab51ba2e7c
+  observed_at: '2026-09-14T19:26:00Z'
 
 ai_guidance:
   do:
-    - keep agent I/O typed; prefer generated types from contracts
+    - "Use exact revisions when extracting historical requirements, ideas, or tests."
+    - "Rejustify useful behavior in the current owning system before implementation."
   dont:
-    - call backends without tracing context
+    - "Route new Fleet, runtime, policy, orchestration, or operator work to HausKI."
+    - "Claim that old HausKI integrations are current producers, consumers, or authority."

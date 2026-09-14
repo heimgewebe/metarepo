@@ -11,6 +11,14 @@ static:
       url: "https://github.com/heimgewebe/hausKI-audio"
       status: historical-donor
       fleet: false
+    - name: hausKI
+      url: "https://github.com/heimgewebe/hausKI"
+      status: archived-reference
+      fleet: false
+      default_branch: main
+      source_commit: a265afce24b6f7106c524da71ddd87ab51ba2e7c
+      locator: docs/archive-readiness.v1.json
+      content_sha256: 42f5ded06265155f5d2d199673ecb4a8495b3cfa14b4d8ac939891093a0dc84a
     - name: heimlern
       url: "https://github.com/heimgewebe/heimlern"
       status: archived-reference
@@ -32,7 +40,6 @@ repos:
   - name: metarepo
   - name: wgx
   - name: contracts-mirror
-  - name: hausKI
   - name: audio
   - name: semantAH
   - name: aussensensor

@@ -28,11 +28,6 @@
       "enabled": true
     },
     {
-      "repo": "heimgewebe/hausKI",
-      "summary_url": "https://github.com/heimgewebe/hausKI/releases/download/integrity/summary.json",
-      "enabled": true
-    },
-    {
       "repo": "heimgewebe/heim-pc",
       "summary_url": "https://github.com/heimgewebe/heim-pc/releases/download/integrity/summary.json",
       "enabled": true

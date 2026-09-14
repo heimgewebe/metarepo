@@ -10,7 +10,6 @@
     "heimgewebe/chronik",
     "heimgewebe/commonthing",
     "heimgewebe/contracts-mirror",
-    "heimgewebe/hausKI",
     "heimgewebe/heim-pc",
     "heimgewebe/heimgeist",
     "heimgewebe/konvergenzregelkreis",
@@ -37,11 +36,11 @@
   "sources": {
     "fleet": {
       "path": "fleet/repos.yml",
-      "sha256": "90be7a74d7179b750879460379ebb61789ce6245536f1e1fd4c86f1807fc7c3f"
+      "sha256": "5bafc4e94b740c015a1270d2bc5ee1bffb22a1c786aebea752287f7b6ce8beaa"
     },
     "policy": {
       "path": "automation/renovate/dependency-updates.v1.yml",
-      "sha256": "ac44a754a2e4a537c552247030763084240f03d49c1632eb993dab35f3004205"
+      "sha256": "507fc8ff8cb1fb4ebfcf5df23d6dfbb6004ba92c0d1331209c0f86f1d0a923f3"
     }
   },
   "version_update_ownership": [
@@ -69,11 +68,6 @@
       "dependabot_version_updates": "none",
       "renovate_version_updates": "enabled",
       "repository": "heimgewebe/contracts-mirror"
-    },
-    {
-      "dependabot_version_updates": "disabled",
-      "renovate_version_updates": "enabled",
-      "repository": "heimgewebe/hausKI"
     },
     {
       "dependabot_version_updates": "none",
@@ -142,7 +136,6 @@
       "order": 1,
       "repositories": [
         "mitschreiber",
-        "hausKI",
         "audio",
         "repoground",
         "commonthing",
