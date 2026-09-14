@@ -23,7 +23,7 @@ jobs:
     env:
       # Whitelist der Ziel-Repos (kommagetrennt). Kann pro Repo via
       # Repository-Variable HEIMGEWEBE_ALLOWED_REPOS überschrieben werden.
-      ALLOWED_TARGET_REPOS: ${{ vars.HEIMGEWEBE_ALLOWED_REPOS || 'sichter,wgx,metarepo,hausKI,semantAH,chronik,leitstand,repoground' }}
+      ALLOWED_TARGET_REPOS: ${{ vars.HEIMGEWEBE_ALLOWED_REPOS || 'sichter,wgx,metarepo,semantAH,chronik,leitstand,repoground' }}
 
       # Whitelist der erlaubten Kommandos (kommagetrennt). Kann via
       # Repository-Variable HEIMGEWEBE_ALLOWED_COMMANDS überschrieben werden.
@@ -140,7 +140,7 @@ jobs:
 
             // Archivierte oder dekommissionierte Repositories bleiben auch dann gesperrt,
             // wenn eine Repository-Variable sie versehentlich wieder in die Whitelist aufnimmt.
-            const archivedRepos = new Set(["heimlern", "leitwerk", "heimgeist"]);
+            const archivedRepos = new Set(["hauski", "heimlern", "leitwerk", "heimgeist"]);
             if (archivedRepos.has(targetRepo)) {
               await reply(
                 `⚠️ Das Ziel-Repo **${targetRepo}** ist eine archivierte oder dekommissionierte Referenz ohne Dispatch-Autorität.\n\n` +
