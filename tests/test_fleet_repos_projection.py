@@ -15,7 +15,7 @@ from wgx import repo_config
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "fleet" / "generate_repos_projection.py"
-PROJECTION_SEMANTIC_SHA256 = "99398024409a257dcb339da0debded644a52554a91a044abf457e5b57e826a63"
+PROJECTION_SEMANTIC_SHA256 = "26d6186b9bcf88b8b490ef733253edb372c6e442ed447ef484c7afe1a1002c9c"
 SPEC = importlib.util.spec_from_file_location("generate_repos_projection", SCRIPT)
 assert SPEC and SPEC.loader
 MODULE = importlib.util.module_from_spec(SPEC)
@@ -40,8 +40,9 @@ def test_projection_is_loadable_by_existing_legacy_consumers() -> None:
 
     assert projection["mode"] == "static"
     assert projection["github"]["owner"] == "heimgewebe"
-    assert len(projection["repos"]) == 10
+    assert len(projection["repos"]) == 9
     assert [item["name"] for item in projection["archived_references"]] == [
+        "hausKI",
         "heimlern",
         "leitwerk",
     ]
@@ -68,7 +69,6 @@ def test_projection_preserves_legacy_consumer_shape() -> None:
     assert names == [
         "contracts-mirror",
         "commonthing",
-        "hausKI",
         "audio",
         "semantAH",
         "wgx",
@@ -178,7 +178,7 @@ def test_normalized_metadata_names_must_be_unique() -> None:
         "github": {"owner": "example"},
         "repositories": {
             "core": {"default_branch": "main"},
-            " core ": {"default_branch": "main"},
+            " core ": {"default_branch": "trunk"},
         },
     }
 
@@ -278,6 +278,18 @@ def test_archived_reference_is_separate_and_exactly_bound() -> None:
     projection = yaml.safe_load((ROOT / "repos.yml").read_text(encoding="utf-8"))
     assert projection["archived_references"] == [
         {
+            "name": "hausKI",
+            "url": "https://github.com/heimgewebe/hausKI",
+            "status": "archived-reference",
+            "fleet": False,
+            "default_branch": "main",
+            "source_commit": "a265afce24b6f7106c524da71ddd87ab51ba2e7c",
+            "locator": "docs/archive-readiness.v1.json",
+            "content_sha256": (
+                "42f5ded06265155f5d2d199673ecb4a8495b3cfa14b4d8ac939891093a0dc84a"
+            ),
+        },
+        {
             "name": "heimlern",
             "url": "https://github.com/heimgewebe/heimlern",
             "status": "archived-reference",
@@ -303,6 +315,7 @@ def test_archived_reference_is_separate_and_exactly_bound() -> None:
         },
     ]
     active_names = [item["name"] for item in projection["repos"]]
+    assert "hausKI" not in active_names
     assert "heimlern" not in active_names
     assert "leitwerk" not in active_names
 
