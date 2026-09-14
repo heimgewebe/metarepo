@@ -1,7 +1,6 @@
 metarepo
 wgx
 contracts-mirror
-hausKI
 audio
 semantAH
 aussensensor
