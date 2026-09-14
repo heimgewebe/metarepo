@@ -11,7 +11,6 @@ Quelle: [`repos.yml`](../repos.yml).
 | [chronik](https://github.com/heimgewebe/chronik) | main | chronik | ingest | – | – |
 | [commonthing](https://github.com/heimgewebe/commonthing) | main | aussen | events | – | – |
 | [contracts-mirror](https://github.com/heimgewebe/contracts-mirror) | main | contracts | schema | – | – |
-| [hausKI](https://github.com/heimgewebe/hausKI) | main | assistant | policy | ✅ | – |
 | [repoground](https://github.com/heimgewebe/repoground) | main | epistemic | codebase-context | – | – |
 | [semantAH](https://github.com/heimgewebe/semantAH) | main | insights | export | – | – |
 | [vault-gewebe](https://github.com/heimgewebe/vault-gewebe) | main | vault | content | – | – |
@@ -23,5 +22,6 @@ Historische Repositories ohne aktive Fleet-, Runtime- oder Routing-Autorität.
 
 | Repo | Status | Bound Commit | Evidence |
 | --- | --- | --- | --- |
+| [hausKI](https://github.com/heimgewebe/hausKI) | archived-reference | `a265afce24b6f7106c524da71ddd87ab51ba2e7c` | `docs/archive-readiness.v1.json` |
 | [heimlern](https://github.com/heimgewebe/heimlern) | archived-reference | `f74579cbe46d5f5f7b95c4c3431da03efb67cc85` | `docs/archive-readiness.v1.json` |
 | [leitwerk](https://github.com/heimgewebe/leitwerk) | archived-reference | `1449145af543b78c0d3813942f1d6d95ddb33c4a` | `archive/leitwerk.freeze.v1.json` |
