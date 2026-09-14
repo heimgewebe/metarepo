@@ -2,8 +2,8 @@
 
 <!-- GENERATED FILE - DO NOT EDIT -->
 <!-- Canonical source: fleet/repos.yml -->
-<!-- Fleet SHA-256: 90be7a74d7179b750879460379ebb61789ce6245536f1e1fd4c86f1807fc7c3f -->
-<!-- Metadata SHA-256: 243781c366e4f677add282e18a5d791b61721187d3cedeef0f7de3826d9fed33 -->
+<!-- Fleet SHA-256: 5bafc4e94b740c015a1270d2bc5ee1bffb22a1c786aebea752287f7b6ce8beaa -->
+<!-- Metadata SHA-256: e9389d7e76fb22893f9fcaaac7cfd736f889b5fc5916f75e597918b4aa87d8de -->
 
 Diese Matrix ist eine menschenlesbare Projektion. Die normative Fleet-Mitgliedschaft liegt ausschließlich in `fleet/repos.yml`; operative Zusatzdaten liegen in `fleet/repo-metadata.yml`.
 
@@ -14,7 +14,6 @@ Diese Matrix ist eine menschenlesbare Projektion. Die normative Fleet-Mitgliedsc
 | metarepo | Aktives Fleet-Mitglied | yes |
 | wgx | platform / metrics | yes |
 | contracts-mirror | contracts / schema | yes |
-| hausKI | assistant / policy | yes |
 | audio | audio / configuration-and-experiments | yes |
 | semantAH | insights / export | yes |
 | aussensensor | aussen / events | yes |
@@ -40,6 +39,7 @@ Diese Matrix ist eine menschenlesbare Projektion. Die normative Fleet-Mitgliedsc
 
 | Repo | Rolle | Fleet |
 | --- | --- | --- |
+| hausKI | Archivierte Referenz; keine aktive Betriebs- oder Entwicklungsautorität | no |
 | heimlern | Archivierte Referenz; keine aktive Betriebs- oder Entwicklungsautorität | no |
 | leitwerk | Archivierte Referenz; keine aktive Betriebs- oder Entwicklungsautorität | no |
 
