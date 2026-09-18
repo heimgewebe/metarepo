@@ -20,6 +20,10 @@ def parse_scalar(value: str) -> Any:
         return True
     if lowered in {"false", "no"}:
         return False
+    if value == "[]":
+        return []
+    if value == "{}":
+        return {}
     try:
         digits = value
         if digits and digits[0] in "+-":

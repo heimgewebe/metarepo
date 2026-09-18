@@ -11,6 +11,12 @@ class ParseSimpleYamlTests(unittest.TestCase):
         parsed = repo_config.parse_simple_yaml("---\nkey: value\n...\n")
         self.assertEqual(parsed, {"key": "value"})
 
+    def test_preserves_explicit_empty_containers(self) -> None:
+        parsed = repo_config.parse_simple_yaml(
+            "empty_list: []\nempty_mapping: {}\n"
+        )
+        self.assertEqual(parsed, {"empty_list": [], "empty_mapping": {}})
+
     def test_preserves_hash_characters_inside_quotes(self) -> None:
         yaml_text = textwrap.dedent(
             """

@@ -92,18 +92,17 @@ def test_docs_drift_guard_rejects_and_preserves_stale_content(tmp_path: Path) ->
     assert generated_path.read_bytes() == stale
 
 
-def test_historical_donor_remains_non_fleet_in_generated_docs(tmp_path: Path) -> None:
+
+def test_physically_deleted_historical_donor_is_absent_from_generated_docs(tmp_path: Path) -> None:
     worktree = _fixture(tmp_path)
     output = _generate(worktree).decode("utf-8")
-    assert "**hausKI-audio** (historical-donor) (Non-Fleet)" in output
+    assert "hausKI-audio" not in output
 
 
-def test_archived_reference_remains_non_fleet_in_generated_docs(tmp_path: Path) -> None:
+def test_physically_deleted_archived_reference_is_absent_from_generated_docs(tmp_path: Path) -> None:
     worktree = _fixture(tmp_path)
     output = _generate(worktree).decode("utf-8")
     fleet = yaml.safe_load((worktree / "fleet/repos.yml").read_text(encoding="utf-8"))
-    archived = next(
-        item for item in fleet["static"]["include"] if item["name"] == "heimlern"
-    )
-    assert archived["fleet"] is False
-    assert "**heimlern** (archived-reference) (Non-Fleet)" in output
+    names = {item["name"] for item in fleet["static"]["include"]}
+    assert "heimlern" not in names
+    assert "heimlern" not in output

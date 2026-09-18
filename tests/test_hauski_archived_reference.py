@@ -11,46 +11,21 @@ CONTENT_SHA256 = "42f5ded06265155f5d2d199673ecb4a8495b3cfa14b4d8ac939891093a0dc8
 LOCATOR = "docs/archive-readiness.v1.json"
 
 
-def test_hauski_is_exactly_one_archived_non_fleet_reference() -> None:
+
+def test_hauski_repository_identity_is_absent_from_fleet_scope() -> None:
     fleet = yaml.safe_load((ROOT / "fleet/repos.yml").read_text(encoding="utf-8"))
     assert "hausKI" not in [entry["name"] for entry in fleet["repos"]]
-    entries = [
-        entry
-        for entry in fleet["static"]["include"]
-        if entry["name"] == "hausKI"
-    ]
-    assert entries == [
-        {
-            "name": "hausKI",
-            "url": "https://github.com/heimgewebe/hausKI",
-            "status": "archived-reference",
-            "fleet": False,
-            "default_branch": "main",
-            "source_commit": SOURCE_COMMIT,
-            "locator": LOCATOR,
-            "content_sha256": CONTENT_SHA256,
-        }
-    ]
+    assert "hausKI" not in [entry["name"] for entry in fleet["static"]["include"]]
 
 
-def test_hauski_is_absent_from_active_metadata_and_projection() -> None:
+def test_hauski_is_absent_from_metadata_and_projection() -> None:
     metadata = yaml.safe_load(
         (ROOT / "fleet/repo-metadata.yml").read_text(encoding="utf-8")
     )
     assert "hausKI" not in metadata["repositories"]
-
     projection = yaml.safe_load((ROOT / "repos.yml").read_text(encoding="utf-8"))
     assert "hausKI" not in [entry["name"] for entry in projection["repos"]]
-    archived = [
-        entry
-        for entry in projection["archived_references"]
-        if entry["name"] == "hausKI"
-    ]
-    assert len(archived) == 1
-    assert archived[0]["source_commit"] == SOURCE_COMMIT
-    assert archived[0]["locator"] == LOCATOR
-    assert archived[0]["content_sha256"] == CONTENT_SHA256
-
+    assert projection["archived_references"] == []
 
 def test_dispatch_hard_blocks_archived_hauski_even_if_allowlist_is_overridden() -> None:
     workflow = (
@@ -68,23 +43,15 @@ def test_dispatch_hard_blocks_archived_hauski_even_if_allowlist_is_overridden() 
     )
 
 
-def test_generated_surfaces_present_hauski_only_as_archived_reference() -> None:
-    matrix = (ROOT / "docs/repo-matrix.md").read_text(encoding="utf-8")
-    assert "| hausKI | Archivierte Referenz; keine aktive Betriebs- oder Entwicklungsautorität | no |" in matrix
-    assert "| hausKI | assistant / policy | yes |" not in matrix
 
-    index = (ROOT / "docs/org-index.md").read_text(encoding="utf-8")
-    assert (
-        "| [hausKI](https://github.com/heimgewebe/hausKI) | archived-reference | "
-        f"`{SOURCE_COMMIT}` | `{LOCATOR}` |"
-    ) in index
-
-    graph = (ROOT / "docs/org-graph.mmd").read_text(encoding="utf-8")
-    assert 'archived_hausKI["hausKI\\n(archived-reference; non-operational)"]' in graph
-
-    fleet_doc = (ROOT / "docs/_generated/fleet.md").read_text(encoding="utf-8")
-    assert "**hausKI** (archived-reference) (Non-Fleet)" in fleet_doc
-
+def test_generated_surfaces_do_not_project_deleted_hauski_repository() -> None:
+    for relative in (
+        "docs/repo-matrix.md",
+        "docs/org-index.md",
+        "docs/org-graph.mmd",
+        "docs/_generated/fleet.md",
+    ):
+        assert "hausKI" not in (ROOT / relative).read_text(encoding="utf-8")
 
 def test_retired_hauski_is_not_an_active_integrity_source() -> None:
     sources = (ROOT / "reports/integrity/sources.v1.json").read_text(encoding="utf-8")

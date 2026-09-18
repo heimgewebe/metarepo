@@ -2,8 +2,8 @@
 
 <!-- GENERATED FILE - DO NOT EDIT -->
 <!-- Canonical source: fleet/repos.yml -->
-<!-- Fleet SHA-256: 5bafc4e94b740c015a1270d2bc5ee1bffb22a1c786aebea752287f7b6ce8beaa -->
-<!-- Metadata SHA-256: e9389d7e76fb22893f9fcaaac7cfd736f889b5fc5916f75e597918b4aa87d8de -->
+<!-- Fleet SHA-256: a089df0e8f45d4a4c73da3517a0cebe1644bf3a83bb0e8460c08924b512379dc -->
+<!-- Metadata SHA-256: ce38fda3636658e41ac4cb6880cfcfcd52c69d314a72f23217ad1848f03ed0a5 -->
 
 Diese Matrix ist eine menschenlesbare Projektion. Die normative Fleet-Mitgliedschaft liegt ausschließlich in `fleet/repos.yml`; operative Zusatzdaten liegen in `fleet/repo-metadata.yml`.
 
@@ -16,35 +16,23 @@ Diese Matrix ist eine menschenlesbare Projektion. Die normative Fleet-Mitgliedsc
 | contracts-mirror | contracts / schema | yes |
 | audio | audio / configuration-and-experiments | yes |
 | semantAH | insights / export | yes |
-| aussensensor | aussen / events | yes |
 | chronik | chronik / ingest | yes |
 | repoground | epistemic / codebase-context | yes |
 | konvergenzregelkreis | Aktives Fleet-Mitglied | yes |
-| mitschreiber | Aktives Fleet-Mitglied | yes |
 | sichter | Aktives Fleet-Mitglied | yes |
 | leitstand | Aktives Fleet-Mitglied | yes |
-| heimgeist | Aktives Fleet-Mitglied | yes |
 | plexer | Aktives Fleet-Mitglied | yes |
 | heim-pc | Aktives Fleet-Mitglied | yes |
-| vault-gewebe | vault / content | yes |
 | commonthing | aussen / events | yes |
 
 ## Historische Spender (Non-Fleet)
 
-| Repo | Rolle | Fleet |
-| --- | --- | --- |
-| hausKI-audio | Historischer Spender; keine aktive Produkt-, Fleet- oder Runtime-Autorität | no |
+_Keine._
 
 ## Archivierte Referenzen (Non-Fleet)
 
-| Repo | Rolle | Fleet |
-| --- | --- | --- |
-| hausKI | Archivierte Referenz; keine aktive Betriebs- oder Entwicklungsautorität | no |
-| heimlern | Archivierte Referenz; keine aktive Betriebs- oder Entwicklungsautorität | no |
-| leitwerk | Archivierte Referenz; keine aktive Betriebs- oder Entwicklungsautorität | no |
+_Keine._
 
 ## Weitere Referenzen (Non-Fleet)
 
-| Repo | Rolle | Fleet |
-| --- | --- | --- |
-| vault-privat | Zugehörige Non-Fleet-Referenz | no |
+_Keine._

@@ -15,7 +15,7 @@ from wgx import repo_config
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "fleet" / "generate_repos_projection.py"
-PROJECTION_SEMANTIC_SHA256 = "26d6186b9bcf88b8b490ef733253edb372c6e442ed447ef484c7afe1a1002c9c"
+PROJECTION_SEMANTIC_SHA256 = "5b65a49c7bd8006a722750f9ca0a79027c8f78d2bc10eadf19804cf9dd1e22d3"
 SPEC = importlib.util.spec_from_file_location("generate_repos_projection", SCRIPT)
 assert SPEC and SPEC.loader
 MODULE = importlib.util.module_from_spec(SPEC)
@@ -35,18 +35,14 @@ def test_repository_projection_is_current() -> None:
     assert (ROOT / "repos.yml").read_text(encoding="utf-8") == expected
 
 
+
 def test_projection_is_loadable_by_existing_legacy_consumers() -> None:
     projection = repo_config.load_config(ROOT / "repos.yml")
 
     assert projection["mode"] == "static"
     assert projection["github"]["owner"] == "heimgewebe"
-    assert len(projection["repos"]) == 9
-    assert [item["name"] for item in projection["archived_references"]] == [
-        "hausKI",
-        "heimlern",
-        "leitwerk",
-    ]
-
+    assert len(projection["repos"]) == 7
+    assert projection["archived_references"] == []
 
 def test_projection_pins_complete_compatibility_semantics() -> None:
     projection = yaml.safe_load((ROOT / "repos.yml").read_text(encoding="utf-8"))
@@ -58,6 +54,7 @@ def test_projection_pins_complete_compatibility_semantics() -> None:
     ).encode("utf-8")
 
     assert hashlib.sha256(canonical).hexdigest() == PROJECTION_SEMANTIC_SHA256
+
 
 
 def test_projection_preserves_legacy_consumer_shape() -> None:
@@ -74,14 +71,11 @@ def test_projection_preserves_legacy_consumer_shape() -> None:
         "wgx",
         "repoground",
         "chronik",
-        "aussensensor",
-        "vault-gewebe",
     ]
     assert all(
         item["url"].startswith("https://github.com/heimgewebe/")
         for item in projection["repos"]
     )
-
 
 def test_metadata_must_reference_projectable_fleet_or_related_repo() -> None:
     fleet = {"repos": [{"name": "known"}]}
@@ -274,51 +268,27 @@ def test_check_mode_fails_for_stale_projection(tmp_path: Path) -> None:
     assert "repos.yml is stale" in result.stderr
 
 
-def test_archived_reference_is_separate_and_exactly_bound() -> None:
-    projection = yaml.safe_load((ROOT / "repos.yml").read_text(encoding="utf-8"))
-    assert projection["archived_references"] == [
-        {
-            "name": "hausKI",
-            "url": "https://github.com/heimgewebe/hausKI",
-            "status": "archived-reference",
-            "fleet": False,
-            "default_branch": "main",
-            "source_commit": "a265afce24b6f7106c524da71ddd87ab51ba2e7c",
-            "locator": "docs/archive-readiness.v1.json",
-            "content_sha256": (
-                "42f5ded06265155f5d2d199673ecb4a8495b3cfa14b4d8ac939891093a0dc84a"
-            ),
-        },
-        {
-            "name": "heimlern",
-            "url": "https://github.com/heimgewebe/heimlern",
-            "status": "archived-reference",
-            "fleet": False,
-            "default_branch": "main",
-            "source_commit": "f74579cbe46d5f5f7b95c4c3431da03efb67cc85",
-            "locator": "docs/archive-readiness.v1.json",
-            "content_sha256": (
-                "bbf1d19865812b9584a3645ecd031f0854ee6110849d249692b4ac62d8f8d1e0"
-            ),
-        },
-        {
-            "name": "leitwerk",
-            "url": "https://github.com/heimgewebe/leitwerk",
-            "status": "archived-reference",
-            "fleet": False,
-            "default_branch": "main",
-            "source_commit": "1449145af543b78c0d3813942f1d6d95ddb33c4a",
-            "locator": "archive/leitwerk.freeze.v1.json",
-            "content_sha256": (
-                "1cf39dc5c311d1cf8d1f91b536354b887d25e810dac215dbb60700148f09948f"
-            ),
-        },
-    ]
-    active_names = [item["name"] for item in projection["repos"]]
-    assert "hausKI" not in active_names
-    assert "heimlern" not in active_names
-    assert "leitwerk" not in active_names
 
+def test_physically_deleted_repositories_are_absent_from_projection() -> None:
+    projection = yaml.safe_load((ROOT / "repos.yml").read_text(encoding="utf-8"))
+    assert projection["archived_references"] == []
+    projected_names = {item["name"] for item in projection["repos"]}
+    assert projected_names.isdisjoint(
+        {
+            "vault-gewebe",
+            "vault-privat",
+            "aussensensor",
+            "mitschreiber",
+            "hausKI",
+            "heimlern",
+            "leitwerk",
+            "hausKI-audio",
+            "heimserver",
+            "heimgeist",
+            "agent-control-surface",
+            "demo-repository",
+        }
+    )
 
 def test_archived_reference_cannot_be_projectable() -> None:
     fleet = {
