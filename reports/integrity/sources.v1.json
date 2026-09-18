@@ -1,16 +1,11 @@
 {
   "apiVersion": "integrity.sources.v1",
-  "generated_at": "2026-09-01T14:09:31Z",
+  "generated_at": "2026-09-18T17:07:47Z",
   "sources": [
     {
       "repo": "heimgewebe/audio",
       "summary_url": "https://github.com/heimgewebe/audio/releases/download/integrity/summary.json",
       "enabled": false
-    },
-    {
-      "repo": "heimgewebe/aussensensor",
-      "summary_url": "https://github.com/heimgewebe/aussensensor/releases/download/integrity/summary.json",
-      "enabled": true
     },
     {
       "repo": "heimgewebe/chronik",
@@ -33,11 +28,6 @@
       "enabled": true
     },
     {
-      "repo": "heimgewebe/heimgeist",
-      "summary_url": "https://github.com/heimgewebe/heimgeist/releases/download/integrity/summary.json",
-      "enabled": true
-    },
-    {
       "repo": "heimgewebe/konvergenzregelkreis",
       "summary_url": "https://github.com/heimgewebe/konvergenzregelkreis/releases/download/integrity/summary.json",
       "enabled": true
@@ -50,11 +40,6 @@
     {
       "repo": "heimgewebe/metarepo",
       "summary_url": "https://github.com/heimgewebe/metarepo/releases/download/integrity/summary.json",
-      "enabled": true
-    },
-    {
-      "repo": "heimgewebe/mitschreiber",
-      "summary_url": "https://github.com/heimgewebe/mitschreiber/releases/download/integrity/summary.json",
       "enabled": true
     },
     {
@@ -75,11 +60,6 @@
     {
       "repo": "heimgewebe/sichter",
       "summary_url": "https://github.com/heimgewebe/sichter/releases/download/integrity/summary.json",
-      "enabled": true
-    },
-    {
-      "repo": "heimgewebe/vault-gewebe",
-      "summary_url": "https://github.com/heimgewebe/vault-gewebe/releases/download/integrity/summary.json",
       "enabled": true
     },
     {
