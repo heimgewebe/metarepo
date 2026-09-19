@@ -1,69 +1,43 @@
 ---
 ai_context_version: 1.1
-
 project:
   name: heimgeist
-  summary: "Systemweiter Meta-Agent und Beobachter des Heimgewebes (Brain)."
-  role: system_observer_and_coordinator
+  summary: Archived historical reference for the deleted former system-wide meta-agent
+    and observer; not a current Fleet or runtime component.
+  role: archived_reference
   primary_language: mixed
   visibility: internal
-
 heimgewebe:
-  axis: [Semantik, Decisions, Events]
+  axis:
+  - Historical Meta-Agent Evidence
   fleet:
-    enabled: true
+    enabled: false
   wgx:
     profile_expected: false
     guard_smoke_expected: false
-
 interfaces:
-  consumes: ["events", "patterns", "drifts"]
-  produces: ["warnings", "analyses", "actions"]
-
+  consumes:
+  - historical repository evidence only
+  produces:
+  - none (deleted repository)
 contracts:
   schemas:
-    - path: "contracts/*.schema.json"
-      note: "Uses canonical schemas."
-
+  - path: contracts/*.schema.json
+    note: Historical schema references do not establish a current producer or consumer.
 dependencies:
-  internal:
-    - name: metarepo
-    - name: wgx
-    - name: sichter
-    - name: semantAH
-    - name: chronik
-    - name: hausKI
+  internal: []
   external: []
-
-architecture:
-  entrypoints:
-    - "scripts/agents/*"
-  key_paths:
-    - path: "docs/"
-      purpose: "System view"
-  data_flow:
-    input: "Events from chronik"
-    processing: "Pattern detection / Risk analysis"
-    output: "New events / Actions"
-
 boundaries:
   not_responsible_for:
-    - "Destructive changes without confirmation"
-    - "Overwriting local policies"
-
+  - Current runtime execution, Fleet rollout, deployment, or producer/consumer truth.
+  dangerous_assumptions:
+  - Treat heimgeist as a current repository, service, Fleet member, producer, or consumer.
 conventions:
-  branching: "main, feature/*"
-  commit_prefix: "heimgeist"
-  ci_platform: github_actions
-
-documentation:
-  runbook: docs/runbook.md
-
+  branching: archived reference; repository physically deleted
+  commit_prefix: heimgeist
+  ci_platform: none
 ai_guidance:
   do:
-    - "Identify risks and alternatives"
-    - "Detect patterns and drift"
-    - "Link back to context"
+  - Use this file only as historical context and verify current successors elsewhere.
   dont:
-    - "Make unconfirmed destructive changes"
-    - "Ignore local repo reality"
+  - Create current work, routing, deployment, or contract claims for the deleted repository.

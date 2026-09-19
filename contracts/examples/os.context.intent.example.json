@@ -13,5 +13,5 @@
       "ref": "heimgewebe/metarepo/.github/workflows/ci.yml"
     }
   ],
-  "source": "hausKI-intent-resolver"
+  "source": "intent-resolver"
 }

@@ -11,19 +11,11 @@ ROOT = Path(__file__).resolve().parents[1]
 ARCHIVE_COMMIT = "f74579cbe46d5f5f7b95c4c3431da03efb67cc85"
 
 
-def test_heimlern_is_only_an_archived_fleet_reference() -> None:
+
+def test_heimlern_repository_identity_is_absent_from_fleet_scope() -> None:
     fleet = yaml.safe_load((ROOT / "fleet/repos.yml").read_text(encoding="utf-8"))
     assert "heimlern" not in [entry["name"] for entry in fleet["repos"]]
-    archived = [
-        entry
-        for entry in fleet["static"]["include"]
-        if entry["name"] == "heimlern"
-    ]
-    assert len(archived) == 1
-    assert archived[0]["status"] == "archived-reference"
-    assert archived[0]["fleet"] is False
-    assert archived[0]["source_commit"] == ARCHIVE_COMMIT
-
+    assert "heimlern" not in [entry["name"] for entry in fleet["static"]["include"]]
 
 def test_metadata_and_active_contract_consumers_do_not_project_heimlern() -> None:
     metadata = yaml.safe_load(
@@ -87,12 +79,15 @@ def test_retired_direct_e2e_paths_always_fail_closed(tmp_path: Path) -> None:
     assert not (tmp_path / "logs").exists()
 
 
-def test_active_projection_docs_do_not_describe_heimlern_as_fleet() -> None:
-    matrix = (ROOT / "docs/repo-matrix.md").read_text(encoding="utf-8")
-    active_section = matrix.split("## Historische Spender", 1)[0]
-    assert "heimlern" not in active_section
-    assert "| heimlern | Archivierte Referenz" in matrix
 
+def test_active_projection_docs_do_not_project_deleted_heimlern_repository() -> None:
+    for relative in (
+        "docs/repo-matrix.md",
+        "docs/org-index.md",
+        "docs/org-graph.mmd",
+        "docs/_generated/fleet.md",
+    ):
+        assert "heimlern" not in (ROOT / relative).read_text(encoding="utf-8")
 
 def test_active_ai_context_is_disabled_and_historical() -> None:
     context = yaml.safe_load(

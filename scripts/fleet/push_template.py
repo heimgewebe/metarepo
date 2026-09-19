@@ -220,7 +220,7 @@ def run(repo_single: str | None, paths: list[str], message: str, branch: str, dr
 
 def main():
     ap = argparse.ArgumentParser(description="Push agent-kit + contracts to fleet as PRs.")
-    ap.add_argument("--repo", help="single repo (e.g. heimgewebe/hausKI)")
+    ap.add_argument("--repo", help="single repo (e.g. heimgewebe/chronik)")
     ap.add_argument("--paths", nargs="+", default=[], help="paths to copy from metarepo")
     ap.add_argument("--message", default=PR_TITLE, help="commit message")
     ap.add_argument("--branch", default=DEFAULT_BRANCH_NAME, help="target branch name")

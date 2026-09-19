@@ -3,22 +3,12 @@
 # Used by Plexer and other routers to apply correct credentials.
 
 services:
-  heimgeist:
-    authKind: x-auth
-    header: X-Auth
-    prefix: ""
-
   chronik:
     authKind: x-auth
     header: X-Auth
     prefix: ""
 
   leitstand:
-    authKind: bearer
-    header: Authorization
-    prefix: "Bearer " # trailing space is intentional and must not be removed
-
-  hausKI:
     authKind: bearer
     header: Authorization
     prefix: "Bearer " # trailing space is intentional and must not be removed

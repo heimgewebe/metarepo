@@ -11,6 +11,8 @@ import sys
 from pathlib import Path
 from jsonschema import validate, ValidationError
 
+ROOT = Path(__file__).resolve().parents[1]
+
 # Map fixture prefixes to schema files
 SCHEMA_MAP = {
     "decision.outcome": "contracts/decision.outcome.v1.schema.json",
@@ -164,3 +166,35 @@ def test_contract_json_guard_rejects_duplicate_keys(tmp_path):
     )
     assert completed.returncode == 1
     assert "duplicate JSON key 'required'" in completed.stdout
+
+def test_deleted_repository_contract_docs_are_explicitly_historical() -> None:
+    deleted = {"hausKI", "aussensensor", "heimlern", "mitschreiber"}
+    index = (ROOT / "docs/contracts/contracts-index.md").read_text(encoding="utf-8")
+    for name in deleted:
+        assert f"Repository: **heimgewebe/{name}**" not in index
+    mitschreiber = (ROOT / "docs/contracts/mitschreiber.md").read_text(encoding="utf-8")
+    assert "Status:** historisch" in mitschreiber
+    assert "kein aktueller Producer, Daemon oder Fleet-Teilnehmer" in mitschreiber
+
+
+def test_retained_heimgeist_contract_docs_do_not_claim_live_service() -> None:
+    sichter = (ROOT / "docs/contracts/sichter.md").read_text(encoding="utf-8")
+    events = (ROOT / "contracts/events/README.md").read_text(encoding="utf-8")
+    assert "frühere Heimgeist war historisch" in sichter
+    assert "POST /ingest/heimgeist" not in events
+    assert "does not establish a current Heimgeist service or producer" in events
+
+
+def test_contract_examples_do_not_use_deleted_repositories_as_current_roles() -> None:
+    insights = json.loads((ROOT / "contracts/examples/insights.example.json").read_text(encoding="utf-8"))
+    insight_event = json.loads((ROOT / "contracts/examples/heimgeist.insight.v1.example.json").read_text(encoding="utf-8"))
+    assert insights["source"].casefold() != "hauski"
+    assert insight_event["kind"] == "heimgeist.insight"
+    assert insight_event["data"]["origin"]["role"] != "heimgeist"
+
+def test_contract_index_does_not_reactivate_deleted_heimlern_or_aussensensor_namespaces() -> None:
+    index = (ROOT / "docs/contracts/contracts-index.md").read_text(encoding="utf-8")
+    assert "Produzenten: heimlern (CLI)" not in index
+    assert "Konsumenten: leitstand, heimgeist" not in index
+    assert "der Name `aussen` begründet kein aktuelles `aussensensor`-Repository" in index
+    assert "`heimgewebe/heimlern` wurde physisch gelöscht und ist kein aktueller Service oder Producer" in index

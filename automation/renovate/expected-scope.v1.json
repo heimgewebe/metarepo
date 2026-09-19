@@ -6,21 +6,17 @@
   "expected_hosted_app_repositories": [],
   "expected_renovate_repositories": [
     "heimgewebe/audio",
-    "heimgewebe/aussensensor",
     "heimgewebe/chronik",
     "heimgewebe/commonthing",
     "heimgewebe/contracts-mirror",
     "heimgewebe/heim-pc",
-    "heimgewebe/heimgeist",
     "heimgewebe/konvergenzregelkreis",
     "heimgewebe/leitstand",
     "heimgewebe/metarepo",
-    "heimgewebe/mitschreiber",
     "heimgewebe/plexer",
     "heimgewebe/repoground",
     "heimgewebe/semantAH",
     "heimgewebe/sichter",
-    "heimgewebe/vault-gewebe",
     "heimgewebe/wgx"
   ],
   "kind": "renovate-fleet-scope-projection",
@@ -36,11 +32,11 @@
   "sources": {
     "fleet": {
       "path": "fleet/repos.yml",
-      "sha256": "5bafc4e94b740c015a1270d2bc5ee1bffb22a1c786aebea752287f7b6ce8beaa"
+      "sha256": "a089df0e8f45d4a4c73da3517a0cebe1644bf3a83bb0e8460c08924b512379dc"
     },
     "policy": {
       "path": "automation/renovate/dependency-updates.v1.yml",
-      "sha256": "507fc8ff8cb1fb4ebfcf5df23d6dfbb6004ba92c0d1331209c0f86f1d0a923f3"
+      "sha256": "b670ca4bc37a8aff6ab4b8c2aeb7136a5693a3b5411f3da3f68be410b7a5b6a3"
     }
   },
   "version_update_ownership": [
@@ -48,11 +44,6 @@
       "dependabot_version_updates": "disabled",
       "renovate_version_updates": "enabled",
       "repository": "heimgewebe/audio"
-    },
-    {
-      "dependabot_version_updates": "none",
-      "renovate_version_updates": "enabled",
-      "repository": "heimgewebe/aussensensor"
     },
     {
       "dependabot_version_updates": "none",
@@ -77,11 +68,6 @@
     {
       "dependabot_version_updates": "none",
       "renovate_version_updates": "enabled",
-      "repository": "heimgewebe/heimgeist"
-    },
-    {
-      "dependabot_version_updates": "none",
-      "renovate_version_updates": "enabled",
       "repository": "heimgewebe/konvergenzregelkreis"
     },
     {
@@ -93,11 +79,6 @@
       "dependabot_version_updates": "disabled",
       "renovate_version_updates": "enabled",
       "repository": "heimgewebe/metarepo"
-    },
-    {
-      "dependabot_version_updates": "none",
-      "renovate_version_updates": "enabled",
-      "repository": "heimgewebe/mitschreiber"
     },
     {
       "dependabot_version_updates": "none",
@@ -122,11 +103,6 @@
     {
       "dependabot_version_updates": "none",
       "renovate_version_updates": "enabled",
-      "repository": "heimgewebe/vault-gewebe"
-    },
-    {
-      "dependabot_version_updates": "none",
-      "renovate_version_updates": "enabled",
       "repository": "heimgewebe/wgx"
     }
   ],
@@ -135,7 +111,6 @@
       "id": "direct-cutover",
       "order": 1,
       "repositories": [
-        "mitschreiber",
         "audio",
         "repoground",
         "commonthing",
@@ -147,17 +122,14 @@
       "id": "active-fleet",
       "order": 2,
       "repositories": [
-        "aussensensor",
         "chronik",
         "contracts-mirror",
         "heim-pc",
-        "heimgeist",
         "konvergenzregelkreis",
         "leitstand",
         "plexer",
         "semantAH",
         "sichter",
-        "vault-gewebe",
         "wgx"
       ],
       "selector": "remaining-eligible-active-fleet"

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.heimgewebe.org/contracts/project.scenario.schema.json",
   "title": "ProjectScenario",
-  "x-producers": ["heimgeist", "hausKI"],
+  "x-producers": [],
   "x-consumers": ["chronik", "leitstand"],
   "description": "Beschreibung alternativer Pfade für ein Thema oder Projekt (konservativ, ambitioniert, experimentell …).",
   "type": "object",
@@ -111,7 +111,7 @@
     },
     "created_by": {
       "type": "string",
-      "description": "Erzeugende Komponente oder Akteur (z. B. heimgeist)."
+      "description": "Erzeugende Komponente oder Akteur (z. B. scenario-engine)."
     }
   },
   "required": [

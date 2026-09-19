@@ -2,7 +2,7 @@
   "$schema":"https://json-schema.org/draft/2020-12/schema",
   "$id":"https://schemas.heimgewebe.org/intent.event.schema.json",
   "title":"Intent Event",
-  "description":"Audio/Text → Intent-Event für chronik/hausKI.",
+  "description":"Audio/Text → Intent-Event für aktuelle Contract-Consumer.",
   "type":"object",
   "additionalProperties": false,
   "required":["ts","source","intent","confidence"],

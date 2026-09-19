@@ -23,8 +23,7 @@ set -euo pipefail
 #   - Die anderen Repos liegen als Geschwister im gleichen Verzeichnis, z. B.:
 #       /pfad/zum/arbeitsbaum/
 #         metarepo/
-#         aussensensor/
-#         chronik/
+# #         chronik/
 #         ...
 #   - Optional kann HEIMGEWEBE_ROOT gesetzt werden, um das gemeinsame Wurzel-
 #     verzeichnis explizit zu definieren.
@@ -73,14 +72,8 @@ declare -A CONTRACT_TARGETS=()
 
 # Beispiel: aussen.event.schema.json
 CONTRACT_TARGETS["contracts/aussen.event.schema.json"]="
-  aussensensor:contracts/aussen.event.schema.json
   chronik:docs/aussen.event.schema.json
 "
-
-# Weitere Contracts können hier ergänzt werden, z. B.:
-# CONTRACT_TARGETS["contracts/heimlern.policy.snapshot.schema.json"]="
-#   heimlern:contracts/heimlern.policy.snapshot.schema.json
-# "
 
 sync_one_target() {
   local src_rel="$1"

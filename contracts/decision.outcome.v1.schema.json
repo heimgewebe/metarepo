@@ -4,8 +4,8 @@
   "title": "Decision Outcome v1",
   "description": "Canonical payload for decision outcomes. This is a payload schema, NOT an event envelope. It captures the result of a decision execution.",
   "type": "object",
-  "x-producers": ["hausKI", "chronik"],
-  "x-consumers": ["heimlern"],
+  "x-producers": ["chronik"],
+  "x-consumers": [],
   "properties": {
     "outcome": {
       "type": "string",

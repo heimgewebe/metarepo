@@ -28,9 +28,6 @@ rollout:
       order: 1
       purpose: Cut all known Dependabot version-update repositories directly to Renovate while preserving Dependabot Security Updates and existing merge gates.
       repositories:
-        - name: mitschreiber
-          dependabot_version_updates: none
-          renovate_version_updates: enabled
         - name: audio
           dependabot_version_updates: disabled
           renovate_version_updates: enabled

@@ -2,8 +2,8 @@
   "contract": "heimgeist.insight.v1",
   "schema": "contracts/events/heimgeist.insight.v1.schema.json",
   "governance": {
-    "producers": ["heimgeist", "semantAH"],
-    "consumers": ["chronik", "wgx", "leitstand", "hausKI", "semantAH"]
+    "producers": ["semantAH"],
+    "consumers": ["chronik", "wgx", "leitstand", "semantAH"]
   },
   "notes": [
     "This file is intentionally NOT JSON-Schema. It is governance metadata.",

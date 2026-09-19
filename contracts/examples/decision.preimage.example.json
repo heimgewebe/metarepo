@@ -3,11 +3,11 @@
   "kind": "decision.preimage",
   "id": "01JFM2V3Z7QY8F8M2GZ2ZVQK9A",
   "ts": "2025-12-14T08:30:00Z",
-  "producer": "hausKI",
+  "producer": "decision-engine",
   "decision": {
     "decision_id": "01JFM2V3Z7QY8F8M2GZ2ZVQK9B",
     "decision_type": "policy.update",
-    "scope": "heimlern",
+    "scope": "policy",
     "explain": "Wir ändern die Policy-Schwellenwerte, weil die letzten 7 Tage systematisch zu aggressiv gefiltert wurde."
   },
   "inputs": {

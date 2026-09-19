@@ -2,8 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.heimgewebe.org/contracts/policy.decision.schema.json",
   "title": "heimlern decision",
-  "x-producers": ["heimlern"],
-  "x-consumers": ["hausKI", "chronik"],
+  "x-producers": [],
+  "x-consumers": ["chronik"],
   "type": "object",
   "required": ["action", "score", "why"],
   "properties": {

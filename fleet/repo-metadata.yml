@@ -55,17 +55,3 @@ repositories:
     scope: ingest
     metrics:
       enable: false
-  aussensensor:
-    default_branch: main
-    domain: aussen
-    scope: events
-    metrics:
-      enable: false
-  vault-gewebe:
-    default_branch: main
-    domain: vault
-    scope: content
-    metrics:
-      enable: false
-    wgx:
-      profile_expected: false

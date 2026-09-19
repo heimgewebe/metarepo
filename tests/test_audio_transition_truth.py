@@ -10,20 +10,19 @@ from wgx import repo_config
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_audio_is_canonical_fleet_member_and_donor_is_non_fleet() -> None:
+
+def test_audio_is_canonical_fleet_member_and_deleted_donor_is_not_in_scope() -> None:
     fleet = repo_config.load_config(ROOT / "fleet/repos.yml")
     active = repo_config.active_fleet_names(fleet)
     assert "audio" in active
     assert "hausKI-audio" not in active
-    assert len(active) == 17
-    donor = next(
-        entry
+    assert len(active) == 13
+    static_names = {
+        entry["name"]
         for entry in fleet["static"]["include"]
-        if entry["name"] == "hausKI-audio"
-    )
-    assert donor["status"] == "historical-donor"
-    assert donor["fleet"] is False
-
+        if isinstance(entry, dict) and "name" in entry
+    }
+    assert "hausKI-audio" not in static_names
 
 def test_audio_operational_metadata_is_fail_closed() -> None:
     metadata = yaml.safe_load(
@@ -75,24 +74,24 @@ def test_generated_consumers_use_audio_but_do_not_claim_integrity() -> None:
     assert "heimgewebe/commonthing" in source_map
 
 
-def test_human_views_are_source_bound_and_historical_views_are_marked() -> None:
+
+def test_human_views_are_source_bound_and_deleted_donor_is_not_projected() -> None:
     matrix = (ROOT / "docs/repo-matrix.md").read_text(encoding="utf-8")
     active_section = matrix.split("## Historische Spender", 1)[0]
     assert "Canonical source: fleet/repos.yml" in matrix
     assert "| audio |" in active_section
-    assert "hausKI-audio" not in active_section
-    assert "historical-donor" not in active_section
-    assert "| hausKI-audio | Historischer Spender" in matrix
+    assert "hausKI-audio" not in matrix
     detailed = (ROOT / "docs/vision/heimgewebe-v2-detailed.md").read_text(encoding="utf-8")
     blueprint = (ROOT / "docs/vision/IDEal_Blueprint.mmd").read_text(encoding="utf-8")
     assert "Status: historisch und nicht normativ" in detailed
     assert "STATUS: historical-non-normative" in blueprint
 
-
 def test_rollout_routes_current_work_to_audio_only() -> None:
     rollout = (ROOT / ".github/ISSUE_TEMPLATE/rollout.md").read_text(encoding="utf-8")
     assert "- [ ] **audio**" in rollout
     assert "- [ ] **hausKI-audio**" not in rollout
+    assert "- [ ] **aussensensor" not in rollout
+    assert "- [ ] **hausKI**" not in rollout
     assert "historischer Vertrag" in rollout
 
 

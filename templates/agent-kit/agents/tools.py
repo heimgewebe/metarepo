@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Any, Dict, List
 
 # Platzhalter-Tool-Implementierungen.
-# In echten Repos an hausKI/semantAH/aussensensor koppeln.
+# In echten Repos nur an aktuell registrierte Producer/Consumer koppeln.
 
 def search_codebase(query: str, repo_filter: List[str] | None = None) -> Dict[str, Any]:
     return {

@@ -77,7 +77,7 @@
       "id": "event_backbone/aussen.event",
       "schema": "contracts/aussen.event.schema.json",
       "schemaExists": true,
-      "schemaSha256": "b43acfd9d5345a966759cb7a4473200777ce24cd9595064df73d9c24287a040e",
+      "schemaSha256": "0c6f90fc65e258feeee26c89b66398d9acba6902e66ecbd5740d7b56ecf60191",
       "lifecycle": "active",
       "replacement": null
     },
@@ -85,7 +85,7 @@
       "id": "event_backbone/event.line",
       "schema": "contracts/event.line.schema.json",
       "schemaExists": true,
-      "schemaSha256": "9e26e15ed569383edfd743b5f3fab81fd389f7fea4ea1b423c6be16b1423b891",
+      "schemaSha256": "22f390ded01f21ced1b6d35116596d4d0db36bfcfb69efdb4de0e8e295ee8e0f",
       "lifecycle": "active",
       "replacement": null
     },
@@ -109,7 +109,7 @@
       "id": "metrics/fleet.health",
       "schema": "contracts/fleet.health.schema.json",
       "schemaExists": true,
-      "schemaSha256": "e743c67d043a7729ad6ca8887d80be033c444a4e67b56dced03826a0bb0869d5",
+      "schemaSha256": "423fa95cb9b3f89971166d359d540b849805c666383c1f3e4bfcaa403780bb14",
       "lifecycle": "active",
       "replacement": null
     },
@@ -149,7 +149,7 @@
       "id": "knowledge/observatory",
       "schema": "contracts/knowledge.observatory.schema.json",
       "schemaExists": true,
-      "schemaSha256": "8da4fe8f04a010f957f9ba1769d444991eaf2ddb378c8f696cd6d026e7c9d153",
+      "schemaSha256": "b60fd752e7cfa5517cfc068f5cb2441fe6ecfb6e5ebe746dc401df1c3005219d",
       "lifecycle": "active",
       "replacement": null
     },
@@ -165,7 +165,7 @@
       "id": "os_context/state",
       "schema": "contracts/os.context.state.schema.json",
       "schemaExists": true,
-      "schemaSha256": "4eaf7bef863aeee699f6c2688da56c472945f8a9fdce7639852bc9f9127217e5",
+      "schemaSha256": "50072e78f6326f7ed0130c88ded96be59378c9ba8551d4ede5df97a6f52999d2",
       "lifecycle": "active",
       "replacement": null
     },
@@ -173,7 +173,7 @@
       "id": "os_context/text.embed",
       "schema": "contracts/os.context.text.embed.schema.json",
       "schemaExists": true,
-      "schemaSha256": "a38400d04ab1428905743c15a966acaa7aec8072e66cb9df8133e1b6a0889ff3",
+      "schemaSha256": "4499f3c2437889631b2942367f2a5b5e72b4a67fa83ea53a802a97879df9e75b",
       "lifecycle": "active",
       "replacement": null
     },
@@ -181,7 +181,7 @@
       "id": "policy/decision",
       "schema": "contracts/policy.decision.schema.json",
       "schemaExists": true,
-      "schemaSha256": "2de890b578285100f57839d6fe7f8dd43326fa9c1c7c84759dd5a3604c025bce",
+      "schemaSha256": "faed9093f64479cbd5f2c713bd8d3d7f8144c7e75541affa5d573f51fbf5581a",
       "lifecycle": "historical",
       "replacement": null
     },
@@ -260,109 +260,6 @@
   ],
   "claims": [
     {
-      "id": "event_backbone/aussen.event::producer::aussensensor",
-      "contract": "event_backbone/aussen.event",
-      "role": "producer",
-      "repository": "heimgewebe/aussensensor",
-      "commit": "a15c1a86a45b4180ce8ff49a16fae6987aeae565",
-      "status": "verified",
-      "mode": null,
-      "files": [
-        ".github/workflows/contracts-drift.yml",
-        ".github/workflows/fixtures-validate.yml",
-        ".github/workflows/validate-aussen-fixtures.yml",
-        ".github/workflows/validate-aussen.yml"
-      ],
-      "evidence": [
-        {
-          "path": ".github/workflows/contracts-drift.yml",
-          "line": 21,
-          "kind": "ci_reference"
-        },
-        {
-          "path": ".github/workflows/contracts-drift.yml",
-          "line": 25,
-          "kind": "ci_reference"
-        },
-        {
-          "path": ".github/workflows/contracts-drift.yml",
-          "line": 28,
-          "kind": "ci_reference"
-        },
-        {
-          "path": ".github/workflows/contracts-drift.yml",
-          "line": 34,
-          "kind": "ci_reference"
-        },
-        {
-          "path": ".github/workflows/contracts-drift.yml",
-          "line": 38,
-          "kind": "ci_reference"
-        },
-        {
-          "path": ".github/workflows/contracts-drift.yml",
-          "line": 42,
-          "kind": "ci_reference"
-        },
-        {
-          "path": ".github/workflows/fixtures-validate.yml",
-          "line": 31,
-          "kind": "ci_reference"
-        },
-        {
-          "path": ".github/workflows/validate-aussen-fixtures.yml",
-          "line": 64,
-          "kind": "ci_reference"
-        },
-        {
-          "path": ".github/workflows/validate-aussen.yml",
-          "line": 23,
-          "kind": "ci_reference"
-        }
-      ],
-      "note": "Current default-branch files reference the exact schema basename; this proves repository coupling, not live production.",
-      "doesNotEstablish": [
-        "runtime_use",
-        "runtime_health",
-        "semantic_correctness",
-        "future_compatibility"
-      ]
-    },
-    {
-      "id": "event_backbone/aussen.event::consumer::aussensensor",
-      "contract": "event_backbone/aussen.event",
-      "role": "consumer",
-      "repository": "heimgewebe/aussensensor",
-      "commit": "a15c1a86a45b4180ce8ff49a16fae6987aeae565",
-      "status": "verified",
-      "mode": "mirror",
-      "files": [
-        "contracts/aussen.event.schema.json"
-      ],
-      "evidence": [
-        {
-          "path": "contracts/aussen.event.schema.json",
-          "line": 3,
-          "kind": "documentation_or_data_reference"
-        }
-      ],
-      "note": "Current default-branch files reference the exact schema basename; this proves repository coupling, not runtime use.",
-      "doesNotEstablish": [
-        "runtime_use",
-        "runtime_health",
-        "semantic_correctness",
-        "future_compatibility"
-      ],
-      "mirrorChecks": [
-        {
-          "path": "contracts/aussen.event.schema.json",
-          "exists": true,
-          "sha256": "b43acfd9d5345a966759cb7a4473200777ce24cd9595064df73d9c24287a040e",
-          "matches_canonical": true
-        }
-      ]
-    },
-    {
       "id": "event_backbone/aussen.event::consumer::chronik",
       "contract": "event_backbone/aussen.event",
       "role": "consumer",
@@ -407,44 +304,6 @@
       ]
     },
     {
-      "id": "event_backbone/event.line::producer::hausKI",
-      "contract": "event_backbone/event.line",
-      "role": "producer",
-      "repository": "heimgewebe/hausKI",
-      "commit": "92f65b361881ebaa2cd1641bbe549c37949c06b8",
-      "status": "unverified",
-      "mode": null,
-      "files": [
-        ".github/workflows/validate-events.yml",
-        "docs/contracts/x-repo-events.md",
-        "scripts/emit_event_line.sh"
-      ],
-      "evidence": [
-        {
-          "path": ".github/workflows/validate-events.yml",
-          "line": 32,
-          "kind": "ci_reference"
-        },
-        {
-          "path": "docs/contracts/x-repo-events.md",
-          "line": 11,
-          "kind": "documentation_or_data_reference"
-        },
-        {
-          "path": "docs/contracts/x-repo-events.md",
-          "line": 122,
-          "kind": "documentation_or_data_reference"
-        }
-      ],
-      "note": "hausKI contains scripts/emit_event_line.sh that emits the event.line field shape; current fixed-string audit proves declared files exist and schema references, but does not establish producer execution, so status remains unverified.",
-      "doesNotEstablish": [
-        "runtime_use",
-        "runtime_health",
-        "semantic_correctness",
-        "future_compatibility"
-      ]
-    },
-    {
       "id": "event_backbone/event.line::consumer::chronik",
       "contract": "event_backbone/event.line",
       "role": "consumer",
@@ -469,32 +328,6 @@
         }
       ],
       "note": "Current default-branch files reference the exact schema basename; this proves repository coupling, not runtime use.",
-      "doesNotEstablish": [
-        "runtime_use",
-        "runtime_health",
-        "semantic_correctness",
-        "future_compatibility"
-      ]
-    },
-    {
-      "id": "event_backbone/heimgeist.insight::producer::heimgeist",
-      "contract": "event_backbone/heimgeist.insight",
-      "role": "producer",
-      "repository": "heimgewebe/heimgeist",
-      "commit": "8ccb7a3a5bed1c25d7d6e5afc6f22abb93ada4e1",
-      "status": "unverified",
-      "mode": null,
-      "files": [
-        "docs/specs/heimgeist-insight-v1.md"
-      ],
-      "evidence": [
-        {
-          "path": "docs/specs/heimgeist-insight-v1.md",
-          "line": 3,
-          "kind": "documentation_or_data_reference"
-        }
-      ],
-      "note": "The producer relationship remains a review target and is not established by current repository evidence.",
       "doesNotEstablish": [
         "runtime_use",
         "runtime_health",
@@ -994,24 +827,6 @@
       ]
     },
     {
-      "id": "knowledge/insights.daily.published.v1::consumer::hausKI",
-      "contract": "knowledge/insights.daily.published.v1",
-      "role": "consumer",
-      "repository": "heimgewebe/hausKI",
-      "commit": "92f65b361881ebaa2cd1641bbe549c37949c06b8",
-      "status": "unverified",
-      "mode": "reference-only",
-      "files": [],
-      "evidence": [],
-      "note": "No exact reference to the schema basename was found in the audited default-branch commit.",
-      "doesNotEstablish": [
-        "runtime_use",
-        "runtime_health",
-        "semantic_correctness",
-        "future_compatibility"
-      ]
-    },
-    {
       "id": "knowledge/observatory::producer::semantAH",
       "contract": "knowledge/observatory",
       "role": "producer",
@@ -1114,24 +929,6 @@
       ]
     },
     {
-      "id": "knowledge/observatory::consumer::hausKI",
-      "contract": "knowledge/observatory",
-      "role": "consumer",
-      "repository": "heimgewebe/hausKI",
-      "commit": "92f65b361881ebaa2cd1641bbe549c37949c06b8",
-      "status": "unverified",
-      "mode": "reference-only",
-      "files": [],
-      "evidence": [],
-      "note": "No exact reference to the schema basename was found in the audited default-branch commit.",
-      "doesNotEstablish": [
-        "runtime_use",
-        "runtime_health",
-        "semantic_correctness",
-        "future_compatibility"
-      ]
-    },
-    {
       "id": "knowledge/knowledge.observatory.published.v1::producer::semantAH",
       "contract": "knowledge/knowledge.observatory.published.v1",
       "role": "producer",
@@ -1168,53 +965,6 @@
       ]
     },
     {
-      "id": "knowledge/knowledge.observatory.published.v1::consumer::hausKI",
-      "contract": "knowledge/knowledge.observatory.published.v1",
-      "role": "consumer",
-      "repository": "heimgewebe/hausKI",
-      "commit": "92f65b361881ebaa2cd1641bbe549c37949c06b8",
-      "status": "verified",
-      "mode": "reference-only",
-      "files": [
-        "crates/core/src/events.rs",
-        "crates/core/src/events_tests.rs"
-      ],
-      "evidence": [
-        {
-          "path": "crates/core/src/events.rs",
-          "line": 297,
-          "kind": "documentation_or_data_reference"
-        },
-        {
-          "path": "crates/core/src/events_tests.rs",
-          "line": 312,
-          "kind": "documentation_or_data_reference"
-        },
-        {
-          "path": "crates/core/src/events_tests.rs",
-          "line": 351,
-          "kind": "documentation_or_data_reference"
-        },
-        {
-          "path": "crates/core/src/events_tests.rs",
-          "line": 388,
-          "kind": "documentation_or_data_reference"
-        },
-        {
-          "path": "crates/core/src/events_tests.rs",
-          "line": 580,
-          "kind": "documentation_or_data_reference"
-        }
-      ],
-      "note": "Current default-branch files reference the exact schema basename; this proves repository coupling, not runtime use.",
-      "doesNotEstablish": [
-        "runtime_use",
-        "runtime_health",
-        "semantic_correctness",
-        "future_compatibility"
-      ]
-    },
-    {
       "id": "knowledge/knowledge.observatory.published.v1::consumer::plexer",
       "contract": "knowledge/knowledge.observatory.published.v1",
       "role": "consumer",
@@ -1225,54 +975,6 @@
       "files": [],
       "evidence": [],
       "note": "No exact reference to the schema basename was found in the audited default-branch commit.",
-      "doesNotEstablish": [
-        "runtime_use",
-        "runtime_health",
-        "semantic_correctness",
-        "future_compatibility"
-      ]
-    },
-    {
-      "id": "os_context/state::consumer::mitschreiber",
-      "contract": "os_context/state",
-      "role": "consumer",
-      "repository": "heimgewebe/mitschreiber",
-      "commit": "3ef97ffc31c0112a0de030a5bd119a819f9ad3a7",
-      "status": "verified",
-      "mode": "reference-only",
-      "files": [
-        ".github/workflows/validate.yml",
-        "docs/ci.md",
-        "docs/contracts.md"
-      ],
-      "evidence": [
-        {
-          "path": ".github/workflows/validate.yml",
-          "line": 38,
-          "kind": "ci_reference"
-        },
-        {
-          "path": "docs/ci.md",
-          "line": 29,
-          "kind": "documentation_or_data_reference"
-        },
-        {
-          "path": "docs/ci.md",
-          "line": 48,
-          "kind": "documentation_or_data_reference"
-        },
-        {
-          "path": "docs/contracts.md",
-          "line": 7,
-          "kind": "documentation_or_data_reference"
-        },
-        {
-          "path": "docs/contracts.md",
-          "line": 28,
-          "kind": "documentation_or_data_reference"
-        }
-      ],
-      "note": "Current default-branch files reference the exact schema basename; this proves repository coupling, not runtime use.",
       "doesNotEstablish": [
         "runtime_use",
         "runtime_health",

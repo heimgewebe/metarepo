@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://raw.githubusercontent.com/heimgewebe/metarepo/contracts-v1/contracts/os.context.text.embed.schema.json",
   "title": "os.context.text.embed",
-  "description": "Persistenter, privacy-sicherer Output aus Mitschreiber: Embeddings + Keyphrases, kein Rohtext.",
+  "description": "Persistenter, privacy-sicherer OS-Kontext-Output: Embeddings + Keyphrases, kein Rohtext.",
   "type": "object",
   "additionalProperties": false,
   "properties": {
@@ -86,7 +86,7 @@
     "source": {
       "type": "string",
       "maxLength": 64,
-      "description": "Sensorquelle (default: mitschreiber)."
+      "description": "Producer-defined OS context source identifier."
     },
     "tags": {
       "type": "array",
@@ -112,7 +112,7 @@
           "actions": ["drop_and_shred"]
         }
       },
-      "source": "mitschreiber",
+      "source": "os-context-source",
       "tags": ["workspace:dev", "project:project-x"]
     }
   ]

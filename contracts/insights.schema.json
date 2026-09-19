@@ -3,7 +3,7 @@
   "$id": "https://schemas.heimgewebe.org/contracts/insights.schema.json",
   "title": "Heimgewebe Review Insight",
   "x-producers": ["semantAH"],
-  "x-consumers": ["hausKI", "chronik"],
+  "x-consumers": ["chronik"],
   "x-related-adrs": ["docs/adrs/0022-erkenntnis-vorlauf-negationsspur.md"],
   "$comment": "ADR-0022: Structural support for negation. Semantics defined in consumer repos.",
   "type": "object",
@@ -27,7 +27,7 @@
       "description": "insight.negation is a meta-insight on an existing insight. Interpretation is out of contract scope."
     },
     "repo":          { "type":"string", "minLength": 1 },
-    "source":        { "type":"string", "enum": ["hauski","ci","manual"] },
+    "source":        { "type":"string", "enum": ["hauski","ci","manual"], "description":"hauski is retained only as a legacy serialized source value; it does not establish a current repository or service." },
     "file":          { "type":"string" },
     "score":         { "type":"integer", "minimum": 0, "maximum": 100 },
     "verdict":       { "type":"string" },

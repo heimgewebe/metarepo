@@ -29,12 +29,12 @@ def _inputs():
 
 def test_current_policy_preset_baseline_and_projection_are_valid() -> None:
     projection, summary = renovate_policy.validate_all()
-    assert summary == {"active_fleet_count": 17, "explicit_rollout_count": 5}
+    assert summary == {"active_fleet_count": 13, "explicit_rollout_count": 4}
     assert projection["runtime_mode"] == "self-hosted-heim-pc"
     assert projection["credential_source"] == "gh-auth-token-transient"
     assert projection["expected_hosted_app_repositories"] == []
     assert projection["prepared_repositories"] == []
-    assert len(projection["expected_renovate_repositories"]) == 17
+    assert len(projection["expected_renovate_repositories"]) == 13
     assert set(projection["expected_renovate_repositories"]) == {
         "heimgewebe/commonthing",
         "heimgewebe/metarepo",
@@ -42,17 +42,13 @@ def test_current_policy_preset_baseline_and_projection_are_valid() -> None:
         "heimgewebe/contracts-mirror",
         "heimgewebe/audio",
         "heimgewebe/semantAH",
-        "heimgewebe/aussensensor",
         "heimgewebe/chronik",
         "heimgewebe/repoground",
         "heimgewebe/konvergenzregelkreis",
-        "heimgewebe/mitschreiber",
         "heimgewebe/sichter",
         "heimgewebe/leitstand",
-        "heimgewebe/heimgeist",
         "heimgewebe/plexer",
         "heimgewebe/heim-pc",
-        "heimgewebe/vault-gewebe",
     }
     committed = json.loads(
         (ROOT / "automation/renovate/expected-scope.v1.json").read_text(encoding="utf-8")
@@ -76,8 +72,8 @@ def test_repository_cannot_appear_in_multiple_waves() -> None:
     mutated = copy.deepcopy(policy)
     mutated["rollout"]["waves"][0]["repositories"].append(
         {
-            "name": "mitschreiber",
-            "dependabot_version_updates": "none",
+            "name": "audio",
+            "dependabot_version_updates": "disabled",
             "renovate_version_updates": "enabled",
         }
     )

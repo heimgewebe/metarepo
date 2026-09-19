@@ -21,7 +21,7 @@ interfaces:
     - "event.line (validated)"
   produces:
     - "event queries/streams"
-    - "snapshots for semantAH/hausKI"
+    - "snapshots for current semantic consumers"
 
 contracts:
   schemas:
@@ -48,7 +48,7 @@ architecture:
 boundaries:
   not_responsible_for:
     - "Generating meaning/insights (semantAH)."
-    - "Executing commands (wgx/hausKI)."
+    - "Executing commands (wgx)."
   dangerous_assumptions:
     - "Treat event store as mutable."
     - "Accept events without contract validation."
