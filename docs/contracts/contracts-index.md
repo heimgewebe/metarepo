@@ -27,14 +27,14 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
 ### 1.1 Event-Backbone
 
 - `event.line.schema.json`
-  - Zweck: generischer Event-Stream-Contract (Basis für chronik, Leitstand, HausKI-Logs, usw.).
+  - Zweck: generischer Event-Stream-Contract für aktuelle und historische Event-Producer; aktuelle Claims stehen in `contracts/consumers.yaml`.
 - `aussen.event.schema.json`
   - Zweck: standardisierte Außen-Events, bevor sie in die interne Event-Landschaft aufgenommen werden.
 - `audio.events.schema.json`
   - Status: historischer, derzeit producer- und consumerloser Payload-Vertrag aus `hausKI-audio`.
   - Grenze: Er ist nicht an das kanonische Repository `audio` gebunden und belegt keine aktuelle Eventzustellung.
 - `intent.event.schema.json`
-  - Zweck: Intent-Events aus Audio/Text für chronik/hausKI (Intent-Erkennung mit Confidence).
+  - Zweck: Intent-Events aus Audio/Text für aktuelle Contract-Consumer (Intent-Erkennung mit Confidence).
 
 ### 1.1a Event Routing & Delivery
 
@@ -53,7 +53,7 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
 - `contracts/chronik/event.batch.v1.schema.json`
   - Zweck: Batch-Antwort für /v1/events (Pull-Modell).
   - Produzenten: chronik
-  - Konsumenten: heimgeist, heimlern
+  - Historische Konsumenten: heimgeist, heimlern; keine aktuelle Repository-Teilnahme daraus ableiten.
 - `contracts/heimlern.ingest.state.schema.json`
   - Zweck: Persistenter Fortschrittszustand (Cursor, last_ok) für den Ingest-Prozess (CLI).
   - Produzenten: heimlern (CLI)
@@ -84,48 +84,36 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
   - Zweck: Notification-Event, das Verfügbarkeit eines neuen Knowledge-Observatory-Snapshots signalisiert.
   - Typ: Notification.
   - Produzent: semantAH.
-  - Konsumenten: plexer, leitstand, hausKI.
+  - Konsumenten: plexer, leitstand.
 - `knowledge.graph.schema.json`
   - Zweck: generisches Wissensgraph-Schema (Knoten, Kanten, Beziehungen).
 - `knowledge.observatory.schema.json`
   - Zweck: Snapshot des semantischen Observatoriums mit aktiven Themenräumen, Quellen, Signalen, Leitfragen, blinden Flecken und verworfenen Hypothesen.
   - Produzent: semantAH
-  - Konsumenten: leitstand, hausKI, heimlern
+  - Aktueller Consumer: leitstand; gelöschte frühere Consumer bleiben nur in Evidence/History nachvollziehbar.
   - Typ: Beobachtung
 - `contracts/events/heimgeist.insight.v1.schema.json`
-  - Zweck: Systemreflexion und Meta-Analysen durch Heimgeist (z. B. Drifts, Risiken).
-  - Produzent: heimgeist
-  - Konsumenten: chronik, leitstand
+  - Zweck: Retained Contract-ID für historische Heimgeist-Insights und kompatible Dekodierung (z. B. Drifts, Risiken).
+  - Aktuelle Governance: siehe `heimgeist.insight.v1.meta.json`; das gelöschte Repository `heimgeist` ist kein aktueller Producer.
   - Governance: siehe `heimgeist.insight.v1.meta.json` (getrennt für strict-mode Compliance)
   - Regel: Versionierung erfolgt über Dateiname (v1) und `schema_version`-Feld. Breaking Changes erfordern v2.
 - `contracts/events/heimgeist.self_state.snapshot.v1.schema.json`
-  - Zweck: Event-Envelope für Self-State Snapshots (Stream).
-  - Produzent: heimgeist
-  - Konsumenten: chronik
+  - Zweck: historische Event-Envelope für Heimgeist-Self-State-Snapshots; kein aktueller Heimgeist-Repository-Producer.
 - `contracts/heimgeist/self_state.schema.json`
-  - Zweck: Explizites Self-Model für Heimgeist (Confidence, Fatigue, Risk-Tension, Autonomy).
-  - Produzent: heimgeist
-  - Konsumenten: chronik, leitstand
-  - Typ: Meta-Kognition
+  - Zweck: historisches Self-Model der früheren Heimgeist-Komponente (Confidence, Fatigue, Risk-Tension, Autonomy).
+  - Typ: historische Meta-Kognition; keine aktuelle Repository-Teilnahme.
 - `contracts/heimgeist/status.v1.schema.json`
-  - Zweck: Status-Meldung des Heimgeist-Systems inkl. Self-State.
-  - Produzent: heimgeist
-  - Konsumenten: leitstand
+  - Zweck: historische Status-Meldung des früheren Heimgeist-Systems inkl. Self-State.
 - `contracts/heimgeist/self_state.bundle.v1.schema.json`
-  - Zweck: Bundle-Artifact für den Leitstand (aktueller Status + Historie).
-  - Produzent: heimgeist
-  - Konsumenten: leitstand
+  - Zweck: historisches Bundle-Artifact der früheren Heimgeist-Self-State-Fläche.
 - `contracts/hauski/system.signals.v1.schema.json`
-  - Zweck: System-Ressourcen-Signale (CPU, Memory, GPU) für Meta-Kognition.
-  - Produzent: hausKI
-  - Konsumenten: heimgeist
+  - Zweck: historischer HausKI-Namensraum für System-Ressourcen-Signale; keine aktuelle HausKI-/Heimgeist-Repository-Bindung.
 
 ### 1.4 Policy-Kreislauf
 
 - `decision.outcome.v1.schema.json`
   - Zweck: Kanonisches Payload-Schema für Entscheidungsergebnisse mit strikter Validierung der Konsistenz zwischen Outcome und Success-Flag.
-  - Produzenten: hausKI, chronik
-  - Konsumenten: heimlern
+  - Aktueller Producer laut Schema-Metadaten: chronik; gelöschte frühere Teilnehmer bleiben nur historisch belegt.
 - `decision.preimage.schema.json`
   - Zweck: expliziter Erkenntnis-Vorlauf vor einer wirksamen Entscheidung – dient Auditierbarkeit, Lernfähigkeit und Sichtbarkeit von Unsicherheit/Alternativen.
 - `policy.decision.schema.json`
@@ -136,8 +124,7 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
   - Zweck: momentane Policy-Konfiguration im zeitlichen Verlauf (Versionierung des Regelwerks).
 - `policy.weight_adjustment.v1.schema.json`
   - Zweck: Strukturierte Policy-Gewichtsanpassungen mit Delta-Objekten und bidirektionalen Evidence/Rate-Regeln.
-  - Produzenten: heimlern
-  - Konsumenten: hausKI, chronik
+  - Historische Policy-Bindungen zu heimlern/hausKI bleiben als Provenienz; aktuelle Teilnehmer werden nicht aus diesen Namen abgeleitet.
 
 ### 1.5 OS-Kontext & Embeddings
 
@@ -187,7 +174,7 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
 ### 1.8 Review-Policies
 
 - `review.policy.yml`
-  - Zweck: Richtlinien für Reviews (z. B. Sichter, heimgeist), dient als semantische Grundlage für automatisierte Bewertung.
+  - Zweck: Richtlinien für Reviews; historische Rollenbezeichnungen können in alten Regeln vorkommen, aktuelle Reviewer werden daraus nicht abgeleitet.
 
 ### 1.9 Planung & Szenarien
 
@@ -239,9 +226,9 @@ Zweck:
 
 ## 3. Repo-spezifische Contracts
 
-### 3.1 hausKI
+### 3.1 hausKI (historisch)
 
-Repository: **heimgewebe/hausKI**
+Historische Provenienz: `heimgewebe/hausKI` wurde am 2026-09-18 physisch gelöscht. Die folgenden Pfade beschreiben frühere Repo-spezifische Contracts und sind keine aktuellen Repository-Entrypoints.
 
 - `docs/contracts/events.schema.json`
   - Zweck: HausKI-Event-Contract (Logging, Bus, Audits).
@@ -249,9 +236,9 @@ Repository: **heimgewebe/hausKI**
 - `docs/contracts/tools/search_codebase.schema.json`
   - Zweck: Tool-Eingabe-Contracts für spezifische HausKI-Tools.
 
-### 3.2 aussensensor
+### 3.2 aussensensor (historisch)
 
-Repository: **heimgewebe/aussensensor**
+Historische Provenienz: `heimgewebe/aussensensor` wurde am 2026-09-18 physisch gelöscht. Die frühere lokale Contract-Kopie ist kein aktueller Sync- oder Producer-Pfad.
 
 - `contracts/aussen.event.schema.json`
   - Zweck: lokale Variante des Außen-Event-Contracts für Sensor-Ingest, bevor die Events an chronik / heimlern weitergereicht werden.
@@ -269,9 +256,9 @@ Repository: **heimgewebe/semantAH**
 - `contracts/semantics/examples/*`
   - Zweck: valid/invalid Beispiele, direkt für Tests und für LLM-Kontext verwendbar.
 
-### 3.4 heimlern
+### 3.4 heimlern (historisch)
 
-Repository: **heimgewebe/heimlern**
+Historische Provenienz: `heimgewebe/heimlern` wurde am 2026-09-18 physisch gelöscht. Die folgenden Pfade dokumentieren frühere Policy-/Ingest-Contracts.
 
 - `contracts/aussen_event.schema.json`
 - `contracts/policy.decision.schema.json`
@@ -304,9 +291,9 @@ Zweck:
 - Datenmodell für Gesprächsräume, Nachrichten, Rollen und semantische Knoten,
 - Grundgerüst für alles, was „Gespräch als Datenstruktur“ versteht.
 
-### 3.6 mitschreiber
+### 3.6 mitschreiber (historisch)
 
-Repository: **heimgewebe/mitschreiber**
+Historische Provenienz: `heimgewebe/mitschreiber` wurde am 2026-09-18 physisch gelöscht. Der Contract `os.context.text.embed` bleibt im Metarepo ohne aktuelle Mitschreiber-Repository-Bindung.
 
 - `contracts/os.context.text.embed.schema.json`
 

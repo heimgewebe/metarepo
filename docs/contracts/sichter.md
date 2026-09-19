@@ -50,4 +50,4 @@ Sichter ist der präzise Werkzeugkasten für automatisierte Qualitätsreflexion 
 2. Immer Markdown-Antwort für Rückkopplung an PR.
 3. Alle Analysen deterministisch, reproducible.
 4. Nutzung von semantAH, wenn verfügbar.
-5. Sichter ist ein Tool, keine Meta-Instanz – das ist Heimgeist.
+5. Sichter ist ein Tool, keine Meta-Instanz. Der frühere Heimgeist war historisch eine solche Meta-Instanz; sein Repository ist gelöscht und daraus folgt keine aktuelle Heimgeist-Autorität.

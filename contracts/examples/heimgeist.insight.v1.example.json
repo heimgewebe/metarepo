@@ -10,11 +10,13 @@
     "insight_type": "drift",
     "summary": "Mögliche Diskrepanz zwischen Zielbild und Implementation in Repository 'sichter'",
     "details": "Die Analyse der letzten 50 Events zeigt...",
-    "context_refs": ["https://github.com/heimgewebe/sichter/pull/42"],
+    "context_refs": [
+      "https://github.com/heimgewebe/sichter/pull/42"
+    ],
     "confidence": 0.85,
     "origin": {
-      "role": "heimgeist",
-      "agent_id": "hg-core-v1"
+      "role": "archivist",
+      "agent_id": "historical-import-v1"
     }
   }
 }

@@ -27,7 +27,7 @@
       "description": "insight.negation is a meta-insight on an existing insight. Interpretation is out of contract scope."
     },
     "repo":          { "type":"string", "minLength": 1 },
-    "source":        { "type":"string", "enum": ["hauski","ci","manual"] },
+    "source":        { "type":"string", "enum": ["hauski","ci","manual"], "description":"hauski is retained only as a legacy serialized source value; it does not establish a current repository or service." },
     "file":          { "type":"string" },
     "score":         { "type":"integer", "minimum": 0, "maximum": 100 },
     "verdict":       { "type":"string" },

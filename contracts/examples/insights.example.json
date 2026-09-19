@@ -2,7 +2,7 @@
   "id": "neg-001",
   "type": "insight.negation",
   "repo": "heimgewebe/core",
-  "source": "hauski",
+  "source": "manual",
   "file": "src/logic.py",
   "score": 85,
   "verdict": "Structural contradiction with thesis.",
