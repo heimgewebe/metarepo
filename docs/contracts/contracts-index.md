@@ -55,9 +55,9 @@ Sie liegen (sofern nicht anders angegeben) in `contracts/*.schema.json` im **met
   - Produzenten: chronik
   - Historische Konsumenten: heimgeist, heimlern; keine aktuelle Repository-Teilnahme daraus ableiten.
 - `contracts/heimlern.ingest.state.schema.json`
-  - Zweck: Persistenter Fortschrittszustand (Cursor, last_ok) für den Ingest-Prozess (CLI).
-  - Produzenten: heimlern (CLI)
-  - Konsumenten: leitstand, heimgeist
+  - Status: historischer Contract-Namensraum der früheren Heimlern-Ingest-Fläche.
+  - Zweck: Persistenter Fortschrittszustand (Cursor, last_ok) für historische/kompatible Daten.
+  - Historische Teilnehmer: heimlern (CLI), leitstand, heimgeist; daraus folgt keine aktuelle Repository-, Producer- oder Consumer-Bindung.
 
 ### 1.2 Fleet & Metriken
 
@@ -205,11 +205,13 @@ Repository: **heimgewebe/contracts-mirror**
 ### 2.1 Protobuf-APIs
 
 - `heimgewebe/aussen/v1/event.proto`
+  - Status: retained API-Namensraum im überlebenden Repository `contracts-mirror`; der Name `aussen` begründet kein aktuelles `aussensensor`-Repository oder einen aktuellen Producer.
   - Contract: `EventEnvelope`
   - Zweck: API-Contract für Außen-Events (id, event_type, occurred_at, payload, context).
 - `heimgewebe/heimlern/v1/decision.proto`
+  - Status: historischer/kompatibler API-Namensraum im überlebenden Repository `contracts-mirror`; `heimgewebe/heimlern` wurde physisch gelöscht und ist kein aktueller Service oder Producer.
   - Contract: `Decision`
-  - Zweck: Entscheidungen aus Sicht von heimlern (decision_id, learner_id, Optionen, decided_at, metadata).
+  - Zweck: historische Entscheidungsdaten im früheren Heimlern-Namensraum (decision_id, learner_id, Optionen, decided_at, metadata).
 
 ### 2.2 JSON-Schema-Mirror
 
@@ -265,9 +267,8 @@ Historische Provenienz: `heimgewebe/heimlern` wurde am 2026-09-18 physisch gelö
 - `contracts/policy_feedback.schema.json`
 - `contracts/policy_snapshot.schema.json`
 - `heimlern.ingest.state.schema.json`
-  - Zweck: Persistenter Fortschrittszustand (Cursor, last_ok) für den Ingest-Prozess (CLI).
-  - Produzenten: heimlern (CLI)
-  - Konsumenten: leitstand, heimgeist
+  - Status: historisch; der frühere Produzent `heimlern` und der frühere Consumer `heimgeist` sind physisch gelöscht.
+  - Zweck: Persistenter Fortschrittszustand (Cursor, last_ok) für historische/kompatible Daten; keine aktuelle Route.
 
 Zweck:
 

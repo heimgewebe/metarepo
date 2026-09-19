@@ -191,3 +191,10 @@ def test_contract_examples_do_not_use_deleted_repositories_as_current_roles() ->
     assert insights["source"].casefold() != "hauski"
     assert insight_event["kind"] == "heimgeist.insight"
     assert insight_event["data"]["origin"]["role"] != "heimgeist"
+
+def test_contract_index_does_not_reactivate_deleted_heimlern_or_aussensensor_namespaces() -> None:
+    index = (ROOT / "docs/contracts/contracts-index.md").read_text(encoding="utf-8")
+    assert "Produzenten: heimlern (CLI)" not in index
+    assert "Konsumenten: leitstand, heimgeist" not in index
+    assert "der Name `aussen` begründet kein aktuelles `aussensensor`-Repository" in index
+    assert "`heimgewebe/heimlern` wurde physisch gelöscht und ist kein aktueller Service oder Producer" in index
