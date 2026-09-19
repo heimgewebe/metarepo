@@ -1,69 +1,44 @@
 ---
 ai_context_version: 1.1
-
 project:
   name: aussensensor
-  summary: Controlled ingest from the outside world; emits aussen.event.* into chronik.
-  role: external_ingest
+  summary: Archived historical reference for the deleted former controlled external-ingest
+    component; not a current Fleet or runtime component.
+  role: archived_reference
   primary_language: mixed
   visibility: internal
-
 heimgewebe:
-  axis: [Events]
+  axis:
+  - Historical External Ingest Evidence
   fleet:
-    enabled: true
+    enabled: false
   wgx:
-    profile_expected: true
-    guard_smoke_expected: true
-
+    profile_expected: false
+    guard_smoke_expected: false
 interfaces:
   consumes:
-    - "external sources (network/files) — ONLY via aussensensor"
+  - historical repository evidence only
   produces:
-    - "aussen.event.*"
-    - "event.line (via chronik append)"
-
+  - none (deleted repository)
 contracts:
   schemas:
-    - path: "contracts/*.schema.json"
-      note: "Must emit contract-valid events; do not drift."
-
+  - path: contracts/*.schema.json
+    note: Historical schema references do not establish a current producer or consumer.
 dependencies:
-  internal:
-    - name: chronik
-      relationship: writes
-      interface:
-        - event_line_append
+  internal: []
   external: []
-  # NOTE: 'external: []' means "not verified from metarepo context".
-  # Prefer 'unknown' over false precision; verify in repo before asserting tech stack.
-
-architecture:
-  entrypoints:
-    - cmd/*
-  key_paths:
-    - path: docs/
-      purpose: "Ingest rules & safety constraints"
-
 boundaries:
   not_responsible_for:
-    - "Interpreting/embedding events (semantAH does that)."
-    - "Direct agent orchestration (hausKI does that)."
+  - Current runtime execution, Fleet rollout, deployment, or producer/consumer truth.
   dangerous_assumptions:
-    - "Assume you may scrape/ingest anything by default."
-    - "Bypass chronik append-only guarantees."
-
+  - Treat aussensensor as a current repository, service, Fleet member, producer, or
+    consumer.
 conventions:
-  branching: "main, feature/*"
-  commit_prefix: "aussensensor"
-  ci_platform: github_actions
-
-documentation:
-  runbook: docs/runbook.md
-
+  branching: archived reference; repository physically deleted
+  commit_prefix: aussensensor
+  ci_platform: none
 ai_guidance:
   do:
-    - validate JSON before sending to avoid noisy ingest failures
-    - implement retries with exponential backoff
+  - Use this file only as historical context and verify current successors elsewhere.
   dont:
-    - send partial or multiline JSONL entries
+  - Create current work, routing, deployment, or contract claims for the deleted repository.

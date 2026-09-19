@@ -19,8 +19,8 @@ heimgewebe:
 interfaces:
   consumes:
     - "event.line (chronik)"
-    - "os.context.* (mitschreiber)"
-    - "vault notes (vault-gewebe)"
+    - "os.context.* (contract-bound source)"
+    - "configured notes/documents"
   produces:
     - "insights.*"
     - "graph nodes/edges"
@@ -36,17 +36,14 @@ dependencies:
     - name: chronik
       relationship: uses
       interface: [event_query]
-    - name: vault-gewebe
-      relationship: uses
-      interface: [notes]
   external: []
   # NOTE: 'external: []' means "not verified from metarepo context".
   # Prefer 'unknown' over false precision; verify in repo before asserting tech stack.
 
 boundaries:
   not_responsible_for:
-    - "Command execution (wgx/hausKI)."
-    - "Outside-world ingest (aussensensor)."
+    - "Command execution (wgx)."
+    - "Outside-world ingest; consume only contract-bound inputs from configured surviving sources."
   dangerous_assumptions:
     - "Treat embeddings as truth; keep provenance and uncertainty."
 

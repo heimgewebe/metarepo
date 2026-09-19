@@ -59,7 +59,7 @@ def _contract_evidence(evidence: dict[str, object], contract_id: str) -> dict[st
 def test_current_registry_is_valid_and_evidence_bound() -> None:
     summary = validate_registry(ROOT)
 
-    assert summary == {"contracts": 23, "claims": 58, "repositories": 11}
+    assert summary == {"contracts": 23, "claims": 50, "repositories": 11}
 
 
 def test_active_contract_with_missing_schema_fails_closed() -> None:
@@ -105,19 +105,29 @@ def test_verified_mirror_with_wrong_hash_fails_closed() -> None:
         consumer = next(
             item
             for item in registry["event_backbone"]["aussen.event"]["consumers"]
-            if item["repo"] == "aussensensor"
+            if item["repo"] == "chronik"
         )
+        consumer["mode"] = "mirror"
         consumer["status"] = "verified"
+        consumer["files"] = ["contracts/aussen.event.schema.json"]
         _write_registry(root, registry)
 
         evidence = _load_evidence(root)
         claim = _claim(
             evidence,
-            "event_backbone/aussen.event::consumer::aussensensor",
+            "event_backbone/aussen.event::consumer::chronik",
         )
+        claim["mode"] = "mirror"
         claim["status"] = "verified"
-        claim["mirrorChecks"][0]["matches_canonical"] = True
-        claim["mirrorChecks"][0]["sha256"] = "0" * 64
+        claim["files"] = ["contracts/aussen.event.schema.json"]
+        claim["mirrorChecks"] = [
+            {
+                "path": "contracts/aussen.event.schema.json",
+                "exists": True,
+                "sha256": "0" * 64,
+                "matches_canonical": True,
+            }
+        ]
         _write_evidence(root, evidence)
 
         with pytest.raises(RegistryError, match="differs from canonical schema"):
@@ -192,7 +202,7 @@ def test_aussen_event_schema_producers_match_audited_registry() -> None:
     registry = _load_registry(ROOT)
     producers = [item["repo"] for item in registry["event_backbone"]["aussen.event"]["producers"]]
 
-    assert schema["x-producers"] == producers == ["aussensensor"]
+    assert schema["x-producers"] == producers == []
 
 
 
@@ -202,5 +212,49 @@ def test_event_line_schema_producers_match_audited_registry() -> None:
     producer_claims = registry["event_backbone"]["event.line"]["producers"]
     producers = [item["repo"] for item in producer_claims]
 
-    assert schema["x-producers"] == producers == ["hausKI"]
-    assert producer_claims[0]["status"] == "unverified"
+    assert schema["x-producers"] == producers == []
+    assert producer_claims == []
+
+def _deleted_repository_names() -> set[str]:
+    evidence = json.loads(
+        (ROOT / "reports/fleet/physical-deletion-evidence.v1.json").read_text(encoding="utf-8")
+    )
+    return {item["name"] for item in evidence["deleted_repositories"]}
+
+
+def test_active_registry_has_no_claims_for_deleted_repositories() -> None:
+    registry = _load_registry(ROOT)
+    deleted = _deleted_repository_names()
+    offenders = []
+    for category, entries in registry.items():
+        for contract_name, contract in entries.items():
+            if contract["lifecycle"] != "active":
+                continue
+            for key in ("producers", "consumers"):
+                for claim in contract.get(key, []):
+                    if claim["repo"] in deleted:
+                        offenders.append((f"{category}/{contract_name}", key, claim["repo"]))
+    assert offenders == []
+
+
+def test_shared_schema_party_metadata_excludes_deleted_repositories() -> None:
+    deleted = _deleted_repository_names()
+    offenders = []
+    for path in sorted((ROOT / "contracts").rglob("*.json")):
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        if not isinstance(payload, dict):
+            continue
+        for field in ("x-producers", "x-consumers"):
+            values = payload.get(field)
+            if isinstance(values, list):
+                hits = sorted(deleted.intersection(value for value in values if isinstance(value, str)))
+                if hits:
+                    offenders.append((str(path.relative_to(ROOT)), field, hits))
+    assert offenders == []
+
+
+def test_contract_sync_does_not_target_deleted_repositories() -> None:
+    deleted = _deleted_repository_names()
+    script = (ROOT / "scripts/contracts-sync.sh").read_text(encoding="utf-8")
+    for name in deleted:
+        assert f"  {name}:" not in script

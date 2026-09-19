@@ -123,7 +123,7 @@ def build_graph():
 if __name__ == "__main__":
     graph = build_graph()
     init: AssistantState = {
-        "messages": [{"role": "user", "content": "Bitte Code in hausKI nach Error-Handling durchsuchen."}],
+        "messages": [{"role": "user", "content": "Bitte Code im Zielservice nach Error-Handling durchsuchen."}],
         "current_task": "code suche",
     }
     out = graph.invoke(init)

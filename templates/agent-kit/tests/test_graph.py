@@ -20,7 +20,7 @@ def test_supervisor_registered_node():
 def test_route_and_invoke_code_path():
     graph = build_graph()
     init = {
-        "messages": [{"role": "user", "content": "Finde Error-Handling in hausKI"}],
+        "messages": [{"role": "user", "content": "Finde Error-Handling im Zielservice"}],
         "current_task": "code suche",
     }
     out = graph.invoke(init)
@@ -30,7 +30,7 @@ def test_route_and_invoke_code_path():
 def test_route_and_invoke_knowledge_path():
     graph = build_graph()
     init = {
-        "messages": [{"role": "user", "content": "Was steht im Wissensgraph zu hausKI?"}],
+        "messages": [{"role": "user", "content": "Was steht im Wissensgraph zum Zielservice?"}],
         "current_task": "wissen abfrage",
     }
     out = graph.invoke(init)

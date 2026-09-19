@@ -90,6 +90,8 @@ def test_rollout_routes_current_work_to_audio_only() -> None:
     rollout = (ROOT / ".github/ISSUE_TEMPLATE/rollout.md").read_text(encoding="utf-8")
     assert "- [ ] **audio**" in rollout
     assert "- [ ] **hausKI-audio**" not in rollout
+    assert "- [ ] **aussensensor" not in rollout
+    assert "- [ ] **hausKI**" not in rollout
     assert "historischer Vertrag" in rollout
 
 

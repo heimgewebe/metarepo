@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "kind": "physical_repository_deletion_evidence",
+  "organization": "heimgewebe",
+  "observed_on": "2026-09-18",
+  "authorization": "owner-authorized repository reduction",
+  "repository_count_before": 41,
+  "repository_count_after": 29,
+  "bureau_evidence": {
+    "issue": "heimgewebe/bureau#1816",
+    "comment": "https://github.com/heimgewebe/bureau/issues/1816#issuecomment-5732296375"
+  },
+  "deleted_repositories": [
+    {
+      "name": "vault-gewebe",
+      "default_branch": "main",
+      "last_known_head": "80073e5339b982523e034ddd6c1b7a3607d34c45"
+    },
+    {
+      "name": "vault-privat",
+      "default_branch": "main",
+      "last_known_head": "48ca782d7854093f24ea3547f74f12863e9d5af3"
+    },
+    {
+      "name": "aussensensor",
+      "default_branch": "main",
+      "last_known_head": "6d55c1dc7c803054693e688ebe289bca7f384338"
+    },
+    {
+      "name": "mitschreiber",
+      "default_branch": "main",
+      "last_known_head": "9d9309bae42401c0eb145066226f6f13b7ee38ee"
+    },
+    {
+      "name": "hausKI",
+      "default_branch": "main",
+      "last_known_head": "a265afce24b6f7106c524da71ddd87ab51ba2e7c"
+    },
+    {
+      "name": "heimlern",
+      "default_branch": "main",
+      "last_known_head": "a0a0d97e3a3dedec80ae90dfe0c094b57bcaac3a"
+    },
+    {
+      "name": "leitwerk",
+      "default_branch": "main",
+      "last_known_head": "1449145af543b78c0d3813942f1d6d95ddb33c4a"
+    },
+    {
+      "name": "hausKI-audio",
+      "default_branch": "main",
+      "last_known_head": "4357ee8da1a6ff38b52763d427d1fca2d52aa132"
+    },
+    {
+      "name": "heimserver",
+      "default_branch": "main",
+      "last_known_head": "4c4099e234a277b5ea48a28939f0ec4d08711f2a"
+    },
+    {
+      "name": "heimgeist",
+      "default_branch": "main",
+      "last_known_head": "8ccb7a3a5bed1c25d7d6e5afc6f22abb93ada4e1"
+    },
+    {
+      "name": "agent-control-surface",
+      "default_branch": "main",
+      "last_known_head": "4ea3b41ac5e3caef6fad78f442e039abbfecd7d6"
+    },
+    {
+      "name": "demo-repository",
+      "default_branch": "main",
+      "last_known_head": "2e2a1d4943e1006414c79f748ce0566ec66c193c"
+    }
+  ],
+  "readback": {
+    "each_repository_lookup": "not_found",
+    "organization_target_name_hits": 0
+  },
+  "does_not_establish": [
+    "availability of deleted GitHub repository objects",
+    "runtime retirement of every historical contract",
+    "absence of historical references",
+    "consumer convergence outside metarepo"
+  ]
+}

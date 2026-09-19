@@ -34,7 +34,7 @@
     },
     "source": {
       "type": "string",
-      "description": "Quelle des Signals (z.B. 'hausKI-node-1')."
+      "description": "Quelle des Signals (z.B. 'service-node-1')."
     },
     "host": {
       "type": "string",

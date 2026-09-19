@@ -18,11 +18,8 @@ labels: ["contracts-v1", "fleet"]
 - [ ] **semantAH** – `vault/.gewebe/insights/today.json` (≤10 KB) validiert gegen `insights.schema.json`
 - [ ] **audio** – `just check` sowie die relevanten Doctor-, Profil- und Labor-Gates am exakten Audio-Head ausführen
 - [ ] **historischer Vertrag** – `audio.events.schema.json` nicht als aktuellen Producervertrag behandeln; `hausKI-audio` bleibt nur als revisionsgebundener Spenderbeleg sichtbar
-- [ ] **aussensensor/weltgewebe** – `export/feed.jsonl` folgt `aussen.event.schema.json`
 
 ## Consumer-Aufgaben
-- [ ] **hausKI** – Endpunkte `/v1/ingest/metrics`, `/v1/policy/decide`, `/v1/policy/feedback` aktiv
-- [ ] **hausKI** – JSONL Event-Log `~/.hauski/events/YYYY-MM.jsonl` validiert gegen `event.line.schema.json`
 - [ ] **chronik** – `POST /ingest/{domain}` appends nach `data/{domain}.jsonl`
 - [ ] **leitstand** (UI) – Panels „Heute/Wissen/PC/Musik/Außen“ zeigen valide Daten, inkl. `why`
 

@@ -49,7 +49,7 @@
           "id": {
             "type": "string",
             "pattern": "^[a-zA-Z0-9._-]+$",
-            "description": "Name des Repos oder Dienstes, z. B. 'chronik' oder 'hausKI'."
+            "description": "Name des Repos oder Dienstes, z. B. 'chronik' oder 'leitstand'."
           },
           "state": {
             "type": "string",

@@ -3,7 +3,7 @@
   "$id": "https://schemas.heimgewebe.org/contracts/insights.schema.json",
   "title": "Heimgewebe Review Insight",
   "x-producers": ["semantAH"],
-  "x-consumers": ["hausKI", "chronik"],
+  "x-consumers": ["chronik"],
   "x-related-adrs": ["docs/adrs/0022-erkenntnis-vorlauf-negationsspur.md"],
   "$comment": "ADR-0022: Structural support for negation. Semantics defined in consumer repos.",
   "type": "object",

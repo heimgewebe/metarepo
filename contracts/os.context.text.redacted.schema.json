@@ -68,7 +68,7 @@
     "source": {
       "type": "string",
       "maxLength": 64,
-      "description": "Sensorquelle (default: mitschreiber)."
+      "description": "Producer-defined OS context source identifier."
     }
   },
   "required": ["ts", "app", "snippet", "privacy"],
@@ -81,7 +81,7 @@
       "pii_detected": [],
       "confidence": 0.0,
       "privacy": { "raw_retained": false, "storage": "ram", "ttl_sec": 60 },
-      "source": "mitschreiber"
+      "source": "os-context-source"
     }
   ]
 }

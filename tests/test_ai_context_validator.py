@@ -1,6 +1,10 @@
 import json
+from pathlib import Path
 
 import pytest
+import yaml
+
+from wgx import repo_config
 
 from scripts.ai_context.validate_ai_context import validate_one
 
@@ -64,3 +68,20 @@ def test_rejects_blank_guidance_entries(tmp_path, field) -> None:
     path = _write_context(tmp_path, **kwargs)
 
     assert f"ai_guidance.{field}[0] must be a non-empty string" in validate_one(path)
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def test_fleet_enabled_ai_contexts_resolve_to_current_fleet_members() -> None:
+    fleet = repo_config.load_config(ROOT / "fleet/repos.yml")
+    active = {name.casefold() for name in repo_config.active_fleet_names(fleet)}
+    violations = []
+    for path in sorted((ROOT / "ai-contexts").glob("*.ai-context.yml")):
+        if path.name.startswith("_"):
+            continue
+        payload = yaml.safe_load(path.read_text(encoding="utf-8"))
+        if payload.get("heimgewebe", {}).get("fleet", {}).get("enabled") is True:
+            name = str(payload.get("project", {}).get("name", ""))
+            if name.casefold() not in active:
+                violations.append((path.name, name))
+    assert violations == []

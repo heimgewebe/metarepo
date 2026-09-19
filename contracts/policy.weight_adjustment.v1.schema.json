@@ -2,8 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.heimgewebe.org/contracts/policy.weight_adjustment.v1.schema.json",
   "title": "heimlern policy weight adjustment proposal v1",
-  "x-producers": ["heimlern"],
-  "x-consumers": ["hausKI", "chronik"],
+  "x-producers": [],
+  "x-consumers": ["chronik"],
   "type": "object",
   "required": ["version", "basis_policy", "ts", "deltas", "confidence", "evidence"],
   "properties": {

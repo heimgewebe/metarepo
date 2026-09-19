@@ -15,7 +15,7 @@ def test_tool_call_envelope_schema_accepts_minimal_payload():
     schema = load_schema()
     payload = {
         "tool": "search_codebase",
-        "args": {"query": "hausKI error handling"},
+        "args": {"query": "target-service error handling"},
     }
 
     jsonschema.validate(instance=payload, schema=schema)
@@ -24,7 +24,7 @@ def test_tool_call_envelope_schema_accepts_minimal_payload():
 def test_tool_call_envelope_schema_rejects_missing_tool():
     schema = load_schema()
     payload = {
-        "args": {"query": "hausKI error handling"},
+        "args": {"query": "target-service error handling"},
     }
 
     try:

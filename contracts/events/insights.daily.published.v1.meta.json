@@ -3,7 +3,7 @@
   "schema": "contracts/events/insights.daily.published.v1.schema.json",
   "governance": {
     "producers": ["semantAH"],
-    "consumers": ["plexer", "chronik", "leitstand", "hausKI"],
+    "consumers": ["plexer", "chronik", "leitstand"],
     "mode": "notification-only"
   },
   "notes": [

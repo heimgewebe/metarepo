@@ -20,7 +20,7 @@ interfaces:
   consumes: []
   produces:
     - "aussen/v1"
-    - "heimlern/v1"
+    - "versioned external API contract mirrors"
     - "contracts/*.schema.json (mirror)"
 
 boundaries:

@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.heimgewebe.org/contracts/event.line.schema.json",
-  "title": "hausKI event line (JSONL)",
-  "x-producers": ["hausKI"],
+  "title": "Heimgewebe event line (JSONL)",
+  "x-producers": [],
   "x-consumers": ["chronik"],
   "type": "object",
   "required": ["id", "node_id", "ts", "kind", "payload"],

@@ -1,58 +1,44 @@
 ---
 ai_context_version: 1.1
-
 project:
   name: mitschreiber
-  summary: OS/app/window/text sampler; emits os.context.* into chronik.
-  role: os_context_sampler
+  summary: Archived historical reference for the deleted former OS/app/window/text
+    sampler; not a current Fleet or runtime component.
+  role: archived_reference
   primary_language: mixed
   visibility: internal
-
 heimgewebe:
-  axis: [OS-Kontext, Events]
+  axis:
+  - Historical OS Context Evidence
   fleet:
-    enabled: true
+    enabled: false
   wgx:
-    profile_expected: true
-    guard_smoke_expected: true
-
+    profile_expected: false
+    guard_smoke_expected: false
 interfaces:
   consumes:
-    - "local OS state (windows/apps/text)"
+  - historical repository evidence only
   produces:
-    - "os.context.state"
-    - "os.context.text.embed (via downstream)"
-
+  - none (deleted repository)
 contracts:
   schemas:
-    - path: "contracts/*.schema.json"
-      note: "OS context event shape must stay stable."
-
+  - path: contracts/*.schema.json
+    note: Historical schema references do not establish a current producer or consumer.
 dependencies:
-  internal:
-    - name: chronik
-      relationship: writes
-      interface: [event_line_append]
+  internal: []
   external: []
-  # NOTE: 'external: []' means "not verified from metarepo context".
-  # Prefer 'unknown' over false precision; verify in repo before asserting tech stack.
-
 boundaries:
   not_responsible_for:
-    - "Meaning/embeddings generation (semantAH)."
+  - Current runtime execution, Fleet rollout, deployment, or producer/consumer truth.
   dangerous_assumptions:
-    - "Capture sensitive data without policy constraints."
-
+  - Treat mitschreiber as a current repository, service, Fleet member, producer, or
+    consumer.
 conventions:
-  branching: "main, feature/*"
-  commit_prefix: "mitschreiber"
-  ci_platform: github_actions
-
-documentation:
-  runbook: docs/runbook.md
-
+  branching: archived reference; repository physically deleted
+  commit_prefix: mitschreiber
+  ci_platform: none
 ai_guidance:
   do:
-    - ensure each JSONL line is standalone valid JSON
+  - Use this file only as historical context and verify current successors elsewhere.
   dont:
-    - write partial lines or multi-line JSON
+  - Create current work, routing, deployment, or contract claims for the deleted repository.

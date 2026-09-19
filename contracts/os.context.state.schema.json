@@ -35,7 +35,7 @@
     "source": {
       "type": "string",
       "maxLength": 64,
-      "description": "Sensorquelle (default: mitschreiber)."
+      "description": "Producer-defined OS context source identifier."
     }
   },
   "required": ["ts", "app", "focus"],
@@ -46,7 +46,7 @@
       "window": "project-x/main.py — Visual Studio Code",
       "focus": true,
       "activity_rpm": 120,
-      "source": "mitschreiber"
+      "source": "os-context-source"
     }
   ]
 }

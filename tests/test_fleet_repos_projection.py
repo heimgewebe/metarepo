@@ -273,22 +273,12 @@ def test_physically_deleted_repositories_are_absent_from_projection() -> None:
     projection = yaml.safe_load((ROOT / "repos.yml").read_text(encoding="utf-8"))
     assert projection["archived_references"] == []
     projected_names = {item["name"] for item in projection["repos"]}
-    assert projected_names.isdisjoint(
-        {
-            "vault-gewebe",
-            "vault-privat",
-            "aussensensor",
-            "mitschreiber",
-            "hausKI",
-            "heimlern",
-            "leitwerk",
-            "hausKI-audio",
-            "heimserver",
-            "heimgeist",
-            "agent-control-surface",
-            "demo-repository",
-        }
+    deletion_evidence = json.loads(
+        (ROOT / "reports/fleet/physical-deletion-evidence.v1.json").read_text(encoding="utf-8")
     )
+    deleted_names = {item["name"] for item in deletion_evidence["deleted_repositories"]}
+    assert len(deleted_names) == 12
+    assert projected_names.isdisjoint(deleted_names)
 
 def test_archived_reference_cannot_be_projectable() -> None:
     fleet = {

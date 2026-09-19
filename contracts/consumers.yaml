@@ -7,13 +7,6 @@ event_backbone:
   aussen.event:
     schema: contracts/aussen.event.schema.json
     consumers:
-    - repo: aussensensor
-      files:
-      - contracts/aussen.event.schema.json
-      mode: mirror
-      status: verified
-      last_verified: '2026-09-02T14:33:51+00:00'
-      evidence_ref: contracts/consumer-evidence.v1.json#claims/event_backbone/aussen.event::consumer::aussensensor
     - repo: chronik
       files:
       - .github/workflows/validate-aussen-fixtures.yml
@@ -27,18 +20,11 @@ event_backbone:
     lifecycle: active
     last_verified: '2026-09-02T14:33:51+00:00'
     replacement: null
-    status_reason: Reviewed against exact current default-branch commits for the declared repositories.
+    status_reason: Schema remains active for current readers such as chronik. Aussensensor
+      was physically deleted on 2026-09-18; no current producer or mirror-consumer claim
+      is asserted for that repository.
     evidence_ref: contracts/consumer-evidence.v1.json#contracts/event_backbone/aussen.event
-    producers:
-    - repo: aussensensor
-      status: verified
-      files:
-      - .github/workflows/contracts-drift.yml
-      - .github/workflows/fixtures-validate.yml
-      - .github/workflows/validate-aussen-fixtures.yml
-      - .github/workflows/validate-aussen.yml
-      last_verified: '2026-09-02T14:33:51+00:00'
-      evidence_ref: contracts/consumer-evidence.v1.json#claims/event_backbone/aussen.event::producer::aussensensor
+    producers: []
   event.line:
     schema: contracts/event.line.schema.json
     consumers:
@@ -53,17 +39,10 @@ event_backbone:
     lifecycle: active
     last_verified: '2026-09-02T14:33:51+00:00'
     replacement: null
-    status_reason: Reviewed against exact current default-branch commits for the declared repositories.
+    status_reason: Schema remains active as the shared event-line format. HausKI was
+      physically deleted on 2026-09-18; no current producer claim is asserted for it.
     evidence_ref: contracts/consumer-evidence.v1.json#contracts/event_backbone/event.line
-    producers:
-    - repo: hausKI
-      status: unverified
-      files:
-      - .github/workflows/validate-events.yml
-      - docs/contracts/x-repo-events.md
-      - scripts/emit_event_line.sh
-      last_verified: '2026-09-02T14:33:51+00:00'
-      evidence_ref: contracts/consumer-evidence.v1.json#claims/event_backbone/event.line::producer::hausKI
+    producers: []
   heimgeist.insight:
     schema: contracts/events/heimgeist.insight.v1.schema.json
     consumers:
@@ -90,15 +69,11 @@ event_backbone:
     lifecycle: active
     last_verified: '2026-09-02T14:33:51+00:00'
     replacement: null
-    status_reason: Reviewed against exact current default-branch commits for the declared repositories.
+    status_reason: Schema remains active as a retained compatibility/read contract.
+      Heimgeist was physically deleted on 2026-09-18; no current producer claim is asserted;
+      historical retirement evidence is kept separately.
     evidence_ref: contracts/consumer-evidence.v1.json#contracts/event_backbone/heimgeist.insight
-    producers:
-    - repo: heimgeist
-      status: unverified
-      files:
-      - docs/specs/heimgeist-insight-v1.md
-      last_verified: '2026-09-02T14:33:51+00:00'
-      evidence_ref: contracts/consumer-evidence.v1.json#claims/event_backbone/heimgeist.insight::producer::heimgeist
+    producers: []
 fixtures:
   chronik-fixtures:
     schema: contracts/chronik-fixtures.schema.json
@@ -251,16 +226,11 @@ knowledge:
       status: unverified
       last_verified: '2026-09-02T14:33:51+00:00'
       evidence_ref: contracts/consumer-evidence.v1.json#claims/knowledge/insights.daily.published.v1::consumer::leitstand
-    - repo: hausKI
-      files: []
-      mode: reference-only
-      status: unverified
-      last_verified: '2026-09-02T14:33:51+00:00'
-      evidence_ref: contracts/consumer-evidence.v1.json#claims/knowledge/insights.daily.published.v1::consumer::hausKI
     lifecycle: active
     last_verified: '2026-09-02T14:33:51+00:00'
     replacement: null
-    status_reason: Reviewed against exact current default-branch commits for the declared repositories.
+    status_reason: Schema remains active for surviving consumers. HausKI was physically
+      deleted on 2026-09-18; no current consumer claim is asserted for it.
     evidence_ref: contracts/consumer-evidence.v1.json#contracts/knowledge/insights.daily.published.v1
     producers:
     - repo: semantAH
@@ -280,16 +250,11 @@ knowledge:
       status: verified
       last_verified: '2026-09-02T14:33:51+00:00'
       evidence_ref: contracts/consumer-evidence.v1.json#claims/knowledge/observatory::consumer::leitstand
-    - repo: hausKI
-      files: []
-      mode: reference-only
-      status: unverified
-      last_verified: '2026-09-02T14:33:51+00:00'
-      evidence_ref: contracts/consumer-evidence.v1.json#claims/knowledge/observatory::consumer::hausKI
     lifecycle: active
     last_verified: '2026-09-02T14:33:51+00:00'
     replacement: null
-    status_reason: Reviewed against exact current default-branch commits for the declared repositories.
+    status_reason: Schema remains active for surviving consumers. HausKI was physically
+      deleted on 2026-09-18; no current consumer claim is asserted for it.
     evidence_ref: contracts/consumer-evidence.v1.json#contracts/knowledge/observatory
     producers:
     - repo: semantAH
@@ -310,14 +275,6 @@ knowledge:
       status: unverified
       last_verified: '2026-09-02T14:33:51+00:00'
       evidence_ref: contracts/consumer-evidence.v1.json#claims/knowledge/knowledge.observatory.published.v1::consumer::leitstand
-    - repo: hausKI
-      files:
-      - crates/core/src/events.rs
-      - crates/core/src/events_tests.rs
-      mode: reference-only
-      status: verified
-      last_verified: '2026-09-02T14:33:51+00:00'
-      evidence_ref: contracts/consumer-evidence.v1.json#claims/knowledge/knowledge.observatory.published.v1::consumer::hausKI
     - repo: plexer
       files: []
       mode: notification-only
@@ -327,7 +284,8 @@ knowledge:
     lifecycle: active
     last_verified: '2026-09-02T14:33:51+00:00'
     replacement: null
-    status_reason: Reviewed against exact current default-branch commits for the declared repositories.
+    status_reason: Schema remains active for surviving consumers. HausKI was physically
+      deleted on 2026-09-18; no current consumer claim is asserted for it.
     evidence_ref: contracts/consumer-evidence.v1.json#contracts/knowledge/knowledge.observatory.published.v1
     producers:
     - repo: semantAH
@@ -338,20 +296,13 @@ knowledge:
 os_context:
   state:
     schema: contracts/os.context.state.schema.json
-    consumers:
-    - repo: mitschreiber
-      files:
-      - .github/workflows/validate.yml
-      - docs/ci.md
-      - docs/contracts.md
-      mode: reference-only
-      status: verified
-      last_verified: '2026-09-02T14:33:51+00:00'
-      evidence_ref: contracts/consumer-evidence.v1.json#claims/os_context/state::consumer::mitschreiber
+    consumers: []
     lifecycle: active
     last_verified: '2026-09-02T14:33:51+00:00'
     replacement: null
-    status_reason: Reviewed against exact current default-branch commits for the declared repositories.
+    status_reason: Schema remains active as a shared decoding contract. Mitschreiber
+      was physically deleted on 2026-09-18; no current consumer claim is asserted for
+      it.
     evidence_ref: contracts/consumer-evidence.v1.json#contracts/os_context/state
     producers: []
   text.embed:

@@ -1,11 +1,19 @@
 {
   "contract": "heimlern.ingest.state.v1",
   "schema": "contracts/heimlern.ingest.state.schema.json",
-  "governance": {
-    "producers": ["heimlern-cli"],
-    "consumers": ["leitstand", "heimgeist"]
-  },
+  "governance": {},
   "notes": [
-    "This file is intentionally NOT JSON-Schema. It is governance metadata."
-  ]
+    "This file is intentionally NOT JSON-Schema. It is governance metadata.",
+    "The Heimlern and Heimgeist repositories are physically deleted; participant names above are historical provenance only and do not establish current routes."
+  ],
+  "lifecycle": "historical",
+  "historical_governance": {
+    "producers": [
+      "heimlern-cli"
+    ],
+    "consumers": [
+      "leitstand",
+      "heimgeist"
+    ]
+  }
 }
