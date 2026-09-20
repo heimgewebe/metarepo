@@ -5,12 +5,15 @@ autopoetischer KI-Organismus funktioniert:
 
 - **metarepo** – Control-Plane (Contracts, CI-Vorlagen, Fleet-Definition)
 - **wgx** – Werkzeugkasten und Fleet-Motorik
-- **hausKI** – KI-Orchestrator mit Gedächtnis
 - **semantAH** – semantischer Index und Insights
 - **chronik** – Ereignisspeicher (Event-Log, Audit)
 - **leitstand** – UI / Dashboard
-- plus weitere aktive Organe: **aussensensor**, **vault-gewebe**, **commonThing**, **repoground**, **sichter**, **mitschreiber**, **heimgeist**, **plexer**.
-- **heimlern** bleibt ausschließlich als archivierte Policy-Referenz sichtbar.
+- **repoground**, **sichter** und **plexer** – Kontext, Prüfung und Routing
+- **commonThing** – verwandte öffentliche Web-Schicht
+
+Die physisch gelöschten Repositories HausKI, Aussensensor, Vault-Gewebe,
+Mitschreiber, Heimgeist und Heimlern gehören nicht mehr zur aktiven Fleet.
+Historische Verträge und Evidenz dürfen ihre Namen weiterhin als Provenienz führen.
 
 Dieses Dokument erklärt:
 
@@ -30,8 +33,8 @@ Die Grundidee:
 > *metarepo definiert, was richtig ist – wgx sorgt dafür, dass die Repos sich daran halten.*
 
 Contracts im metarepo legen fest, wie Events, Insights, Metrics aussehen sollen;
-Repos wie hausKI, semantAH, chronik, aussensensor usw. sind Producer/Consumer
-dieser Datenströme.
+Aktive Repos wie semantAH, chronik, sichter und plexer sind Producer oder
+Consumer dieser Datenströme.
 
 ### 1.2 Typischer Tagesablauf (Operator-Sicht)
 
@@ -44,20 +47,20 @@ Ganz grob:
 2. **Wissenslage checken**
    - `semantAH` erzeugt tägliche Vault-Insights nach
      `contracts/insights.daily.schema.json`.
-   - hausKI / Leitstand können `topics`, `questions`, `deltas` daraus visualisieren.
+   - Leitstand kann `topics`, `questions` und `deltas` daraus visualisieren.
 
 3. **Events & Incidents ansehen**
-   - `chronik` speichert hausKI-Events im Format `event.line.schema.json`.
+   - `chronik` speichert Events im Format `event.line.schema.json`.
    - Leitstand liest daraus Dashboards und Tages-Digests.
 
 4. **Arbeit an Repos**
    - WGX-Befehle nutzen (`wgx guard`, `wgx metrics snapshot` etc.).
-   - sichter/mitschreiber/heimgeist als Reflexions- und Schreib-Hilfen dazunehmen.
+   - sichter für Prüf- und Reflexionsaufgaben nutzen; plexer routet unterstützte Ströme.
 
 Kurzfassung für Dummies:
 > Heimgewebe ist ein Haufen Repos, die so tun, als wären sie ein Körper.
-> metarepo ist das Regelbuch, wgx die Muskeln, hausKI das Gehirn,
-> semantAH das Bedeutungs-Gedächtnis und chronik das Tagebuch.
+> metarepo ist das Regelbuch, wgx die Muskeln, semantAH das Bedeutungs-Gedächtnis,
+> chronik das Tagebuch und leitstand die Anzeige.
 
 ---
 
@@ -74,8 +77,8 @@ Kurzfassung für Dummies:
   - Nutze sie als Einstieg, um zu verstehen, welches Repo wofür zuständig ist.
 
 - **Contracts (Schemas)**
-  - `contracts/event.line.schema.json` – hausKI → chronik Event-Schema.
-  - `contracts/insights.daily.schema.json` – semantAH Daily-Insights, Consumer: hausKI, chronik.
+  - `contracts/event.line.schema.json` – gemeinsames Event-Schema für chronik-kompatible Ereignisse.
+  - `contracts/insights.daily.schema.json` – Schema für semantAH Daily-Insights.
   - `contracts/insights.schema.json` – Review-Insights (z. B. aus semantAH/sichter).
   - `contracts/dev.tooling.schema.json` – wie Repos ihre Tooling-Umgebung beschreiben (Language, Tests, LSP etc.).
 
@@ -104,17 +107,13 @@ die lokal und in CI gleich funktionieren.
 
 ---
 
-### 2.3 hausKI – KI-Orchestrator
+### 2.3 HausKI – historische Referenz
 
-**Repo:** `heimgewebe/hausKI`
+Das frühere Repository `heimgewebe/hausKI` ist physisch gelöscht und besitzt
+keine aktive Runtime-, Orchestrierungs- oder Consumer-Autorität mehr.
 
-- Schreibt Events nach `chronik` im Format `contracts/event.line.schema.json`.
-- Nutzt semantAH-Insights (`insights.schema.json`, `insights.daily.schema.json`) als Kontext.
-- Dreht Entscheidungen und Playbooks für andere Repos.
-
-**Nutzen:**
-hausKI ist das **entscheidende Gehirn**: es verknüpft Metriken, Events, semantische
-Insights und Policies zu Aktionen.
+Historische Contracts, Tests und Evidenz dürfen HausKI weiterhin nennen, wenn
+der historische Status ausdrücklich erkennbar ist.
 
 ---
 
@@ -125,11 +124,13 @@ Insights und Policies zu Aktionen.
 - Producer für:
   - `insights.daily` – Tages-Zusammenfassung des Wissenszustands, Schema siehe Contracts.
   - `insights` – Review-Insights (z. B. aus Code-Analyse).
-- Arbeitet gegen den Vault (`vault-gewebe`) und andere Quellen.
+- Arbeitet gegen konfigurierte Vault-Pfade und andere Quellen; daraus folgt keine
+  Abhängigkeit vom gelöschten Repository Vault-Gewebe.
 
 **Nutzen:**
 semantAH beantwortet die Frage: **„Was ist gerade wichtig?“**
-hausKI/Leitstand müssen dann nur noch entscheiden, wie sie darauf reagieren.
+Leitstand kann diese Informationen darstellen; weitere Consumer binden sich über
+aktuelle Contracts und den Systemkatalog.
 
 ---
 
@@ -137,7 +138,7 @@ hausKI/Leitstand müssen dann nur noch entscheiden, wie sie darauf reagieren.
 
 **Repo:** `heimgewebe/chronik`
 
-- Speichert hausKI-Events im JSONL-Format gemäß `event.line.schema.json`.
+- Speichert Events im JSONL-Format gemäß `event.line.schema.json`.
 - Ist Consumer von:
   - `insights.daily` (Tages-Zusammenfassungen)
   - `insights` (Review-Insights)
@@ -166,43 +167,28 @@ ganzen JSONs zu einem Bild werden.
 
 ---
 
-### 2.7 aussensensor – kuratierte Außenwelt
+### 2.7 Aussensensor – historische Referenz
 
-**Repo:** `heimgewebe/aussensensor`
-
-- Holt kuratierte Feeds (z. B. Nachrichten, Telemetrie, externe APIs).
-- Transformiert sie in Events nach metarepo-Contracts und schreibt sie in chronik.
-- Achtet auf Sicherheitsgrenzen: keine direkten Agent-Prompts von außen,
-nur strukturierte Events.
-
-**Nutzen:**
-aussensensor sorgt dafür, dass der Organismus etwas von der Außenwelt mitbekommt,
-ohne dass jeder RSS-Feed direkt am Hirnstamm zieht.
+Das frühere Repository `heimgewebe/aussensensor` ist physisch gelöscht.
+Seine früheren Event-Verträge bleiben nur als historische Provenienz erhalten;
+es ist kein aktueller Feed-, Telemetrie- oder Producer-Pfad.
 
 ---
 
-### 2.8 heimlern – archivierte Policy-Referenz
+### 2.8 Heimlern – historische Policy-Referenz
 
-**Repo:** `heimgewebe/heimlern` (archiviert)
-
-Heimlern bewahrt die frühere Policy- und Bandit-Implementierung als historischen Beleg.
-Es besitzt keine aktive Runtime-, Routing-, Queue- oder Produktionsautorität. Neue
-Integrationen dürfen daraus keine operative Abhängigkeit ableiten; aktuelle Zuständigkeiten
-stehen im Systemkatalog.
+Das frühere Repository `heimgewebe/heimlern` ist physisch gelöscht.
+Erhaltene Policy- und Bandit-Evidenz dient ausschließlich als historischer Beleg.
+Es besitzt keine aktive Runtime-, Routing-, Queue- oder Produktionsautorität;
+aktuelle Zuständigkeiten stehen im Systemkatalog.
 
 ---
 
-### 2.9 vault-gewebe – Vault / Notizen
+### 2.9 Vault-Gewebe – historische Referenz
 
-**Repo:** `heimgewebe/vault-gewebe`
-
-- Enthält Obsidian-Vault mit Notizen, ADR-Entwürfen, Konzepten.
-- semantAH indexiert ausgewählte Bereiche und erzeugt `insights.daily`.
-- Timer/Jobs synchronisieren Vault und Fleet (z. B. Snapshots, Index-Rebuild).
-
-**Nutzen:**
-vault-gewebe ist das **assoziative Gedächtnis** – alles, was noch kein Code ist,
-aber schon mehr als eine Idee.
+Das frühere Repository `heimgewebe/vault-gewebe` ist physisch gelöscht.
+SemantAH kann weiterhin konfigurierte lokale Vault-Pfade indexieren; daraus darf
+keine aktuelle Repository-Abhängigkeit zu Vault-Gewebe abgeleitet werden.
 
 ---
 
@@ -244,19 +230,16 @@ und mehrstufige Artefakte für Analyse, Reflexion und Agentenbetrieb.
 - Automatisierte PR-Checks, Review-Heuristiken, Metriken.
 - Produziert Insights, die in `insights.schema.json` passen.
 
-#### mitschreiber
+#### Mitschreiber – historisch
 
-**Repo:** `heimgewebe/mitschreiber`
+Das frühere Repository `heimgewebe/mitschreiber` ist physisch gelöscht.
+Verbliebene Contracts oder Beispiele sind historische Provenienz, keine aktuelle
+Schreib- oder Consumer-Fläche.
 
-- Hilft beim Erstellen von Protokollen, Notizen, Texten auf Basis von Events und
-semantischen Kontexten.
+#### Heimgeist – historisch
 
-#### heimgeist
-
-**Repo:** `heimgewebe/heimgeist`
-
-- Meta-Agent, der über Events, Insights und Policies nachdenkt.
-- Langfristig: „Bewusstseins-Schicht“ des Heimgewebes.
+Das frühere Repository `heimgewebe/heimgeist` ist physisch gelöscht.
+Es besitzt keine aktive Meta-Agent-, Runtime- oder Consumer-Autorität.
 
 #### plexer
 
@@ -265,8 +248,8 @@ semantischen Kontexten.
 - „Kreuzschiene“ für Ströme: verteilt Befehle und Events an die richtigen Organe.
 
 **Nutzen insgesamt:**
-Diese Repos sind das **Meta-Nervensystem**: sie schauen aufs Ganze,
-formulieren Einsichten und helfen, nicht immer dieselben Fehler zu machen.
+Sichter und Plexer bilden weiterhin aktive Prüf- und Routing-Flächen.
+Mitschreiber und Heimgeist sind nur noch historische Referenzen.
 
 ---
 
@@ -312,7 +295,7 @@ Ergebnis: das Repo wird automatisch in Fleet-Metriken und Leitstand-Sichten auft
 3. Ergebnis:
    - `$VAULT_ROOT/.gewebe/insights/daily/YYYY-MM-DD.json`
    - `$VAULT_ROOT/.gewebe/insights/today.json`
-4. hausKI/Leitstand nutzen diese Dateien, um „Heute im Vault“ zu zeigen – im Schema von `insights.daily.schema.json`.
+4. Leitstand kann diese Dateien im Schema von `insights.daily.schema.json` darstellen.
 
 ---
 
@@ -320,11 +303,11 @@ Ergebnis: das Repo wird automatisch in Fleet-Metriken und Leitstand-Sichten auft
 
 - metarepo definiert Contracts und Reusable CI.
 - wgx führt Befehle Fleet-weit konsistent aus.
-- hausKI, semantAH, chronik bilden das Gehirn + Gedächtnis.
-- leitstand und commonThing sind die Augen & Anzeigen.
-- aussensensor, vault-gewebe, sichter, mitschreiber, heimgeist und plexer
-sorgen für Wahrnehmung, Reflexion und Text.
-- Heimlern dokumentiert nur noch die historische Policy- und Lernschicht.
+- semantAH und chronik bilden semantisches Gedächtnis und Ereignisspur.
+- leitstand und commonThing sind Anzeige- und Web-Flächen.
+- sichter und plexer liefern aktive Prüf- und Routing-Funktionen.
+- HausKI, Aussensensor, Vault-Gewebe, Mitschreiber, Heimgeist und Heimlern
+  sind physisch gelöscht; erhaltene Nennungen dienen nur historischer Evidenz.
 
 Heimgewebe wird benutzbar, wenn:
 
@@ -338,8 +321,8 @@ Contracts im metarepo + wgx-Kommandos + chronik-Events + semantAH-Insights
 - Unsicherheitsgrad: ca. 0,3
 - Mögliche Abweichungen:
   - Repo-Struktur kann sich seit dem letzten Merge geändert haben.
-  - Einige Features (leitstand-UI, heimgeist-Core-Loop) sind noch konzeptionell
-und ggf. nur teilweise umgesetzt.
+  - Einige Leitstand- und Integrationsfunktionen können noch konzeptionell oder
+    nur teilweise umgesetzt sein.
   - Die hier genannten CI-Snippets basieren auf der aktuellen
 `wgx-metrics.yml`-Struktur; künftige Versionen könnten Inputs/Defaults ändern.
 

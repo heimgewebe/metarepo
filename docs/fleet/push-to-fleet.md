@@ -17,25 +17,22 @@
 Bearbeite `fleet/repos.yml`:
 ```yaml
 repos:
-  - name: heimgewebe/hausKI
-    default_branch: main
   - name: heimgewebe/semantAH
     default_branch: main
-  - name: heimgewebe/mitschreiber
+  - name: heimgewebe/chronik
     default_branch: main
-  # - name: heimgewebe/chronik
-  #   default_branch: main
-  - name: heimgewebe/aussensensor
+  - name: heimgewebe/sichter
     default_branch: main
 ```
 
-Archivierte Referenzen mit `fleet: false`, darunter Heimlern, dürfen nicht als Rollout-Ziel
-aufgenommen werden. Der Generator und die Fleet-Konfiguration schließen sie fail-closed aus.
+Rollout-Ziele müssen aus dem aktuellen Bestand in `fleet/repos.yml` stammen.
+Physisch gelöschte Repositories wie HausKI, Mitschreiber, Aussensensor und Heimlern
+dürfen nicht erneut als Fleet-Ziel eingetragen werden.
 
 ## Ausführen
 Ein Repo:
 ```bash
-just fleet.push repo=heimgewebe/hausKI
+just fleet.push repo=heimgewebe/semantAH
 ```
 
 Alle Repos:
