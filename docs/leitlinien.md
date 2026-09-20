@@ -8,10 +8,10 @@
 - Gerätestate (SQLite) wird **nicht** zwischen Geräten gesynct; stattdessen Events replizieren.
 
 ## Events & Schemas (Contracts v1)
-- aussensensor → `aussen.event.schema.json`
+- `aussen.event.schema.json` bleibt als gemeinsamer Event-Vertrag erhalten; das physisch gelöschte Repository Aussensensor besitzt keine aktuelle Producer-Autorität
 - semantAH → `insights.schema.json`
 - wgx → `metrics.snapshot.schema.json`
-- hausKI JSONL Event-Log → `event.line.schema.json`
+- `event.line.schema.json` bleibt das gemeinsame Event-Line-Format; das physisch gelöschte Repository HausKI besitzt keine aktuelle Producer-Autorität
 - historische Heimlern-Decisions → `policy.decision.schema.json`
 - historischer Heimlern-Ingest-Status → `heimlern.ingest.state.schema.json`
 
