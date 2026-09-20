@@ -8,7 +8,7 @@ Es informiert das Heimgewebe darüber, dass an einem kanonischen Ort (z.B. GitHu
 1.  **Signal, kein Transport**: Das Event enthält niemals das Artefakt selbst, sondern nur einen Zeiger (`url`).
 2.  **Kanonische Quelle**: Die `url` muss auf die persistente, autoritative Quelle zeigen (z.B. GitHub Releases), niemals auf den Plexer oder temporäre Caches.
 3.  **Fail-Open**: Der Versand eines Notify-Events darf niemals den produzierenden Workflow abbrechen. Plexer-Ausfälle sind zu tolerieren.
-4.  **Pull-Prinzip**: Konsumenten (wie Heimgeist oder HausKI) reagieren auf das Signal, indem sie die Daten bei Bedarf von der `url` abrufen. Sie ziehen keine Daten aus dem Event-Payload.
+4.  **Pull-Prinzip**: Aktuelle Konsumenten reagieren auf das Signal, indem sie die Daten bei Bedarf von der `url` abrufen. Sie ziehen keine Daten aus dem Event-Payload; historische Consumer-Namen begründen keine aktuelle Bindung.
 
 ## Schema
 Das Schema ist definiert in [`contracts/events/published.v1.schema.json`](../../contracts/events/published.v1.schema.json).
