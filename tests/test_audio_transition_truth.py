@@ -16,7 +16,7 @@ def test_audio_is_canonical_fleet_member_and_deleted_donor_is_not_in_scope() -> 
     active = repo_config.active_fleet_names(fleet)
     assert "audio" in active
     assert "hausKI-audio" not in active
-    assert len(active) == 13
+    assert len(active) == 12
     static_names = {
         entry["name"]
         for entry in fleet["static"]["include"]

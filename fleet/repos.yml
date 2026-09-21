@@ -14,7 +14,6 @@ repos:
   - name: chronik
   - name: repoground
   - name: konvergenzregelkreis
-  - name: sichter
   - name: leitstand
   - name: plexer
   - name: heim-pc

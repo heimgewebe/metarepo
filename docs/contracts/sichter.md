@@ -1,53 +1,9 @@
-# Sichter – Contract Overview
+# Sichter – historischer Contract-Beleg
 
-Sichter ist der präzise Werkzeugkasten für automatisierte Qualitätsreflexion innerhalb des Heimgewebes. Er reagiert auf `repository_dispatch`-Events und führt Analysen mit deterministischer Struktur durch.
+**Status:** historisch; das Repository `heimgewebe/sichter` wurde am 21. September 2026 physisch gelöscht.
 
-## Ereignis: heimgewebe-command
+Diese Datei erhält nur die frühere Contract-Identität als Provenienz. Sie begründet **keinen aktuellen Producer, Consumer, Reviewer, Service, Fleet-Teilnehmer, Dispatch-Pfad oder sonstige Autorität**.
 
-### Payload (vereinfacht):
+Die frühere Sichter-Fläche bündelte automatisierte Review-Heuristiken, PR-Kommentare und Diagnoseausgaben. Tragende Prinzipien wie evidenzgebundene Reviews, Deduplizierung und getrennte Risiko-/Unsicherheitsbetrachtung werden heute über aktuelle Operator- und Evidenzverträge abgedeckt; daraus folgt keine Nachfolgeautorität für diesen historischen Contract.
 
-```json
-{
-  "repo": "heimgewebe/<zielrepo>",
-  "run_id": "<run>",
-  "command": "<string>",
-  "context": {
-    "pr": "<nummer oder null>",
-    "file": "<optional datei>",
-    "args": {}
-  }
-}
-```
-
-### Antwortstruktur
-
-```json
-{
-  "status": "ok" | "error",
-  "analysis": {
-    "summary": "<kurze Einschätzung>",
-    "details": "<markdown-html-fähiger Text>",
-    "actions": [
-      {
-        "suggestion": "<konkrete Handlung>",
-        "risk": "<niedrig/mittel/hoch>"
-      }
-    ]
-  }
-}
-```
-
-## Hauptfunktionen
-
-- `quick_analysis`: leichte Heuristik, semantisch + syntaktisch
-- `deep_analysis`: vollständiger Durchgang inkl. CI-Hilfsmodulen
-- `file_focus`: targeted Analyse einzelner Dateien
-- `risk_vector`: heuristische Bewertung von Einfluss, Drift, Redundanz
-
-## Grundprinzipien
-
-1. Keine direkte Ausführung gefährlicher Aktionen.
-2. Immer Markdown-Antwort für Rückkopplung an PR.
-3. Alle Analysen deterministisch, reproducible.
-4. Nutzung von semantAH, wenn verfügbar.
-5. Sichter ist ein Tool, keine Meta-Instanz. Der frühere Heimgeist war historisch eine solche Meta-Instanz; sein Repository ist gelöscht und daraus folgt keine aktuelle Heimgeist-Autorität.
+Historische Commits und Archive dürfen frühere `heimgewebe-command`-Payloads und Sichter-spezifische Strukturen weiterhin dokumentieren. Neue Integrationen dürfen diese Datei nicht als Laufzeitvertrag verwenden.

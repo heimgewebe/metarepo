@@ -23,7 +23,7 @@ jobs:
     env:
       # Whitelist der Ziel-Repos (kommagetrennt). Kann pro Repo via
       # Repository-Variable HEIMGEWEBE_ALLOWED_REPOS überschrieben werden.
-      ALLOWED_TARGET_REPOS: ${{ vars.HEIMGEWEBE_ALLOWED_REPOS || 'sichter,wgx,metarepo,semantAH,chronik,leitstand,repoground' }}
+      ALLOWED_TARGET_REPOS: ${{ vars.HEIMGEWEBE_ALLOWED_REPOS || 'wgx,metarepo,semantAH,chronik,leitstand,repoground' }}
 
       # Whitelist der erlaubten Kommandos (kommagetrennt). Kann via
       # Repository-Variable HEIMGEWEBE_ALLOWED_COMMANDS überschrieben werden.
@@ -90,12 +90,12 @@ jobs:
             // ROBUSTER ERKENNER FÜR KOMMANDOS
             //
             // Erlaubt u. a.:
-            // @heimgewebe/sichter quick
-            // @heimgewebe/sichter    quick
-            // @heimgewebe/sichter /quick
-            // @heimgewebe/sichter /quick extra
-            // @HEIMGEWEBE/SICHTER /QUICK
-            // @heimgewebe/sichter        / quick foo bar
+            // @heimgewebe/wgx quick
+            // @heimgewebe/wgx    quick
+            // @heimgewebe/wgx /quick
+            // @heimgewebe/wgx /quick extra
+            // @HEIMGEWEBE/WGX /QUICK
+            // @heimgewebe/wgx        / quick foo bar
             // Hinweis: Ohne Kommando wird nicht dispatched.
             //
             // Strategie:
@@ -140,7 +140,7 @@ jobs:
 
             // Archivierte oder dekommissionierte Repositories bleiben auch dann gesperrt,
             // wenn eine Repository-Variable sie versehentlich wieder in die Whitelist aufnimmt.
-            const archivedRepos = new Set(["hauski", "heimlern", "leitwerk", "heimgeist"]);
+            const archivedRepos = new Set(["hauski", "heimlern", "leitwerk", "heimgeist", "sichter"]);
             if (archivedRepos.has(targetRepo)) {
               await reply(
                 `⚠️ Das Ziel-Repo **${targetRepo}** ist eine archivierte oder dekommissionierte Referenz ohne Dispatch-Autorität.\n\n` +

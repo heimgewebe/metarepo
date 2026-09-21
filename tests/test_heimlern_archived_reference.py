@@ -110,8 +110,8 @@ def test_integrity_pull_sources_exclude_archived_heimlern() -> None:
 def test_active_docs_and_rollout_surfaces_do_not_reactivate_heimlern() -> None:
     assertions = {
         "docs/policies/automation.md": "historische Kompatibilitätsnamen",
-        "docs/policies/ci-reusables.md": "kein aktiver Workflow-Consumer",
-        "docs/fleet/push-to-fleet.md": "dürfen nicht als Rollout-Ziel",
+        "docs/policies/ci-reusables.md": "keine aktiven Workflow-Consumer",
+        "docs/fleet/push-to-fleet.md": "dürfen nicht erneut als Fleet-Ziel eingetragen werden",
         ".github/ISSUE_TEMPLATE/rollout.md": "keine `archived-reference`",
         "docs/contracts/mitschreiber.md": "Historische Lernreferenz",
     }

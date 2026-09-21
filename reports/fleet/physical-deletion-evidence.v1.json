@@ -8,7 +8,8 @@
   "repository_count_after": 29,
   "bureau_evidence": {
     "issue": "heimgewebe/bureau#1816",
-    "comment": "https://github.com/heimgewebe/bureau/issues/1816#issuecomment-5732296375"
+    "comment": "https://github.com/heimgewebe/bureau/issues/1816#issuecomment-5732296375",
+    "sichter_comment": "https://github.com/heimgewebe/bureau/issues/1816#issuecomment-5755471053"
   },
   "deleted_repositories": [
     {
@@ -70,16 +71,39 @@
       "name": "demo-repository",
       "default_branch": "main",
       "last_known_head": "2e2a1d4943e1006414c79f748ce0566ec66c193c"
+    },
+    {
+      "name": "sichter",
+      "default_branch": "main",
+      "last_known_head": "ab1ef4e09c75ad11ad733ed79b67d823e076eb33"
     }
   ],
   "readback": {
     "each_repository_lookup": "not_found",
-    "organization_target_name_hits": 0
+    "organization_target_name_hits": 0,
+    "sichter_repository_lookup": "not_found",
+    "organization_repository_count_after_sichter_delete": 29
   },
   "does_not_establish": [
     "availability of deleted GitHub repository objects",
     "runtime retirement of every historical contract",
     "absence of historical references",
     "consumer convergence outside metarepo"
-  ]
+  ],
+  "repository_count_observations": [
+    {
+      "observed_on": "2026-09-18",
+      "repository_count_before": 41,
+      "repository_count_after": 29,
+      "deleted_count": 12
+    },
+    {
+      "observed_on": "2026-09-21",
+      "repository_count_before": 30,
+      "repository_count_after": 29,
+      "deleted_count": 1,
+      "note": "Counts are batch-local; heimgewebe/gegner was created between the two deletion batches."
+    }
+  ],
+  "last_observed_on": "2026-09-21"
 }

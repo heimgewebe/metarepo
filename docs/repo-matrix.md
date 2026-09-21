@@ -2,7 +2,7 @@
 
 <!-- GENERATED FILE - DO NOT EDIT -->
 <!-- Canonical source: fleet/repos.yml -->
-<!-- Fleet SHA-256: a089df0e8f45d4a4c73da3517a0cebe1644bf3a83bb0e8460c08924b512379dc -->
+<!-- Fleet SHA-256: 055fbda9e55ab915d5d5a2035693a5cd601ce7c959ee184bb33f09f6205e8bd3 -->
 <!-- Metadata SHA-256: ce38fda3636658e41ac4cb6880cfcfcd52c69d314a72f23217ad1848f03ed0a5 -->
 
 Diese Matrix ist eine menschenlesbare Projektion. Die normative Fleet-Mitgliedschaft liegt ausschließlich in `fleet/repos.yml`; operative Zusatzdaten liegen in `fleet/repo-metadata.yml`.
@@ -19,7 +19,6 @@ Diese Matrix ist eine menschenlesbare Projektion. Die normative Fleet-Mitgliedsc
 | chronik | chronik / ingest | yes |
 | repoground | epistemic / codebase-context | yes |
 | konvergenzregelkreis | Aktives Fleet-Mitglied | yes |
-| sichter | Aktives Fleet-Mitglied | yes |
 | leitstand | Aktives Fleet-Mitglied | yes |
 | plexer | Aktives Fleet-Mitglied | yes |
 | heim-pc | Aktives Fleet-Mitglied | yes |

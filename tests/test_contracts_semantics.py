@@ -177,10 +177,15 @@ def test_deleted_repository_contract_docs_are_explicitly_historical() -> None:
     assert "kein aktueller Producer, Daemon oder Fleet-Teilnehmer" in mitschreiber
 
 
-def test_retained_heimgeist_contract_docs_do_not_claim_live_service() -> None:
+def test_deleted_sichter_contract_is_historical_only() -> None:
     sichter = (ROOT / "docs/contracts/sichter.md").read_text(encoding="utf-8")
+    assert "**Status:** historisch" in sichter
+    assert "physisch gelöscht" in sichter
+    assert "keinen aktuellen Producer, Consumer, Reviewer, Service, Fleet-Teilnehmer" in sichter
+
+
+def test_retained_heimgeist_contract_docs_do_not_claim_live_service() -> None:
     events = (ROOT / "contracts/events/README.md").read_text(encoding="utf-8")
-    assert "frühere Heimgeist war historisch" in sichter
     assert "POST /ingest/heimgeist" not in events
     assert "does not establish a current Heimgeist service or producer" in events
 

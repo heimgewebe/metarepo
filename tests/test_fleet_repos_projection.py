@@ -277,7 +277,7 @@ def test_physically_deleted_repositories_are_absent_from_projection() -> None:
         (ROOT / "reports/fleet/physical-deletion-evidence.v1.json").read_text(encoding="utf-8")
     )
     deleted_names = {item["name"] for item in deletion_evidence["deleted_repositories"]}
-    assert len(deleted_names) == 12
+    assert len(deleted_names) == 13
     assert projected_names.isdisjoint(deleted_names)
 
 def test_archived_reference_cannot_be_projectable() -> None:

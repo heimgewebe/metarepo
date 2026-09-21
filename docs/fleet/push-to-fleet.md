@@ -21,12 +21,12 @@ repos:
     default_branch: main
   - name: heimgewebe/chronik
     default_branch: main
-  - name: heimgewebe/sichter
+  - name: heimgewebe/leitstand
     default_branch: main
 ```
 
 Rollout-Ziele müssen aus dem aktuellen Bestand in `fleet/repos.yml` stammen.
-Physisch gelöschte Repositories wie HausKI, Mitschreiber, Aussensensor und Heimlern
+Physisch gelöschte Repositories wie HausKI, Mitschreiber, Aussensensor, Heimlern und Sichter
 dürfen nicht erneut als Fleet-Ziel eingetragen werden.
 
 ## Ausführen
