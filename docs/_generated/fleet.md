@@ -1,6 +1,6 @@
 <!-- GENERATED FILE - DO NOT EDIT -->
 <!-- Source: fleet/repos.yml -->
-<!-- Source SHA-256: a089df0e8f45d4a4c73da3517a0cebe1644bf3a83bb0e8460c08924b512379dc -->
+<!-- Source SHA-256: 055fbda9e55ab915d5d5a2035693a5cd601ce7c959ee184bb33f09f6205e8bd3 -->
 
 # Heimgewebe Fleet Overview
 
@@ -17,7 +17,6 @@ Repositories managed by WGX (Contracts, Templates, Policies).
 - **chronik**
 - **repoground**
 - **konvergenzregelkreis**
-- **sichter**
 - **leitstand**
 - **plexer**
 - **heim-pc**

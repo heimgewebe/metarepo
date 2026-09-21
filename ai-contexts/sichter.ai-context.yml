@@ -1,74 +1,42 @@
 ---
 ai_context_version: 1.1
-
 project:
   name: sichter
-  summary: Review/QA gate for content, policies, and outputs.
-  role: gatekeeper_quality_checks
+  summary: Archived historical reference for the deleted former automated review/QA component; not a current Fleet or runtime component.
+  role: archived_reference
   primary_language: mixed
   visibility: internal
-
 heimgewebe:
-  axis: [Motorik, Contracts, Decisions]
+  axis:
+  - Historical Review/QA Evidence
   fleet:
-    enabled: true
+    enabled: false
   wgx:
-    profile_expected: true
-    guard_smoke_expected: true
-
+    profile_expected: false
+    guard_smoke_expected: false
 interfaces:
   consumes:
-    - "repolens-agent/v1 snapshots"
-    - "policies"
-    - "validation_schemas"
+  - historical repository evidence only
   produces:
-    - "quality findings (machine-readable)"
-
+  - none (deleted repository)
 contracts:
   schemas:
-    - path: "contracts/*.schema.json"
-      note: "Validate against canonical contracts."
-
+  - path: contracts/*.schema.json
+    note: Historical schema references do not establish a current producer or consumer.
 dependencies:
-  internal:
-    - name: wgx
-      relationship: uses
-      interface: [cli, guard]
-    - name: metarepo
-      relationship: uses
-      interface: [policies, contracts]
-  external:
-    - name: ajv-cli
-
+  internal: []
+  external: []
 boundaries:
   not_responsible_for:
-    - "Defining canonical schemas (metarepo/contracts do that)."
-    - "Mutating repos; it only reports findings."
+  - Current code review, pull-request automation, runtime execution, Fleet rollout, deployment, or policy truth.
   dangerous_assumptions:
-    - "Treat style as policy without explicit rule."
-
-architecture:
-  entrypoints:
-    - "scripts/validate-contracts.sh"
-    - ".github/workflows/validate.yml"
-  key_paths:
-    - path: "policies/"
-      purpose: "Define what is allowed"
-  data_flow:
-    input: "PR diff / content"
-    processing: "validation against policies/contracts"
-    output: "Pass/Fail + Comments"
-
+  - Treat sichter as a current repository, reviewer, service, Fleet member, producer, consumer, or authority.
 conventions:
-  branching: "main, feature/*"
-  commit_prefix: "sichter"
-  ci_platform: github_actions
-
-documentation:
-  runbook: docs/runbook.md
-
+  branching: archived reference; repository physically deleted
+  commit_prefix: sichter
+  ci_platform: none
 ai_guidance:
   do:
-    - prefer warnings unless contracts are violated
+  - Use this file only as historical context and verify current operator and review responsibilities in the live Systemkatalog and Grabowski contracts.
   dont:
-    - block on stylistic concerns without policy basis
+  - Create current work, routing, deployment, review-authority, or contract claims for the deleted repository.

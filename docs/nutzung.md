@@ -8,11 +8,11 @@ autopoetischer KI-Organismus funktioniert:
 - **semantAH** – semantischer Index und Insights
 - **chronik** – Ereignisspeicher (Event-Log, Audit)
 - **leitstand** – UI / Dashboard
-- **repoground**, **sichter** und **plexer** – Kontext, Prüfung und Routing
+- **repoground** und **plexer** – verifizierbarer Kontext und Routing
 - **commonThing** – verwandte öffentliche Web-Schicht
 
 Die physisch gelöschten Repositories HausKI, Aussensensor, Vault-Gewebe,
-Mitschreiber, Heimgeist und Heimlern gehören nicht mehr zur aktiven Fleet.
+Mitschreiber, Heimgeist, Heimlern und Sichter gehören nicht mehr zur aktiven Fleet.
 Historische Verträge und Evidenz dürfen ihre Namen weiterhin als Provenienz führen.
 
 Dieses Dokument erklärt:
@@ -33,7 +33,7 @@ Die Grundidee:
 > *metarepo definiert, was richtig ist – wgx sorgt dafür, dass die Repos sich daran halten.*
 
 Contracts im metarepo legen fest, wie Events, Insights, Metrics aussehen sollen;
-Aktive Repos wie semantAH, chronik, sichter und plexer sind Producer oder
+Aktive Repos wie semantAH, chronik und plexer sind Producer oder
 Consumer dieser Datenströme.
 
 ### 1.2 Typischer Tagesablauf (Operator-Sicht)
@@ -55,7 +55,7 @@ Ganz grob:
 
 4. **Arbeit an Repos**
    - WGX-Befehle nutzen (`wgx guard`, `wgx metrics snapshot` etc.).
-   - sichter für Prüf- und Reflexionsaufgaben nutzen; plexer routet unterstützte Ströme.
+   - aktuelle Operator- und Review-Pfade für Prüfaufgaben nutzen; plexer routet unterstützte Ströme.
 
 Kurzfassung für Dummies:
 > Heimgewebe ist ein Haufen Repos, die so tun, als wären sie ein Körper.
@@ -79,7 +79,7 @@ Kurzfassung für Dummies:
 - **Contracts (Schemas)**
   - `contracts/event.line.schema.json` – gemeinsames Event-Schema für chronik-kompatible Ereignisse.
   - `contracts/insights.daily.schema.json` – Schema für semantAH Daily-Insights.
-  - `contracts/insights.schema.json` – Review-Insights (z. B. aus semantAH/sichter).
+  - `contracts/insights.schema.json` – Review-Insights (z. B. aus semantAH).
   - `contracts/dev.tooling.schema.json` – wie Repos ihre Tooling-Umgebung beschreiben (Language, Tests, LSP etc.).
 
 - **Reusable CI-Workflows**
@@ -223,12 +223,9 @@ und mehrstufige Artefakte für Analyse, Reflexion und Agentenbetrieb.
 
 ### 2.12 Reflektions- und Meta-Organe
 
-#### sichter
+#### Sichter – historisch
 
-**Repo:** `heimgewebe/sichter`
-
-- Automatisierte PR-Checks, Review-Heuristiken, Metriken.
-- Produziert Insights, die in `insights.schema.json` passen.
+Das frühere Repository `heimgewebe/sichter` wurde physisch gelöscht. Es besitzt keine aktuelle Review-, PR-Automations-, Fleet- oder Runtime-Autorität. Verbliebene Contracts und Dokumente dienen ausschließlich als historische Provenienz.
 
 #### Mitschreiber – historisch
 
@@ -248,8 +245,7 @@ Es besitzt keine aktive Meta-Agent-, Runtime- oder Consumer-Autorität.
 - „Kreuzschiene“ für Ströme: verteilt Befehle und Events an die richtigen Organe.
 
 **Nutzen insgesamt:**
-Sichter und Plexer bilden weiterhin aktive Prüf- und Routing-Flächen.
-Mitschreiber und Heimgeist sind nur noch historische Referenzen.
+Plexer bleibt eine aktive Routing-Fläche. Sichter, Mitschreiber und Heimgeist sind nur noch historische Referenzen.
 
 ---
 
@@ -305,8 +301,8 @@ Ergebnis: das Repo wird automatisch in Fleet-Metriken und Leitstand-Sichten auft
 - wgx führt Befehle Fleet-weit konsistent aus.
 - semantAH und chronik bilden semantisches Gedächtnis und Ereignisspur.
 - leitstand und commonThing sind Anzeige- und Web-Flächen.
-- sichter und plexer liefern aktive Prüf- und Routing-Funktionen.
-- HausKI, Aussensensor, Vault-Gewebe, Mitschreiber, Heimgeist und Heimlern
+- plexer liefert aktive Routing-Funktionen; Prüf- und Review-Autorität folgt den aktuellen Operatorverträgen.
+- HausKI, Aussensensor, Vault-Gewebe, Mitschreiber, Heimgeist, Heimlern und Sichter
   sind physisch gelöscht; erhaltene Nennungen dienen nur historischer Evidenz.
 
 Heimgewebe wird benutzbar, wenn:

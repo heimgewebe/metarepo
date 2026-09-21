@@ -1,6 +1,6 @@
 {
   "apiVersion": "integrity.sources.v1",
-  "generated_at": "2026-09-18T17:07:47Z",
+  "generated_at": "2026-09-21T06:01:03Z",
   "sources": [
     {
       "repo": "heimgewebe/audio",
@@ -55,11 +55,6 @@
     {
       "repo": "heimgewebe/semantAH",
       "summary_url": "https://github.com/heimgewebe/semantAH/releases/download/integrity/summary.json",
-      "enabled": true
-    },
-    {
-      "repo": "heimgewebe/sichter",
-      "summary_url": "https://github.com/heimgewebe/sichter/releases/download/integrity/summary.json",
       "enabled": true
     },
     {

@@ -16,7 +16,6 @@
     "heimgewebe/plexer",
     "heimgewebe/repoground",
     "heimgewebe/semantAH",
-    "heimgewebe/sichter",
     "heimgewebe/wgx"
   ],
   "kind": "renovate-fleet-scope-projection",
@@ -32,7 +31,7 @@
   "sources": {
     "fleet": {
       "path": "fleet/repos.yml",
-      "sha256": "a089df0e8f45d4a4c73da3517a0cebe1644bf3a83bb0e8460c08924b512379dc"
+      "sha256": "055fbda9e55ab915d5d5a2035693a5cd601ce7c959ee184bb33f09f6205e8bd3"
     },
     "policy": {
       "path": "automation/renovate/dependency-updates.v1.yml",
@@ -98,11 +97,6 @@
     {
       "dependabot_version_updates": "none",
       "renovate_version_updates": "enabled",
-      "repository": "heimgewebe/sichter"
-    },
-    {
-      "dependabot_version_updates": "none",
-      "renovate_version_updates": "enabled",
       "repository": "heimgewebe/wgx"
     }
   ],
@@ -129,7 +123,6 @@
         "leitstand",
         "plexer",
         "semantAH",
-        "sichter",
         "wgx"
       ],
       "selector": "remaining-eligible-active-fleet"

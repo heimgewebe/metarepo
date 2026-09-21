@@ -6,7 +6,6 @@ semantAH
 chronik
 repoground
 konvergenzregelkreis
-sichter
 leitstand
 plexer
 heim-pc

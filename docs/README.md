@@ -31,7 +31,7 @@ Tasks, priorities and completion belong to Bureau. Execution, leases, audit and 
 - [Contracts Overview](contracts/contracts-index.md): contract index
 - [API](api.md): API documentation
 - [Mitschreiber Contract](contracts/mitschreiber.md): intent and context events
-- [Sichter Contract](contracts/sichter.md): review and diagnostic events
+- [Historischer Sichter-Contract](contracts/sichter.md): provenance only; repository deleted
 
 ### Development and operations
 
