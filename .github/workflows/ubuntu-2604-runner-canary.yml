@@ -1,0 +1,247 @@
+---
+name: ubuntu-26.04 runner canary
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash --noprofile --norc -euo pipefail {0}
+
+"on":
+  pull_request:
+    paths:
+      - ".github/workflows/ubuntu-2604-runner-canary.yml"
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/ubuntu-2604-runner-canary.yml"
+  workflow_dispatch: {}
+
+# Purpose: exercise runner-sensitive parts of representative Heimgewebe workflows
+# on the real GitHub-hosted Ubuntu 26.04 image before ubuntu-latest migrates.
+# This is not proof that every ubuntu-latest workflow is compatible.
+# Reassess or remove after the ubuntu-latest migration finishes on 2026-11-19.
+
+jobs:
+  metarepo-shellcheck:
+    name: metarepo / apt + shellcheck
+    runs-on: ubuntu-26.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a # v7.0.1
+
+      - name: Record runner and source identity
+        run: |
+          {
+            echo "### metarepo"
+            echo
+            echo "- source: `$(git rev-parse HEAD)`"
+            echo "- runner: `$(. /etc/os-release && printf '%s %s' "$NAME" "$VERSION_ID")`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Install ShellCheck
+        run: sudo apt-get update -yqq && sudo apt-get install -yqq shellcheck
+
+      - name: Run the existing metarepo shellcheck gate
+        run: |
+          mapfile -t scripts < <(git ls-files '*.sh' '*.bash' 'scripts/wgx' 'wgx/wgx' | grep -v '^completions/')
+          if [ "${#scripts[@]}" -eq 0 ]; then
+            echo "No shell scripts found."
+            exit 0
+          fi
+          shellcheck -x -P scripts/lib --format=gcc -S style "${scripts[@]}"
+
+  wgx-shell-lint:
+    name: wgx / apt + bash + shfmt + shellcheck
+    runs-on: ubuntu-26.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a # v7.0.1
+        with:
+          repository: heimgewebe/wgx
+          ref: main
+          persist-credentials: false
+
+      - name: Record runner and source identity
+        run: |
+          {
+            echo "### wgx"
+            echo
+            echo "- source: `$(git rev-parse HEAD)`"
+            echo "- runner: `$(. /etc/os-release && printf '%s %s' "$NAME" "$VERSION_ID")`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Install shell tooling
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y --no-install-recommends shellcheck shfmt jq
+
+      - name: Build the full shell-file set used by workflow_dispatch
+        run: |
+          git ls-files '*.sh' '*.bash' 'wgx' > /tmp/wgx-shell-files
+
+      - name: bash -n
+        run: ./etc/ci/run-with-files.sh --per-file "No shell files to check." bash -n < /tmp/wgx-shell-files
+
+      - name: shfmt
+        run: ./etc/ci/run-with-files.sh "No shell files to format." shfmt -d < /tmp/wgx-shell-files
+
+      - name: shellcheck
+        run: ./etc/ci/run-with-files.sh "No shell files to lint." shellcheck -x -S style < /tmp/wgx-shell-files
+
+  repoground-pytest-full:
+    name: repoground / Python + bubblewrap + full pytest
+    runs-on: ubuntu-26.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a # v7.0.1
+        with:
+          repository: heimgewebe/repoground
+          ref: main
+          persist-credentials: false
+
+      - name: Record runner and source identity
+        run: |
+          {
+            echo "### repoground"
+            echo
+            echo "- source: `$(git rev-parse HEAD)`"
+            echo "- runner: `$(. /etc/os-release && printf '%s %s' "$NAME" "$VERSION_ID")`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+
+      - name: Reject test stub shadow packages
+        run: python scripts/check_no_test_stubs.py
+
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check --require-hashes -r requirements/repoground-dev.lock.txt
+
+      - name: Install and verify Patch Evaluation sandbox runtime
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends --yes bubblewrap
+          if sysctl kernel.unprivileged_userns_clone >/dev/null 2>&1; then
+            sudo sysctl -w kernel.unprivileged_userns_clone=1
+          fi
+          if sysctl kernel.apparmor_restrict_unprivileged_userns >/dev/null 2>&1; then
+            sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          fi
+          bwrap --die-with-parent --new-session --unshare-pid \
+            --ro-bind /usr /usr --ro-bind-try /bin /bin \
+            --ro-bind-try /lib /lib --ro-bind-try /lib64 /lib64 \
+            --proc /proc --dev /dev /usr/bin/true
+
+      - name: Run the existing full pytest gate
+        run: pytest -q -m "not browser and not doc_freshness_live"
+
+  commonthing-compose-smoke:
+    name: commonthing / Docker Buildx + Compose smoke
+    runs-on: ubuntu-26.04
+    timeout-minutes: 25
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+    steps:
+      - uses: actions/checkout@f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a # v7.0.1
+        with:
+          repository: heimgewebe/commonthing
+          ref: main
+          persist-credentials: false
+
+      - name: Record runner and source identity
+        run: |
+          source_sha="$(git rev-parse HEAD)"
+          echo "GIT_COMMIT_SHA=$source_sha" >> "$GITHUB_ENV"
+          {
+            echo "### commonthing compose-smoke"
+            echo
+            echo "- source: `$source_sha`"
+            echo "- runner: `$(. /etc/os-release && printf '%s %s' "$NAME" "$VERSION_ID")`"
+            echo "- docker: `$(docker --version)`"
+            echo "- compose: `$(docker compose version)`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
+
+      - name: Compose up
+        run: docker compose -f infra/compose/compose.core.yml --profile dev up -d --build
+
+      - name: Wait for services
+        run: |
+          tries=60
+          until curl -fsS http://localhost:8081/ >/dev/null; do
+            ((tries--)) || (docker compose -f infra/compose/compose.core.yml --profile dev logs --no-color && exit 1)
+            sleep 2
+          done
+          tries=60
+          until curl -fsS http://localhost:8081/api/version >/dev/null \
+            || curl -fsS http://localhost:8081/api/health/ready >/dev/null; do
+            ((tries--)) || (docker compose -f infra/compose/compose.core.yml --profile dev logs --no-color && exit 1)
+            sleep 2
+          done
+
+      - name: Show brief logs
+        if: always()
+        run: docker compose -f infra/compose/compose.core.yml --profile dev logs --no-color --tail=200
+
+      - name: Compose down
+        if: always()
+        run: docker compose -f infra/compose/compose.core.yml --profile dev down -v
+
+  commonthing-api-build:
+    name: commonthing / native deps + Rust API build
+    runs-on: ubuntu-26.04
+    timeout-minutes: 20
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+      CARGO_TARGET_DIR: ./target
+    steps:
+      - uses: actions/checkout@f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a # v7.0.1
+        with:
+          repository: heimgewebe/commonthing
+          ref: main
+          persist-credentials: false
+
+      - name: Record runner and source identity
+        run: |
+          {
+            echo "### commonthing API build"
+            echo
+            echo "- source: `$(git rev-parse HEAD)`"
+            echo "- runner: `$(. /etc/os-release && printf '%s %s' "$NAME" "$VERSION_ID")`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Install native build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pkg-config libssl-dev libpq-dev postgresql-client
+          pkg-config --version
+          openssl version
+          pg_config --version
+
+      - name: Read Rust version
+        id: rust-version
+        run: |
+          SED_EXPR="s/^[[:space:]]*rust:[[:space:]]*['\"]?([^'\"#[:space:]]+)['\"]?[[:space:]]*(#.*)?$/\1/p"
+          RUST_VERSION="$(sed -nE "${SED_EXPR}" toolchain.versions.yml | head -n1 | xargs)"
+          test -n "${RUST_VERSION}"
+          printf 'rust_version=%s\n' "${RUST_VERSION}" >> "${GITHUB_OUTPUT}"
+
+      - name: Set up Rust toolchain
+        uses: dtolnay/rust-toolchain@e97e2d8cc328f1b50210efc529dca0028893a2d9 # v1
+        with:
+          toolchain: ${{ steps.rust-version.outputs.rust_version }}
+
+      - name: Build the existing API target with runner-native libraries
+        working-directory: apps/api
+        run: |
+          commit="$(git rev-parse HEAD)"
+          build_timestamp="$(git show -s --format=%cI "$commit")"
+          GIT_COMMIT_SHA="$commit" \
+            BUILD_TIMESTAMP="$build_timestamp" \
+            cargo build --locked --release --bin weltgewebe-api
