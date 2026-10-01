@@ -18,7 +18,7 @@ fi
 CANDIDATE=$(mktemp)
 
 # Invoked indirectly by the EXIT trap below.
-# shellcheck disable=SC2317
+# shellcheck disable=SC2317,SC2329
 cleanup_candidate() {
   rc=$?
   trap - EXIT

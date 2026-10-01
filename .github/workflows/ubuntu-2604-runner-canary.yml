@@ -33,12 +33,10 @@ jobs:
 
       - name: Record runner and source identity
         run: |
-          {
-            echo "### metarepo"
-            echo
-            echo "- source: `$(git rev-parse HEAD)`"
-            echo "- runner: `$(. /etc/os-release && printf '%s %s' "$NAME" "$VERSION_ID")`"
-          } >> "$GITHUB_STEP_SUMMARY"
+          printf '### metarepo\n\n- source: `%s`\n- runner: `%s`\n' \
+            "$(git rev-parse HEAD)" \
+            "$(. /etc/os-release && printf '%s %s' "$NAME" "$VERSION_ID")" \
+            >> "$GITHUB_STEP_SUMMARY"
 
       - name: Install ShellCheck
         run: sudo apt-get update -yqq && sudo apt-get install -yqq shellcheck
@@ -65,12 +63,10 @@ jobs:
 
       - name: Record runner and source identity
         run: |
-          {
-            echo "### wgx"
-            echo
-            echo "- source: `$(git rev-parse HEAD)`"
-            echo "- runner: `$(. /etc/os-release && printf '%s %s' "$NAME" "$VERSION_ID")`"
-          } >> "$GITHUB_STEP_SUMMARY"
+          printf '### wgx\n\n- source: `%s`\n- runner: `%s`\n' \
+            "$(git rev-parse HEAD)" \
+            "$(. /etc/os-release && printf '%s %s' "$NAME" "$VERSION_ID")" \
+            >> "$GITHUB_STEP_SUMMARY"
 
       - name: Install shell tooling
         run: |
@@ -103,12 +99,10 @@ jobs:
 
       - name: Record runner and source identity
         run: |
-          {
-            echo "### repoground"
-            echo
-            echo "- source: `$(git rev-parse HEAD)`"
-            echo "- runner: `$(. /etc/os-release && printf '%s %s' "$NAME" "$VERSION_ID")`"
-          } >> "$GITHUB_STEP_SUMMARY"
+          printf '### repoground\n\n- source: `%s`\n- runner: `%s`\n' \
+            "$(git rev-parse HEAD)" \
+            "$(. /etc/os-release && printf '%s %s' "$NAME" "$VERSION_ID")" \
+            >> "$GITHUB_STEP_SUMMARY"
 
       - name: Set up Python
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
@@ -156,14 +150,12 @@ jobs:
         run: |
           source_sha="$(git rev-parse HEAD)"
           echo "GIT_COMMIT_SHA=$source_sha" >> "$GITHUB_ENV"
-          {
-            echo "### commonthing compose-smoke"
-            echo
-            echo "- source: `$source_sha`"
-            echo "- runner: `$(. /etc/os-release && printf '%s %s' "$NAME" "$VERSION_ID")`"
-            echo "- docker: `$(docker --version)`"
-            echo "- compose: `$(docker compose version)`"
-          } >> "$GITHUB_STEP_SUMMARY"
+          printf '### commonthing compose-smoke\n\n- source: `%s`\n- runner: `%s`\n- docker: `%s`\n- compose: `%s`\n' \
+            "$source_sha" \
+            "$(. /etc/os-release && printf '%s %s' "$NAME" "$VERSION_ID")" \
+            "$(docker --version)" \
+            "$(docker compose version)" \
+            >> "$GITHUB_STEP_SUMMARY"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
@@ -209,12 +201,10 @@ jobs:
 
       - name: Record runner and source identity
         run: |
-          {
-            echo "### commonthing API build"
-            echo
-            echo "- source: `$(git rev-parse HEAD)`"
-            echo "- runner: `$(. /etc/os-release && printf '%s %s' "$NAME" "$VERSION_ID")`"
-          } >> "$GITHUB_STEP_SUMMARY"
+          printf '### commonthing API build\n\n- source: `%s`\n- runner: `%s`\n' \
+            "$(git rev-parse HEAD)" \
+            "$(. /etc/os-release && printf '%s %s' "$NAME" "$VERSION_ID")" \
+            >> "$GITHUB_STEP_SUMMARY"
 
       - name: Install native build dependencies
         run: |
