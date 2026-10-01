@@ -33,7 +33,7 @@ jobs:
 
       - name: Record runner and source identity
         run: |
-          printf '### metarepo\n\n- source: `%s`\n- runner: `%s`\n' \
+          printf "### metarepo\n\n- source: \`%s\`\n- runner: \`%s\`\n" \
             "$(git rev-parse HEAD)" \
             "$(. /etc/os-release && printf '%s %s' "$NAME" "$VERSION_ID")" \
             >> "$GITHUB_STEP_SUMMARY"
@@ -63,7 +63,7 @@ jobs:
 
       - name: Record runner and source identity
         run: |
-          printf '### wgx\n\n- source: `%s`\n- runner: `%s`\n' \
+          printf "### wgx\n\n- source: \`%s\`\n- runner: \`%s\`\n" \
             "$(git rev-parse HEAD)" \
             "$(. /etc/os-release && printf '%s %s' "$NAME" "$VERSION_ID")" \
             >> "$GITHUB_STEP_SUMMARY"
@@ -99,7 +99,7 @@ jobs:
 
       - name: Record runner and source identity
         run: |
-          printf '### repoground\n\n- source: `%s`\n- runner: `%s`\n' \
+          printf "### repoground\n\n- source: \`%s\`\n- runner: \`%s\`\n" \
             "$(git rev-parse HEAD)" \
             "$(. /etc/os-release && printf '%s %s' "$NAME" "$VERSION_ID")" \
             >> "$GITHUB_STEP_SUMMARY"
@@ -150,7 +150,7 @@ jobs:
         run: |
           source_sha="$(git rev-parse HEAD)"
           echo "GIT_COMMIT_SHA=$source_sha" >> "$GITHUB_ENV"
-          printf '### commonthing compose-smoke\n\n- source: `%s`\n- runner: `%s`\n- docker: `%s`\n- compose: `%s`\n' \
+          printf "### commonthing compose-smoke\n\n- source: \`%s\`\n- runner: \`%s\`\n- docker: \`%s\`\n- compose: \`%s\`\n" \
             "$source_sha" \
             "$(. /etc/os-release && printf '%s %s' "$NAME" "$VERSION_ID")" \
             "$(docker --version)" \
@@ -201,7 +201,7 @@ jobs:
 
       - name: Record runner and source identity
         run: |
-          printf '### commonthing API build\n\n- source: `%s`\n- runner: `%s`\n' \
+          printf "### commonthing API build\n\n- source: \`%s\`\n- runner: \`%s\`\n" \
             "$(git rev-parse HEAD)" \
             "$(. /etc/os-release && printf '%s %s' "$NAME" "$VERSION_ID")" \
             >> "$GITHUB_STEP_SUMMARY"
