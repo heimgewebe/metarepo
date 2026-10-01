@@ -1,0 +1,8 @@
+---
+paths:
+  ".github/workflows/ubuntu-2604-runner-canary.yml":
+    ignore:
+      # GitHub already serves ubuntu-26.04, but actionlint v1.7.5 does not
+      # recognize that GitHub-hosted runner label yet. Remove this exception
+      # once the pinned actionlint version recognizes ubuntu-26.04 natively.
+      - 'label "ubuntu-26\.04" is unknown'
