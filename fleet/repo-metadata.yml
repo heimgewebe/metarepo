@@ -49,6 +49,12 @@ repositories:
     scope: codebase-context
     metrics:
       enable: false
+  grabowski:
+    default_branch: main
+    domain: operator
+    scope: agent-execution-and-review
+    metrics:
+      enable: false
   chronik:
     default_branch: main
     domain: chronik

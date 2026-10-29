@@ -2,8 +2,8 @@
 
 <!-- GENERATED FILE - DO NOT EDIT -->
 <!-- Canonical source: fleet/repos.yml -->
-<!-- Fleet SHA-256: 055fbda9e55ab915d5d5a2035693a5cd601ce7c959ee184bb33f09f6205e8bd3 -->
-<!-- Metadata SHA-256: ce38fda3636658e41ac4cb6880cfcfcd52c69d314a72f23217ad1848f03ed0a5 -->
+<!-- Fleet SHA-256: 58f300ebee1def81868cd17aaac80d03b33769a89b03183430181202509c07da -->
+<!-- Metadata SHA-256: fe307aad209e3963d978c8055787068f186487941f1d52bb0e8bb36e4aaa6598 -->
 
 Diese Matrix ist eine menschenlesbare Projektion. Die normative Fleet-Mitgliedschaft liegt ausschließlich in `fleet/repos.yml`; operative Zusatzdaten liegen in `fleet/repo-metadata.yml`.
 
@@ -18,6 +18,7 @@ Diese Matrix ist eine menschenlesbare Projektion. Die normative Fleet-Mitgliedsc
 | semantAH | insights / export | yes |
 | chronik | chronik / ingest | yes |
 | repoground | epistemic / codebase-context | yes |
+| grabowski | operator / agent-execution-and-review | yes |
 | konvergenzregelkreis | Aktives Fleet-Mitglied | yes |
 | leitstand | Aktives Fleet-Mitglied | yes |
 | plexer | Aktives Fleet-Mitglied | yes |

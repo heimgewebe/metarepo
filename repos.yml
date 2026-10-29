@@ -50,6 +50,13 @@ repos:
     scope: codebase-context
     metrics:
       enable: false
+  - name: grabowski
+    url: https://github.com/heimgewebe/grabowski
+    default_branch: main
+    domain: operator
+    scope: agent-execution-and-review
+    metrics:
+      enable: false
   - name: chronik
     url: https://github.com/heimgewebe/chronik
     default_branch: main
