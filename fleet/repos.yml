@@ -13,6 +13,7 @@ repos:
   - name: semantAH
   - name: chronik
   - name: repoground
+  - name: grabowski
   - name: konvergenzregelkreis
   - name: leitstand
   - name: plexer

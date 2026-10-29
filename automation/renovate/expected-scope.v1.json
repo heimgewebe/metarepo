@@ -9,6 +9,7 @@
     "heimgewebe/chronik",
     "heimgewebe/commonthing",
     "heimgewebe/contracts-mirror",
+    "heimgewebe/grabowski",
     "heimgewebe/heim-pc",
     "heimgewebe/konvergenzregelkreis",
     "heimgewebe/leitstand",
@@ -31,7 +32,7 @@
   "sources": {
     "fleet": {
       "path": "fleet/repos.yml",
-      "sha256": "055fbda9e55ab915d5d5a2035693a5cd601ce7c959ee184bb33f09f6205e8bd3"
+      "sha256": "58f300ebee1def81868cd17aaac80d03b33769a89b03183430181202509c07da"
     },
     "policy": {
       "path": "automation/renovate/dependency-updates.v1.yml",
@@ -58,6 +59,11 @@
       "dependabot_version_updates": "none",
       "renovate_version_updates": "enabled",
       "repository": "heimgewebe/contracts-mirror"
+    },
+    {
+      "dependabot_version_updates": "none",
+      "renovate_version_updates": "enabled",
+      "repository": "heimgewebe/grabowski"
     },
     {
       "dependabot_version_updates": "none",
@@ -118,6 +124,7 @@
       "repositories": [
         "chronik",
         "contracts-mirror",
+        "grabowski",
         "heim-pc",
         "konvergenzregelkreis",
         "leitstand",
