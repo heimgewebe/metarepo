@@ -32,7 +32,7 @@
   "sources": {
     "fleet": {
       "path": "fleet/repos.yml",
-      "sha256": "58f300ebee1def81868cd17aaac80d03b33769a89b03183430181202509c07da"
+      "sha256": "6fa4dfb2945a1461b8bf3ffabc48cdf3c477e4bb5c918a8cedc7c8ce758db8ac"
     },
     "policy": {
       "path": "automation/renovate/dependency-updates.v1.yml",

@@ -4,6 +4,7 @@ static:
     - name: commonthing
       url: "https://github.com/heimgewebe/commonthing"
       status: related
+      fleet: true
 
 repos:
   - name: metarepo

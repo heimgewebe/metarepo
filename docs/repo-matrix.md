@@ -2,7 +2,7 @@
 
 <!-- GENERATED FILE - DO NOT EDIT -->
 <!-- Canonical source: fleet/repos.yml -->
-<!-- Fleet SHA-256: 58f300ebee1def81868cd17aaac80d03b33769a89b03183430181202509c07da -->
+<!-- Fleet SHA-256: 6fa4dfb2945a1461b8bf3ffabc48cdf3c477e4bb5c918a8cedc7c8ce758db8ac -->
 <!-- Metadata SHA-256: fe307aad209e3963d978c8055787068f186487941f1d52bb0e8bb36e4aaa6598 -->
 
 Diese Matrix ist eine menschenlesbare Projektion. Die normative Fleet-Mitgliedschaft liegt ausschließlich in `fleet/repos.yml`; operative Zusatzdaten liegen in `fleet/repo-metadata.yml`.

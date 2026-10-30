@@ -15,7 +15,7 @@ from wgx import repo_config
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "fleet" / "generate_repos_projection.py"
-PROJECTION_SEMANTIC_SHA256 = "5b65a49c7bd8006a722750f9ca0a79027c8f78d2bc10eadf19804cf9dd1e22d3"
+PROJECTION_SEMANTIC_SHA256 = "e088bd7744eda998670c086d9c09acec83eca5a6dd3a75923ce25edc5b0cf5ca"
 SPEC = importlib.util.spec_from_file_location("generate_repos_projection", SCRIPT)
 assert SPEC and SPEC.loader
 MODULE = importlib.util.module_from_spec(SPEC)
@@ -41,7 +41,7 @@ def test_projection_is_loadable_by_existing_legacy_consumers() -> None:
 
     assert projection["mode"] == "static"
     assert projection["github"]["owner"] == "heimgewebe"
-    assert len(projection["repos"]) == 7
+    assert len(projection["repos"]) == 8
     assert projection["archived_references"] == []
 
 def test_projection_pins_complete_compatibility_semantics() -> None:
@@ -70,6 +70,7 @@ def test_projection_preserves_legacy_consumer_shape() -> None:
         "semantAH",
         "wgx",
         "repoground",
+        "grabowski",
         "chronik",
     ]
     assert all(
