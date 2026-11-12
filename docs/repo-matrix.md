@@ -2,7 +2,7 @@
 
 <!-- GENERATED FILE - DO NOT EDIT -->
 <!-- Canonical source: fleet/repos.yml -->
-<!-- Fleet SHA-256: 6fa4dfb2945a1461b8bf3ffabc48cdf3c477e4bb5c918a8cedc7c8ce758db8ac -->
+<!-- Fleet SHA-256: d8604520fc1f60f2355ff5cf0f87b16daa4d43914fc1e3e3422ec1cc2724e3f6 -->
 <!-- Metadata SHA-256: fe307aad209e3963d978c8055787068f186487941f1d52bb0e8bb36e4aaa6598 -->
 
 Diese Matrix ist eine menschenlesbare Projektion. Die normative Fleet-Mitgliedschaft liegt ausschließlich in `fleet/repos.yml`; operative Zusatzdaten liegen in `fleet/repo-metadata.yml`.
@@ -24,6 +24,7 @@ Diese Matrix ist eine menschenlesbare Projektion. Die normative Fleet-Mitgliedsc
 | plexer | Aktives Fleet-Mitglied | yes |
 | heim-pc | Aktives Fleet-Mitglied | yes |
 | commonthing | aussen / events | yes |
+| schauwerk | Aktives Fleet-Mitglied | yes |
 
 ## Historische Spender (Non-Fleet)
 
