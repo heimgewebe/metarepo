@@ -5,6 +5,10 @@ static:
       url: "https://github.com/heimgewebe/commonthing"
       status: related
       fleet: true
+    - name: schauwerk
+      url: "https://github.com/heimgewebe/schauwerk"
+      status: related
+      fleet: true
 
 repos:
   - name: metarepo
