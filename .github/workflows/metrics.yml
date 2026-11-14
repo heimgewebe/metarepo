@@ -4,15 +4,15 @@
 # wgx-metrics.yml so the two cannot drift apart.
 # Canonical schema: contracts/metrics.snapshot.schema.json (ADR-0007).
 
-name: "📊 Metrics Snapshot & Validation"
+name: "WGX metrics contract fixture (manual only)"
 permissions:
   contents: read          # Repo lesen, um Skripte auszuführen
   actions: write          # notwendig für upload-artifact
   checks: write
 'on':
   workflow_dispatch:
-  schedule:
-    - cron: "0 * * * *"
+  # Intentionally no schedule: this verifies synthetic runner-local data,
+  # not the actual Heim-PC, Fleet backups, updates or operational health.
 
 defaults:
   run:
