@@ -1,326 +1,55 @@
-# Heimgewebe – Nutzung & täglicher Betrieb
+# Heimgewebe – Nutzung und täglicher Betrieb
 
-Heimgewebe ist ein verteiltes System aus mehreren Repos, das zusammen wie ein
-autopoetischer KI-Organismus funktioniert:
+Diese Seite ist eine **Orientierung, keine Live-Status- oder Steuerungsquelle**. Sie ersetzt die frühere Organismus-Anleitung mit nicht mehr gültigen WGX-Kommandos, Meta-Agenten und Rollenbildern. Ob eine Funktion gerade läuft, ergibt sich nur aus ihren Primärquellen.
 
-- **metarepo** – Control-Plane (Contracts, CI-Vorlagen, Fleet-Definition)
-- **wgx** – Werkzeugkasten und Fleet-Motorik
-- **semantAH** – semantischer Index und Insights
-- **chronik** – Ereignisspeicher (Event-Log, Audit)
-- **leitstand** – UI / Dashboard
-- **repoground** und **plexer** – verifizierbarer Kontext und Routing
-- **commonThing** – verwandte öffentliche Web-Schicht
+## Wo finde ich die zuständige Funktion?
 
-Die physisch gelöschten Repositories HausKI, Aussensensor, Vault-Gewebe,
-Mitschreiber, Heimgeist, Heimlern und Sichter gehören nicht mehr zur aktiven Fleet.
-Historische Verträge und Evidenz dürfen ihre Namen weiterhin als Provenienz führen.
+| Frage | Zuständige Quelle |
+| --- | --- |
+| Welche Systeme gibt es und wofür sind sie zuständig? | [Systemkatalog](https://github.com/heimgewebe/systemkatalog) |
+| Welche Repositories gehören zur definierten Fleet? | [Metarepo `fleet/repos.yml`](../fleet/repos.yml) |
+| Wo liegen gemeinsame Schemas, Vorlagen und CI-Workflows? | [Metarepo `contracts/`](../contracts/) und `.github/workflows/` |
+| Was ist in Git, PRs, Reviews und CI tatsächlich passiert? | GitHub und die konkrete Repository-Revision |
+| Welche Aufgaben sind reserviert, ausführbar oder abgeschlossen? | [Bureau](https://github.com/heimgewebe/bureau) |
+| Wer führt lokale Änderungen, Service- und Diagnosearbeiten aus? | [Grabowski](https://github.com/heimgewebe/grabowski) |
+| Wo finde ich frühere Reparaturen und Ereignisse? | [Chronik](https://github.com/heimgewebe/chronik), append-only, historische Evidenz |
+| Wie erhalte ich reproduzierbaren Quellcodekontext für Agenten? | [RepoGround](https://github.com/heimgewebe/repoground), Bundles und Retrieval |
+| Wie prüfe ich deklarierte Repository-Tasks? | [WGX](https://github.com/heimgewebe/wgx), lokaler Verifikationsrunner |
+| Wo werden Ereignisse weitergeleitet? | [Plexer](https://github.com/heimgewebe/plexer), Ereignis-Gateway |
+| Wo gibt es eine zusammengefasste Betriebsanzeige? | [Leitstand](https://github.com/heimgewebe/leitstand), read-only |
+| Wo liegen semantischer Index und Wissensgraph? | [semantAH](https://github.com/heimgewebe/semantAH) |
+| Wo liegt das eigenständige gesellschaftliche Produkt? | [commonThing](https://github.com/heimgewebe/commonthing) |
 
-Dieses Dokument erklärt:
+**Autoritätsgrenze:** Metarepo definiert Fleet-Mitgliedschaft und geteilte Verträge, aber weder die globale Systemarchitektur noch Aufgaben-/Deploy-Wahrheit. WGX koordiniert keine Fleet und besitzt keine generische Host- oder Ausführungsautorität.
 
-1. Wie du Heimgewebe im Alltag benutzt.
-2. Welche Features es gibt.
-3. Wo die jeweiligen Repos und Dokumente zu finden sind.
+## Typischer Ablauf
 
----
+1. **Ziel abgrenzen:** Repository, Dienst oder konkreten Nutzerweg bestimmen.
+2. **Historie lesen:** Bei Heimgewebe-Arbeit gezielt nach relevanten Chronik-Entscheidungen, Fehlschlägen und Reparaturen suchen.
+3. **Gegenwart prüfen:** Exakten Git-Stand, offenen PR, CI, Leases, laufenden Dienst und gegebenenfalls echten Client durch ihre jeweiligen Primärquellen prüfen.
+4. **Kleinste wirksame Änderung ausführen:** Repository-Validierung mit WGX; operative Host-, Checkout- und Serviceänderungen über Grabowski; Aufgaben-/Kollisionsabgleich über Bureau.
+5. **Wirkung nachweisen:** Tests, aktualisierten Commit, PR-Status, tatsächliches Deployment, Laufzeitfunktion und bei riskanter Änderung Restore separat belegen.
+6. **Ergebnis dokumentieren:** Relevante Erkenntnisse und bestätigte Fehlerursachen mit Quellen in der Chronik festhalten. Nicht aus dem Merge allein auf Produktnutzen schließen.
 
-## 1. Schnellstart – „Wie bediene ich das Ding?“
+## WGX – tatsächlich unterstützte Befehle
 
-### 1.1 Mindset
+WGX liest die `.wgx/profile.yml` des **ausgewählten Ziel-Repositories**. Es besitzt nur drei operative Einstiegspunkte:
 
-Heimgewebe ist **kein Monorepo**, sondern eine Fleet mit klaren Rollen.
-Die Grundidee:
+```bash
+wgx validate --profile quick
+wgx validate --profile full
+wgx tasks
+wgx task smoke
+```
 
-> *metarepo definiert, was richtig ist – wgx sorgt dafür, dass die Repos sich daran halten.*
+`smoke` ist dabei nur ein Beispiel: Der Name muss im jeweiligen Repository-Profil deklariert sein. Es gibt **keine** allgemeinen WGX-Unterbefehle `wgx guard`, `wgx metrics snapshot` oder `wgx bridge` als heutige Produkt-API. Für gemeinsame CI-Workflows gelten die im Metarepo tatsächlich versionierten Dateien, nicht historische Beispielnamen.
 
-Contracts im metarepo legen fest, wie Events, Insights, Metrics aussehen sollen;
-Aktive Repos wie semantAH, chronik und plexer sind Producer oder
-Consumer dieser Datenströme.
+## Repository in die Fleet aufnehmen
 
-### 1.2 Typischer Tagesablauf (Operator-Sicht)
+Die Mitgliedschaft wird in [`fleet/repos.yml`](../fleet/repos.yml) gepflegt. Das neue Repository versieht seine fachlichen Verträge, benötigten Tests und gegebenenfalls sein WGX-Verifikationsprofil selbst mit Versionen. Gemeinsame Schemas und Reusable Workflows werden über Metarepo bezogen. Ein Eintrag im Fleet-Vertrag sagt nichts über einen aktuell gesunden Dienst oder eine erledigte Aufgabe aus.
 
-Ganz grob:
+## Abgelöste Komponenten
 
-1. **Fleet-Status prüfen**
-   - GitHub Actions → `wgx-metrics` und CI-Workflows beobachten.
-   - Optional: Metrics-Snapshots an eine Ingest-URL posten (chronik/leitstand).
+Die früheren Repositories **HausKI, hausKI-audio, Heimgeist, Sichter, Heimlern, Aussensensor, Mitschreiber und Vault-Gewebe** sind keine aktuellen operativen Fleet-Organe. Der frühere Produktname **Lenskit / repoLens / rLens** wurde durch RepoGround ersetzt. Persistierte Schema-IDs, historische Dokumente und unveränderliche Ereignisse dürfen alte Namen weiterhin enthalten, solange die Kompatibilität oder Provenienz sie erfordert.
 
-2. **Wissenslage checken**
-   - `semantAH` erzeugt tägliche Vault-Insights nach
-     `contracts/insights.daily.schema.json`.
-   - Leitstand kann `topics`, `questions` und `deltas` daraus visualisieren.
-
-3. **Events & Incidents ansehen**
-   - `chronik` speichert Events im Format `event.line.schema.json`.
-   - Leitstand liest daraus Dashboards und Tages-Digests.
-
-4. **Arbeit an Repos**
-   - WGX-Befehle nutzen (`wgx guard`, `wgx metrics snapshot` etc.).
-   - aktuelle Operator- und Review-Pfade für Prüfaufgaben nutzen; plexer routet unterstützte Ströme.
-
-Kurzfassung für Dummies:
-> Heimgewebe ist ein Haufen Repos, die so tun, als wären sie ein Körper.
-> metarepo ist das Regelbuch, wgx die Muskeln, semantAH das Bedeutungs-Gedächtnis,
-> chronik das Tagebuch und leitstand die Anzeige.
-
----
-
-## 2. Feature-Übersicht nach Repo (mit Links)
-
-> Hinweis: Die GitHub-Links nehmen `heimgewebe` als Organisation an.
-
-### 2.1 Control-Plane (metarepo)
-
-**Repo:** `heimgewebe/metarepo`
-
-- **Repo-Matrix & Fleet-Übersicht**
-  - Welche Repos es gibt, ihre Rolle (z. B. memorativ, semantisch, politisch) und ihr Reifegrad.
-  - Nutze sie als Einstieg, um zu verstehen, welches Repo wofür zuständig ist.
-
-- **Contracts (Schemas)**
-  - `contracts/event.line.schema.json` – gemeinsames Event-Schema für chronik-kompatible Ereignisse.
-  - `contracts/insights.daily.schema.json` – Schema für semantAH Daily-Insights.
-  - `contracts/insights.schema.json` – Review-Insights (z. B. aus semantAH).
-  - `contracts/dev.tooling.schema.json` – wie Repos ihre Tooling-Umgebung beschreiben (Language, Tests, LSP etc.).
-
-- **Reusable CI-Workflows**
-  - `.github/workflows/wgx-metrics.yml` – Fleet-weiter Metrics-Snapshot.
-  - Weitere Reusables (Guard/Smoke etc.) sind ähnlich aufgebaut und ziehen Schemas per Tag `contracts-v1` aus metarepo.
-
-**Nutzen:**
-metarepo ist die **einzige** Quelle der Wahrheit für Contracts und gemeinsame CI-Bausteine.
-Alle anderen Repos sollten auf diese Dateien verlinken, nicht eigene Varianten pflegen.
-
----
-
-### 2.2 wgx – Fleet-Motorik
-
-**Repo:** `heimgewebe/wgx`
-
-- CLI und Scripte für:
-  - `wgx metrics snapshot` – erzeugt Metrics-Payloads, die gegen `metrics.snapshot.schema.json` validiert werden.
-  - Guard/Smoke-Runs für Repos.
-- Wird in CI über `.github/workflows/wgx-metrics.yml` und andere Reusables aufgerufen.
-
-**Nutzen:**
-wgx macht aus „Organismus“ einen **beweglichen** Organismus: einheitliche Befehle,
-die lokal und in CI gleich funktionieren.
-
----
-
-### 2.3 HausKI – historische Referenz
-
-Das frühere Repository `heimgewebe/hausKI` ist physisch gelöscht und besitzt
-keine aktive Runtime-, Orchestrierungs- oder Consumer-Autorität mehr.
-
-Historische Contracts, Tests und Evidenz dürfen HausKI weiterhin nennen, wenn
-der historische Status ausdrücklich erkennbar ist.
-
----
-
-### 2.4 semantAH – semantischer Index & Insights
-
-**Repo:** `heimgewebe/semantAH`
-
-- Producer für:
-  - `insights.daily` – Tages-Zusammenfassung des Wissenszustands, Schema siehe Contracts.
-  - `insights` – Review-Insights (z. B. aus Code-Analyse).
-- Arbeitet gegen konfigurierte Vault-Pfade und andere Quellen; daraus folgt keine
-  Abhängigkeit vom gelöschten Repository Vault-Gewebe.
-
-**Nutzen:**
-semantAH beantwortet die Frage: **„Was ist gerade wichtig?“**
-Leitstand kann diese Informationen darstellen; weitere Consumer binden sich über
-aktuelle Contracts und den Systemkatalog.
-
----
-
-### 2.5 chronik – Ereignisspeicher
-
-**Repo:** `heimgewebe/chronik`
-
-- Speichert Events im JSONL-Format gemäß `event.line.schema.json`.
-- Ist Consumer von:
-  - `insights.daily` (Tages-Zusammenfassungen)
-  - `insights` (Review-Insights)
-- Dient als Audit-Log und Basis für Leitstand-Dashboards.
-
-**Nutzen:**
-chronik ist das **Langzeit-Gedächtnis**.
-Ohne chronik wüsste niemand mehr, was gestern schiefgelaufen ist – außer deinem Gefühl,
-und das ist notoriously nicht CI-kompatibel.
-
----
-
-### 2.6 leitstand – Dashboard & Digests
-
-**Repo:** `heimgewebe/leitstand`
-
-- UI-Schicht für:
-  - Fleet-Health (wgx-Metrics, CI-Status)
-  - Tages-Digest aus `insights.daily`
-  - Event-Ansichten aus `chronik`
-- Arbeitet nur über dokumentierte Gateways (kein Direktzugriff auf rohe Files).
-
-**Nutzen:**
-leitstand ist das **Gesicht** des Heimgewebes – der Ort, an dem die
-ganzen JSONs zu einem Bild werden.
-
----
-
-### 2.7 Aussensensor – historische Referenz
-
-Das frühere Repository `heimgewebe/aussensensor` ist physisch gelöscht.
-Seine früheren Event-Verträge bleiben nur als historische Provenienz erhalten;
-es ist kein aktueller Feed-, Telemetrie- oder Producer-Pfad.
-
----
-
-### 2.8 Heimlern – historische Policy-Referenz
-
-Das frühere Repository `heimgewebe/heimlern` ist physisch gelöscht.
-Erhaltene Policy- und Bandit-Evidenz dient ausschließlich als historischer Beleg.
-Es besitzt keine aktive Runtime-, Routing-, Queue- oder Produktionsautorität;
-aktuelle Zuständigkeiten stehen im Systemkatalog.
-
----
-
-### 2.9 Vault-Gewebe – historische Referenz
-
-Das frühere Repository `heimgewebe/vault-gewebe` ist physisch gelöscht.
-SemantAH kann weiterhin konfigurierte lokale Vault-Pfade indexieren; daraus darf
-keine aktuelle Repository-Abhängigkeit zu Vault-Gewebe abgeleitet werden.
-
----
-
-### 2.10 commonThing – öffentliche Web-Schicht
-
-**Repo:** `heimgewebe/commonthing`
-
-- Docs-first Web-Projekt (SvelteKit + Rust/Axum + Postgres, JetStream, Caddy).
-- Dient als **öffentliche Oberfläche** für Teile des Heimgewebes, mit klaren Gates
-(A–D), welche Daten überhaupt hinaus dürfen.
-
-**Nutzen:**
-commonThing ist die **Haut** nach außen: nur das, was durch die Gates geht,
-wird öffentlich sichtbar.
-
----
-
-### 2.11 RepoGround – verifizierbarer Codebase-Kontext
-
-**Repo:** `heimgewebe/repoground`
-
-- Enthält:
-  - Merging-Tools (z. B. repomerger, wc-merger) zur Snapshot-Erstellung.
-  - Scanner-/Merger-Läufe für Fleet-weite Snapshot- und Report-Bildung.
-- Wird von metarepo/wgx genutzt, um Org-Assets zu generieren (z. B. Tabellen aus `repos.yml`).
-
-**Nutzen:**
-RepoGround erzeugt **verifizierbaren Codebase-Kontext**: konsistente Snapshots
-und mehrstufige Artefakte für Analyse, Reflexion und Agentenbetrieb.
-
----
-
-### 2.12 Reflektions- und Meta-Organe
-
-#### Sichter – historisch
-
-Das frühere Repository `heimgewebe/sichter` wurde physisch gelöscht. Es besitzt keine aktuelle Review-, PR-Automations-, Fleet- oder Runtime-Autorität. Verbliebene Contracts und Dokumente dienen ausschließlich als historische Provenienz.
-
-#### Mitschreiber – historisch
-
-Das frühere Repository `heimgewebe/mitschreiber` ist physisch gelöscht.
-Verbliebene Contracts oder Beispiele sind historische Provenienz, keine aktuelle
-Schreib- oder Consumer-Fläche.
-
-#### Heimgeist – historisch
-
-Das frühere Repository `heimgewebe/heimgeist` ist physisch gelöscht.
-Es besitzt keine aktive Meta-Agent-, Runtime- oder Consumer-Autorität.
-
-#### plexer
-
-**Repo:** `heimgewebe/plexer`
-
-- „Kreuzschiene“ für Ströme: verteilt Befehle und Events an die richtigen Organe.
-
-**Nutzen insgesamt:**
-Plexer bleibt eine aktive Routing-Fläche. Sichter, Mitschreiber und Heimgeist sind nur noch historische Referenzen.
-
----
-
-## 3. Typische Workflows (How-Tos)
-
-### 3.1 Neues Repo in die Fleet aufnehmen
-
-1. Repo in `heimgewebe` Organisation anlegen.
-2. Im metarepo in der Repo-Matrix eintragen (Rolle, Status).
-3. `.wgx/profile.yml` definieren (Sprache, Tests, CI-Erwartungen).
-4. Reusable Workflows aus metarepo einbinden:
-   - `wgx-metrics.yml` für Metrics-Snapshots.
-   - Guard/Smoke (falls vorhanden) für Basis-Checks.
-
-Ergebnis: das Repo wird automatisch in Fleet-Metriken und Leitstand-Sichten auftauchen.
-
----
-
-### 3.2 Metrics-Snapshot eines Repos erzeugen
-
-1. In der CI des Repos:
-
-   ```yaml
-   jobs:
-     metrics:
-       uses: heimgewebe/metarepo/.github/workflows/wgx-metrics.yml@contracts-v1
-   ```
-
-2. Optional: post_url setzen, damit der Snapshot direkt in eine chronik/leitstand-Ingest-Route wandert.
-
----
-
-### 3.3 Tägliche Vault-Insights erzeugen
-
-1. Vault-Pfad über VAULT_ROOT setzen.
-2. semantAH-Script laufen lassen (z. B. per Timer):
-
-   ```bash
-   export VAULT_ROOT=/pfad/zum/vault
-   python scripts/export_insights.py
-   ```
-
-3. Ergebnis:
-   - `$VAULT_ROOT/.gewebe/insights/daily/YYYY-MM-DD.json`
-   - `$VAULT_ROOT/.gewebe/insights/today.json`
-4. Leitstand kann diese Dateien im Schema von `insights.daily.schema.json` darstellen.
-
----
-
-## 4. Verdichtete Essenz
-
-- metarepo definiert Contracts und Reusable CI.
-- wgx führt Befehle Fleet-weit konsistent aus.
-- semantAH und chronik bilden semantisches Gedächtnis und Ereignisspur.
-- leitstand und commonThing sind Anzeige- und Web-Flächen.
-- plexer liefert aktive Routing-Funktionen; Prüf- und Review-Autorität folgt den aktuellen Operatorverträgen.
-- HausKI, Aussensensor, Vault-Gewebe, Mitschreiber, Heimgeist, Heimlern und Sichter
-  sind physisch gelöscht; erhaltene Nennungen dienen nur historischer Evidenz.
-
-Heimgewebe wird benutzbar, wenn:
-
-Contracts im metarepo + wgx-Kommandos + chronik-Events + semantAH-Insights
-→ regelmäßig laufen und im Leitstand sichtbar werden.
-
----
-
-## 5. Ungewissheitsanalyse
-
-- Unsicherheitsgrad: ca. 0,3
-- Mögliche Abweichungen:
-  - Repo-Struktur kann sich seit dem letzten Merge geändert haben.
-  - Einige Leitstand- und Integrationsfunktionen können noch konzeptionell oder
-    nur teilweise umgesetzt sein.
-  - Die hier genannten CI-Snippets basieren auf der aktuellen
-`wgx-metrics.yml`-Struktur; künftige Versionen könnten Inputs/Defaults ändern.
-
-Trotzdem ist das README eine brauchbare Landkarte, um im Heimgewebe
-nicht mehr ständig in den Gedärmen des Organismus nach der richtigen Datei zu suchen.
+Ältere detaillierte Anleitungen bleiben in der Git-Historie dieser Datei nachvollziehbar. Vor jeder Übernahme historischer Befehle ist die tatsächlich vorhandene CLI und die zuständige Primärquelle zu prüfen.
