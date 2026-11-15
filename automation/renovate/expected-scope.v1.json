@@ -12,12 +12,9 @@
     "heimgewebe/grabowski",
     "heimgewebe/heim-pc",
     "heimgewebe/konvergenzregelkreis",
-    "heimgewebe/leitstand",
     "heimgewebe/metarepo",
-    "heimgewebe/plexer",
     "heimgewebe/repoground",
     "heimgewebe/schauwerk",
-    "heimgewebe/semantAH",
     "heimgewebe/wgx"
   ],
   "kind": "renovate-fleet-scope-projection",
@@ -33,7 +30,7 @@
   "sources": {
     "fleet": {
       "path": "fleet/repos.yml",
-      "sha256": "d8604520fc1f60f2355ff5cf0f87b16daa4d43914fc1e3e3422ec1cc2724e3f6"
+      "sha256": "36adab74da33db4513190661c4664ba00e78cf5661abb9a0026c36170d39ce20"
     },
     "policy": {
       "path": "automation/renovate/dependency-updates.v1.yml",
@@ -77,19 +74,9 @@
       "repository": "heimgewebe/konvergenzregelkreis"
     },
     {
-      "dependabot_version_updates": "none",
-      "renovate_version_updates": "enabled",
-      "repository": "heimgewebe/leitstand"
-    },
-    {
       "dependabot_version_updates": "disabled",
       "renovate_version_updates": "enabled",
       "repository": "heimgewebe/metarepo"
-    },
-    {
-      "dependabot_version_updates": "none",
-      "renovate_version_updates": "enabled",
-      "repository": "heimgewebe/plexer"
     },
     {
       "dependabot_version_updates": "disabled",
@@ -100,11 +87,6 @@
       "dependabot_version_updates": "none",
       "renovate_version_updates": "enabled",
       "repository": "heimgewebe/schauwerk"
-    },
-    {
-      "dependabot_version_updates": "none",
-      "renovate_version_updates": "enabled",
-      "repository": "heimgewebe/semantAH"
     },
     {
       "dependabot_version_updates": "none",
@@ -133,10 +115,7 @@
         "grabowski",
         "heim-pc",
         "konvergenzregelkreis",
-        "leitstand",
-        "plexer",
         "schauwerk",
-        "semantAH",
         "wgx"
       ],
       "selector": "remaining-eligible-active-fleet"

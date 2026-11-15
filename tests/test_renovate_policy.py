@@ -29,26 +29,23 @@ def _inputs():
 
 def test_current_policy_preset_baseline_and_projection_are_valid() -> None:
     projection, summary = renovate_policy.validate_all()
-    assert summary == {"active_fleet_count": 14, "explicit_rollout_count": 4}
+    assert summary == {"active_fleet_count": 11, "explicit_rollout_count": 4}
     assert projection["runtime_mode"] == "self-hosted-heim-pc"
     assert projection["credential_source"] == "gh-auth-token-transient"
     assert projection["expected_hosted_app_repositories"] == []
     assert projection["prepared_repositories"] == []
-    assert len(projection["expected_renovate_repositories"]) == 14
+    assert len(projection["expected_renovate_repositories"]) == 11
     assert set(projection["expected_renovate_repositories"]) == {
         "heimgewebe/commonthing",
         "heimgewebe/metarepo",
         "heimgewebe/wgx",
         "heimgewebe/contracts-mirror",
         "heimgewebe/audio",
-        "heimgewebe/semantAH",
         "heimgewebe/chronik",
         "heimgewebe/repoground",
         "heimgewebe/schauwerk",
         "heimgewebe/grabowski",
         "heimgewebe/konvergenzregelkreis",
-        "heimgewebe/leitstand",
-        "heimgewebe/plexer",
         "heimgewebe/heim-pc",
     }
     committed = json.loads(

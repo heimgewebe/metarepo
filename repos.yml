@@ -29,13 +29,6 @@ repos:
       profile_expected: false
     integrity:
       enabled: false
-  - name: semantAH
-    url: https://github.com/heimgewebe/semantAH
-    default_branch: main
-    domain: insights
-    scope: export
-    metrics:
-      enable: false
   - name: wgx
     url: https://github.com/heimgewebe/wgx
     default_branch: main

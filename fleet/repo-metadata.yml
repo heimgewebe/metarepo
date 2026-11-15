@@ -31,12 +31,6 @@ repositories:
       profile_expected: false
     integrity:
       enabled: false
-  semantAH:
-    default_branch: main
-    domain: insights
-    scope: export
-    metrics:
-      enable: false
   wgx:
     default_branch: main
     domain: platform

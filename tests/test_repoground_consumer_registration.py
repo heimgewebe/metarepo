@@ -30,10 +30,20 @@ def test_active_fleet_surfaces_use_repoground_identity() -> None:
 def test_dispatch_keeps_legacy_aliases_but_targets_repoground() -> None:
     workflow = _read(".github/workflows/heimgewebe-command-dispatch.yml")
 
-    assert "leitstand,repoground" in workflow
+    assert "chronik,repoground" in workflow
     assert '["tools", "lenskit"].includes(targetRepo)' in workflow
     assert "Bitte nutze **repoground**" in workflow
     assert "leitstand,lenskit" not in workflow
+    archived_repos = workflow.split("const archivedRepos = new Set([", 1)[1].split("]);", 1)[0]
+    for retired in (
+        "semantah",
+        "plexer",
+        "leitstand",
+        "obsidian-bridge",
+        "alpha-lab",
+        "capacity-marketplace",
+    ):
+        assert f'"{retired}"' in archived_repos
 
 
 def test_repo_identity_guard_does_not_require_pcre2() -> None:
