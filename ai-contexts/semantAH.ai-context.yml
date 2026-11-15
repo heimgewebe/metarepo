@@ -11,7 +11,7 @@ project:
 heimgewebe:
   axis: [Semantik, Events]
   fleet:
-    enabled: true
+    enabled: false
   wgx:
     profile_expected: true
     guard_smoke_expected: true

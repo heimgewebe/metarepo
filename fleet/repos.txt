@@ -2,13 +2,10 @@ metarepo
 wgx
 contracts-mirror
 audio
-semantAH
 chronik
 repoground
 grabowski
 konvergenzregelkreis
-leitstand
-plexer
 heim-pc
 commonthing
 schauwerk

@@ -155,3 +155,12 @@ def test_drift_guard_propagates_generator_failure_without_mutating_tracked_repor
     assert result.returncode == 7
     assert "Generator script failed" in result.stdout
     assert report.read_bytes() == original
+
+
+def test_committed_integrity_sources_match_active_fleet(tmp_path: Path) -> None:
+    """Prevent green PR CI from shipping stale integration discovery."""
+    candidate = tmp_path / "sources.v1.json"
+    result = _run_generator(ROOT, "--output", str(candidate))
+    assert result.returncode == 0, result.stderr
+    committed = ROOT / "reports" / "integrity" / "sources.v1.json"
+    assert candidate.read_bytes() == committed.read_bytes()

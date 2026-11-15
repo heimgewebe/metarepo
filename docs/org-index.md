@@ -12,5 +12,4 @@ Quelle: [`repos.yml`](../repos.yml).
 | [contracts-mirror](https://github.com/heimgewebe/contracts-mirror) | main | contracts | schema | – | – |
 | [grabowski](https://github.com/heimgewebe/grabowski) | main | operator | agent-execution-and-review | – | – |
 | [repoground](https://github.com/heimgewebe/repoground) | main | epistemic | codebase-context | – | – |
-| [semantAH](https://github.com/heimgewebe/semantAH) | main | insights | export | – | – |
 | [wgx](https://github.com/heimgewebe/wgx) | main | platform | metrics | ✅ | – |

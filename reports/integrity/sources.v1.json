@@ -1,6 +1,6 @@
 {
   "apiVersion": "integrity.sources.v1",
-  "generated_at": "2026-09-21T06:01:03Z",
+  "generated_at": "2026-11-15T09:43:11Z",
   "sources": [
     {
       "repo": "heimgewebe/audio",
@@ -23,6 +23,11 @@
       "enabled": true
     },
     {
+      "repo": "heimgewebe/grabowski",
+      "summary_url": "https://github.com/heimgewebe/grabowski/releases/download/integrity/summary.json",
+      "enabled": true
+    },
+    {
       "repo": "heimgewebe/heim-pc",
       "summary_url": "https://github.com/heimgewebe/heim-pc/releases/download/integrity/summary.json",
       "enabled": true
@@ -33,18 +38,8 @@
       "enabled": true
     },
     {
-      "repo": "heimgewebe/leitstand",
-      "summary_url": "https://github.com/heimgewebe/leitstand/releases/download/integrity/summary.json",
-      "enabled": true
-    },
-    {
       "repo": "heimgewebe/metarepo",
       "summary_url": "https://github.com/heimgewebe/metarepo/releases/download/integrity/summary.json",
-      "enabled": true
-    },
-    {
-      "repo": "heimgewebe/plexer",
-      "summary_url": "https://github.com/heimgewebe/plexer/releases/download/integrity/summary.json",
       "enabled": true
     },
     {
@@ -53,8 +48,8 @@
       "enabled": true
     },
     {
-      "repo": "heimgewebe/semantAH",
-      "summary_url": "https://github.com/heimgewebe/semantAH/releases/download/integrity/summary.json",
+      "repo": "heimgewebe/schauwerk",
+      "summary_url": "https://github.com/heimgewebe/schauwerk/releases/download/integrity/summary.json",
       "enabled": true
     },
     {
