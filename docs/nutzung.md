@@ -15,9 +15,6 @@ Diese Seite ist eine **Orientierung, keine Live-Status- oder Steuerungsquelle**.
 | Wo finde ich frühere Reparaturen und Ereignisse? | [Chronik](https://github.com/heimgewebe/chronik), append-only, historische Evidenz |
 | Wie erhalte ich reproduzierbaren Quellcodekontext für Agenten? | [RepoGround](https://github.com/heimgewebe/repoground), Bundles und Retrieval |
 | Wie prüfe ich deklarierte Repository-Tasks? | [WGX](https://github.com/heimgewebe/wgx), lokaler Verifikationsrunner |
-| Wo werden Ereignisse weitergeleitet? | [Plexer](https://github.com/heimgewebe/plexer), Ereignis-Gateway |
-| Wo gibt es eine zusammengefasste Betriebsanzeige? | [Leitstand](https://github.com/heimgewebe/leitstand), read-only |
-| Wo liegen semantischer Index und Wissensgraph? | [semantAH](https://github.com/heimgewebe/semantAH) |
 | Wo liegt das eigenständige gesellschaftliche Produkt? | [commonThing](https://github.com/heimgewebe/commonthing) |
 
 **Autoritätsgrenze:** Metarepo definiert Fleet-Mitgliedschaft und geteilte Verträge, aber weder die globale Systemarchitektur noch Aufgaben-/Deploy-Wahrheit. WGX koordiniert keine Fleet und besitzt keine generische Host- oder Ausführungsautorität.
