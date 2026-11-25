@@ -77,7 +77,15 @@ def _run_guard(repo: Path) -> subprocess.CompletedProcess[str]:
     env = os.environ.copy()
     # Keep the fixture deterministic and exercise the portable python3 path,
     # independent of whether the development machine has uv in ~/.local/bin.
-    env["PATH"] = "/usr/bin:/bin"
+    # Expose only the actual utilities this fixture needs; uv must stay absent.
+    tools = repo.parent / "guard-tools"
+    tools.mkdir()
+    for name in ("dirname", "mktemp", "rm", "cmp", "diff"):
+        executable = shutil.which(name)
+        assert executable is not None, name
+        (tools / name).symlink_to(executable)
+    (tools / "python3").symlink_to(sys.executable)
+    env["PATH"] = str(tools)
     return subprocess.run(
         [BASH, "scripts/check-integrity-drift.sh"],
         cwd=repo,
