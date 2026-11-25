@@ -82,7 +82,7 @@ exit 0
     )
 
     env = os.environ.copy()
-    env["PATH"] = f"{fake_bin}:/usr/bin:/bin"
+    env["PATH"] = os.pathsep.join((str(fake_bin), os.environ["PATH"]))
     return repo, env
 
 

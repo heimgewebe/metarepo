@@ -4,8 +4,15 @@ set -euo pipefail
 RENOVATE_VERSION="42.99.0"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONFIG_FILE="${SCRIPT_DIR}/runtime-config.cjs"
-NPX_BIN="${RENOVATE_NPX_BIN:-/usr/bin/npx}"
-DEFAULT_TOOL_PATH="${HOME}/.cargo/bin:${HOME}/.local/bin:${HOME}/.bun/bin:/usr/local/bin:/usr/bin:/bin"
+SYSTEM_TOOL_PATH="/usr/local/bin:/usr/bin:/bin"
+DEFAULT_NPX_BIN="/usr/bin/npx"
+# NixOS system packages are exposed through the active system profile.
+if [[ -d /run/current-system/sw/bin ]]; then
+  SYSTEM_TOOL_PATH="/run/current-system/sw/bin:${SYSTEM_TOOL_PATH}"
+  DEFAULT_NPX_BIN="/run/current-system/sw/bin/npx"
+fi
+NPX_BIN="${RENOVATE_NPX_BIN:-${DEFAULT_NPX_BIN}}"
+DEFAULT_TOOL_PATH="${HOME}/.cargo/bin:${HOME}/.local/bin:${HOME}/.bun/bin:${SYSTEM_TOOL_PATH}"
 export PATH="${RENOVATE_TOOL_PATH:-${DEFAULT_TOOL_PATH}}"
 
 RUNTIME_DIR="${RENOVATE_XDG_RUNTIME_DIR:-${XDG_RUNTIME_DIR:-/run/user/$(id -u)}}"

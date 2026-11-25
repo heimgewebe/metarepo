@@ -70,7 +70,9 @@ def _assert_runtime_contract(
 
 def test_runner_defaults_to_system_npx_and_forwards_runtime_contract(tmp_path: Path) -> None:
     runner_text = RUNNER.read_text(encoding="utf-8")
-    assert 'NPX_BIN="${RENOVATE_NPX_BIN:-/usr/bin/npx}"' in runner_text
+    assert 'NPX_BIN="${RENOVATE_NPX_BIN:-${DEFAULT_NPX_BIN}}"' in runner_text
+    assert 'DEFAULT_NPX_BIN="/usr/bin/npx"' in runner_text
+    assert 'DEFAULT_NPX_BIN="/run/current-system/sw/bin/npx"' in runner_text
     assert 'export PATH="${RENOVATE_TOOL_PATH:-${DEFAULT_TOOL_PATH}}"' in runner_text
     assert 'export DBUS_SESSION_BUS_ADDRESS="unix:path=${RUNTIME_DIR}/bus"' in runner_text
     assert 'export GIT_CONFIG_KEY_0=core.hooksPath' in runner_text
@@ -86,7 +88,7 @@ def test_runner_defaults_to_system_npx_and_forwards_runtime_contract(tmp_path: P
     _fake_gh(fake_gh)
     _fake_npx(fake_npx)
 
-    custom_path = f"{fake_bin}:/usr/bin:/bin"
+    custom_path = os.pathsep.join((str(fake_bin), os.environ["PATH"]))
     runtime_dir = tmp_path / "runtime"
     runtime_dir.mkdir()
     env = os.environ.copy()
@@ -127,10 +129,13 @@ def test_runner_supplies_user_tools_in_systemd_environment(tmp_path: Path) -> No
 
     env = os.environ.copy()
     env.pop("RENOVATE_TOOL_PATH", None)
+    system_path = "/usr/local/bin:/usr/bin:/bin"
+    if Path("/run/current-system/sw/bin").is_dir():
+        system_path = f"/run/current-system/sw/bin:{system_path}"
     env.update(
         {
             "HOME": str(home),
-            "PATH": "/usr/bin:/bin",
+            "PATH": system_path,
             "RENOVATE_NPX_BIN": str(fake_npx),
             "RENOVATE_XDG_RUNTIME_DIR": str(runtime_dir),
             "CAPTURE_DIR": str(capture),
@@ -148,7 +153,7 @@ def test_runner_supplies_user_tools_in_systemd_environment(tmp_path: Path) -> No
         capture_output=True,
     )
 
-    expected_path = f"{cargo_bin}:{local_bin}:{bun_bin}:/usr/local/bin:/usr/bin:/bin"
+    expected_path = f"{cargo_bin}:{local_bin}:{bun_bin}:{system_path}"
     _assert_runtime_contract(capture, expected_path, runtime_dir)
 
 
